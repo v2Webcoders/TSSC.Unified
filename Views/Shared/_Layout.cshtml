@@ -1,0 +1,51 @@
+﻿@using Microsoft.AspNetCore.Http
+@addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
+@{
+    ViewData["Title"] = "";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Apollo Tyres Contest</title>
+    <link href="/assetsfe/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assetsfe/css/stellarnav.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="/assetsfe/css/owl.carousel.min.css" rel="stylesheet">
+    <link href="/assetsfe/css/owl.theme.default.min.css" rel="stylesheet">
+    <link href="/assetsfe/css/lightcase.css" rel="stylesheet" type="text/css">
+    <link href="/assetsfe/css/seastar.css" rel="stylesheet">
+    <link href="/assetsfe/css/responsive.css" rel="stylesheet">
+    <meta name="_csrf_header" content="${_csrf.headerName}" />
+    <meta name="_csrf" content="${_csrf.token}" />
+</head>
+<body>
+
+    
+   
+    @RenderBody()
+    
+
+    <script src="~/assetsfe/js/jquery.min.js"></script>
+    <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script src="~/assetsfe/js/bootstrap.bundle.min.js"></script>
+    <script src="~/assetsfe/js/stellarnav.min.js"></script>
+    @* <script src="~/assetsfe/js/owl.carousel.js"></script> *@
+    <script src="@Url.Content("~/assetsfe/js/owl.carousel.js")"></script>
+    <script src="~/assetsfe/js/custom.js"></script>
+    @* <script>
+        window.onload = function () {
+            const isMobile = /Android|iPhone|iPad|iPod|Windows Phone|webOS|BlackBerry/i.test(navigator.userAgent);
+
+            if (!isMobile) {
+                document.body.innerHTML = `
+                    <div style="text-align:center; padding:40px; font-size:20px;">
+                        This contest link can be opened only on mobile devices.
+                    </div>
+                `;
+            }
+        };
+    </script> *@
+</body>
+</html>

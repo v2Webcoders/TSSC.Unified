@@ -1,0 +1,1114 @@
+﻿@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<AppUser> UserManager
+@inject SignInManager<AppUser> SignInManager
+
+@{
+	var currentUser = await UserManager.GetUserAsync(User);
+	var name = currentUser?.Name ?? currentUser?.UserName ?? "User";
+	var email = currentUser?.Email ?? "No email";
+	var mobile = currentUser?.MobileNo ?? "NA";
+	var role = currentUser?.UserRole ?? "Admin";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	@* <base href="../"> *@
+	<meta charset="utf-8">
+	<meta name="author" content="Softnio">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="TSSC Unified Portal — Dashboard for Skills, Training & Certification across the Telecom Sector.">
+	<!-- Fav Icon  -->
+	<!--<link rel="shortcut icon" href="./images/favicon.png">-->
+	<!-- Page Title  -->
+	<title>Dashboard | TSSC Unified Portal</title>
+	<!-- StyleSheets  -->
+	<link rel="stylesheet" href="/assets/css/dashlite.css?ver=3.4.0">
+	<link id="skin-default" rel="stylesheet" href="/assets/css/theme.css?ver=3.4.0">
+	<link rel="stylesheet" href="/assets/css/style.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    @RenderSection("Styles", required: false)
+
+</head>
+<body class="nk-body bg-lighter npc-general has-sidebar ">
+    <div class="nk-app-root">
+        <div class="nk-main">
+            <!-- sidebar  -->
+            <div class="nk-sidebar nk-sidebar-fixed is-theme " data-content="sidebarMenu">
+                <div class="nk-sidebar-element nk-sidebar-head">
+                    <div class="nk-menu-trigger">
+                        <a href="javascript:void(0);" class="nk-nav-toggle nk-quick-nav-icon d-xl-none" data-target="sidebarMenu"><em class="icon ni ni-arrow-left"></em></a>
+                        <a href="javascript:void(0);" class="nk-nav-compact nk-quick-nav-icon d-none d-xl-inline-flex" data-target="sidebarMenu"><em class="icon ni ni-menu"></em></a>
+                    </div>
+                    <div class="nk-sidebar-brand">
+                        <a asp-controller="Home" asp-action="Index" class="logo-link nk-sidebar-logo">
+                            <img src="~/assets/images/logo.png" class="img-fluid w-auto" alt="">
+                        </a>
+                    </div>
+                </div><!-- .nk-sidebar-element -->
+                <div class="nk-sidebar-element nk-sidebar-body">
+                    <div class="nk-sidebar-content">
+                        <div class="nk-sidebar-menu" data-simplebar>
+                            <ul class="nk-menu">
+                                <li class="nk-menu-heading">
+                                    <h6 class="overline-title">Main</h6>
+                                </li><!-- .nk-menu-heading -->
+
+                                <li class="nk-menu-item">
+                                    <a href="/Admin/Home/Index" class="nk-menu-link">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-th-large"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Dashboard</span>
+                                    </a>
+                                </li>
+                                <li class="nk-menu-heading">
+                                    <h6 class="overline-title">HR &amp; Operations</h6>
+                                </li><!-- .nk-menu-heading -->
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-users"></i>
+                                        </span>
+                                        <span class="nk-menu-text">HR Module</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/Admin/Dealer/Index" class="nk-menu-link">
+                                                <span class="nk-menu-text">Employee Dashboard</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Hr/Attendance" class="nk-menu-link">
+                                                <span class="nk-menu-text">Mark Attendance</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Hr/RegularizationRequest" class="nk-menu-link">
+                                                <span class="nk-menu-text">Attendance Regularization</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Hr/LeaveRequest" class="nk-menu-link">
+                                                <span class="nk-menu-text">Leave Request</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Hr/OdRequest" class="nk-menu-link">
+                                                <span class="nk-menu-text">OD Request</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Hr/Policies" class="nk-menu-link">
+                                                <span class="nk-menu-text">HR Policy Documents</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Hr/ManagerDashboard" class="nk-menu-link">
+                                                <span class="nk-menu-text">RM / HR Dashboard</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Hr/Approvals" class="nk-menu-link">
+                                                <span class="nk-menu-text">Regularization / Leave / OD Approval</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Hr/ViewAttendance" class="nk-menu-link">
+                                                <span class="nk-menu-text">View Attendance</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Hr/LeaveCalendar" class="nk-menu-link">
+                                                <span class="nk-menu-text">Leave Calendar</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Hr/AdjustLeave" class="nk-menu-link">
+                                                <span class="nk-menu-text">Adjust / Credit Leaves</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Hr/Employees" class="nk-menu-link">
+                                                <span class="nk-menu-text">Employee Management</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Hr/CreatePolicy" class="nk-menu-link">
+                                                <span class="nk-menu-text">Create Policy</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Hr/HolidayCalendar" class="nk-menu-link">
+                                                <span class="nk-menu-text">Holiday Marking</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-laptop"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Asset Management</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/Assets/Dashboard" class="nk-menu-link">
+                                                <span class="nk-menu-text">IT Dashboard</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Assets/Create" class="nk-menu-link">
+                                                <span class="nk-menu-text">Add Asset</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Assets/Allocate" class="nk-menu-link">
+                                                <span class="nk-menu-text">Asset Allocation</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Assets/Tickets" class="nk-menu-link">
+                                                <span class="nk-menu-text">Ticket Management</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Assets/RaiseTicket" class="nk-menu-link">
+                                                <span class="nk-menu-text">Raise Ticket</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-handshake"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Vendor Management</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/Vendor/Register" class="nk-menu-link">
+                                                <span class="nk-menu-text">Vendor Registration</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Vendor/Verify" class="nk-menu-link">
+                                                <span class="nk-menu-text">Vendor Verification</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Vendor/Dashboard" class="nk-menu-link">
+                                                <span class="nk-menu-text">Vendor Dashboard</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nk-menu-heading">
+                                    <h6 class="overline-title">Affiliation &amp; Standards</h6>
+                                </li><!-- .nk-menu-heading -->
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-building"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Affiliation</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/Affiliation/Register" class="nk-menu-link">
+                                                <span class="nk-menu-text">TP Registration</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Affiliation/Index" class="nk-menu-link">
+                                                <span class="nk-menu-text">TP Application Management</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Affiliation/AssignReviewer" class="nk-menu-link">
+                                                <span class="nk-menu-text">Select Regional</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Affiliation/Dashboard" class="nk-menu-link">
+                                                <span class="nk-menu-text">TP Dashboard</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Finance/Payments" class="nk-menu-link">
+                                                <span class="nk-menu-text">Payment Approval</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Affiliation/Certificate" class="nk-menu-link">
+                                                <span class="nk-menu-text">Certificate</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-award"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Standards</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/Standards/Dashboard" class="nk-menu-link">
+                                                <span class="nk-menu-text">Job Roles &amp; Templates</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Standards/CreateTemplate" class="nk-menu-link">
+                                                <span class="nk-menu-text">Certificate Template Creation</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Standards/TemplateApprovals" class="nk-menu-link">
+                                                <span class="nk-menu-text">Template Approval</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Job Role &amp; TC Approval</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/JobRoleTc/Create" class="nk-menu-link">
+                                                <span class="nk-menu-text">Add Job Role &amp; TC</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/JobRoleTc/Approval" class="nk-menu-link">
+                                                <span class="nk-menu-text">Business Head Approval</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/JobRoleTc/Index" class="nk-menu-link">
+                                                <span class="nk-menu-text">Job Role &amp; Center Status</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/JobRoleTc/Certificate" class="nk-menu-link">
+                                                <span class="nk-menu-text">Certificate</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="nk-menu-heading">
+                                    <h6 class="overline-title">Training &amp; Certification</h6>
+                                </li><!-- .nk-menu-heading -->
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-chalkboard-teacher"></i>
+                                        </span>
+                                        <span class="nk-menu-text">TOT / TOA</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/TotToa/Index" class="nk-menu-link">
+                                                <span class="nk-menu-text">Manage TOT/TOA Batches</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/TotToa/CreateBatch" class="nk-menu-link">
+                                                <span class="nk-menu-text">Create Batch</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/TotToa/VerticalHeadApproval" class="nk-menu-link">
+                                                <span class="nk-menu-text">Vertical Head Approval</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/TotToa/AgencyApproval" class="nk-menu-link">
+                                                <span class="nk-menu-text">Agency &amp; Trainer Approval</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/TotToa/AgencyBatches" class="nk-menu-link">
+                                                <span class="nk-menu-text">Manage / Upload Result</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Trainer/Dashboard" class="nk-menu-link">
+                                                <span class="nk-menu-text">Trainer Dashboard</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/TotToa/CertificateUpload" class="nk-menu-link">
+                                                <span class="nk-menu-text">Certificate Upload</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-tasks"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Training Process</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/Training/CreateBatch" class="nk-menu-link">
+                                                <span class="nk-menu-text">Create Batch</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Training/ScheduleMonitoring" class="nk-menu-link">
+                                                <span class="nk-menu-text">Monitoring Aligning</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Training/MonitoringChecklist" class="nk-menu-link">
+                                                <span class="nk-menu-text">Monitoring Checklist</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Training/UploadAttendance" class="nk-menu-link">
+                                                <span class="nk-menu-text">Upload Attendance</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Training/AssignAssessor" class="nk-menu-link">
+                                                <span class="nk-menu-text">Assessment Agency Selection</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Training/Approval" class="nk-menu-link">
+                                                <span class="nk-menu-text">Vertical Head / Agency Approval</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-certificate"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Bulk Certificate Creation</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/Results/Dashboard" class="nk-menu-link">
+                                                <span class="nk-menu-text">Results Dashboard</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Results/GenerateCertificate" class="nk-menu-link">
+                                                <span class="nk-menu-text">Generate Certificate</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Results/DownloadCertificates" class="nk-menu-link">
+                                                <span class="nk-menu-text">Download Certificate</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                
+
+                                <li class="nk-menu-heading">
+                                    <h6 class="overline-title">Procurement &amp; Projects</h6>
+                                </li><!-- .nk-menu-heading -->
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-file-invoice-dollar"></i>
+                                        </span>
+                                        <span class="nk-menu-text">EOI</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/Eoi/Index" class="nk-menu-link">
+                                                <span class="nk-menu-text">EOI Listing</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Eoi/Evaluate" class="nk-menu-link">
+                                                <span class="nk-menu-text">Evaluate Bids</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Eoi/ComparativeStatement" class="nk-menu-link">
+                                                <span class="nk-menu-text">Comparative Statement</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Eoi/CeoApproval" class="nk-menu-link">
+                                                <span class="nk-menu-text">CEO Approval</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Eoi/PurchaseOrder" class="nk-menu-link">
+                                                <span class="nk-menu-text">PO Generation &amp; Approval</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Finance/Invoices" class="nk-menu-link">
+                                                <span class="nk-menu-text">Invoice Approval</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-industry"></i>
+                                        </span>
+                                        <span class="nk-menu-text">NAPS Module</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/Naps/Dashboard" class="nk-menu-link">
+                                                <span class="nk-menu-text">IT Dashboard</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Naps/UploadMis" class="nk-menu-link">
+                                                <span class="nk-menu-text">Update Dashboard (Upload MIS)</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Naps/AssignTarget" class="nk-menu-link">
+                                                <span class="nk-menu-text">Add Business Head + Target</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Naps/AddIndustry" class="nk-menu-link">
+                                                <span class="nk-menu-text">Add New Industry</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-project-diagram"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Project Management</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/Projects/Create" class="nk-menu-link">
+                                                <span class="nk-menu-text">Create Project</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Projects/Index" class="nk-menu-link">
+                                                <span class="nk-menu-text">Projects List</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Projects/PlanAllocation" class="nk-menu-link">
+                                                <span class="nk-menu-text">Timeline, Milestone &amp; Budget</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Projects/CeoApproval" class="nk-menu-link">
+                                                <span class="nk-menu-text">CEO Project Approval</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Projects/PmDashboard" class="nk-menu-link">
+                                                <span class="nk-menu-text">Project Manager Dashboard</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Projects/Tasks" class="nk-menu-link">
+                                                <span class="nk-menu-text">Task &amp; Activities</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Projects/Timeline" class="nk-menu-link">
+                                                <span class="nk-menu-text">Timeline</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Projects/Budget" class="nk-menu-link">
+                                                <span class="nk-menu-text">Budget Tracking</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Projects/PaymentRequests" class="nk-menu-link">
+                                                <span class="nk-menu-text">Payment Requests</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Projects/AddTranche" class="nk-menu-link">
+                                                <span class="nk-menu-text">Add New Tranche</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Projects/Documents" class="nk-menu-link">
+                                                <span class="nk-menu-text">Documents</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="nk-menu-heading">
+                                    <h6 class="overline-title">General</h6>
+                                </li><!-- .nk-menu-heading -->
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-check-double"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Approval Process</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/Approvals/Create" class="nk-menu-link">
+                                                <span class="nk-menu-text">Add New Approval Request</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Approvals/SelectApprovers" class="nk-menu-link">
+                                                <span class="nk-menu-text">Select Approver</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Approvals/FinanceQueue" class="nk-menu-link">
+                                                <span class="nk-menu-text">Finance Approval Queue</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="nk-menu-item">
+                                    <a href="/News/Broadcast" class="nk-menu-link">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-bullhorn"></i>
+                                        </span>
+                                        <span class="nk-menu-text">News &amp; Updates</span>
+                                    </a>
+                                </li>
+
+                                <li class="nk-menu-item">
+                                    <a href="/Letters/Index" class="nk-menu-link">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-envelope-open-text"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Letter Register</span>
+                                    </a>
+                                </li>
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-clipboard-list"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Task Module</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/Tasks/Create" class="nk-menu-link">
+                                                <span class="nk-menu-text">Assign Task</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Tasks/Index" class="nk-menu-link">
+                                                <span class="nk-menu-text">Pending / Close Task</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Grievance Module</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/Grievance/Index" class="nk-menu-link">
+                                                <span class="nk-menu-text">Grievance List</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Grievance/Create" class="nk-menu-link">
+                                                <span class="nk-menu-text">Add New Grievance</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="nk-menu-heading">
+                                    <h6 class="overline-title">System</h6>
+                                </li><!-- .nk-menu-heading -->
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-cog"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Admin Settings</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="/Admin/Users" class="nk-menu-link">
+                                                <span class="nk-menu-text">User / Role Management</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Admin/WorkflowConfig" class="nk-menu-link">
+                                                <span class="nk-menu-text">Workflow Configuration</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Admin/Lookups" class="nk-menu-link">
+                                                <span class="nk-menu-text">Lookups (State, Doc Types, etc.)</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Admin/AuditLog" class="nk-menu-link">
+                                                <span class="nk-menu-text">Audit Log</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                           @*  <ul class="nk-menu">
+                                <li class="nk-menu-heading">
+
+                                </li><!-- .nk-menu-heading -->
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link ">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-th-large"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Dashboard  </span>
+                                    </a>
+
+                                </li>
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-user-graduate"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Students</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item ">
+                                            <a href="javascript:void(0);" class="nk-menu-link ">
+                                                <span class="nk-menu-text">Students1</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item ">
+                                            <a href="javascript:void(0);" class="nk-menu-link ">
+                                                <span class="nk-menu-text">Students2</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="javascript:void(0);" class="nk-menu-link ">
+                                                <span class="nk-menu-text">Students3</span>
+                                            </a>
+
+                                        </li>
+
+                                    </ul>
+                                </li>
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link ">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-chalkboard-teacher"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Training</span>
+                                    </a>
+
+                                </li>
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link ">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-tasks"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Assessments</span>
+                                    </a>
+
+                                </li>
+
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link ">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-certificate"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Certification</span>
+                                    </a>
+
+                                </li>
+
+
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link ">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-file-alt"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Reports</span>
+                                    </a>
+
+                                </li>
+
+
+
+                                <li class="nk-menu-item has-sub">
+                                    <a href="html#" class="nk-menu-link ">
+                                        <span class="nk-menu-icon">
+                                            <i class="fas fa-cog"></i>
+                                        </span>
+                                        <span class="nk-menu-text">Settings</span>
+                                    </a>
+
+                                </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            </ul> *@
+                        </div><!-- .nk-sidebar-menu -->
+                    </div><!-- .nk-sidebar-content -->
+                </div><!-- .nk-sidebar-element -->
+            </div>
+            <!-- sidebar  -->
+            <div class="nk-wrap">
+                <!-- main header  -->
+                <div class="nk-header nk-header-fixed is-light">
+                    <div class="container-fluid">
+                        <div class="nk-header-wrap">
+                            <div class="nk-menu-trigger d-xl-none ms-n1">
+                                <a href="javascript:void(0);" class="nk-nav-toggle nk-quick-nav-icon" data-target="sidebarMenu"><em class="icon ni ni-menu"></em></a>
+                            </div>
+                            <div class="nk-header-brand d-xl-none">
+                                <a href="html/index.html" class="logo-link">
+                                    <img class="logo-light logo-img" src="./images/logomine.png" srcset="./images/logo2x.png 2x" alt="logo">
+                                    <img class="logo-dark logo-img" src="./images/logomine.png" srcset="./images/logo-dark2x.png 2x" alt="logo-dark">
+                                </a>
+                            </div><!-- .nk-header-brand -->
+
+                            <div class="nk-header-tools">
+                                <ul class="nk-quick-nav">
+
+                                    <li class="dropdown user-dropdown">
+                                        <a href="javascript:void(0);" class="dropdown-toggle" data-bs-toggle="dropdown">
+                                            <div class="user-toggle">
+                                                <div class="user-avatar sm">
+                                                    <em class="icon ni ni-user-alt"></em>
+                                                </div>
+                                                <div class="user-info d-none d-md-block">
+                                                    @* <div class="user-status">TSSC Admin</div>
+                                                    <div class="user-name dropdown-indicator">Administrator</div> *@
+                                                    <div class="user-status">@role</div>
+                                                    <div class="user-name dropdown-indicator">@name</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-md dropdown-menu-end dropdown-menu-s1">
+                                            <div class="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
+                                                <div class="user-card">
+                                                    <div class="user-avatar">
+                                                        @* <span>TC</span> *@
+                                                        <span>@name?.Substring(0, 2).ToUpper()</span>
+                                                    </div>
+                                                    <div class="user-info">
+                                                        @* <span class="lead-text">TSSC Admin</span>
+                                                        <span class="sub-text">tssc@admin.com</span> *@
+                                                        <span class="lead-text">@name</span>
+                                                        <span class="sub-text">@email</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @* <div class="dropdown-inner">
+                                                <ul class="link-list">
+                                                    <li><a href="javascript:void(0);"><em class="icon ni ni-user-alt"></em><span>View Profile</span></a></li>
+                                                    <li><a href="javascript:void(0);"><em class="icon ni ni-setting-alt"></em><span>Account Setting</span></a></li>
+                                                    <li><a href="javascript:void(0);"><em class="icon ni ni-activity-alt"></em><span>Login Activity</span></a></li>
+
+                                                </ul>
+                                            </div> *@
+                                            <div class="dropdown-inner">
+                                                <ul class="link-list">
+                                                    <li><a href="/Account/LogOut"><em class="icon ni ni-signout"></em><span>Sign out</span></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li><!-- .dropdown -->
+                                    <li class="dropdown notification-dropdown me-n1">
+                                        <a href="javascript:void(0);" class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
+                                            <div class="icon-status icon-status-info"><em class="icon ni ni-bell"></em></div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end dropdown-menu-s1">
+                                            <div class="dropdown-head">
+                                                <span class="sub-title nk-dropdown-title">Notifications</span>
+                                                <a href="javascript:void(0);">Mark All as Read</a>
+                                            </div>
+                                            <div class="dropdown-body">
+                                                <div class="nk-notification">
+                                                    <div class="nk-notification-item dropdown-inner">
+                                                        <div class="nk-notification-icon">
+                                                            <em class="icon icon-circle bg-warning-dim ni ni-curve-down-right"></em>
+                                                        </div>
+                                                        <div class="nk-notification-content">
+                                                            <div class="nk-notification-text">New student registration received</span></div>
+                                                            <div class="nk-notification-time">2 hrs ago</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="nk-notification-item dropdown-inner">
+                                                        <div class="nk-notification-icon">
+                                                            <em class="icon icon-circle bg-success-dim ni ni-curve-down-left"></em>
+                                                        </div>
+                                                        <div class="nk-notification-content">
+                                                            <div class="nk-notification-text">Training partner registration approved</div>
+                                                            <div class="nk-notification-time">3 hrs ago</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="nk-notification-item dropdown-inner">
+                                                        <div class="nk-notification-icon">
+                                                            <em class="icon icon-circle bg-warning-dim ni ni-curve-down-right"></em>
+                                                        </div>
+                                                        <div class="nk-notification-content">
+                                                            <div class="nk-notification-text">New assessment scheduled</div>
+                                                            <div class="nk-notification-time">5 hrs ago</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="nk-notification-item dropdown-inner">
+                                                        <div class="nk-notification-icon">
+                                                            <em class="icon icon-circle bg-success-dim ni ni-curve-down-left"></em>
+                                                        </div>
+                                                        <div class="nk-notification-content">
+                                                            <div class="nk-notification-text">Certification successfully issued</div>
+                                                            <div class="nk-notification-time">Yesterday</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="nk-notification-item dropdown-inner">
+                                                        <div class="nk-notification-icon">
+                                                            <em class="icon icon-circle bg-warning-dim ni ni-curve-down-right"></em>
+                                                        </div>
+                                                        <div class="nk-notification-content">
+                                                            <div class="nk-notification-text">New training program has been created</div>
+                                                            <div class="nk-notification-time">Yesterday</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="nk-notification-item dropdown-inner">
+                                                        <div class="nk-notification-icon">
+                                                            <em class="icon icon-circle bg-success-dim ni ni-curve-down-left"></em>
+                                                        </div>
+                                                        <div class="nk-notification-content">
+                                                            <div class="nk-notification-text">Your Assessment results are now available</div>
+                                                            <div class="nk-notification-time">2 days ago</div>
+                                                        </div>
+                                                    </div>
+                                                </div><!-- .nk-notification -->
+                                            </div><!-- .nk-dropdown-body -->
+                                            <div class="dropdown-foot center">
+                                                <a href="javascript:void(0);">View All</a>
+                                            </div>
+                                        </div>
+                                    </li><!-- .dropdown -->
+                                </ul><!-- .nk-quick-nav -->
+                            </div><!-- .nk-header-tools -->
+                        </div><!-- .nk-header-wrap -->
+                    </div><!-- .container-fliud -->
+                </div>
+                <!-- main header  -->
+                <div class="nk-content">
+                    <div class="container-fluid">
+                        <div class="nk-content-inner">
+                            <div class="nk-content-body">
+                                @RenderBody()
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- footer  -->
+                <div class="nk-footer">
+                    <div class="container-fluid">
+                        <div class="nk-footer-wrap">
+                            <div class="nk-footer-copyright">
+                                &copy; 2026 Telecom Sector Skill Council (TSSC). All Rights Reserved.
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- footer  -->
+            </div>
+        </div>
+    </div>
+    <!-- select region modal -->
+    <div class="modal fade" tabindex="-1" role="dialog" id="region">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <a href="javascript:void(0);" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+                <div class="modal-body modal-body-md">
+                    <h5 class="title mb-4">Select Your Country</h5>
+                    <div class="nk-country-region">
+                        <ul class="country-list text-center gy-2">
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/arg.png" alt="" class="country-flag">
+                                    <span class="country-name">Argentina</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/aus.png" alt="" class="country-flag">
+                                    <span class="country-name">Australia</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/bangladesh.png" alt="" class="country-flag">
+                                    <span class="country-name">Bangladesh</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/canada.png" alt="" class="country-flag">
+                                    <span class="country-name">Canada <small>(English)</small></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/china.png" alt="" class="country-flag">
+                                    <span class="country-name">Centrafricaine</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/china.png" alt="" class="country-flag">
+                                    <span class="country-name">China</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/french.png" alt="" class="country-flag">
+                                    <span class="country-name">France</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/germany.png" alt="" class="country-flag">
+                                    <span class="country-name">Germany</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/iran.png" alt="" class="country-flag">
+                                    <span class="country-name">Iran</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/italy.png" alt="" class="country-flag">
+                                    <span class="country-name">Italy</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/mexico.png" alt="" class="country-flag">
+                                    <span class="country-name">México</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/philipine.png" alt="" class="country-flag">
+                                    <span class="country-name">Philippines</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/portugal.png" alt="" class="country-flag">
+                                    <span class="country-name">Portugal</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/s-africa.png" alt="" class="country-flag">
+                                    <span class="country-name">South Africa</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/spanish.png" alt="" class="country-flag">
+                                    <span class="country-name">Spain</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/switzerland.png" alt="" class="country-flag">
+                                    <span class="country-name">Switzerland</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/uk.png" alt="" class="country-flag">
+                                    <span class="country-name">United Kingdom</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="country-item">
+                                    <img src="./images/flags/english.png" alt="" class="country-flag">
+                                    <span class="country-name">United State</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div><!-- .modal-content -->
+        </div><!-- .modla-dialog -->
+    </div><!-- .modal -->
+    <!-- JavaScript -->
+    <script src="~/assets/js/bundle.js?ver=3.4.0"></script>
+    <script src="~/assets/js/scripts.js?ver=3.4.0"></script>
+    <script src="~/assets/js/charts/gd-default.js?ver=3.4.0"></script>
+    <script src="~/assets/js/charts/tssc-dashboard.js?ver=1.0.0"></script>
+
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

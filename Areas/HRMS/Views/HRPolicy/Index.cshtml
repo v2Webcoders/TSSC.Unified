@@ -1,0 +1,155 @@
+﻿@model IEnumerable<TSSC.Unified.Models.HRPolicy>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+	Layout = "_Layout";
+	int serial = 1;
+	//int serial = ((Model.PageNumber - 1) * Model.PageSize) + 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">HR Policy List</h3>
+        </div>
+
+        <div class="nk-block-head-content">
+            <div class="toggle-wrap nk-block-tools-toggle">
+                <a href="#" class="btn btn-icon btn-trigger toggle-expand me-n1"
+                   data-target="pageMenu">
+                    <em class="icon ni ni-more-v"></em>
+                </a>
+
+                <div class="toggle-expand-content" data-content="pageMenu">
+                    <ul class="nk-block-tools g-3">
+
+                        <li class="nk-block-tools-opt">
+                            <a asp-action="Create"
+                               class="btn btn-primary">
+                                <em class="icon ni ni-plus"></em>
+                                <span>Add HR Policy</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="nk-block nk-block-lg">
+    <div class="card card-preview">
+
+        <div class="card-inner">
+
+            <div class="table-responsive">
+
+                <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+                    <thead>
+                        <tr>
+                            <th width="60">S.No.</th>
+                            <th>Policy Title</th>
+                            <th>Description</th>
+                            <th>Document</th>
+                            <th>Created By</th>
+                            <th>Created On</th>
+                            <th>Status</th>
+                            <th width="130">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>@serial</td>
+
+                                <td>
+                                    @item.PolicyTitle
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrEmpty(item.Description)
+                                        ? "-"
+                                        : (item.Description.Length > 60
+                                        ? item.Description.Substring(0, 60) + "..."
+                                        : item.Description))
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.PolicyDocument))
+                                    {
+                                        <a href="~/uploads/policies/@item.PolicyDocument"
+                                           target="_blank"
+                                           class="btn btn-sm btn-outline-info">
+                                            <em class="icon ni ni-file-docs"></em>
+                                            View PDF
+                                        </a>
+                                    }
+                                </td>
+
+                                <td>@item.CreatedBy</td>
+
+                                <td>@item.CreatedOn?.ToString("dd-MMM-yyyy")</td>
+
+                                <td>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge badge-dot bg-success">
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-dot bg-danger">
+                                            Inactive
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+
+                                    <div class="btn-group">
+
+                                        <a asp-action="Create"
+                                           asp-route-id="@item.PolicyId"
+                                           class="btn btn-sm btn-outline-warning"
+                                           title="Edit">
+                                            <em class="icon ni ni-edit"></em>
+                                        </a>
+
+                                        <a asp-action="Delete"
+                                           asp-route-id="@item.PolicyId"
+                                           onclick="return confirm('Are you sure you want to delete this policy?');"
+                                           class="btn btn-sm btn-outline-danger"
+                                           title="Delete">
+                                            <em class="icon ni ni-trash"></em>
+                                        </a>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                            serial++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+

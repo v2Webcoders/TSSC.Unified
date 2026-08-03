@@ -1,0 +1,639 @@
+﻿@model TSSC.Unified.ViewModel.EmployeeVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+	Layout = "_Layout";
+}
+@* <div class="nk-block-head nk-block-head-lg wide-sm">
+	<div class="nk-block-head-content">
+		<h2 class="nk-block-title fw-normal">
+			@(Model.EmployeeId > 0 ? "Edit Employee" : "Add Employee")
+		</h2>
+	</div>
+</div> *@
+<div class="nk-block-head nk-block-head-sm">
+<div class="nk-block-between">
+	<div class="nk-block-head-content">
+		<h3 class="nk-block-title page-title">@(Model.EmployeeId > 0 ? "Edit Employee" : "Add Employee")</h3>
+		<div class="nk-block-des text-soft">
+			@* <p>You have total 95 pages/posts.</p> *@
+		</div>
+	</div><!-- .nk-block-head-content -->
+	<div class="nk-block-head-content">
+		@* <a href="html/cms/page-post-add.html" class="btn btn-icon btn-primary d-md-none"><em class="icon ni ni-plus"></em></a> *@
+			<a asp-action="EmployeeList"
+			   asp-controller="Employee"
+			   class="btn btn-primary d-none d-md-inline-flex">
+				<em class="icon ni ni-users"></em>&nbsp; Employee List
+			</a>
+		@* <a href="html/cms/page-post-add.html" class="btn btn-primary d-none d-md-inline-flex"><em class="icon ni ni-plus"></em><span>Add Page/Post</span></a> *@
+	</div><!-- .nk-block-head-content -->
+</div><!-- .nk-block-between -->
+								</div>
+<div class="nk-block nk-block-lg">
+	<div class="card card-preview">
+
+		@if (!ViewData.ModelState.IsValid)
+		{
+			@Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+		}
+
+		@if (TempData["msg"] != null)
+		{
+			<div class="example-alert w-100">
+				<div class="alert alert-success alert-icon">
+					<em class="icon ni ni-check-circle"></em>
+					<strong>@TempData["msg"]</strong>
+				</div>
+			</div>
+		}
+
+		<div class="card-inner">
+			<div class="preview-block">
+				<div class="row gy-4">
+					<div class="col-md-12">
+						<div class="text-end mb-3">
+							
+						</div>
+					</div>
+
+					<div class="col-sm-12">
+						<form asp-action="Create"
+							  asp-controller="Employee"
+							  method="post" enctype="multipart/form-data">
+
+							<input type="hidden" asp-for="EmployeeId" />
+
+							<div class="row gy-3">
+								<!-- ============= Basic Information ============= -->
+								<div class="col-12 mb-4">
+									<div style="border-left:4px solid #D9622F;padding-left:12px;">
+										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+											<em class="ni ni-user-alt"></em>
+											Basic Information
+										</h5>
+									</div>
+								</div>
+
+								<div class="col-lg-9">
+									<div class="row gy-3">
+
+										<div class="col-md-4">
+											<label class="form-label">Employee Code <span class="text-danger">*</span></label>
+											<input asp-for="EmployeeCode" class="form-control" />
+										</div>
+
+										<div class="col-md-4">
+											<label class="form-label">First Name <span class="text-danger">*</span></label>
+											<input asp-for="FirstName" class="form-control" />
+											
+										</div>
+
+										<div class="col-md-4">
+											<label class="form-label">Last Name</label>
+											<input asp-for="LastName" class="form-control" />
+										</div>
+
+										<div class="col-md-4">
+											<label class="form-label">Gender<span class="text-danger">*</span></label>
+											<select asp-for="Gender" class="form-select">
+												<option value="">Select Gender</option>
+												<option>Male</option>
+												<option>Female</option>
+												<option>Other</option>
+											</select>
+										</div>
+
+										<div class="col-md-4">
+											<label class="form-label">Date of Birth <span class="text-danger">*</span></label>
+											<input asp-for="DOB" type="date" class="form-control" />
+										</div>
+
+										<div class="col-md-4">
+											<label class="form-label">Blood Group</label>
+											<select asp-for="BloodGroup" class="form-select">
+												<option value="">Select</option>
+												<option>A+</option>
+												<option>A-</option>
+												<option>B+</option>
+												<option>B-</option>
+												<option>AB+</option>
+												<option>AB-</option>
+												<option>O+</option>
+												<option>O-</option>
+											</select>
+										</div>
+
+										<div class="col-md-4">
+											<label class="form-label">Marital Status<span class="text-danger">*</span></label>
+											<select asp-for="MaritalStatus" class="form-select">
+												<option value="">Select</option>
+												<option>Single</option>
+												<option>Married</option>
+												<option>Divorced</option>
+												<option>Widowed</option>
+											</select>
+										</div>
+
+									</div>
+								</div>
+
+								<!-- Employee Photo -->
+								<div class="col-lg-3">
+
+									<label class="form-label">Employee Photo</label>
+
+									<div class="card card-bordered text-center p-3">
+
+										<img id="photoPreview"
+											 src="@(string.IsNullOrEmpty(Model.PhotoPath) ? Url.Content("~/images/no-user.png") : Url.Content(Model.PhotoPath))"
+											 class="rounded-circle mx-auto mb-3"
+											 style="width:140px;height:140px;object-fit:cover;border:3px solid #dee2e6;" />
+
+										<input asp-for="Photo"
+											   type="file"
+											   class="form-control"
+											   accept="image/*"
+											   onchange="previewPhoto(this)" />
+
+										<small class="text-muted mt-2 d-block">
+											JPG, JPEG, PNG (Max 2 MB)
+										</small>
+
+									</div>
+
+								</div>
+
+								@* <!-- ============= Basic Information ============= -->
+								<div id="sec-basic" class="col-12 mb-4">
+									<div style="border-left:4px solid #D9622F;padding-left:12px;">
+										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+											<em class="ni ni-user-alt"></em> Basic Information
+										</h5>
+									</div>
+								</div>
+								
+								<div class="col-md-4">
+									<label class="form-label">Employee Code <span class="text-danger">*</span></label>
+									<input asp-for="EmployeeCode" class="form-control" />
+									<span asp-validation-for="EmployeeCode" class="text-danger"></span>
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label">First Name <span class="text-danger">*</span></label>
+									<input asp-for="FirstName" class="form-control" />
+									<span asp-validation-for="FirstName" class="text-danger"></span>
+								</div>
+
+
+
+								<div class="col-md-4">
+									<label class="form-label">Last Name</label>
+									<input asp-for="LastName" class="form-control" />
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label">Gender</label>
+									<select asp-for="Gender" class="form-select">
+										<option value="">Select Gender</option>
+										<option>Male</option>
+										<option>Female</option>
+										<option>Other</option>
+									</select>
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label">Date of Birth</label>
+									<input asp-for="DOB" type="date" class="form-control" />
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label">Blood Group</label>
+									<select asp-for="BloodGroup" class="form-select">
+										<option value="">Select</option>
+										<option>A+</option>
+										<option>A-</option>
+										<option>B+</option>
+										<option>B-</option>
+										<option>AB+</option>
+										<option>AB-</option>
+										<option>O+</option>
+										<option>O-</option>
+									</select>
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label">Marital Status</label>
+									<select asp-for="MaritalStatus" class="form-select">
+										<option value="">Select</option>
+										<option>Single</option>
+										<option>Married</option>
+										<option>Divorced</option>
+										<option>Widowed</option>
+									</select>
+								</div> *@
+
+								<!-- ============= Official Information ============= -->
+								<div id="sec-official" class="col-12 mb-4 mt-5">
+									<div style="border-left:4px solid #D9622F;padding-left:12px;">
+										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+											<em class="ni ni-building"></em> Official Information
+										</h5>
+									</div>
+								</div>
+								<div class="col-md-4">
+									<label class="form-label">Department<span class="text-danger">*</span></label>
+									<select asp-for="DepartmentId"
+											asp-items="ViewBag.Departments"
+											class="form-select">
+										<option value="">Select Department</option>
+									</select>
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label">Designation<span class="text-danger">*</span></label>
+									<select asp-for="DesignationId"
+											asp-items="ViewBag.Designations"
+											class="form-control">
+										<option value="">Select Designation</option>
+									</select>
+								</div>
+								<div class="col-md-4">
+									<label class="form-label">Reporting Manager</label>
+									<select asp-for="ReportingManagerId"
+											asp-items="ViewBag.Managers"
+											class="form-control">
+										<option value="">Select Manager</option>
+									</select>
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label">Joining Date</label>
+									<input asp-for="JoiningDate" type="date" class="form-control" />
+								</div>
+
+								<div class="col-md-4">
+									<div class="form-group">
+										<label class="form-label">
+											Employee Type <span class="text-danger">*</span>
+										</label>
+
+										<select asp-for="EmployeeType" class="form-select">
+											<option value="">-- Select Employee Type --</option>
+											<option value="Permanent">Permanent</option>
+											<option value="Probation">Probation</option>
+											<option value="Contract">Contract</option>
+											<option value="Temporary">Temporary</option>
+											<option value="Internship">Internship</option>
+											<option value="Consultant">Consultant</option>
+											<option value="Part-Time">Part-Time</option>
+										</select>
+
+										<span asp-validation-for="EmployeeType" class="text-danger"></span>
+									</div>
+								</div>
+
+								<div class="col-md-4">
+									<div class="form-group">
+										<label class="form-label">
+											Employment Status <span class="text-danger">*</span>
+										</label>
+
+										<select asp-for="EmploymentStatus" class="form-select">
+											<option value="">-- Select Employment Status --</option>
+											<option value="Active">Active</option>
+											<option value="On Probation">On Probation</option>
+											<option value="On Leave">On Leave</option>
+											<option value="Notice Period">Notice Period</option>
+											<option value="Suspended">Suspended</option>
+											<option value="Resigned">Resigned</option>
+											<option value="Relieved">Relieved</option>
+											<option value="Terminated">Terminated</option>
+											<option value="Retired">Retired</option>
+										</select>
+
+										<span asp-validation-for="EmploymentStatus" class="text-danger"></span>
+									</div>
+								</div>
+
+								<!-- ============= Contact Information ============= -->
+								<div id="sec-contact" class="col-12 mb-4 mt-5">
+									<div style="border-left:4px solid #D9622F;padding-left:12px;">
+										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+											<em class="ni ni-call"></em> Contact Information
+										</h5>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Official Email<span class="text-danger">*</span></label>
+									@* <input asp-for="OfficialEmail" class="form-control" onkeyup="setUsername()"
+										   onchange="setUsername()" /> *@
+									@if (Model.EmployeeId == 0)
+									{
+										<input asp-for="OfficialEmail"
+											   class="form-control"
+											   onkeyup="setUsername()"
+											   onchange="setUsername()" />
+									}
+									else
+									{
+										<input asp-for="OfficialEmail" class="form-control" />
+									}
+								</div>
+
+								<div class="col-md-6">
+									<label class="form-label">Personal Email</label>
+									<input asp-for="PersonalEmail" class="form-control" />
+								</div>
+
+								<div class="col-md-6">
+									<label class="form-label">Mobile Number<span class="text-danger">*</span></label>
+									<input asp-for="MobileNo" class="form-control" />
+								</div>
+
+								<div class="col-md-6">
+									<label class="form-label">Alternate Mobile</label>
+									<input asp-for="AlternateMobile" class="form-control" />
+								</div>
+
+								<!-- ============= Address ============= -->
+								<div id="sec-address" class="col-12 mb-4 mt-5">
+									<div style="border-left:4px solid #D9622F;padding-left:12px;">
+										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+											<em class="ni ni-map-pin"></em> Address
+										</h5>
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<label class="form-label">Current Address</label>
+									<textarea asp-for="CurrentAddress"
+											  class="form-control"
+											  rows="3"></textarea>
+								</div>
+
+								<div class="col-md-6">
+									<label class="form-label">Permanent Address</label>
+									<textarea asp-for="PermanentAddress"
+											  class="form-control"
+											  rows="3"></textarea>
+								</div>
+
+								<!-- ============= Identity Details ============= -->
+								<div id="sec-identity" class="col-12 mb-4 mt-5">
+									<div style="border-left:4px solid #D9622F;padding-left:12px;">
+										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+											<em class="ni ni-shield-check"></em> Identity Details
+										</h5>
+									</div>
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label">Aadhaar Number</label>
+									<input asp-for="AadhaarNo" class="form-control" />
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label">PAN Number</label>
+									<input asp-for="PANNo" class="form-control" />
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label">Passport Number</label>
+									<input asp-for="PassportNo" class="form-control" />
+								</div>
+
+								<div class="col-md-6">
+									<label class="form-label">UAN Number</label>
+									<input asp-for="UANNo" class="form-control" />
+								</div>
+
+								<div class="col-md-3">
+									<label class="form-label">PF Number</label>
+									<input asp-for="PFNo" class="form-control" />
+								</div>
+
+								<div class="col-md-3">
+									<label class="form-label">ESIC Number</label>
+									<input asp-for="ESICNo" class="form-control" />
+								</div>
+
+								<!-- ============= Bank Details ============= -->
+								<div id="sec-bank" class="col-12 mb-4 mt-5">
+									<div style="border-left:4px solid #D9622F;padding-left:12px;">
+										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+											<em class="icon ni ni-money"></em> Bank Details
+										</h5>
+									</div>
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label">Bank Name</label>
+									<input asp-for="BankName" class="form-control" />
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label">Account Number</label>
+									<input asp-for="AccountNo" class="form-control" />
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label">IFSC Code</label>
+									<input asp-for="IFSCCode" class="form-control" />
+								</div>
+
+								<!-- ============= Salary Details ============= -->
+								<div id="sec-salary" class="col-12 mb-4 mt-5">
+									<div style="border-left:4px solid #D9622F;padding-left:12px;">
+										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+											<em class="ni ni-wallet"></em> Salary Details
+										</h5>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<label class="form-label">CTC</label>
+									<input asp-for="CTC" class="form-control" />
+								</div>
+
+								<div class="col-md-3">
+									<label class="form-label">Basic Salary</label>
+									<input asp-for="BasicSalary" class="form-control" />
+								</div>
+
+								<div class="col-md-3">
+									<label class="form-label">HRA</label>
+									<input asp-for="HRA" class="form-control" />
+								</div>
+
+								<div class="col-md-3">
+									<label class="form-label">Special Allowance</label>
+									<input asp-for="SpecialAllowance" class="form-control" />
+								</div>
+
+								<!-- ============= Login Information ============= -->
+								<div id="sec-login" class="col-12 mb-4 mt-5">
+									<div style="border-left:4px solid #D9622F;padding-left:12px;">
+										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+											<em class="ni ni-signin"></em> Login Information 
+										</h5>
+									</div>
+								</div>
+								<div class="col-md-4">
+									<label class="form-label">Username</label>
+									<input asp-for="Username" class="form-control bg-light" />
+								</div>
+								@* @if (Model.EmployeeId > 0)
+								{
+									<div class="col-md-4">
+										<label class="form-label">Username</label>
+										<input asp-for="Username" class="form-control bg-light" readonly />
+									</div>
+								}
+								else
+								{
+									<div class="col-md-4">
+										<label class="form-label">
+											Username <span class="text-danger">*</span>
+										</label>
+										<input asp-for="Username" class="form-control" />
+										<span asp-validation-for="Username" class="text-danger"></span>
+									</div>
+								} *@
+
+								@if (Model.EmployeeId == 0)
+								{
+									<div class="col-md-4">
+										<label class="form-label">
+											Password <span class="text-danger">*</span>
+										</label>
+
+										<input asp-for="Password"
+											   type="password"
+											   class="form-control"
+											   autocomplete="new-password" />
+
+										<span asp-validation-for="Password" class="text-danger"></span>
+									</div>
+								}
+
+								@* <div class="col-md-4">
+									<label class="form-label">Role<span class="text-danger">*</span></label>
+									<select asp-for="RoleId"
+											asp-items="ViewBag.Roles"
+											class="form-select">
+										<option value="">Select Role</option>
+									</select>
+								</div> *@
+								@if (Model.EmployeeId > 0)
+								{
+									<div class="col-md-4">
+										<label class="form-label">Role</label>
+
+										<select asp-for="RoleId"
+												asp-items="ViewBag.Roles"
+												class="form-select"
+												disabled>
+										</select>
+
+										<input type="hidden" asp-for="RoleId" />
+									</div>
+								}
+								else
+								{
+									<div class="col-md-4">
+										<label class="form-label">
+											Role <span class="text-danger">*</span>
+										</label>
+
+										<select asp-for="RoleId"
+												asp-items="ViewBag.Roles"
+												class="form-select">
+											<option value="">Select Role</option>
+										</select>
+
+										
+									</div>
+								}
+								<!-- ================= Status ================= -->
+
+								<div class="col-12 mt-4">
+									<div class="custom-control custom-checkbox">
+										<input asp-for="IsActive"
+											   class="custom-control-input"
+											   id="chkActive"
+											   type="checkbox" />
+
+										<label class="custom-control-label"
+											   for="chkActive">
+											Active Employee
+										</label>
+									</div>
+								</div>
+
+								<!-- ================= Buttons ================= -->
+
+								<div class="col-12 mt-4">
+
+									<button type="submit" class="btn btn-primary">
+
+										@if (Model.EmployeeId > 0)
+										{
+											<em class="icon ni ni-edit"></em>
+											<span> Update Employee</span>
+										}
+										else
+										{
+											<em class="icon ni ni-plus"></em>
+											<span> Add Employee</span>
+										}
+
+									</button>
+
+									<a asp-action="EmployeeList"
+									   asp-controller="Employee"
+									   class="btn btn-outline-secondary ms-2">
+										Cancel
+									</a>
+
+								</div>
+
+							</div>
+
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	function previewPhoto(input) {
+		if (input.files && input.files[0]) {
+			var reader = new FileReader();
+
+			reader.onload = function (e) {
+				document.getElementById("photoPreview").src = e.target.result;
+			};
+
+			reader.readAsDataURL(input.files[0]);
+		}
+	}
+</script>
+<script>
+		function setUsername() {
+
+		var email = document.getElementById("OfficialEmail").value;
+		var username = document.getElementById("Username");
+
+		if (username) {
+			username.value = email;
+			username.readOnly = true;
+		}
+	}
+
+	// Populate on page load (Add mode)
+	window.onload = function () {
+		setUsername();
+	};
+</script>

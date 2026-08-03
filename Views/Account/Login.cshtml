@@ -1,0 +1,388 @@
+﻿@using QUIZAPP.ViewModel
+@model LoginViewModel
+@{
+	Layout = null;
+	ViewData["Title"] = "Login";
+	var items = ViewBag.Items as List<SelectListItem>;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Sign In — TSSC Unified Portal</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+	<!-- Bootstrap 5 (grid + utilities only — visual styling stays on TSSC theme) -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="/assetsfe/styles.css">
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<link rel="stylesheet" href="/assetsfe/styles.css">
+
+
+	<style>
+		/* Bootstrap resets some base tags — keep the TSSC look on top of it */
+		.stage.container-fluid {
+			padding: 0;
+		}
+
+		.role-tile {
+			cursor: pointer;
+		}
+
+		.pw-toggle {
+			position: absolute;
+			right: 12px;
+			top: 50%;
+			transform: translateY(-50%);
+			background: none;
+			border: none;
+			padding: 0;
+			cursor: pointer;
+			color: var(--ink-soft);
+		}
+
+			.pw-toggle svg {
+				width: 17px;
+				height: 17px;
+				stroke: currentColor;
+				left: -20px;
+			}
+
+		input[type=password], input[type=text].pw-field {
+			padding-right: 38px;
+		}
+	</style>
+</head>
+<body>
+
+	<!-- Utility bar -->
+	<div class="utility-bar text-white py-2">
+		<div class="container d-flex justify-content-end align-items-center gap-2 flex-wrap">
+			<a class="chip chip-red" href="#">EOI</a>
+			<a class="chip chip-red" href="#">SIC Registration</a>
+			<a class="chip chip-red" href="#">TelcoJobs.in</a>
+			<a class="chip chip-red" href="#">TelcoLearning.com</a>
+			<div class="dropdown login-dropdown">
+				<a class="chip chip-amber dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+					<i class="far fa-user"></i>Login
+				</a>
+				<ul class="dropdown-menu dropdown-menu-end">
+					<li><a class="dropdown-item" href="sign.html"><i class="fas fa-user"></i>Login</a></li>
+					<li><a class="dropdown-item" href="employee-login.html"><i class="fas fa-id-badge"></i>Employee Login</a></li>
+				</ul>
+			</div>
+			<a class="chip chip-amber" href="register.html"><i class="fas fa-rocket"></i>Register Now</a>
+		</div>
+	</div>
+
+	<!-- Header / Navbar -->
+	<header class="site-header">
+		<nav class="navbar navbar-expand-xl py-2">
+			<div class="container-fluid px-4">
+				<a class="navbar-brand" href="index.html">
+					<img src="https://tsscindia.com/assetsfe/images/logo.png" alt="Telecom Sector Skill Council" class="logo-img">
+				</a>
+
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+
+				<div class="collapse navbar-collapse justify-content-center" id="mainNav">
+					<ul class="navbar-nav gap-1 align-items-xl-center">
+
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">About Us</a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item" href="#">About TSSC</a></li>
+								<li class="dropdown-submenu">
+									<a class="dropdown-item dropdown-toggle" href="#">Team TSSC</a>
+									<ul class="dropdown-menu">
+										<li><a class="dropdown-item" href="#">Our Leadership</a></li>
+										<li><a class="dropdown-item" href="#">Regional Team</a></li>
+										<li><a class="dropdown-item" href="#">Our Team</a></li>
+									</ul>
+								</li>
+								<li><a class="dropdown-item" href="#">Vision &amp; Mission</a></li>
+								<li><a class="dropdown-item" href="#">Our Promoters</a></li>
+								<li><a class="dropdown-item" href="#">Governing Council</a></li>
+								<li><a class="dropdown-item" href="#">Occupational Competency Committee</a></li>
+							</ul>
+						</li>
+
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Partners</a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item" href="#">TP Presence</a></li>
+								<li class="dropdown-submenu">
+									<a class="dropdown-item dropdown-toggle" href="#">Industry Partners</a>
+									<ul class="dropdown-menu">
+										<li><a class="dropdown-item" href="#">Blacklisted Industry Partners</a></li>
+										<li><a class="dropdown-item" href="#">Industry Partners</a></li>
+									</ul>
+								</li>
+								<li><a class="dropdown-item" href="#">Academic Partners</a></li>
+								<li class="dropdown-submenu">
+									<a class="dropdown-item dropdown-toggle" href="#">New Membership Registration</a>
+									<ul class="dropdown-menu">
+										<li><a class="dropdown-item" href="#">Industry Member</a></li>
+										<li><a class="dropdown-item" href="#">Assessment Body</a></li>
+										<li><a class="dropdown-item" href="#">Platinum Industry Member</a></li>
+										<li><a class="dropdown-item" href="#">Associate Member</a></li>
+									</ul>
+								</li>
+								<li><a class="dropdown-item" href="#">Assessment Partners</a></li>
+								<li class="dropdown-submenu">
+									<a class="dropdown-item dropdown-toggle" href="#">Training Partners</a>
+									<ul class="dropdown-menu">
+										<li><a class="dropdown-item" href="#">Associate Member</a></li>
+										<li><a class="dropdown-item" href="#">Industry Member</a></li>
+										<li><a class="dropdown-item" href="#">Platinum Industry Member</a></li>
+										<li><a class="dropdown-item" href="#">Academia Member</a></li>
+									</ul>
+								</li>
+								<li><a class="dropdown-item" href="#" target="_blank">Centres Affiliation Guidline</a></li>
+							</ul>
+						</li>
+
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Training Resources</a>
+							<ul class="dropdown-menu">
+								<li class="dropdown-submenu">
+									<a class="dropdown-item dropdown-toggle" href="#">Qualification Packs</a>
+									<ul class="dropdown-menu">
+										<li><a class="dropdown-item" href="#">Micro Credentials</a></li>
+										<li><a class="dropdown-item" href="#">Mock Test</a></li>
+										<li><a class="dropdown-item" href="#">Qualification Packs</a></li>
+									</ul>
+								</li>
+								<li><a class="dropdown-item" href="#" target="_blank">Download Qualification Packs Book 2024</a></li>
+								<li><a class="dropdown-item" href="#">Schemes</a></li>
+								<li><a class="dropdown-item" href="#" target="_blank">Upskill with us!</a></li>
+							</ul>
+						</li>
+
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Media &amp; Information</a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item" href="#">Articles</a></li>
+								<li><a class="dropdown-item" href="#">Events</a></li>
+								<li><a class="dropdown-item" href="#">Gallery</a></li>
+								<li><a class="dropdown-item" href="#">eNewsletter</a></li>
+								<li><a class="dropdown-item" href="#">Reports</a></li>
+								<li><a class="dropdown-item" href="#" target="_blank">Download our Brochure</a></li>
+								<li><a class="dropdown-item" href="#">Press Release</a></li>
+							</ul>
+						</li>
+
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Explore</a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item" href="#">Faculty Development Program</a></li>
+								<li class="dropdown-submenu">
+									<a class="dropdown-item dropdown-toggle" href="#">Training Calendar</a>
+									<ul class="dropdown-menu">
+										<li><a class="dropdown-item" href="#">ToA Schedule</a></li>
+										<li><a class="dropdown-item" href="#">ToT Schedule</a></li>
+									</ul>
+								</li>
+								<li><a class="dropdown-item" href="#">CSR</a></li>
+								<li class="dropdown-submenu">
+									<a class="dropdown-item dropdown-toggle" href="#">Skill Competitions</a>
+									<ul class="dropdown-menu">
+										<li><a class="dropdown-item" href="#">IndiaSkills</a></li>
+										<li><a class="dropdown-item" href="#">WorldSkills</a></li>
+									</ul>
+								</li>
+								<li><a class="dropdown-item" href="#" target="_blank">Job Fairs with TelcoJobs.in</a></li>
+								<li><a class="dropdown-item" href="#">Center of Excellence</a></li>
+								<li><a class="dropdown-item" href="#" target="_blank">TelcoLearning.com</a></li>
+								<li><a class="dropdown-item" href="#" target="_blank">TelcoJobs.in</a></li>
+							</ul>
+						</li>
+
+						<li class="nav-item"><a class="nav-link" href="#">Careers</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">Contact Us</a></li>
+					</ul>
+				</div>
+
+				<img src="https://tsscindia.com/assetsfe/images/logo-right.png" alt="Skill India / NSDC" class="logo-right-img d-none d-md-block">
+			</div>
+		</nav>
+	</header>
+
+	<div class="container-fluid stage">
+
+		<div class="row g-0" style="min-height: calc(100vh - 32px);">
+
+
+
+			<!-- Right sign-in form -->
+			<div class="col-lg-6 panel">
+				<div class="card">
+
+					<a class="d-lg-none brand-mark" href="index.html" style="color:var(--navy); margin-bottom:22px; display:flex;">
+						<span class="dot"></span> TSSC UNIFIED PORTAL
+					</a>
+
+					<div class="status-chip" id="formTitle"><span class="pulse"></span> HRMS Administrator Portal</div>
+					<div class="card-title">Welcome back</div>
+					<div class="card-note">Sign in with your registered user name and password to continue.</div>
+
+
+					@using (Html.BeginForm("Login", "Account", FormMethod.Post,
+										new
+										{
+											@class = "",
+											id = "signinForm",
+											autocomplete = "off",
+											autocorrect = "off",
+											autocapitalize = "off",
+											novalidate = "novalidate"
+										}))
+					{
+						<div class="field">
+							<label for="userid">User Name</label>
+
+							<div class="input-wrap">
+								<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+									<rect x="3" y="5" width="18" height="14" rx="2" />
+									<path d="M3 7l9 6 9-6" />
+								</svg>
+
+								@Html.TextBoxFor(m => m.userid, new
+									{
+										@class = "",
+										@id = "userid",
+										@placeholder = "Enter your username",
+										@autocomplete = "username",
+										required = "required"
+									})
+							</div>
+
+							@Html.ValidationMessageFor(m => m.userid, "", new { @class = "error-text" })
+						</div>
+
+						<div class="field">
+							<label for="password">Password</label>
+
+							<div class="input-wrap">
+								<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+									<rect x="5" y="11" width="14" height="9" rx="2" />
+									<path d="M8 11V8a4 4 0 018 0v3" />
+								</svg>
+
+								@Html.PasswordFor(m => m.Password, new
+									{
+										@class = "pw-field",
+										@id = "password",
+										@placeholder = "Enter your password",
+										@autocomplete = "current-password",
+										required = "required"
+									})
+
+								@* <button type="button"
+                                        class="pw-toggle"
+                                        id="pwToggle"
+                                        aria-label="Show password">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+                                        <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                </button> *@
+
+							</div>
+
+							@Html.ValidationMessageFor(m => m.Password, "", new { @class = "error-text" })
+						</div>
+
+						<div class="row-between">
+							@* <label class="remember">
+                                <input type="checkbox" name="RememberMe" />
+                                Remember me
+                            </label> *@
+
+							<a class="link-btn" href="javascript:void(0);">
+								Forgot password?
+							</a>
+						</div>
+
+						<button type="submit" id="btnSubmit" class="btn-primary">
+							Sign In
+						</button>
+
+						@if (TempData["ErrorMessage"] != null)
+						{
+							<div class="alert alert-danger mt-3">
+								<i class="fas fa-exclamation-circle me-2"></i>
+								@TempData["ErrorMessage"]
+							</div>
+						}
+					}
+
+
+					<div class="switch-line">Don't have an account? <a href="register.html">Register</a></div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="connect-bar">
+		<div class="wrap connect-inner">
+			<span class="connect-title">© 2026 Telecom Sector Skill Council. All Rights Reserved. Designed By v2web</span>
+			<span class="connect-icons">
+				Follow Us
+				<ul class="social-links ">
+					<li><a href="https://www.facebook.com/tssc.india" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+					<li><a href="https://www.linkedin.com/company/tsscindia" target="_blank"><i class="fab fa-linkedin-in"></i></a></li>
+					<li><a href="https://twitter.com/TSSCINDIA" target="_blank"><i class="fab fa-twitter"></i></a></li>
+					<li><a href="https://www.youtube.com/channel/UCzdYCsXY2fqf4se3CxMEOIA" target="_blank"><i class="fab fa-youtube"></i></a></li>
+
+
+				</ul>
+			</span>
+		</div>
+	</div>
+	<script src="~/Scripts/jquery-3.7.1.min.js"></script>
+	<script src="~/Scripts/jquery.validate.min.js"></script>
+	<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+	<script>
+		const role = sessionStorage.getItem('regRole');
+		if(role) document.getElementById('formTitle').textContent = role + ' Registration';
+
+		function toggleAcc(headEl){
+		  const acc = headEl.closest('.accordion');
+		  document.querySelectorAll('.accordion').forEach(a => { if(a !== acc) a.classList.remove('open'); });
+		  acc.classList.toggle('open');
+		  updateProgress();
+		}
+
+		function updateProgress(){
+		  const openStep = document.querySelector('.accordion.open');
+		  const stepNum = openStep ? parseInt(openStep.dataset.step) : 0;
+		  document.querySelectorAll('.form-progress .seg').forEach((seg, i) => {
+			seg.classList.toggle('done', i < stepNum);
+		  });
+		}
+		updateProgress();
+
+		function fileChosen(input){
+		  const label = input.closest('.file-drop').querySelector('.name');
+		  label.textContent = input.files.length ? input.files[0].name : 'no file chosen';
+		}
+
+		document.getElementById('tpForm').addEventListener('submit', (e) => {
+		  e.preventDefault();
+		  window.location.href = 'notification.html';
+		});
+
+	</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+	<script src="~/assets/js/bundle.js?ver=3.4.0"></script>
+	<script src="~/assets/js/scripts.js?ver=3.4.0"></script>
+
+</body>
+</html>

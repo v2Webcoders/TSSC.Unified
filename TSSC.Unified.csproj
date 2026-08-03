@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Areas\Dealer\**" />
+    <Compile Remove="wwwroot\excel\**" />
+    <Content Remove="Areas\Dealer\**" />
+    <Content Remove="wwwroot\excel\**" />
+    <EmbeddedResource Remove="Areas\Dealer\**" />
+    <EmbeddedResource Remove="wwwroot\excel\**" />
+    <None Remove="Areas\Dealer\**" />
+    <None Remove="wwwroot\excel\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="appsettings.json~RF97bfc7.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.Reporting" Version="2.1.0" />
+    <PackageReference Include="CCAvenueCryptoPackage" Version="2.2.0" />
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
+    <PackageReference Include="ExcelDataReader.DataSet" Version="3.8.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="8.0.7" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
+    <PackageReference Include="RestSharp" Version="111.4.1" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.7" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.7.0" />
+    <PackageReference Include="System.Security.Permissions" Version="8.0.0" />
+    <PackageReference Include="upwi.ExcelDataReader" Version="3.6.0" />
+    <PackageReference Include="X.PagedList" Version="10.5.9" />
+    <PackageReference Include="X.PagedList.Mvc.Core" Version="10.5.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Repository\" />
+    <Folder Include="wwwroot\uploads\invoices\" />
+  </ItemGroup>
+
+</Project>

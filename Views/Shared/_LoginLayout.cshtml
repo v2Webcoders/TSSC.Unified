@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html lang="zxx" class="js">
+
+<head>
+  @*   <base href="../../../"> *@
+    <meta charset="utf-8">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <!-- Fav Icon  -->
+    @* <link rel="shortcut icon" href="~/images/favicon.png"> *@
+    <!-- Page Title  -->
+    <title>Admin Login</title>
+    <!-- StyleSheets  -->
+    <link rel="stylesheet" href="~/assets/css/dashlite.css?ver=3.4.0">
+    <link id="skin-default" rel="stylesheet" href="~/assets/css/theme.css?ver=3.4.0">
+    @* <link id="skin-default" rel="stylesheet" href="~/assets/css/theme.css?ver=2.7.0">
+    <link id="skin-default" rel="stylesheet" href="~/assets/css/custom.css"> *@
+</head>
+
+<body class="nk-body bg-white npc-general pg-auth">
+    <section class="admin_loginArea sec_padding">
+        <div class="container">
+        @RenderBody()
+    </div>
+    </section>
+    
+    <!-- app-root @@e -->
+    <!-- JavaScript -->
+    <script src="~/assets/js/bundle.js?ver=2.7.0"></script>
+    <script src="~/assets/js/scripts.js?ver=2.7.0"></script>
+      <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+
+</html>

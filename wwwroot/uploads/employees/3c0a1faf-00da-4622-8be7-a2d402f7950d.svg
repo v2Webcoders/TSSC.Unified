@@ -1,0 +1,133 @@
+<svg viewBox="0 0 1500 1000" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="scpwdProcessTitle scpwdProcessDesc">
+  <title id="scpwdProcessTitle">Illustration: skilling mechanism leading to a diverse council and to opportunity</title>
+  <desc id="scpwdProcessDesc">Interlocking gears feed into a ring of diverse abstract figures representing the Council, which leads along a rising path to a star marking opportunity.</desc>
+
+  <defs>
+    <linearGradient id="scpwdBgLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EAF2F8"/>
+      <stop offset="100%" stop-color="#DCEAF3"/>
+    </linearGradient>
+    <radialGradient id="scpwdHubGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1BA2BA" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#1BA2BA" stop-opacity="0"/>
+    </radialGradient>
+    <marker id="scpwdArrowHead" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#00478E"/>
+    </marker>
+  </defs>
+
+  <rect width="1500" height="1000" fill="url(#scpwdBgLight)"/>
+
+  <!-- Faint logo-echo rings for brand texture -->
+  <circle cx="120" cy="880" r="160" fill="none" stroke="#1DA838" stroke-opacity="0.14" stroke-width="10"/>
+  <circle cx="1420" cy="90" r="140" fill="none" stroke="#F9B30A" stroke-opacity="0.16" stroke-width="10"/>
+
+  <!-- ================= LEFT: gear cluster = the skilling mechanism ================= -->
+  <g transform="translate(255,470)">
+    <!-- big navy gear -->
+    <g fill="#00478E">
+      <path id="scpwdGearBig" d="M 100.00,0.00 L 99.51,9.93 L 116.25,20.26 L 110.80,40.58 L 91.14,41.15 L 86.60,50.00 L 81.21,58.35 L 90.55,75.67 L 75.67,90.55 L 58.35,81.21 L 50.00,86.60 L 41.15,91.14 L 40.58,110.80 L 20.26,116.25 L 9.93,99.51 L 0.00,100.00 L -9.93,99.51 L -20.26,116.25 L -40.58,110.80 L -41.15,91.14 L -50.00,86.60 L -58.35,81.21 L -75.67,90.55 L -90.55,75.67 L -81.21,58.35 L -86.60,50.00 L -91.14,41.15 L -110.80,40.58 L -116.25,20.26 L -99.51,9.93 L -100.00,0.00 L -99.51,-9.93 L -116.25,-20.26 L -110.80,-40.58 L -91.14,-41.15 L -86.60,-50.00 L -81.21,-58.35 L -90.55,-75.67 L -75.67,-90.55 L -58.35,-81.21 L -50.00,-86.60 L -41.15,-91.14 L -40.58,-110.80 L -20.26,-116.25 L -9.93,-99.51 L -0.00,-100.00 L 9.93,-99.51 L 20.26,-116.25 L 40.58,-110.80 L 41.15,-91.14 L 50.00,-86.60 L 58.35,-81.21 L 75.67,-90.55 L 90.55,-75.67 L 81.21,-58.35 L 86.60,-50.00 L 91.14,-41.15 L 110.80,-40.58 L 116.25,-20.26 L 99.51,-9.93 Z"/>
+      <circle cx="0" cy="0" r="46" fill="#EAF2F8"/>
+    </g>
+    <!-- teal small gear, bottom-right overlap -->
+    <g transform="translate(96,86)" fill="#1BA2BA">
+      <path d="M 58.00,0.00 L 57.54,7.27 L 68.46,14.63 L 63.98,28.40 L 50.83,27.94 L 46.92,34.09 L 42.28,39.70 L 46.78,52.07 L 35.06,60.59 L 24.70,52.48 L 17.92,55.16 L 10.87,56.97 L 7.24,69.62 L -7.24,69.62 L -10.87,56.97 L -17.92,55.16 L -24.70,52.48 L -35.06,60.59 L -46.78,52.07 L -42.28,39.70 L -46.92,34.09 L -50.83,27.94 L -63.98,28.40 L -68.46,14.63 L -57.54,7.27 L -58.00,0.00 L -57.54,-7.27 L -68.46,-14.63 L -63.98,-28.40 L -50.83,-27.94 L -46.92,-34.09 L -42.28,-39.70 L -46.78,-52.07 L -35.06,-60.59 L -24.70,-52.48 L -17.92,-55.16 L -10.87,-56.97 L -7.24,-69.62 L 7.24,-69.62 L 10.87,-56.97 L 17.92,-55.16 L 24.70,-52.48 L 35.06,-60.59 L 46.78,-52.07 L 42.28,-39.70 L 46.92,-34.09 L 50.83,-27.94 L 63.98,-28.40 L 68.46,-14.63 L 57.54,-7.27 Z"/>
+      <circle cx="0" cy="0" r="27" fill="#EAF2F8"/>
+    </g>
+    <!-- gold tiny gear, top-right overlap -->
+    <g transform="translate(74,-92)" fill="#F9B30A">
+      <path d="M 37.00,0.00 L 36.60,5.41 L 44.71,10.83 L 41.21,20.44 L 31.51,19.39 L 28.34,23.78 L 24.57,27.67 L 27.28,37.03 L 18.43,42.15 L 11.68,35.11 L 6.42,36.44 L 1.03,36.99 L -2.90,45.91 L -12.97,44.13 L -13.62,34.40 L -18.50,32.04 L -22.98,29.00 L -31.73,33.30 L -38.31,25.47 L -32.55,17.60 L -34.77,12.65 L -36.24,7.44 L -45.72,5.11 L -45.72,-5.11 L -36.24,-7.44 L -34.77,-12.65 L -32.55,-17.60 L -38.31,-25.47 L -31.73,-33.30 L -22.98,-29.00 L -18.50,-32.04 L -13.62,-34.40 L -12.97,-44.13 L -2.90,-45.91 L 1.03,-36.99 L 6.42,-36.44 L 11.68,-35.11 L 18.43,-42.15 L 27.28,-37.03 L 24.57,-27.67 L 28.34,-23.78 L 31.51,-19.39 L 41.21,-20.44 L 44.71,-10.83 L 36.60,-5.41 Z"/>
+      <circle cx="0" cy="0" r="18" fill="#EAF2F8"/>
+    </g>
+    <!-- small skill mark inside the big gear hub -->
+    <g transform="translate(0,-4) scale(1.15)" fill="#00478E">
+      <path d="M -11 -3 L 0 -9 L 11 -3 L 0 3 Z"/>
+      <path d="M -6 0 L -6 7 C -6 9, 6 9, 6 7 L 6 0 L 0 3 Z"/>
+    </g>
+  </g>
+
+  <!-- Connector: mechanism -> council -->
+  <path d="M 420 480 C 520 470, 560 470, 640 480" fill="none" stroke="#00478E" stroke-width="3"
+        stroke-dasharray="1 12" stroke-linecap="round" marker-end="url(#scpwdArrowHead)"/>
+
+  <!-- ================= CENTER: ring of diverse figures = the Council ================= -->
+  <g transform="translate(830,480)">
+    <circle r="205" fill="url(#scpwdHubGlow)"/>
+    <circle r="188" fill="none" stroke="#00478E" stroke-opacity="0.18" stroke-width="2" stroke-dasharray="1 10"/>
+
+    <!-- central shared-goal hub -->
+    <circle r="34" fill="#FFFFFF" stroke="#00478E" stroke-opacity="0.25" stroke-width="2"/>
+    <g fill="#00478E">
+      <path d="M -11 -3 L 0 -9 L 11 -3 L 0 3 Z"/>
+      <path d="M -6 0 L -6 7 C -6 9, 6 9, 6 7 L 6 0 L 0 3 Z"/>
+    </g>
+
+    <!-- six diverse figures around the ring, spokes to hub -->
+    <!-- figure template reused at 6 angles: 0,60,120,180,240,300 degrees, radius 172 -->
+    <g id="scpwdRingFigures">
+      <!-- 0deg -->
+      <line x1="0" y1="0" x2="0" y2="-150" stroke="#00478E" stroke-opacity="0.15" stroke-width="1.5"/>
+      <g transform="translate(0,-172) scale(1.7)">
+        <path d="M -20 10 C -8 10, -2 -6, 14 -17" fill="none" stroke="#00478E" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="18" cy="-20" r="7.5" fill="#00478E"/>
+      </g>
+      <!-- 60deg -->
+      <line x1="0" y1="0" x2="129.9" y2="-75" stroke="#1BA2BA" stroke-opacity="0.15" stroke-width="1.5"/>
+      <g transform="translate(148.9,-86) rotate(60) scale(1.7)">
+        <path d="M -20 10 C -8 10, -2 -6, 14 -17" fill="none" stroke="#1BA2BA" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="18" cy="-20" r="7.5" fill="#1BA2BA"/>
+      </g>
+      <!-- 120deg -->
+      <line x1="0" y1="0" x2="129.9" y2="75" stroke="#1DA838" stroke-opacity="0.15" stroke-width="1.5"/>
+      <g transform="translate(148.9,86) rotate(120) scale(1.7)">
+        <path d="M -20 10 C -8 10, -2 -6, 14 -17" fill="none" stroke="#1DA838" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="18" cy="-20" r="7.5" fill="#1DA838"/>
+      </g>
+      <!-- 180deg -->
+      <line x1="0" y1="0" x2="0" y2="150" stroke="#F9B30A" stroke-opacity="0.15" stroke-width="1.5"/>
+      <g transform="translate(0,172) rotate(180) scale(1.7)">
+        <path d="M -20 10 C -8 10, -2 -6, 14 -17" fill="none" stroke="#F9B30A" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="18" cy="-20" r="7.5" fill="#F9B30A"/>
+      </g>
+      <!-- 240deg -->
+      <line x1="0" y1="0" x2="-129.9" y2="75" stroke="#00478E" stroke-opacity="0.15" stroke-width="1.5"/>
+      <g transform="translate(-148.9,86) rotate(240) scale(1.7)">
+        <path d="M -20 10 C -8 10, -2 -6, 14 -17" fill="none" stroke="#00478E" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="18" cy="-20" r="7.5" fill="#00478E"/>
+      </g>
+      <!-- 300deg -->
+      <line x1="0" y1="0" x2="-129.9" y2="-75" stroke="#1BA2BA" stroke-opacity="0.15" stroke-width="1.5"/>
+      <g transform="translate(-148.9,-86) rotate(300) scale(1.7)">
+        <path d="M -20 10 C -8 10, -2 -6, 14 -17" fill="none" stroke="#1BA2BA" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="18" cy="-20" r="7.5" fill="#1BA2BA"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- Connector: council -> opportunity -->
+  <path d="M 1040 420 C 1120 380, 1160 340, 1220 270" fill="none" stroke="#00478E" stroke-width="3"
+        stroke-dasharray="1 12" stroke-linecap="round" marker-end="url(#scpwdArrowHead)"/>
+
+  <!-- ================= RIGHT: rising path to opportunity ================= -->
+  <g transform="translate(1300,205)">
+    <circle r="30" fill="#F9B30A"/>
+    <path d="M0 -14 L4 -4.2 L14 -4.2 L6 2.1 L9 12.6 L0 6 L-9 12.6 L-6 2.1 L-14 -4.2 L-4 -4.2 Z" fill="#00478E"/>
+  </g>
+
+  <!-- accessibility badges echoing the login illustration, for family continuity -->
+  <g transform="translate(1140,610)">
+    <circle r="24" fill="#FFFFFF" stroke="#00478E" stroke-opacity="0.2" stroke-width="2"/>
+    <g stroke="#00478E" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="0" cy="9" r="9"/>
+      <circle cx="-2" cy="-9" r="3.4" fill="#00478E" stroke="none"/>
+      <path d="M -2 -5 L -2 3 L 8 3 M -2 -1 L 5 -1"/>
+    </g>
+  </g>
+  <g transform="translate(1220,700)">
+    <circle r="24" fill="#FFFFFF" stroke="#1DA838" stroke-opacity="0.2" stroke-width="2"/>
+    <g stroke="#1DA838" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M -10 0 C -6 -7, 6 -7, 10 0 C 6 7, -6 7, -10 0 Z"/>
+      <circle cx="0" cy="0" r="3" fill="#1DA838" stroke="none"/>
+    </g>
+  </g>
+</svg>

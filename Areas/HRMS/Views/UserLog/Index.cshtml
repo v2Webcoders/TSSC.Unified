@@ -1,0 +1,151 @@
+﻿@{
+    ViewData["Title"] = "User Login History";
+    Layout = "_Layout";
+}
+<style>
+	.dt-buttons {
+		margin-bottom: 15px !important;
+	}
+
+	#testListTable_filter {
+		margin-bottom: 15px !important;
+	}
+
+	/* Optional: Add space between buttons and search box */
+	.dt-buttons,
+	.dataTables_filter {
+		margin-right: 10px;
+	}
+
+	.dataTables_wrapper .dataTables_paginate .paginate_button {
+		margin-right: 1px !important; /* default is 15px+ */
+	}
+
+	/* Optional: reduce padding inside buttons */
+	.dataTables_wrapper .dataTables_paginate .paginate_button {
+		padding: 1px 1px !important;
+		text-align: center !important;
+	}
+
+	/* Fix DataTables Custom Button (DashLite compatible) */
+	.dt-buttons .btn,
+	.dt-buttons button {
+		display: inline-block !important;
+		min-width: 150px !important;
+		padding: 8px 16px !important;
+		background-color: #6576ff !important; /* DashLite primary */
+		border-color: #6576ff !important;
+		color: #ffffff !important; /* <-- IMPORTANT */
+		border-radius: 4px !important;
+		font-size: 14px !important;
+	}
+
+	/* Remove auto DataTables style */
+	.dt-buttons .btn-secondary {
+		color: #ffffff !important; /* make text visible */
+		background-color: #6576ff !important;
+		border-color: #6576ff !important;
+		opacity: 1 !important;
+	}
+
+	.dt-buttons .btn.btn-secondary span,
+	.dt-buttons .btn.btn-secondary span,
+	.dt-buttons .btn.btn-primary span,
+	.dt-buttons button.dt-button span {
+		color: #fff !important;
+		opacity: 1 !important;
+		visibility: visible !important;
+		display: inline-block;
+	}
+	/* Extra spacing */
+	.dataTables_wrapper .dt-buttons {
+		margin-bottom: 15px !important;
+	}
+
+	.dataTables_processing {
+		position: absolute !important;
+		top: 50% !important;
+		left: 50% !important;
+		transform: translate(-50%, -50%) !important;
+		z-index: 99999 !important;
+		padding: 20px 40px !important;
+		background: rgba(255, 255, 255, 0.95) !important;
+		border-radius: 8px !important;
+		font-size: 18px !important;
+		font-weight: 700 !important;
+		color: #ff6a00 !important;
+		border: 1px solid #d0d7de !important;
+		box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important;
+	}
+</style>
+
+@* <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css"> *@
+<div class="nk-block-head nk-block-head-lg wide-sm">
+	<div class="nk-block-head-content">
+		<h2 class="nk-block-title fw-normal">User Login History</h2>
+	</div>
+</div>
+<div class="nk-block nk-block-lg">
+    <div class="card card-bordered">
+        <div class="card-inner table-responsive">
+			<table id="loginHistoryTable" class="table table-tranx table_custom table-bordered ">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>User ID</th>
+                        <th>User Type</th>
+                        <th>Action</th>
+                        <th>Action Time</th>
+                        <th>IP Address</th>
+                        <th>Browser Info</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+
+<!-- DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#loginHistoryTable').DataTable({
+            processing: true,
+            serverSide: false,
+            ajax: {
+                url: '@Url.Action("GetLoginHistory", "UserLog", new { area = "Admin" })',
+                type: 'POST',
+                dataSrc: 'data'
+            },
+            pageLength: 25,
+            lengthMenu: [10, 25, 50, 100],
+            columns: [
+                {
+                    data: null,
+                    title: "S.No",
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                },
+                { data: "userId" },
+                { data: "userType" },
+                { data: "action" },
+                { data: "actionTime" },
+                { data: "ipAddress" },
+                { data: "browserInfo" }
+            ],
+            
+        });
+    });
+</script>

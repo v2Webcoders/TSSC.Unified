@@ -1,0 +1,155 @@
+﻿@using TSSC.Unified.Models
+@model HRPolicyVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+	Layout = "_Layout";
+    ViewData["Title"] = Model.PolicyId == 0 ? "Add HR Policy" : "Edit HR Policy";
+}
+
+
+
+<div class="nk-block-head">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                @(Model.PolicyId == 0 ? "Add HR Policy" : "Edit HR Policy")
+            </h3>
+            @* <div class="nk-block-des">
+                <p>Upload and manage HR policy documents.</p>
+            </div> *@
+        </div>
+
+        <div class="nk-block-head-content">
+            <a asp-action="Index" class="btn btn-primary">
+                <em class="icon ni ni-file-docs"></em>
+                <span>HR Policy List</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <form asp-action="Create"
+              method="post"
+              enctype="multipart/form-data">
+
+            @Html.AntiForgeryToken()
+
+            @Html.HiddenFor(x => x.PolicyId)
+            @Html.HiddenFor(x => x.PolicyDocument)
+
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-danger"></div>
+
+            <div class="row g-4">
+
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Policy Title <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="PolicyTitle"
+                           class="form-control"
+                           placeholder="Enter Policy Title" />
+
+                    <span asp-validation-for="PolicyTitle"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Policy PDF
+                        @if (Model.PolicyId == 0)
+                        {
+                            <span class="text-danger">*</span>
+                        }
+                    </label>
+
+                    <input asp-for="PolicyFile"
+                           type="file"
+                           accept=".pdf"
+                           class="form-control" required="@(Model.PolicyId == 0)" />
+
+                    <span asp-validation-for="PolicyFile"
+                          class="text-danger"></span>
+
+                    @if (!string.IsNullOrEmpty(Model.PolicyDocument))
+                    {
+                        <div class="mt-2">
+                            <a href="~/uploads/policies/@Model.PolicyDocument"
+                               target="_blank"
+                               class="btn btn-sm btn-outline-info">
+                                <em class="icon ni ni-file-docs"></em>
+                                View Current PDF
+                            </a>
+                        </div>
+                    }
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">
+                        Description
+                    </label>
+
+                    <textarea asp-for="Description"
+                              rows="5"
+                              class="form-control"
+                              placeholder="Enter Policy Description"></textarea>
+
+                    <span asp-validation-for="Description"
+                          class="text-danger"></span>
+                </div>
+
+                @if (Model.PolicyId > 0)
+                {
+                    <div class="col-md-12">
+                        <div class="custom-control custom-checkbox">
+
+                            <input asp-for="IsActive"
+                                   class="custom-control-input"
+                                   id="chkActive" />
+
+                            <label class="custom-control-label"
+                                   for="chkActive">
+                                Make this Active Policy
+                            </label>
+
+                        </div>
+                    </div>
+
+                }
+
+            </div>
+
+            <hr />
+
+            <div class="text-end">
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    <em class="icon ni @(Model.PolicyId == 0 ? "ni-save" : "ni-edit")"></em>
+
+                    @(Model.PolicyId == 0 ? "Save Policy" : "Update Policy")
+
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-light">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

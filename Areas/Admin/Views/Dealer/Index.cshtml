@@ -1,0 +1,80 @@
+﻿@model List<DealerMasterVM>
+@using QUIZAPP.Areas.Admin.ViewModels
+@using X.PagedList
+@using X.PagedList.Mvc.Core;
+@{
+	Layout = "_Layout";
+	int serial = 1;
+	//int serial = ((Model.PageNumber - 1) * Model.PageSize) + 1;
+}
+@section Styles {
+	<link rel="stylesheet" href="~/assets/css/style.css" asp-append-version="true" />
+}
+<div class="nk-block-head nk-block-head-lg wide-sm">
+	<div class="nk-block-head-content">
+		<h2 class="nk-block-title fw-normal">Dealer Master List (@ViewBag.Count)</h2>
+	</div>
+</div><!-- .nk-block-head -->
+<div class="nk-block nk-block-lg">
+	<div class="nk-block nk-block-lg">
+		<div class="card card-bordered card-preview">
+			<div class="card-inner">
+				<div class="row gy-4 pb-3">
+					<div class="col-md-12">
+						<div class="text-right">
+							@*  <a asp-controller="Client" asp-action="Create" class="btn badge-primary">Create Client</a> *@
+						</div>
+					</div>
+				</div>
+				<div id="accordion-1" class="accordion accordion-s2">
+					<div class="table table-responsive pb-2">
+						
+						<table class="datatable-init-export table table-tranx table_custom table-bordered mb-2" data-auto-responsive="false">
+							<thead class="table-dark">
+								<tr>
+									<th>S.No.</th>
+									<th>Dealer Code</th>
+									<th>Dealer Name</th>
+									<th>Pincode</th>
+									<th>Status</th>
+									<th>Type</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								@foreach (var d in Model)
+								{
+									<tr>
+										<td>@serial</td>
+										<td>@d.DealerCode</td>
+										<td>@d.DealerName</td>
+										<td>@d.Pincode</td>
+										<td>@d.DealerStatus</td>
+										<td>@(d.DType == "2w" ? "2-Wheeler" : d.DType == "4w" ? "4-Wheeler" : "Unknown")</td>
+									</tr>
+									serial++;
+								}
+							</tbody>
+						</table>
+						@* @Html.PagedListPager(
+															Model,
+															page => Url.Action("Index", new { page }),
+															new PagedListRenderOptions
+						{
+							LiElementClasses = new[] { "page-item" },
+							PageClasses = new[] { "page-link" },
+							DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+							DisplayLinkToLastPage = PagedListDisplayMode.Always,
+							DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+							DisplayLinkToNextPage = PagedListDisplayMode.Always,
+							MaximumPageNumbersToDisplay = 5,
+							UlElementClasses = new[] { "pagination", "justify-content-left", "mt-3 mb-3" }
+						}
+															) *@
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+

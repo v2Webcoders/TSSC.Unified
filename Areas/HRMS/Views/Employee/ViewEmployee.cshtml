@@ -1,0 +1,393 @@
+﻿@model TSSC.Unified.ViewModel.EmployeeVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+	Layout = "_Layout";
+}
+@functions {
+    // Renders a fallback dash for null/empty values so the layout never looks "broken"
+    string Val(string? v) => string.IsNullOrWhiteSpace(v) ? "—" : v;
+}
+<div class="nk-block-head nk-block-head-sm">
+	<div class="nk-block-between">
+		<div class="nk-block-head-content">
+			<h3 class="nk-block-title page-title">Employee Details</h3>
+			<div class="nk-block-des text-soft">
+				<p>View employee information.</p>
+			</div>
+		</div>
+
+		<div class="nk-block-head-content">
+			<a asp-action="EmployeeList"
+			   class="btn btn-primary d-none d-md-inline-flex">
+				<em class="icon ni ni-users"></em> Employee List
+			</a>
+
+			<a asp-action="Create"
+			   asp-route-id="@Model.EmployeeId"
+			   class="btn btn-warning d-none d-md-inline-flex ms-2">
+				<em class="icon ni ni-edit"></em>
+				<span>Edit</span>
+			</a>
+		</div>
+	</div>
+</div>
+
+<div class="nk-block nk-block-lg">
+
+    <!-- ============= Profile Summary Header ============= -->
+    <div class="card card-preview mb-3">
+        <div class="card-inner">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-5">
+                <div class="d-flex align-items-center gap-5 p-3">
+                    @* <div class="d-flex align-items-center justify-content-center flex-shrink-0"
+                         style="width:56px;height:56px;border-radius:50%;background:#EEF1F8;color:#1B2A4A;font-weight:600;font-size:20px;">
+                        @(string.IsNullOrWhiteSpace(Model.FirstName) ? "?" : Model.FirstName.Substring(0, 1))@(string.IsNullOrWhiteSpace(Model.LastName) ? "" : Model.LastName.Substring(0, 1))
+                    </div> *@
+                    <div class="flex-shrink-0">
+                        @if (!string.IsNullOrEmpty(Model.PhotoPath))
+                        {
+                            <img src="@Model.PhotoPath"
+                                 alt="Employee Photo"
+                                 class="rounded-circle border"
+                                 style="width:75px;height:75px;object-fit:cover;">
+                        }
+                        else
+                        {
+                            <img src="~/images/no-user.png"
+                                 alt="No Photo"
+                                 class="rounded-circle border"
+                                 style="width:75px;height:75px;object-fit:cover;">
+                        }
+                    </div>
+                    <div >
+                        <h5 class="mb-1">@Val(Model.FirstName) @Val(Model.LastName)</h5>
+                        <div class="text-muted small">
+                            <span>@Val(Model.EmployeeCode)</span>
+                            <span class="mx-1">•</span>
+                            <span>@Val(Model.DesignationName)</span>
+                            <span class="mx-1">•</span>
+                            <span>@Val(Model.DepartmentName)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Inactive</span>
+                    }
+                    @* <a href="#" class="btn btn-outline-primary btn-sm">
+                        <em class="ni ni-edit me-1"></em> Edit
+                    </a>
+                    <a href="#" class="btn btn-light btn-sm">Back to List</a> *@
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============= Tab Bar + Content — one continuous card ============= -->
+    <div class="card card-preview">
+
+        <!-- Tab bar: DashLite nav-tabs-mline style, scroll-spy quick nav -->
+        <div class="card-inner border-bottom py-0">
+            <ul class="nav nav-tabs nav-tabs-mline border-0">
+                <li class="nav-item"><a class="nav-link active" href="#sec-basic">Basic</a></li>
+                <li class="nav-item"><a class="nav-link" href="#sec-official">Official</a></li>
+                <li class="nav-item"><a class="nav-link" href="#sec-contact">Contact</a></li>
+                <li class="nav-item"><a class="nav-link" href="#sec-address">Address</a></li>
+                <li class="nav-item"><a class="nav-link" href="#sec-identity">Identity</a></li>
+                <li class="nav-item"><a class="nav-link" href="#sec-bank">Bank</a></li>
+                <li class="nav-item"><a class="nav-link" href="#sec-salary">Salary</a></li>
+                <li class="nav-item"><a class="nav-link" href="#sec-login">Login</a></li>
+            </ul>
+        </div>
+
+        <div class="card-inner">
+
+            <!-- ============= Basic Information ============= -->
+            <div id="sec-basic" class="col-12 mb-4">
+                <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
+                    <h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+                        <em class="ni ni-user-alt"></em> Basic Information
+                    </h5>
+                </div>
+            </div>
+
+            <div class="row gy-4">
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Employee Code</label>
+                    <p class="fw-medium mb-0">@Val(Model.EmployeeCode)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">First Name</label>
+                    <p class="fw-medium mb-0">@Val(Model.FirstName)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Last Name</label>
+                    <p class="fw-medium mb-0">@Val(Model.LastName)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Gender</label>
+                    <p class="fw-medium mb-0">@Val(Model.Gender)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Date of Birth</label>
+                    <p class="fw-medium mb-0">@(Model.DOB.HasValue ? Model.DOB.Value.ToString("dd-MMM-yyyy") : "—")</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Blood Group</label>
+                    <p class="fw-medium mb-0">@Val(Model.BloodGroup)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Marital Status</label>
+                    <p class="fw-medium mb-0">@Val(Model.MaritalStatus)</p>
+                </div>
+            </div>
+
+            <div class="my-5"></div>
+
+            <!-- ============= Official Information ============= -->
+            <div id="sec-official" class="col-12 mb-4 mt-5">
+                <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
+                    <h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+                        <em class="ni ni-building"></em> Official Information
+                    </h5>
+                </div>
+            </div>
+
+            <div class="row gy-4">
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Department</label>
+                    <p class="fw-medium mb-0">@Val(Model.DepartmentName)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Designation</label>
+                    <p class="fw-medium mb-0">@Val(Model.DesignationName)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Reporting Manager</label>
+                    <p class="fw-medium mb-0">@Val(Model.ReportingManagerName)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Joining Date</label>
+                    <p class="fw-medium mb-0">@(Model.JoiningDate.HasValue ? Model.JoiningDate.Value.ToString("dd-MMM-yyyy") : "—")</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Employee Type</label>
+                    <p class="fw-medium mb-0">@Val(Model.EmployeeType)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Employment Status</label>
+                    <p class="fw-medium mb-0">@Val(Model.EmploymentStatus)</p>
+                </div>
+            </div>
+
+            <div class="my-5"></div>
+
+            <!-- ============= Contact Information ============= -->
+            <div id="sec-contact" class="col-12 mb-4 mt-5">
+                <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
+                    <h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+                        <em class="ni ni-call"></em> Contact Information
+                    </h5>
+                </div>
+            </div>
+
+            <div class="row gy-4">
+                <div class="col-md-6">
+                    <label class="form-label text-muted mb-1">Official Email</label>
+                    <p class="fw-medium mb-0">@Val(Model.OfficialEmail)</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label text-muted mb-1">Personal Email</label>
+                    <p class="fw-medium mb-0">@Val(Model.PersonalEmail)</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label text-muted mb-1">Mobile</label>
+                    <p class="fw-medium mb-0">@Val(Model.MobileNo)</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label text-muted mb-1">Alternate Mobile</label>
+                    <p class="fw-medium mb-0">@Val(Model.AlternateMobile)</p>
+                </div>
+            </div>
+
+            <div class="my-5"></div>
+
+            <!-- ============= Address ============= -->
+            <div id="sec-address" class="col-12 mb-4 mt-5">
+                <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
+                    <h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+                        <em class="ni ni-map-pin"></em> Address
+                    </h5>
+                </div>
+            </div>
+
+            <div class="row gy-4">
+                <div class="col-md-6">
+                    <label class="form-label text-muted mb-1">Current Address</label>
+                    <p class="fw-medium mb-0">@Val(Model.CurrentAddress)</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label text-muted mb-1">Permanent Address</label>
+                    <p class="fw-medium mb-0">@Val(Model.PermanentAddress)</p>
+                </div>
+            </div>
+
+            <div class="my-5"></div>
+
+            <!-- ============= Identity Details ============= -->
+            <div id="sec-identity" class="col-12 mb-4 mt-5">
+                <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
+                    <h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+                        <em class="ni ni-shield-check"></em> Identity Details
+                    </h5>
+                </div>
+            </div>
+
+            <div class="row gy-4">
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Aadhaar</label>
+                    <p class="fw-medium mb-0">@Val(Model.AadhaarNo)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">PAN</label>
+                    <p class="fw-medium mb-0">@Val(Model.PANNo)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Passport</label>
+                    <p class="fw-medium mb-0">@Val(Model.PassportNo)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">UAN</label>
+                    <p class="fw-medium mb-0">@Val(Model.UANNo)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">PF</label>
+                    <p class="fw-medium mb-0">@Val(Model.PFNo)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">ESIC</label>
+                    <p class="fw-medium mb-0">@Val(Model.ESICNo)</p>
+                </div>
+            </div>
+
+            <div class="my-5"></div>
+
+            <!-- ============= Bank Details ============= -->
+            <div id="sec-bank" class="col-12 mb-4 mt-5">
+                <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
+                    <h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+                        <em class="icon ni ni-money"></em> Bank Details
+                    </h5>
+                </div>
+            </div>
+
+            <div class="row gy-4">
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Bank Name</label>
+                    <p class="fw-medium mb-0">@Val(Model.BankName)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Account No.</label>
+                    <p class="fw-medium mb-0">@Val(Model.AccountNo)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">IFSC Code</label>
+                    <p class="fw-medium mb-0">@Val(Model.IFSCCode)</p>
+                </div>
+            </div>
+
+            <div class="my-5"></div>
+
+            <!-- ============= Salary Details ============= -->
+            <div id="sec-salary" class="col-12 mb-4 mt-5">
+                <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
+                    <h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+                        <em class="ni ni-wallet"></em> Salary Details
+                    </h5>
+                </div>
+            </div>
+
+            <div class="row gy-4">
+                <div class="col-md-3">
+                    <label class="form-label text-muted mb-1">CTC</label>
+                    <p class="fw-medium mb-0">@Val(Model.CTC?.ToString("N0"))</p>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted mb-1">Basic Salary</label>
+                    <p class="fw-medium mb-0">@Val(Model.BasicSalary?.ToString("N0"))</p>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted mb-1">HRA</label>
+                    <p class="fw-medium mb-0">@Val(Model.HRA?.ToString("N0"))</p>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted mb-1">Special Allowance</label>
+                    <p class="fw-medium mb-0">@Val(Model.SpecialAllowance?.ToString("N0"))</p>
+                </div>
+            </div>
+
+            <div class="my-5"></div>
+
+            <!-- ============= Login Information ============= -->
+            <div id="sec-login" class="col-12 mb-4 mt-5">
+                <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
+                    <h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+                        <em class="ni ni-signin"></em> Login Information
+                    </h5>
+                </div>
+            </div>
+
+            <div class="row gy-4">
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Username</label>
+                    <p class="fw-medium mb-0">@Val(Model.Username)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Role</label>
+                    <p class="fw-medium mb-0">@Val(Model.RoleName)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Status</label>
+                    <p class="mb-0">
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactive</span>
+                        }
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Highlight active tab in the scroll-spy nav as the user scrolls
+    document.addEventListener('DOMContentLoaded', function () {
+        var sections = ['sec-basic','sec-official','sec-contact','sec-address','sec-identity','sec-bank','sec-salary','sec-login'];
+        var navLinks = document.querySelectorAll('.nav-tabs .nav-link');
+
+        window.addEventListener('scroll', function () {
+            var scrollPos = window.scrollY + 120;
+            sections.forEach(function (id, i) {
+                var el = document.getElementById(id);
+                if (el && el.offsetTop <= scrollPos) {
+                    navLinks.forEach(function (l) { l.classList.remove('active'); });
+                    navLinks[i].classList.add('active');
+                }
+            });
+        });
+    });
+</script>
+
