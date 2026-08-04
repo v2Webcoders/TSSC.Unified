@@ -9,6 +9,10 @@
 	var email = currentUser?.Email ?? "No email";
 	var mobile = currentUser?.MobileNo ?? "NA";
 	var role = currentUser?.UserRole ?? "HR Manager";
+    var roles = currentUser != null
+        ? await UserManager.GetRolesAsync(currentUser)
+        : new List<string>();
+}
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -156,7 +160,7 @@
 
                                         <li class="nk-menu-item">
                                             <a href="/HRMS/HRPolicy" class="nk-menu-link">
-                                                <span class="nk-menu-text">HR Policy List</span>
+                                                <span class="nk-menu-text"> Policy List</span>
                                             </a>
                                         </li>
 
@@ -184,122 +188,7 @@
                                     </a>
                                 </li>
                             </ul>
-                            @* <ul class="nk-menu">
-                                <li class="nk-menu-heading">
-                                    <h6 class="overline-title">HR Manager Panel</h6>
-                                </li><!-- .nk-menu-heading -->
-
-                                <li class="nk-menu-item">
-                                    <a href="/HRMS/Dashboard" class="nk-menu-link">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-th-large"></i>
-                                        </span>
-                                        <span class="nk-menu-text">Dashboard</span>
-                                    </a>
-                                </li>
-
-                                <li class="nk-menu-item">
-                                    <a href="/HRMS/Profile/MyProfile" class="nk-menu-link">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-user-circle"></i>
-                                        </span>
-                                        <span class="nk-menu-text">My Profile</span>
-                                    </a>
-                                </li>
-
-                                <li class="nk-menu-heading">
-                                    <h6 class="overline-title">Employee Management</h6>
-                                </li><!-- .nk-menu-heading -->
-
-                                <li class="nk-menu-item">
-                                    <a href="/HRMS/Employee/EmployeeList" class="nk-menu-link">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-user-plus"></i>
-                                        </span>
-                                        <span class="nk-menu-text">Employee Management</span>
-                                    </a>
-                                </li>
-
-                                <li class="nk-menu-heading">
-                                    <h6 class="overline-title">Attendance &amp; Leave</h6>
-                                </li><!-- .nk-menu-heading -->
-
-                                <li class="nk-menu-item">
-                                    <a href="/HRMS/Attendance/Mark" class="nk-menu-link">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-clock"></i>
-                                        </span>
-                                        <span class="nk-menu-text">Mark Attendance</span>
-                                    </a>
-                                </li>
-
-                                <li class="nk-menu-item">
-                                    <a href="/HRMS/Attendance/ViewAll" class="nk-menu-link">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-eye"></i>
-                                        </span>
-                                        <span class="nk-menu-text">View Attendance</span>
-                                    </a>
-                                </li>
-
-                                <li class="nk-menu-item">
-                                    <a href="/HRMS/Approvals/Pending" class="nk-menu-link">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-check-double"></i>
-                                        </span>
-                                        <span class="nk-menu-text">Regularization / Leave / OD Approval</span>
-                                    </a>
-                                </li>
-
-                                <li class="nk-menu-item">
-                                    <a href="/HRMS/Leave/Calendar" class="nk-menu-link">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-calendar-alt"></i>
-                                        </span>
-                                        <span class="nk-menu-text">Leave Calendar</span>
-                                    </a>
-                                </li>
-
-                                <li class="nk-menu-item">
-                                    <a href="/HRMS/Leave/Adjust" class="nk-menu-link">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-balance-scale"></i>
-                                        </span>
-                                        <span class="nk-menu-text">Adjust / Credit Leaves</span>
-                                    </a>
-                                </li>
-
-                                <li class="nk-menu-heading">
-                                    <h6 class="overline-title">Policies &amp; Calendar</h6>
-                                </li><!-- .nk-menu-heading -->
-
-                                <li class="nk-menu-item">
-                                    <a href="/HRMS/Policy/Index" class="nk-menu-link">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-file-alt"></i>
-                                        </span>
-                                        <span class="nk-menu-text">HR Policy Documents</span>
-                                    </a>
-                                </li>
-
-                                <li class="nk-menu-item">
-                                    <a href="/HRMS/Policy/Create" class="nk-menu-link">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-file-upload"></i>
-                                        </span>
-                                        <span class="nk-menu-text">Create Policy</span>
-                                    </a>
-                                </li>
-
-                                <li class="nk-menu-item">
-                                    <a href="/HRMS/Calendar/Holidays" class="nk-menu-link">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-umbrella-beach"></i>
-                                        </span>
-                                        <span class="nk-menu-text">Holiday Marking</span>
-                                    </a>
-                                </li>
-                            </ul> *@
+                           
                         </div><!-- .nk-sidebar-menu -->
                     </div><!-- .nk-sidebar-content -->
                 </div><!-- .nk-sidebar-element -->

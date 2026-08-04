@@ -82,7 +82,7 @@
 											<label class="form-label">Employee Code <span class="text-danger">*</span></label>
 											<input asp-for="EmployeeCode" class="form-control" />
 										</div>
-
+										
 										<div class="col-md-4">
 											<label class="form-label">First Name <span class="text-danger">*</span></label>
 											<input asp-for="FirstName" class="form-control" />
@@ -121,6 +121,7 @@
 												<option>AB-</option>
 												<option>O+</option>
 												<option>O-</option>
+												<option>NA</option>
 											</select>
 										</div>
 
@@ -237,83 +238,90 @@
 								<div id="sec-official" class="col-12 mb-4 mt-5">
 									<div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
 										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
-											<em class="ni ni-building"></em> Official Information
+											<em class="ni ni-building"></em>
+											Official Information
 										</h5>
 									</div>
 								</div>
-								<div class="col-md-4">
-									<label class="form-label">Department<span class="text-danger">*</span></label>
-									<select asp-for="DepartmentId"
-											asp-items="ViewBag.Departments"
-											class="form-select">
+
+								<div class="col-md-3">
+									<label class="form-label">Branch <span class="text-danger"></span></label>
+									<select asp-for="BranchId" asp-items="ViewBag.Branches" class="form-select">
+										<option value="">Select Branch</option>
+									</select>
+								</div>
+
+								<div class="col-md-3">
+									<label class="form-label">Sub Branch</label>
+									<select asp-for="SubBranchId" asp-items="ViewBag.SubBranches" class="form-select">
+										<option value="">Select Sub Branch</option>
+									</select>
+								</div>
+
+								<div class="col-md-3">
+									<label class="form-label">Department <span class="text-danger">*</span></label>
+									<select asp-for="DepartmentId" asp-items="ViewBag.Departments" class="form-select">
 										<option value="">Select Department</option>
 									</select>
 								</div>
 
-								<div class="col-md-4">
-									<label class="form-label">Designation<span class="text-danger">*</span></label>
-									<select asp-for="DesignationId"
-											asp-items="ViewBag.Designations"
-											class="form-control">
+								<div class="col-md-3">
+									<label class="form-label">Designation <span class="text-danger">*</span></label>
+									<select asp-for="DesignationId" asp-items="ViewBag.Designations" class="form-select">
 										<option value="">Select Designation</option>
 									</select>
 								</div>
-								<div class="col-md-4">
+
+								<div class="col-md-3">
 									<label class="form-label">Reporting Manager</label>
-									<select asp-for="ReportingManagerId"
-											asp-items="ViewBag.Managers"
-											class="form-control">
+									<select asp-for="ReportingManagerId" asp-items="ViewBag.Managers" class="form-select">
 										<option value="">Select Manager</option>
 									</select>
 								</div>
 
-								<div class="col-md-4">
-									<label class="form-label">Joining Date</label>
+								<div class="col-md-3">
+									<label class="form-label">Joining Date <span class="text-danger">*</span></label>
 									<input asp-for="JoiningDate" type="date" class="form-control" />
 								</div>
 
-								<div class="col-md-4">
-									<div class="form-group">
-										<label class="form-label">
-											Employee Type <span class="text-danger">*</span>
-										</label>
-
-										<select asp-for="EmployeeType" class="form-select">
-											<option value="">-- Select Employee Type --</option>
-											<option value="Permanent">Permanent</option>
-											<option value="Probation">Probation</option>
-											<option value="Contract">Contract</option>
-											<option value="Temporary">Temporary</option>
-											<option value="Internship">Internship</option>
-											<option value="Consultant">Consultant</option>
-											<option value="Part-Time">Part-Time</option>
-										</select>
-
-										<span asp-validation-for="EmployeeType" class="text-danger"></span>
-									</div>
+								<div class="col-md-3">
+									<label class="form-label">Employee Type <span class="text-danger">*</span></label>
+									<select asp-for="EmployeeType" class="form-select">
+										<option value="">Select Employee Type</option>
+										<option>Permanent</option>
+										<option>Probation</option>
+										<option>Contract</option>
+										<option>Temporary</option>
+										<option>Internship</option>
+										<option>Consultant</option>
+										<option>Part-Time</option>
+									</select>
 								</div>
 
-								<div class="col-md-4">
-									<div class="form-group">
-										<label class="form-label">
-											Employment Status <span class="text-danger">*</span>
-										</label>
+								<div class="col-md-3">
+									<label class="form-label">Employment Status <span class="text-danger">*</span></label>
+									<select asp-for="EmploymentStatus" class="form-select">
+										<option value="">Select Status</option>
+										<option>Active</option>
+										<option>On Probation</option>
+										<option>On Leave</option>
+										<option>Notice Period</option>
+										<option>Resigned</option>
+										<option>Relieved</option>
+										<option>Terminated</option>
+									</select>
+								</div>
 
-										<select asp-for="EmploymentStatus" class="form-select">
-											<option value="">-- Select Employment Status --</option>
-											<option value="Active">Active</option>
-											<option value="On Probation">On Probation</option>
-											<option value="On Leave">On Leave</option>
-											<option value="Notice Period">Notice Period</option>
-											<option value="Suspended">Suspended</option>
-											<option value="Resigned">Resigned</option>
-											<option value="Relieved">Relieved</option>
-											<option value="Terminated">Terminated</option>
-											<option value="Retired">Retired</option>
-										</select>
-
-										<span asp-validation-for="EmploymentStatus" class="text-danger"></span>
-									</div>
+								<div class="col-md-3">
+									<label class="form-label">Notice Period</label>
+									<select asp-for="NoticePeriod" class="form-select">
+										<option value="">Select</option>
+										<option value="0">Immediate</option>
+										<option value="15">15 Days</option>
+										<option value="30">30 Days</option>
+										<option value="60">60 Days</option>
+										<option value="90">90 Days</option>
+									</select>
 								</div>
 
 								<!-- ============= Contact Information ============= -->

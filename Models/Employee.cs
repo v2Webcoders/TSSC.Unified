@@ -147,6 +147,13 @@ namespace TSSC.Unified.Models
         [ForeignKey(nameof(ReportingManagerId))]
         public virtual Employee? ReportingManager { get; set; }
         public string? PhotoPath { get; set; }
+        public string? Prefix { get; set; }
+
+        public int? BranchId { get; set; }
+
+        public int? SubBranchId { get; set; }
+
+        public int? NoticePeriod { get; set; }
     }
     public class Department
     {

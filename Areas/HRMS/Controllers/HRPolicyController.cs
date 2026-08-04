@@ -54,6 +54,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 {
                     PolicyId = policy.PolicyId,
                     PolicyTitle = policy.PolicyTitle,
+                    PolicyType = policy.PolicyType,   
                     Description = policy.Description,
                     PolicyDocument = policy.PolicyDocument,
                     IsActive = policy.IsActive,
@@ -103,22 +104,26 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 }
             }
 
-            // Make only one policy active
+            // Make only one policy active for the selected Policy Type
             if (model.IsActive)
             {
                 var activePolicies = await _context.HRPolicies
-                    .Where(x => x.IsActive && x.PolicyId != model.PolicyId)
+                    .Where(x => x.IsActive
+                             && x.PolicyType == model.PolicyType
+                             && x.PolicyId != model.PolicyId)
                     .ToListAsync();
 
                 foreach (var item in activePolicies)
+                {
                     item.IsActive = false;
+                }
             }
-
             if (model.PolicyId == 0)
             {
                 var policy = new HRPolicy
                 {
                     PolicyTitle = model.PolicyTitle,
+                    PolicyType = model.PolicyType,          // Added
                     Description = model.Description,
                     PolicyDocument = fileName,
                     IsActive = true,                     // Always active for new policy
@@ -139,7 +144,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
                 policy.PolicyTitle = model.PolicyTitle;
                 policy.Description = model.Description;
-
+                policy.PolicyType = model.PolicyType;       // Added
                 if (!string.IsNullOrEmpty(fileName))
                     policy.PolicyDocument = fileName;
 
