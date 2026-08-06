@@ -1,0 +1,158 @@
+﻿@model IEnumerable<TSSC.Unified.ViewModel.TaskVM>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+
+    bool isClosedPage = ViewBag.IsClosedPage != null
+        && Convert.ToBoolean(ViewBag.IsClosedPage);
+}
+<div class="nk-content-body">
+
+    <div class="card card-bordered">
+
+        <div class="card-inner">
+
+            <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer dtr-inline collapsed">
+
+                <thead>
+
+                    <tr>
+
+                        <th>S.No.</th>
+
+                        <th>Task Name</th>
+
+                        <th>Description</th>
+
+                        <th>Assigned To</th>
+
+                        <th>Assigned By</th>
+
+                        <th>Deadline</th>
+
+                        <th>Employee Remarks</th>
+
+                        <th>Employee Attachment</th>
+
+                        <th>Completed On</th>
+
+                        <th>Status</th>
+
+                        <th width="120">Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <td>@serial</td>
+
+                            <td>@item.TaskName</td>
+
+                            <td>@item.TaskDescription</td>
+
+                            <td>@item.AssignedToName</td>
+
+                            <td>@item.AssignedByName</td>
+
+                            <td>@item.Deadline.ToString("dd-MMM-yyyy")</td>
+
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.EmployeeRemarks))
+                                {
+                                    @item.EmployeeRemarks
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+
+                            <td>
+
+                                @if (!string.IsNullOrEmpty(item.AttachmentByEmployee))
+                                {
+                                    <a href="~/Uploads/Tasks/@item.AttachmentByEmployee"
+                                       target="_blank"
+                                       class="btn btn-sm btn-outline-info">
+
+                                        <em class="icon ni ni-file-text"></em>
+                                        View File
+
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+
+                            </td>
+
+                            <td>
+
+                                @(item.CompletedOn?.ToString("dd-MMM-yyyy"))
+
+                            </td>
+
+                            <td>
+
+                                <span class="badge badge-dot bg-success">
+                                    Completed
+                                </span>
+
+                            </td>
+
+                            <td>
+                                <div class="btn-group" role="group">
+
+                                    <a asp-action="CompletedTaskDetails"
+                                       asp-route-id="@item.TaskId"
+                                       class="btn btn-sm btn-outline-info"
+                                       title="View">
+                                        <em class="icon ni ni-eye"></em>
+                                    </a>
+
+                                    @if (!isClosedPage)
+                                    {
+                                        <form asp-action="CloseTask" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.TaskId" />
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-success">
+                                                <em class="icon ni ni-check-circle"></em>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-success" disabled>
+                                            <em class="icon ni ni-check-circle-fill"></em>
+                                        </button>
+                                    }
+
+                                </div>
+                            </td>
+
+                        </tr>
+
+                        serial++;
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

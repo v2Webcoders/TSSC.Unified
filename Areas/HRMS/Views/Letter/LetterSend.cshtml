@@ -1,0 +1,167 @@
+﻿@model TSSC.Unified.ViewModel.LetterRegisterVM
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Send Letter";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                @(Model.LetterId > 0 ? "Edit Send Letter" : "Send Letter")
+            </h3>
+        </div>
+
+        <div class="nk-block-head-content">
+            <a asp-action="Index"
+               asp-controller="Letter"
+               class="btn btn-primary d-none d-md-inline-flex">
+                <em class="icon ni ni-list"></em>&nbsp; Letter Register
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="nk-block nk-block-lg">
+    <div class="card card-preview">
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+        }
+
+        @if (TempData["msg"] != null)
+        {
+            <div class="example-alert w-100">
+                <div class="alert alert-success alert-icon">
+                    <em class="icon ni ni-check-circle"></em>
+                    <strong>@TempData["msg"]</strong>
+                </div>
+            </div>
+        }
+
+        <div class="card-inner">
+            <form asp-action="LetterSend"
+                  asp-controller="Letter"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <input type="hidden" asp-for="LetterId" />
+
+                <div class="row gy-3">
+
+                    <!-- Receive Information -->
+                    <div class="col-12 mb-4">
+                        <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
+                            <h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+                                <em class="ni ni-inbox"></em>
+                                Receive Information
+                            </h5>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            Received Item <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="ItemName" class="form-control" />
+                        <span asp-validation-for="ItemName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Name of Receiver</label>
+                        <input asp-for="ReceiverName" class="form-control" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Mode of Send</label>
+                        <select asp-for="Mode" class="form-select">
+                            <option value="">Select</option>
+                            <option>Courier</option>
+                            <option>By Hand</option>
+                            <option>Post</option>
+                            <option>Email</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Docket No.</label>
+                        <input asp-for="DocketNo" class="form-control" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Send By</label>
+                        <select asp-for="SentBy"
+                                asp-items="Model.EmployeeList"
+                                class="form-select">
+                            <option value="">Select Employee</option>
+                        </select>
+                    </div>
+
+
+                    <div class="col-md-4">
+                        <label class="form-label">Handover To</label>
+                        <input asp-for="Handover" class="form-control" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Handover Date</label>
+                        <input asp-for="HandoverDate"
+                               type="date"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Attachment</label>
+                        <input asp-for="LetterAttachmentFile"
+                               type="file"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label">Remarks</label>
+                        <textarea asp-for="Remarks"
+                                  rows="3"
+                                  class="form-control"></textarea>
+                    </div>
+
+                    <div class="col-12 mt-4">
+
+                        <button type="submit" class="btn btn-primary">
+
+                            @if (Model.LetterId > 0)
+                            {
+                                <em class="icon ni ni-edit"></em>
+                                <span> Update Letter</span>
+                            }
+                            else
+                            {
+                                <em class="icon ni ni-save"></em>
+                                <span> Save Letter</span>
+                            }
+
+                        </button>
+
+                        <a asp-action="Index"
+                           asp-controller="Letter"
+                           class="btn btn-outline-secondary ms-2">
+                            Cancel
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

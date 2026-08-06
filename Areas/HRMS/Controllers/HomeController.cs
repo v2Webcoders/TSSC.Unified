@@ -23,9 +23,21 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
         public IActionResult Index()
         {
+            if (User.IsInRole("HR"))
+            {
+                return View("Index");
+            }
+            else if (User.IsInRole("Employee"))
+            {
+                return View("EmployeeDashboard");
+            }
+
             return View();
         }
-       
+        public IActionResult EmployeeDashboard()
+        {
+            return View();
+        }
         public IActionResult Privacy()
         {
             return View();

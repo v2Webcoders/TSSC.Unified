@@ -26,11 +26,16 @@ namespace QUIZAPP
 
         public DbSet<Designation> Designation { get; set; }
         public DbSet<HRPolicy> HRPolicies { get; set; }
+
         public DbSet<Branch> Branch { get; set; }
 
         public DbSet<SubBranch> SubBranch { get; set; }
         public DbSet<LeaveType> LeaveType { get; set; }
         public DbSet<LeaveRequest> LeaveRequest { get; set; }
+
+        public DbSet<Tasks> Tasks { get; set; }
+        public DbSet<LetterRegister> LetterRegister { get; set; }
+
 
     }
 }
