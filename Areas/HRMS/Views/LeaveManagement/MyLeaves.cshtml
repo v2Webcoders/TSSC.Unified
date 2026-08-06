@@ -1,0 +1,204 @@
+﻿@model IEnumerable<TSSC.Unified.Models.LeaveRequest>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+	Layout = "_Layout";
+	int serial = 1;
+	//int serial = ((Model.PageNumber - 1) * Model.PageSize) + 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Leave Management</h3>
+        </div>
+
+        <div class="nk-block-head-content">
+            <div class="toggle-wrap nk-block-tools-toggle">
+
+                <a href="#"
+                   class="btn btn-icon btn-trigger toggle-expand me-n1"
+                   data-target="pageMenu">
+                    <em class="icon ni ni-more-v"></em>
+                </a>
+
+                <div class="toggle-expand-content" data-content="pageMenu">
+                    <ul class="nk-block-tools g-3">
+
+                        <li class="nk-block-tools-opt">
+                            <a asp-action="Create" asp-controller="LeaveRequest"
+                               class="btn btn-primary">
+                                <em class="icon ni ni-plus"></em>
+                                <span>Apply Leave</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="nk-block nk-block-lg">
+    <div class="card card-preview">
+
+        <div class="card-inner">
+
+            <div class="table-responsive">
+
+                <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+                    <thead>
+                        <tr>
+                            <th width="60">S.No.</th>
+                            <th>Leave Type</th>
+                            <th>Duration</th>
+                            <th>From Date</th>
+                            <th>To Date</th>
+                            <th>Total Days</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th width="130">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>@serial</td>
+
+                                <td>
+                                    @item.LeaveType?.LeaveTypeName
+                                </td>
+
+                                <td>
+                                    @item.LeaveDuration
+                                </td>
+
+                                <td>
+                                    @item.FromDate.ToString("dd-MMM-yyyy")
+                                </td>
+
+                                <td>
+                                    @item.ToDate.ToString("dd-MMM-yyyy")
+                                </td>
+
+                                <td>
+                                    @item.TotalDays
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrEmpty(item.Reason)
+                                        ? "-"
+                                        : (item.Reason.Length > 50
+                                        ? item.Reason.Substring(0, 50) + "..."
+                                        : item.Reason))
+                                </td>
+
+                                <td>
+                                    @if (item.Status == "Approved")
+                                    {
+                                        <span class="badge badge-dot bg-success">
+                                            Approved
+                                        </span>
+
+                                        <br />
+                                        <small class="text-muted">
+                                            @item.ApprovedDate?.ToString("dd-MMM-yyyy")
+                                        </small>
+                                    }
+                                    else if (item.Status == "Rejected")
+                                    {
+                                        <span class="badge badge-dot bg-danger">
+                                            Rejected
+                                        </span>
+
+                                        <br />
+                                        <small class="text-muted">
+                                            @item.ApprovedDate?.ToString("dd-MMM-yyyy hh:mm")
+                                        </small>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-dot bg-warning">
+                                            Pending
+                                        </span>
+
+                                        <br />
+                                        <small class="text-muted">
+                                            Applied: @item.CreatedDate.ToString("dd-MMM-yyyy hh:mm")
+                                        </small>
+                                    }
+                                </td>
+
+
+
+                                <td>
+                                    <div class="btn-group">
+
+                                        @if (item.Status == "Pending")
+                                        {
+                                            <a asp-action="Approve"
+                                               asp-route-id="@item.LeaveRequestId"
+                                               class="btn btn-sm btn-outline-success"
+                                               title="Approve"
+                                               onclick="return confirm('Are you sure you want to approve this leave request?');">
+                                                <em class="icon ni ni-check"></em>
+                                            </a>
+
+                                            <a asp-action="Reject"
+                                               asp-route-id="@item.LeaveRequestId"
+                                               class="btn btn-sm btn-outline-danger"
+                                               title="Reject"
+                                               onclick="return confirm('Are you sure you want to reject this leave request?');">
+                                                <em class="icon ni ni-cross"></em>
+                                            </a>
+                                        }
+                                        else if (item.Status == "Approved")
+                                        {
+                                            <a asp-action="Reject"
+                                               asp-route-id="@item.LeaveRequestId"
+                                               class="btn btn-sm btn-outline-danger"
+                                               title="Reject"
+                                               onclick="return confirm('This leave request is already approved. Change it to Rejected?');">
+                                                <em class="icon ni ni-cross"></em>
+                                            </a>
+                                        }
+                                        else if (item.Status == "Rejected")
+                                        {
+                                            <a asp-action="Approve"
+                                               asp-route-id="@item.LeaveRequestId"
+                                               class="btn btn-sm btn-outline-success"
+                                               title="Approve"
+                                               onclick="return confirm('This leave request is already rejected. Change it to Approved?');">
+                                                <em class="icon ni ni-check"></em>
+                                            </a>
+                                        }
+
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                            serial++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+

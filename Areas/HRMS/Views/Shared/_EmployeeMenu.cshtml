@@ -1,0 +1,114 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<ul class="nk-menu">
+
+    <li class="nk-menu-heading">
+        <h6 class="overline-title">Employee Panel</h6>
+    </li>
+
+    <!-- Dashboard -->
+    <li class="nk-menu-item">
+        <a href="/HRMS/Home/" class="nk-menu-link">
+            <span class="nk-menu-icon">
+                <em class="icon ni ni-monitor"></em>
+            </span>
+            <span class="nk-menu-text">Dashboard</span>
+        </a>
+    </li>
+
+    <!-- Attendance & Leave -->
+    <li class="nk-menu-item has-sub">
+        <a href="#" class="nk-menu-link nk-menu-toggle">
+            <span class="nk-menu-icon">
+                <em class="icon ni ni-calendar"></em>
+            </span>
+            <span class="nk-menu-text">Attendance & Leave</span>
+        </a>
+
+        <ul class="nk-menu-sub">
+
+            <li class="nk-menu-item">
+                <a href="/HRMS/Attendance/Mark" class="nk-menu-link">
+                    <span class="nk-menu-text">Mark Attendance</span>
+                </a>
+            </li>
+
+            <li class="nk-menu-item">
+                <a href="/HRMS/Attendance/MyAttendance" class="nk-menu-link">
+                    <span class="nk-menu-text">My Attendance</span>
+                </a>
+            </li>
+
+            <li class="nk-menu-item">
+                <a href="/HRMS/Attendance/Regularization" class="nk-menu-link">
+                    <span class="nk-menu-text">Attendance Regularization</span>
+                </a>
+            </li>
+
+            <li class="nk-menu-item">
+                <a href="/HRMS/LeaveRequest/Create" class="nk-menu-link">
+                    <span class="nk-menu-text">Apply Leave</span>
+                </a>
+            </li>
+
+            <li class="nk-menu-item">
+                <a href="/HRMS/LeaveRequest/MyLeaves" class="nk-menu-link">
+                    <span class="nk-menu-text">My Leave Requests</span>
+                </a>
+            </li>
+
+            <li class="nk-menu-item">
+                <a href="/HRMS/Leave/Balance" class="nk-menu-link">
+                    <span class="nk-menu-text">Leave Balance</span>
+                </a>
+            </li>
+
+            <li class="nk-menu-item">
+                <a href="/HRMS/Leave/Calendar" class="nk-menu-link">
+                    <span class="nk-menu-text">Holiday Calendar</span>
+                </a>
+            </li>
+
+        </ul>
+    </li>
+
+    <!-- HR Policies -->
+    <li class="nk-menu-item has-sub">
+        <a href="#" class="nk-menu-link nk-menu-toggle">
+            <span class="nk-menu-icon">
+                <em class="icon ni ni-file-docs"></em>
+            </span>
+            <span class="nk-menu-text">HR Policies</span>
+        </a>
+
+        <ul class="nk-menu-sub">
+
+            <li class="nk-menu-item">
+                <a href="/HRMS/HRPolicy/EmployeePolicies" class="nk-menu-link">
+                    <span class="nk-menu-text">Company Policies</span>
+                </a>
+            </li>
+
+            <li class="nk-menu-item">
+                <a href="/HRMS/Calendar/Holidays" class="nk-menu-link">
+                    <span class="nk-menu-text">Holiday Calendar</span>
+                </a>
+            </li>
+
+        </ul>
+    </li>
+
+    <!-- My Profile -->
+    <li class="nk-menu-item">
+        <a href="/HRMS/Profile/MyProfile" class="nk-menu-link">
+            <span class="nk-menu-icon">
+                <em class="icon ni ni-user-circle"></em>
+            </span>
+            <span class="nk-menu-text">My Profile</span>
+        </a>
+    </li>
+
+</ul>

@@ -9,7 +9,7 @@ using System.Diagnostics;
 namespace QUIZAPP.Areas.HRMS.Controllers
 {
     [Area("HRMS")]
-    [Authorize(Roles = "HR")]
+    [Authorize(Roles = "HR, Employee")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

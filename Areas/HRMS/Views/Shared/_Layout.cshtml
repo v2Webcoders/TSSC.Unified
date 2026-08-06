@@ -54,7 +54,7 @@
                 <div class="nk-sidebar-element nk-sidebar-body">
                     <div class="nk-sidebar-content">
                         <div class="nk-sidebar-menu" data-simplebar>
-                            <ul class="nk-menu">
+                            @* <ul class="nk-menu">
 
                                 <li class="nk-menu-heading">
                                     <h6 class="overline-title">HR Manager Panel</h6>
@@ -187,8 +187,15 @@
                                         <span class="nk-menu-text">My Profile</span>
                                     </a>
                                 </li>
-                            </ul>
-                           
+                            </ul>  *@
+                        @if (User.IsInRole("HR"))
+                        {
+                            <partial name="_HRMenu" />
+                        }
+                        else if (User.IsInRole("Employee"))
+                        {
+                            <partial name="_EmployeeMenu" />
+                        }
                         </div><!-- .nk-sidebar-menu -->
                     </div><!-- .nk-sidebar-content -->
                 </div><!-- .nk-sidebar-element -->

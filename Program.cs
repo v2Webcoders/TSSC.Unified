@@ -54,8 +54,25 @@ var app = builder.Build();
 //    var userManager = services.GetRequiredService<UserManager<AppUser>>();
 //    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-//    //Seed Roles
-//    string[] roles = new[] { "HR", "Employee" };
+//   // Seed Roles
+//string[] roles = new[]
+//{
+//    "Employee",
+//    "CEO",
+//    "Finance",
+//    "BusinessHead",
+//    "VerticalHead",
+//    "HR",
+//    "ITAdmin",
+//    "AffiliationTeam",
+//    "RegionalOffice",
+//    "ValidationTeam",
+//    "StandardsTeam",
+//    "AssessmentReviewer",
+//    "ProjectManager",
+//    "GrievanceTeam"
+//};
+
 //    foreach (var role in roles)
 //    {
 //        if (!await roleManager.RoleExistsAsync(role))
