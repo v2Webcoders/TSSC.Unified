@@ -1,0 +1,213 @@
+﻿@model TSSC.Unified.ViewModel.TaskVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+}
+
+@if (TempData["msg"] != null)
+{
+    <div class="example-alert w-100">
+        <div class="alert alert-success alert-icon">
+            <em class="icon ni ni-check-circle"></em>
+            <strong>@TempData["msg"]</strong>
+        </div>
+    </div>
+}
+
+<div class="preview-block">
+
+    <div class="row gy-4">
+
+        <div class="col-sm-12">
+
+            <div class="row gy-3">
+
+                <!-- ================= Task Information ================= -->
+
+                <div class="col-12 mb-4">
+                    <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
+
+                        <h5 class="mb-0 d-flex align-items-center gap-2"
+                            style="color:#1B2A4A;">
+
+                            <em class="icon ni ni-eye"></em>
+                            Task Details
+
+                        </h5>
+
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Task Name
+                    </label>
+
+                    <input asp-for="TaskName"
+                           class="form-control"
+                           readonly />
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Assign To
+                    </label>
+
+                    <input asp-for="AssignedToName"
+                           class="form-control"
+                           readonly />
+
+                </div>
+
+                <div class="col-md-12">
+
+                    <label class="form-label">
+                        Task Description
+                    </label>
+
+                    <textarea asp-for="TaskDescription"
+                              class="form-control"
+                              rows="4"
+                              readonly></textarea>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Deadline
+                    </label>
+
+                    <input asp-for="Deadline"
+                           type="date"
+                           class="form-control"
+                           readonly />
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Status
+                    </label>
+
+                    <input asp-for="Status"
+                           class="form-control"
+                           readonly />
+
+                </div>
+
+                <div class="col-md-12">
+
+                    <label class="form-label">
+                        HR Remarks
+                    </label>
+
+                    <textarea asp-for="Remarks"
+                              class="form-control"
+                              rows="3"
+                              readonly></textarea>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        HR Attachment
+                    </label>
+                    <br />
+
+                    @if (!string.IsNullOrEmpty(Model.Attachment))
+                    {
+                        <a href="~/Uploads/Tasks/@Model.Attachment"
+                           target="_blank"
+                           class="btn btn-outline-info btn-sm">
+
+                            <em class="icon ni ni-file-text"></em>
+                            View Attachment
+
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No Attachment</span>
+                    }
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Employee Attachment
+                    </label>
+                    <br />
+
+                    @if (!string.IsNullOrEmpty(Model.AttachmentByEmployee))
+                    {
+                        <a href="~/Uploads/Tasks/@Model.AttachmentByEmployee"
+                           target="_blank"
+                           class="btn btn-outline-success btn-sm">
+
+                            <em class="icon ni ni-file-text"></em>
+                            View Attachment
+
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No Attachment</span>
+                    }
+
+                </div>
+
+                <div class="col-md-12">
+
+                    <label class="form-label">
+                        Employee Remarks
+                    </label>
+
+                    <textarea asp-for="EmployeeRemarks"
+                              class="form-control"
+                              rows="3"
+                              readonly></textarea>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Completed On
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           value="@(Model.CompletedOn?.ToString("dd-MMM-yyyy"))"
+                           readonly />
+
+                </div>
+
+                <div class="col-12 mt-4">
+
+                    <a asp-action="CompletedTask"
+                       asp-controller="Task"
+                       class="btn btn-outline-secondary">
+
+                        <em class="icon ni ni-arrow-left"></em>
+                        Back
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

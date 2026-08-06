@@ -9,7 +9,7 @@ using System.Diagnostics;
 namespace QUIZAPP.Areas.HRMS.Controllers
 {
     [Area("HRMS")]
-    [Authorize(Roles = "HR")]
+    [Authorize(Roles = "HR,Employee")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -23,9 +23,21 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
         public IActionResult Index()
         {
+            if (User.IsInRole("HR"))
+            {
+                return View("Index");
+            }
+            else if (User.IsInRole("Employee"))
+            {
+                return View("EmployeeDashboard");
+            }
+
             return View();
         }
-       
+        public IActionResult EmployeeDashboard()
+        {
+            return View();
+        }
         public IActionResult Privacy()
         {
             return View();

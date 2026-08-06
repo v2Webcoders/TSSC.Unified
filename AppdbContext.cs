@@ -29,6 +29,8 @@ namespace QUIZAPP
 
         public DbSet<Designation> Designation { get; set; }
         public DbSet<HRPolicy> HRPolicies { get; set; }
+        public DbSet<Tasks>Tasks { get; set; }
+        public DbSet<LetterRegister> LetterRegister { get; set; }
 
     }
 }

@@ -1,5 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Identity
+@using QUIZAPP
+@using QUIZAPP.Models
+@inject AppdbContext Context
 @inject UserManager<AppUser> UserManager
 @inject SignInManager<AppUser> SignInManager
 
@@ -9,6 +12,23 @@
 	var email = currentUser?.Email ?? "No email";
 	var mobile = currentUser?.MobileNo ?? "NA";
 	var role = currentUser?.UserRole ?? "HR Manager";
+  
+   
+     var employee = Context.Employee
+      .FirstOrDefault(x => x.ApplicationUserId == currentUser.Id);
+    bool isReportingManager = Context.Employee
+  .Any(x => x.ReportingManagerId == employee.EmployeeId);
+    // var employeeList = Context.Employee
+    // .Where(x => x.ReportingManagerId == employee.EmployeeId && x.IsActive)
+    // .Select(x => new SelectListItem
+    // {
+    //     Value = x.EmployeeId.ToString(),
+    //     Text = x.FirstName + " " + x.LastName
+    // })
+    // .ToList();
+
+    // ViewBag.EmployeeList = employeeList;
+
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -46,9 +66,12 @@
                             <img src="~/assets/images/logo.png" class="img-fluid w-auto" alt="">
                         </a>
                     </div>
-                </div><!-- .nk-sidebar-element -->
-                <div class="nk-sidebar-element nk-sidebar-body">
-                    <div class="nk-sidebar-content">
+                </div>
+                @if (User.IsInRole("HR"))
+                {
+                    <!-- .nk-sidebar-element -->
+                    <div class="nk-sidebar-element nk-sidebar-body">
+                        <div class="nk-sidebar-content">
                         <div class="nk-sidebar-menu" data-simplebar>
                             <ul class="nk-menu">
 
@@ -69,28 +92,30 @@
                                
 
                                 <!-- Employee Management -->
-                                <li class="nk-menu-item has-sub">
-                                    <a href="#" class="nk-menu-link nk-menu-toggle">
-                                        <span class="nk-menu-icon">
-                                            <em class="icon ni ni-users"></em>
-                                        </span>
-                                        <span class="nk-menu-text">Employee Management</span>
-                                    </a>
+                               
+                                    <li class="nk-menu-item has-sub">
+                                        <a href="#" class="nk-menu-link nk-menu-toggle">
+                                            <span class="nk-menu-icon">
+                                                <em class="icon ni ni-users"></em>
+                                            </span>
+                                            <span class="nk-menu-text">Employee Management</span>
+                                        </a>
 
-                                    <ul class="nk-menu-sub">
-                                        <li class="nk-menu-item">
-                                            <a href="/HRMS/Employee/Create" class="nk-menu-link">
-                                                <span class="nk-menu-text">Add Employee</span>
-                                            </a>
-                                        </li>
-                                        <li class="nk-menu-item">
-                                            <a href="/HRMS/Employee/EmployeeList" class="nk-menu-link">
-                                                <span class="nk-menu-text">Employee List</span>
-                                            </a>
-                                        </li>
+                                        <ul class="nk-menu-sub">
+                                            <li class="nk-menu-item">
+                                                <a href="/HRMS/Employee/Create" class="nk-menu-link">
+                                                    <span class="nk-menu-text">Add Employee</span>
+                                                </a>
+                                            </li>
+                                            <li class="nk-menu-item">
+                                                <a href="/HRMS/Employee/EmployeeList" class="nk-menu-link">
+                                                    <span class="nk-menu-text">Employee List</span>
+                                                </a>
+                                            </li>
 
-                                    </ul>
-                                </li>
+                                        </ul>
+                                    </li>
+                                
 
                                 <!-- Attendance & Leave -->
                                 <li class="nk-menu-item has-sub">
@@ -302,7 +327,130 @@
                             </ul> *@
                         </div><!-- .nk-sidebar-menu -->
                     </div><!-- .nk-sidebar-content -->
-                </div><!-- .nk-sidebar-element -->
+                    </div>
+
+                    <!-- .nk-sidebar-element -->
+                }
+
+                @if (User.IsInRole("Employee"))
+                {
+                    <!-- .nk-sidebar-element -->
+                    <div class="nk-sidebar-element nk-sidebar-body">
+                        <div class="nk-sidebar-content">
+                            <div class="nk-sidebar-menu" data-simplebar>
+                                <ul class="nk-menu">
+
+                                    <li class="nk-menu-heading">
+                                        <h6 class="overline-title">Employee Manager Panel</h6>
+                                    </li>
+
+                                    <!-- Dashboard -->
+                                    <li class="nk-menu-item">
+                                        <a href="/HRMS/Home/" class="nk-menu-link">
+                                            <span class="nk-menu-icon">
+                                                <em class="icon ni ni-monitor"></em>
+                                            </span>
+                                            <span class="nk-menu-text">Dashboard</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="nk-menu-item has-sub">
+                                        <a href="#" class="nk-menu-link nk-menu-toggle">
+                                            <span class="nk-menu-icon">
+                                                <em class="icon ni ni-users"></em>
+                                            </span>
+                                            <span class="nk-menu-text">Letter(Send / Receive)</span>
+                                        </a>
+
+                                        <ul class="nk-menu-sub">
+                                            <li class="nk-menu-item">
+                                                <a href="/HRMS/Letter/LetterReceive" class="nk-menu-link">
+                                                    <span class="nk-menu-text">Receive Letter</span>
+                                                </a>
+                                            </li>
+                                            <li class="nk-menu-item">
+                                                <a href="/HRMS/Letter/LetterSend" class="nk-menu-link">
+                                                    <span class="nk-menu-text">Send Letter</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+
+                                    <!-- Employee Management -->
+                                  @*   @if (employee != null && employee.CanAssignTask)
+                                    { *@
+                                    @if (isReportingManager)
+                                    {
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle">
+                                            <span class="nk-menu-icon">
+                                                <em class="icon ni ni-users"></em>
+                                            </span>
+                                            <span class="nk-menu-text">Task & Activities (Assign & Apporval)</span>
+                                        </a>
+
+                                        <ul class="nk-menu-sub">
+                                            <li class="nk-menu-item">
+                                                <a href="/HRMS/Task/Create" class="nk-menu-link">
+                                                    <span class="nk-menu-text">Assign Task</span>
+                                                </a>
+                                            </li>
+                                            <li class="nk-menu-item">
+                                                <a href="/HRMS/Task/TaskList" class="nk-menu-link">
+                                                    <span class="nk-menu-text">Task List</span>
+                                                </a>
+                                            </li>
+                                            <li class="nk-menu-item">
+                                                <a href="/HRMS/Task/CompletedTask" class="nk-menu-link">
+                                                    <span class="nk-menu-text">Completed Tasks</span>
+                                                </a>
+                                            </li>
+                                                <li class="nk-menu-item">
+                                                    <a href="/HRMS/Task/ClosedTask" class="nk-menu-link">
+                                                        <span class="nk-menu-text">Closed Tasks</span>
+                                                    </a>
+                                                </li>
+                                        </ul>
+                                    </li>
+                                    }
+                                   else
+                                    {
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon">
+                                                    <em class="icon ni ni-users"></em>
+                                                </span>
+                                                <span class="nk-menu-text">Task & Activities</span>
+                                            </a>
+
+                                            <ul class="nk-menu-sub">
+                                                <li class="nk-menu-item">
+                                                    <a href="/HRMS/Task/MyTasks" class="nk-menu-link">
+                                                        <span class="nk-menu-text">My Task</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    }
+
+                                   
+                                    <!-- My Profile -->
+                                    <li class="nk-menu-item">
+                                        <a href="/HRMS/Profile/MyProfile" class="nk-menu-link">
+                                            <span class="nk-menu-icon">
+                                                <em class="icon ni ni-user-circle"></em>
+                                            </span>
+                                            <span class="nk-menu-text">My Profile</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div><!-- .nk-sidebar-menu -->
+                        </div><!-- .nk-sidebar-content -->
+                    </div>
+
+                    <!-- .nk-sidebar-element -->
+                }
+
             </div>
             <!-- sidebar  -->
             <div class="nk-wrap">

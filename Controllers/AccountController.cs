@@ -83,7 +83,7 @@ namespace QUIZAPP.Controllers
                 return RedirectToAction("Index", "Home", new { area = "Admin" });
             }
 
-            if (role == "hr")
+            if (role == "hr" || role =="employee")
             {
                 return RedirectToAction("Index", "Home", new { area = "HRMS" });
             }

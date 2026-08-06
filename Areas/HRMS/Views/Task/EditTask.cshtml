@@ -1,0 +1,212 @@
+﻿@model TSSC.Unified.ViewModel.TaskVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+}
+
+@if (TempData["msg"] != null)
+{
+    <div class="example-alert w-100">
+        <div class="alert alert-success alert-icon">
+            <em class="icon ni ni-check-circle"></em>
+            <strong>@TempData["msg"]</strong>
+        </div>
+    </div>
+}
+
+<div class="card-inner">
+
+    <div class="preview-block">
+
+        <div class="row gy-4">
+
+            <div class="col-sm-12">
+
+                <form asp-action="Edit"
+                      asp-controller="Task"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    <input type="hidden" asp-for="TaskId" />
+
+                    <div class="row gy-3">
+
+                        <!-- ================= Task Information ================= -->
+
+                        <div class="col-12 mb-4">
+                            <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
+
+                                <h5 class="mb-0 d-flex align-items-center gap-2"
+                                    style="color:#1B2A4A;">
+
+                                    <em class="ni ni-edit"></em>
+                                    Edit Task
+
+                                </h5>
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Task Name <span class="text-danger">*</span>
+                            </label>
+
+                            <input asp-for="TaskName"
+                                   class="form-control" />
+
+                            <span asp-validation-for="TaskName"
+                                  class="text-danger"></span>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Assign To <span class="text-danger">*</span>
+                            </label>
+
+                            <select asp-for="AssignedTo"
+                                    asp-items="ViewBag.EmployeeList"
+                                    class="form-select">
+
+                                <option value="">
+                                    Select Employee
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="AssignedTo"
+                                  class="text-danger"></span>
+
+                        </div>
+
+                        <div class="col-md-12">
+
+                            <label class="form-label">
+                                Task Description
+                            </label>
+
+                            <textarea asp-for="TaskDescription"
+                                      class="form-control"
+                                      rows="4"></textarea>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Deadline <span class="text-danger">*</span>
+                            </label>
+
+                            <input asp-for="Deadline"
+                                   type="date"
+                                   class="form-control" />
+
+                            <span asp-validation-for="Deadline"
+                                  class="text-danger"></span>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Current Attachment
+                            </label>
+
+                            @if (!string.IsNullOrEmpty(Model.Attachment))
+                            {
+                                <div class="mb-2">
+                                    <a href="~/Uploads/Tasks/@Model.Attachment"
+                                       target="_blank"
+                                       class="btn btn-outline-info btn-sm">
+
+                                        <em class="icon ni ni-file-text"></em>
+                                        View Attachment
+
+                                    </a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-muted mb-2">
+                                    No Attachment
+                                </div>
+                            }
+
+                            <input asp-for="AttachmentFile"
+                                   type="file"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-12">
+
+                            <label class="form-label">
+                                Remarks
+                            </label>
+
+                            <textarea asp-for="Remarks"
+                                      class="form-control"
+                                      rows="3"></textarea>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Status
+                            </label>
+
+                            <select asp-for="Status"
+                                    class="form-select">
+
+                                <option value="Pending">Pending</option>
+
+                                <option value="In Progress">In Progress</option>
+
+                                <option value="Completed">Completed</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-12 mt-4">
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                <em class="icon ni ni-edit"></em>
+                                <span>Update Task</span>
+
+                            </button>
+
+                            <a asp-action="TaskList"
+                               asp-controller="Task"
+                               class="btn btn-outline-secondary ms-2">
+
+                                Cancel
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,172 @@
+﻿@model IEnumerable<TSSC.Unified.ViewModel.TaskVM>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+@* <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Task List</h4>
+
+    <a asp-action="Create"
+       asp-controller="Task"
+       class="btn btn-primary">
+        <em class="icon ni ni-plus"></em>
+        Assign Task
+    </a>
+</div> *@
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Task List</h3>
+        </div>
+        <div class="nk-block-head-content">
+            <div class="toggle-wrap nk-block-tools-toggle">
+                <a href="#" class="btn btn-icon btn-trigger toggle-expand me-n1" data-target="pageMenu"><em class="icon ni ni-more-v"></em></a>
+                <div class="toggle-expand-content" data-content="pageMenu">
+                    <ul class="nk-block-tools g-3">
+                        <li class="nk-block-tools-opt"><a href="/HRMS/Task/Create" class="btn btn-primary"><em class="icon ni ni-plus"></em><span>Add Task</span></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer dtr-inline collapsed">
+
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Task Name</th>
+                    <th>Description</th>
+                    <th>Assigned To</th>
+                    <th>Assigned By</th>
+                    <th>Deadline</th>
+                    <th>Status</th>
+                    <th>Attachment</th>
+                    <th>Created On</th>
+                    <th>Updated On</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>@serial</td>
+
+                        <td>
+                            @item.TaskName
+                        </td>
+
+                        <td>
+                            @item.TaskDescription
+                        </td>
+
+                        <td>
+                            @item.AssignedToName
+                        </td>
+
+                        <td>
+                            @item.AssignedByName
+                        </td>
+
+
+                        <td>
+                            @item.Deadline.ToString("dd-MMM-yyyy")
+                        </td>
+
+
+                        <td>
+                            @if (item.Status == "Completed")
+                            {
+                                <span class="badge badge-dot bg-success">
+                                    Completed
+                                </span>
+                            }
+                            else if (item.Status == "In Progress")
+                            {
+                                <span class="badge badge-dot bg-info">
+                                    In Progress
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-dot bg-warning">
+                                    Pending
+                                </span>
+                            }
+                        </td>
+
+
+                        <td>
+
+                            @if (!string.IsNullOrEmpty(item.Attachment))
+                            {
+                                <a href="~/Uploads/Tasks/@item.Attachment"
+                                   target="_blank">
+                                    View File
+                                </a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+
+                        </td>
+
+
+                        <td>
+                            @item.CreatedOn?.ToString("dd-MMM-yyyy")
+                        </td>
+
+
+                        <td>
+                            @item.UpdatedOn?.ToString("dd-MMM-yyyy")
+                        </td>
+
+
+                        <td>
+
+                            <div class="btn-group" role="group">
+
+                                <a asp-action="EditTask"
+                                asp-controller="Task"
+                                   asp-route-id="@item.TaskId"
+                                   class="btn btn-sm btn-outline-warning"
+                                   title="Edit">
+                                    <em class="icon ni ni-edit"></em>
+                                </a>
+
+
+                                <a asp-action="DeleteTask"
+                                asp-controller="Task"
+                                   asp-route-id="@item.TaskId"
+                                   class="btn btn-sm btn-outline-danger"
+                                   title="Delete">
+                                    <em class="icon ni ni-trash"></em>
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    serial++;
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+</div>
