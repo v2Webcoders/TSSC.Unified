@@ -1,0 +1,228 @@
+﻿
+:root {
+    --bs-primary: #12406B;
+    --bs-primary-rgb: 18,64,107;
+    --bs-secondary: #F0943D;
+    --bs-secondary-rgb: 240,148,61;
+    --navy: #12406B;
+    --navy-dark: #0A2E52;
+    --blue: #1868B0;
+    --saffron: #F0943D;
+    --saffron-dark: #DB7F1C;
+}
+
+body {
+    background: #F5F7FA;
+    font-family: 'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--navy);
+    --bs-btn-border-color: var(--navy);
+    --bs-btn-hover-bg: var(--navy-dark);
+    --bs-btn-hover-border-color: var(--navy-dark);
+    --bs-btn-active-bg: var(--navy-dark);
+}
+
+.btn-secondary {
+    --bs-btn-bg: var(--saffron);
+    --bs-btn-border-color: var(--saffron);
+    --bs-btn-hover-bg: var(--saffron-dark);
+    --bs-btn-hover-border-color: var(--saffron-dark);
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--navy);
+    --bs-btn-border-color: var(--navy);
+    --bs-btn-hover-bg: var(--navy);
+    --bs-btn-hover-border-color: var(--navy);
+}
+
+.text-primary {
+    color: var(--navy) !important;
+}
+
+.text-secondary-brand {
+    color: var(--saffron-dark) !important;
+}
+
+.bg-navy {
+    background: var(--navy) !important;
+}
+
+.bg-navy-dark {
+    background: var(--navy-dark) !important;
+}
+
+.bg-gradient-brand {
+    background: linear-gradient(120deg,var(--navy) 0%,var(--blue) 100%) !important;
+}
+
+.topbar {
+    background: var(--navy-dark);
+    color: #cfe0f0;
+    font-size: 13.5px;
+}
+
+    .topbar a {
+        color: #cfe0f0;
+        text-decoration: none;
+        opacity: .85;
+    }
+
+        .topbar a:hover {
+            opacity: 1;
+            color: #fff;
+        }
+
+.brand-mark {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: linear-gradient(135deg,var(--navy),var(--blue));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: .5px;
+}
+
+/* Sidebar */
+.sidebar {
+    background: var(--navy-dark);
+    min-height: calc(100vh - 106px);
+}
+
+    .sidebar .nav-link {
+        color: #dbe7f2;
+        font-size: 14.5px;
+        border-radius: 8px;
+        padding: .6rem .75rem;
+    }
+
+        .sidebar .nav-link:hover {
+            background: rgba(255,255,255,.06);
+            color: #fff;
+        }
+
+        .sidebar .nav-link.active {
+            background: var(--saffron);
+            color: #fff;
+            font-weight: 600;
+        }
+
+    .sidebar .nav-group-label {
+        font-size: 11.5px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #7f9cb8;
+        margin: 14px 10px 6px;
+    }
+
+.avatar-circle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--saffron);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.card-stat .stat-num {
+    font-size: 27px;
+    font-weight: 800;
+    color: var(--navy);
+}
+
+.success-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #E4F5EC;
+    color: #1E8E5A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 31px;
+}
+
+.step-dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #E2E8F0;
+    color: #8494a3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+    .step-dot.done {
+        background: #1E8E5A;
+        color: #fff;
+    }
+
+    .step-dot.active {
+        background: var(--navy);
+        color: #fff;
+    }
+
+.policy-row {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 8px;
+    transition: .15s;
+}
+
+    .policy-row:hover {
+        border-color: var(--blue);
+        background: #F7FAFD;
+    }
+
+.policy-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 7px;
+    background: #E7F0FA;
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+footer.site-footer {
+    background: var(--navy-dark);
+    color: #a9c0d6;
+    font-size: 13.5px;
+}
+
+@@media(max - width:767.98px) {
+    .sidebar {
+        min-height: auto;
+    }
+
+        .sidebar .nav {
+            flex-direction: row !important;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+        }
+
+        .sidebar .nav-group-label {
+            display: none;
+        }
+}
+.card-body.d-grid {
+    gap: 16px;
+}
+
+
