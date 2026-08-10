@@ -154,6 +154,16 @@ namespace TSSC.Unified.Models
         public int? SubBranchId { get; set; }
 
         public int? NoticePeriod { get; set; }
+        [NotMapped]
+        public string EmployeeDisplayName
+        {
+            get
+            {
+                return string.Join(" ", new[] { Prefix, FirstName, LastName }
+                    .Where(x => !string.IsNullOrWhiteSpace(x)))
+                    + $" - EMP{EmployeeCode}";
+            }
+        }
     }
     public class Department
     {
@@ -177,6 +187,7 @@ namespace TSSC.Unified.Models
         [StringLength(100)]
         public string? ModifiedBy { get; set; }
         
+        [NotMapped]
 
         // Navigation Property
         public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();

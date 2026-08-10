@@ -17,7 +17,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace QUIZAPP.Areas.HRMS.Controllers
 {
     [Area("HRMS")]
-    [Authorize(Roles = "HR")]
+    [Authorize]
     public class HRPolicyController : Controller
     {
         
@@ -39,6 +39,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             _roleManager = roleManager;
             _environment = environment;
         }
+        [Authorize(Roles = "HR")]
         public async Task<IActionResult> Create(int? id)
         {
             HRPolicyVM model = new HRPolicyVM();
@@ -70,6 +71,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "HR")]
         public async Task<IActionResult> Create(HRPolicyVM model)
         {
             if (!ModelState.IsValid)
@@ -159,6 +161,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+        [Authorize(Roles = "HR")]
         public async Task<IActionResult> Index()
         {
             var model = await _context.HRPolicies
@@ -169,6 +172,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             return View(model);
         }
         [HttpGet]
+        [Authorize(Roles = "HR")]
         public async Task<IActionResult> Delete(int id)
         {
             var policy = await _context.HRPolicies.FindAsync(id);
@@ -199,6 +203,17 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             TempData["SuccessMessage"] = "HR Policy deleted successfully.";
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // Employee Policy View
+        
+        public IActionResult EmployeePolicies()
+        {
+            var policies = _context.HRPolicies
+                .Where(x => x.IsActive)
+                .ToList();
+
+            return View(policies);
         }
     }
 

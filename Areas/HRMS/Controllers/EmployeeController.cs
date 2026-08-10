@@ -494,6 +494,31 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
                     await _context.SaveChangesAsync();
 
+                    // Initialize Leave Balance from active Leave Policies
+                    var leavePolicies = await _context.LeavePolicy
+                        .Where(x => x.IsActive
+                            && x.EffectiveFrom <= DateTime.Today
+                            && (x.EffectiveTo == null ||
+                                x.EffectiveTo >= DateTime.Today))
+                        .ToListAsync();
+
+                    foreach (var policy in leavePolicies)
+                    {
+                        var leaveBalance = new EmployeeLeaveBalance
+                        {
+                            EmployeeId = employee.EmployeeId,
+                            LeaveTypeId = policy.LeaveTypeId,
+                            OpeningBalance = policy.NoOfDays,
+                            UsedLeaves = 0,
+                            Adjustment = 0,
+                            LastUpdated = DateTime.Now
+                        };
+
+                        _context.EmployeeLeaveBalance.Add(leaveBalance);
+                    }
+
+                    await _context.SaveChangesAsync();
+
                     await transaction.CommitAsync();
 
                     TempData["msg"] = "Employee created successfully.";
@@ -646,7 +671,8 @@ namespace QUIZAPP.Areas.HRMS.Controllers
          OfficialEmail = e.OfficialEmail,
          DepartmentName = d.DepartmentName,
          DesignationName = des.DesignationName,
-         IsActive = e.IsActive
+         IsActive = e.IsActive,
+         Username=e.ApplicationUser.UserName
      }).ToListAsync();
 
             return View(employees);
@@ -850,6 +876,49 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             }
 
             return View(employee);
+        }
+
+        public class ResetPasswordRequest
+        {
+            public int EmployeeId { get; set; }
+            public string NewPassword { get; set; } = string.Empty;
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "HR")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 8)
+            {
+                return Json(new { success = false, message = "Password must be at least 8 characters." });
+            }
+
+            var employee = await _context.Employee.FindAsync(request.EmployeeId);
+            if (employee == null || string.IsNullOrEmpty(employee.ApplicationUserId))
+            {
+                return Json(new { success = false, message = "Employee login not found." });
+            }
+
+            var user = await _userManager.FindByIdAsync(employee.ApplicationUserId);
+            if (user == null)
+            {
+                return Json(new { success = false, message = "User account not found." });
+            }
+
+            // Admin-initiated reset — no old password required.
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, request.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(" ", result.Errors.Select(e => e.Description));
+                return Json(new { success = false, message = errors });
+            }
+
+            // Optional: audit log
+            // _logger.LogInformation("Password reset for employee {EmployeeId} by {AdminUser}", request.EmployeeId, User.Identity.Name);
+
+            return Json(new { success = true });
         }
     }
 }

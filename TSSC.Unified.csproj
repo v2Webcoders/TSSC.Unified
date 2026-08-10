@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <None Remove="appsettings.json~RF97bfc7.TMP" />
+    <None Remove="Areas\HRMS\Views\LeaveManagement\Balance.cshtml~RFbb1c99b.TMP" />
   </ItemGroup>
 
   <ItemGroup>

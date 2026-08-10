@@ -35,6 +35,10 @@ namespace QUIZAPP
 
         public DbSet<Tasks> Tasks { get; set; }
         public DbSet<LetterRegister> LetterRegister { get; set; }
+        public DbSet<EmployeeLeaveBalance> EmployeeLeaveBalance { get; set; }
+
+        public DbSet<LeaveAdjustment> LeaveAdjustment { get; set; }
+        public DbSet<LeavePolicy> LeavePolicy { get; set; }
 
 
     }

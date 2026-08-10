@@ -1,0 +1,185 @@
+﻿@model IEnumerable<TSSC.Unified.Models.EmployeeLeaveBalance>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+	Layout = "_Layout";
+	int serial = 1;
+	//int serial = ((Model.PageNumber - 1) * Model.PageSize) + 1;
+}
+
+<div class="nk-block-head">
+    <div class="nk-block-head-between">
+
+        <!-- Page Title -->
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                My Leave Balance
+            </h3>
+
+            <div class="nk-block-des text-soft">
+                <p>
+                    View your available leave balance.
+                </p>
+            </div>
+        </div>
+        <div class="nk-block-head-content">
+            <div class="toggle-wrap nk-block-tools-toggle">
+
+                <a href="#"
+                   class="btn btn-icon btn-trigger toggle-expand me-n1"
+                   data-target="pageMenu">
+                    <em class="icon ni ni-more-v"></em>
+                </a>
+
+                <div class="toggle-expand-content" data-content="pageMenu">
+                    <ul class="nk-block-tools g-3">
+
+                        <li class="nk-block-tools-opt">
+                            <a asp-action="Create"
+                               class="btn btn-primary">
+                                <em class="icon ni ni-plus"></em>
+                                <span>Apply Leave</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+             
+
+    </div>
+</div>
+
+
+<div class="nk-block">
+
+    <div class="card card-bordered card-stretch">
+
+        <div class="card-inner">
+
+            <div class="table-responsive">
+
+                <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+                    <thead>
+                        <tr>
+
+                            <th width="60">
+                                S.No.
+                            </th>
+
+                            <th>
+                                Leave Type
+                            </th>
+
+                            <th>
+                                Opening Balance
+                            </th>
+
+                            <th>
+                                Used
+                            </th>
+
+                            <th>
+                                Adjustment
+                            </th>
+
+                            <th>
+                                Current Balance
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <!-- S.No. -->
+                                    <td>
+                                        @serial
+                                    </td>
+
+                                    <!-- Leave Type -->
+                                    <td>
+                                        <strong>
+                                            @item.LeaveType?.LeaveTypeName
+                                        </strong>
+                                    </td>
+
+                                    <!-- Opening Balance -->
+                                    <td>
+                                        @item.OpeningBalance
+                                        <span class="text-muted">Days</span>
+                                    </td>
+
+                                    <!-- Used -->
+                                    <td>
+                                        @item.UsedLeaves
+                                        <span class="text-muted">Days</span>
+                                    </td>
+
+                                    <!-- Adjustment -->
+                                    <td>
+
+                                        @if (item.Adjustment > 0)
+                                        {
+                                            <span class="text-success">
+                                                +@item.Adjustment
+                                            </span>
+                                        }
+                                        else if (item.Adjustment < 0)
+                                        {
+                                            <span class="text-danger">
+                                                @item.Adjustment
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                0
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <!-- Current Balance -->
+                                    <td>
+
+                                        @if (item.CurrentBalance > 0)
+                                        {
+                                            <span class="badge badge-dot bg-success">
+                                                @item.CurrentBalance Days
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-dot bg-danger">
+                                                0 Days
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                </tr>
+
+                                serial++;
+                            }
+                       
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

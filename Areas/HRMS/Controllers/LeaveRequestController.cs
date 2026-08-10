@@ -175,6 +175,13 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             // Calculate Total Days
             model.TotalDays = (model.ToDate - model.FromDate).Days + 1;
 
+            // Validate Total Days
+            if (model.TotalDays <= 0)
+            {
+                ModelState.AddModelError(nameof(model.TotalDays), "Total days must be greater than 0.");
+                return View(model);
+            }
+
             // Upload Attachment
             string fileName = null;
 
@@ -317,44 +324,178 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             return View(leaveRequests);
         }
 
+        //public async Task<IActionResult> Approve(int id)
+        //{
+        //    var applicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        //    var employee = await _context.Employee
+        //        .FirstOrDefaultAsync(x => x.ApplicationUserId == applicationUserId);
+
+        //    var leave = await _context.LeaveRequest
+        //        .FirstOrDefaultAsync(x => x.LeaveRequestId == id
+        //                              && x.ApproverId == employee.EmployeeId);
+
+        //    if (leave == null)
+        //        return NotFound();
+
+        //    leave.Status = "Approved";
+        //    leave.ApprovedBy = employee.EmployeeId;
+        //    leave.ApprovedDate = DateTime.Now;
+
+        //    await _context.SaveChangesAsync();
+
+        //    TempData["Success"] = "Leave request approved successfully.";
+
+        //    return RedirectToAction(nameof(MyLeaves));
+        //}
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Approve(int id)
         {
-            var applicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var applicationUserId =
+                User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var employee = await _context.Employee
-                .FirstOrDefaultAsync(x => x.ApplicationUserId == applicationUserId);
+                .FirstOrDefaultAsync(x =>
+                    x.ApplicationUserId == applicationUserId);
+
+            if (employee == null)
+                return NotFound("Approver employee record not found.");
 
             var leave = await _context.LeaveRequest
-                .FirstOrDefaultAsync(x => x.LeaveRequestId == id
-                                      && x.ApproverId == employee.EmployeeId);
+                .FirstOrDefaultAsync(x =>
+                    x.LeaveRequestId == id &&
+                    x.ApproverId == employee.EmployeeId);
 
             if (leave == null)
                 return NotFound();
 
+            // Prevent duplicate deduction
+            if (leave.Status == "Approved")
+            {
+                TempData["Error"] = "This leave request is already approved.";
+                return RedirectToAction(nameof(MyLeaves));
+            }
+
+            // Get employee leave balance
+            var balance = await _context.EmployeeLeaveBalance
+                .FirstOrDefaultAsync(x =>
+                    x.EmployeeId == leave.EmployeeId &&
+                    x.LeaveTypeId == leave.LeaveTypeId);
+
+            if (balance == null)
+            {
+                TempData["Error"] =
+                    "Leave balance record not found for this employee.";
+
+                return RedirectToAction(nameof(MyLeaves));
+            }
+
+            // Check available balance
+            if (balance.CurrentBalance < leave.TotalDays)
+            {
+                TempData["Error"] =
+                    $"Insufficient leave balance. Available balance: {balance.CurrentBalance} days.";
+
+                return RedirectToAction(nameof(MyLeaves));
+            }
+
+            // Deduct leave
+            balance.UsedLeaves += leave.TotalDays;
+            balance.LastUpdated = DateTime.Now;
+
+            // Approve leave
             leave.Status = "Approved";
             leave.ApprovedBy = employee.EmployeeId;
             leave.ApprovedDate = DateTime.Now;
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Leave request approved successfully.";
+            TempData["Success"] =
+                "Leave request approved and leave balance updated successfully.";
 
             return RedirectToAction(nameof(MyLeaves));
         }
 
+        //public async Task<IActionResult> Reject(int id)
+        //{
+        //    var applicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        //    var employee = await _context.Employee
+        //        .FirstOrDefaultAsync(x => x.ApplicationUserId == applicationUserId);
+
+        //    var leave = await _context.LeaveRequest
+        //        .FirstOrDefaultAsync(x => x.LeaveRequestId == id
+        //                              && x.ApproverId == employee.EmployeeId);
+
+        //    if (leave == null)
+        //        return NotFound();
+
+        //    leave.Status = "Rejected";
+        //    leave.ApprovedBy = employee.EmployeeId;
+        //    leave.ApprovedDate = DateTime.Now;
+
+        //    await _context.SaveChangesAsync();
+
+        //    TempData["Success"] = "Leave request rejected successfully.";
+
+        //    return RedirectToAction(nameof(MyLeaves));
+        //}
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject(int id)
         {
-            var applicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var applicationUserId =
+                User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var employee = await _context.Employee
-                .FirstOrDefaultAsync(x => x.ApplicationUserId == applicationUserId);
+                .FirstOrDefaultAsync(x =>
+                    x.ApplicationUserId == applicationUserId);
+
+            if (employee == null)
+                return NotFound("Approver employee record not found.");
 
             var leave = await _context.LeaveRequest
-                .FirstOrDefaultAsync(x => x.LeaveRequestId == id
-                                      && x.ApproverId == employee.EmployeeId);
+                .FirstOrDefaultAsync(x =>
+                    x.LeaveRequestId == id &&
+                    x.ApproverId == employee.EmployeeId);
 
             if (leave == null)
                 return NotFound();
+
+            // Already rejected
+            if (leave.Status == "Rejected")
+            {
+                TempData["Error"] = "This leave request is already rejected.";
+                return RedirectToAction(nameof(MyLeaves));
+            }
+
+            // If an already-approved leave is being changed to rejected,
+            // restore the previously deducted balance.
+            if (leave.Status == "Approved")
+            {
+                var balance = await _context.EmployeeLeaveBalance
+                    .FirstOrDefaultAsync(x =>
+                        x.EmployeeId == leave.EmployeeId &&
+                        x.LeaveTypeId == leave.LeaveTypeId);
+
+                if (balance == null)
+                {
+                    TempData["Error"] =
+                        "Leave balance record not found.";
+
+                    return RedirectToAction(nameof(MyLeaves));
+                }
+
+                balance.UsedLeaves -= leave.TotalDays;
+
+                if (balance.UsedLeaves < 0)
+                    balance.UsedLeaves = 0;
+
+                balance.LastUpdated = DateTime.Now;
+            }
 
             leave.Status = "Rejected";
             leave.ApprovedBy = employee.EmployeeId;
@@ -362,7 +503,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Leave request rejected successfully.";
+            TempData["Success"] =
+                "Leave request rejected successfully.";
 
             return RedirectToAction(nameof(MyLeaves));
         }

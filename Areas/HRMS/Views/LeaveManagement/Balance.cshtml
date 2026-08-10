@@ -1,0 +1,257 @@
+﻿@model IEnumerable<TSSC.Unified.Models.EmployeeLeaveBalance>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+	Layout = "_Layout";
+	int serial = 1;
+	//int serial = ((Model.PageNumber - 1) * Model.PageSize) + 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+	<div class="nk-block-between">
+
+		<div class="nk-block-head-content">
+			<h3 class="nk-block-title page-title">Leave Balance</h3>
+		</div>
+
+		<div class="nk-block-head-content">
+			<div class="toggle-wrap nk-block-tools-toggle">
+
+				<a href="#"
+				   class="btn btn-icon btn-trigger toggle-expand me-n1"
+				   data-target="pageMenu">
+					<em class="icon ni ni-more-v"></em>
+				</a>
+
+				<div class="toggle-expand-content" data-content="pageMenu">
+					<ul class="nk-block-tools g-3">
+						<!-- Employee Filter -->
+						<li>
+							<div class="drodown">
+								<a href="#"
+								   class="dropdown-toggle btn btn-white btn-dim btn-outline-light"
+								   data-bs-toggle="dropdown"
+								   aria-expanded="false">
+
+									<em class="d-none d-sm-inline icon ni ni-filter-alt"></em>
+
+									<span>
+										@(ViewBag.SelectedEmployeeId != null
+																				? ViewBag.SelectedEmployeeName
+																				: "Filter Employee")
+									</span>
+
+									<em class="dd-indc icon ni ni-chevron-right"></em>
+
+								</a>
+
+								<div class="dropdown-menu dropdown-menu-end">
+
+									<ul class="link-list-opt no-bdr">
+
+										<!-- All Employees -->
+										<li>
+											<a asp-action="Balance"
+											   asp-controller="LeaveManagement">
+
+												<span>All Employees</span>
+
+											</a>
+										</li>
+
+										@foreach (var employee in ViewBag.Employees)
+										{
+											<li>
+												<a asp-action="Balance"
+												   asp-controller="LeaveManagement"
+												   asp-route-employeeId="@employee.EmployeeId">
+
+													<span>
+														@employee.FirstName
+														@employee.LastName
+														(@employee.EmployeeCode)
+													</span>
+
+												</a>
+											</li>
+										}
+
+									</ul>
+
+								</div>
+
+							</div>
+						</li>
+						<li class="nk-block-tools-opt">
+							<a asp-action="Create" asp-controller="LeaveAdjustment"
+							   class="btn btn-primary">
+								<em class="icon ni ni-plus"></em>
+								<span>Adjust / Credit Leaves</span>
+							</a>
+
+						</li>
+
+					</ul>
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<div class="nk-block nk-block-lg">
+	<div class="card card-preview">
+
+		<div class="card-inner">
+
+			<div class="table-responsive">
+
+				<table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer dtr-inline collapsed">
+
+					<thead>
+						<tr>
+							<th width="60">
+								S.No.
+							</th>
+
+							<th>
+								Employee
+							</th>
+
+							<th>
+								Leave Type
+							</th>
+
+							<th>
+								Opening Balance
+							</th>
+
+							<th>
+								Used
+							</th>
+
+							<th>
+								Adjustment
+							</th>
+
+							<th>
+								Current Balance
+							</th>
+
+						</tr>
+					</thead>
+
+					<tbody>
+						@if (!Model.Any())
+						{
+							<tr>
+								<td colspan="7"class="text-center text-muted py-4">
+
+									No leave balance records found.
+
+								</td>
+							</tr>
+						}
+						else
+						{
+							foreach (var item in Model)
+							{
+								<tr>
+
+									<!-- S.No. -->
+									<td>
+										@serial
+									</td>
+
+									<!-- Employee -->
+									<td>
+
+										<strong>
+											@(item.Employee?.FirstName + " " +
+																					item.Employee?.LastName)
+										</strong>
+
+										<br />
+
+										<small class="text-muted">
+											@item.Employee?.EmployeeCode
+										</small>
+
+									</td>
+
+									<!-- Leave Type -->
+									<td>
+										@item.LeaveType?.LeaveTypeName
+									</td>
+
+									<!-- Opening Balance -->
+									<td>
+										@item.OpeningBalance
+									</td>
+
+									<!-- Used Leaves -->
+									<td>
+										@item.UsedLeaves
+									</td>
+
+									<!-- Adjustment -->
+									<td>
+
+										@if (item.Adjustment > 0)
+										{
+											<span class="text-success">
+												+@item.Adjustment
+											</span>
+										}
+										else if (item.Adjustment < 0)
+										{
+											<span class="text-danger">
+												@item.Adjustment
+											</span>
+										}
+										else
+										{
+											<span class="text-muted">
+												0
+											</span>
+										}
+
+									</td>
+
+									<!-- Current Balance -->
+									<td>
+
+										@if (item.CurrentBalance > 0)
+										{
+											<span class="badge badge-dot bg-success">
+												@item.CurrentBalance Days
+											</span>
+										}
+										else
+										{
+											<span class="badge badge-dot bg-danger">
+												0 Days
+											</span>
+										}
+
+									</td>
+
+								</tr>
+
+								serial++;
+							}
+						}
+
+					</tbody>
+
+				</table>
+
+			</div>
+
+		</div>
+
+	</div>
+</div>
+
+

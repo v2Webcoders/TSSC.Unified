@@ -101,18 +101,21 @@
 
 										<a asp-action="ViewEmployee"
 										   asp-route-id="@item.EmployeeId"
-										   class="btn btn-sm btn-outline-info"
+										   class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" data-bs-placement="top"
 										   title="View">
 											<em class="icon ni ni-eye"></em>
 										</a>
 
 										<a asp-action="Create"
 										   asp-route-id="@item.EmployeeId"
-										   class="btn btn-sm btn-outline-warning"
+										   class="btn btn-sm btn-outline-warning" data-bs-toggle="tooltip" data-bs-placement="top"
 										   title="Edit">
 											<em class="icon ni ni-edit"></em>
 										</a>
-
+										<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Reset Password"
+										   onclick="openResetPasswordModal(@item.EmployeeId, '@item.FirstName @item.LastName', '@item.Username')">
+											<em class="icon ni ni-lock-alt"></em>
+										</a>
 									</div>
 
 								</td>
@@ -125,7 +128,63 @@
 					</tbody>
 
 				</table>
+				<!-- ============= Reset Password Modal (shared — one instance for the whole list) ============= -->
+				<div class="modal fade" tabindex="-1" role="dialog" id="resetPasswordModal">
+					<div class="modal-dialog modal-dialog-centered" role="document">
+						<div class="modal-content">
+							<a href="javascript:void(0);" class="close" data-bs-dismiss="modal">
+								<em class="icon ni ni-cross-sm"></em>
+							</a>
+							<div class="modal-body modal-body-md">
+								<h5 class="title mb-4">Reset Password</h5>
 
+								<p class="text-muted mb-4">
+									Set a new password for <strong id="rpEmployeeName"></strong>
+									(<span class="text-primary" id="rpUsername"></span>).
+									They will need to use this new password on their next login.
+								</p>
+
+								<div id="resetPasswordAlert" class="alert d-none mb-3" role="alert"></div>
+
+								<div class="form-group mb-3">
+									<label class="form-label">New Password <span class="text-danger">*</span></label>
+									<div class="form-control-wrap">
+										<input type="password" id="newPassword" class="form-control" autocomplete="new-password" />
+									</div>
+									<small class="text-muted">Minimum 8 characters.</small>
+								</div>
+
+								<div class="form-group mb-4">
+									<label class="form-label">Confirm New Password <span class="text-danger">*</span></label>
+									<div class="form-control-wrap">
+										<input type="password" id="confirmPassword" class="form-control" autocomplete="new-password" />
+									</div>
+									<span id="confirmPasswordError" class="text-danger small d-none">Passwords do not match.</span>
+								</div>
+
+								<div class="form-group">
+									<div class="d-flex justify-content-end gap-2">
+
+										<button type="button"
+												class="btn btn-outline-light py-3"
+												data-bs-dismiss="modal">
+											Cancel
+										</button>
+
+										<button type="button"
+												id="btnConfirmReset"
+												class="btn btn-primary py-3"
+												onclick="submitPasswordReset()">
+											<em class="icon ni ni-lock-alt me-1"></em>
+											Reset Password
+										</button>
+
+									</div>
+								</div>
+							</div>
+						</div><!-- .modal-content -->
+					</div><!-- .modal-dialog -->
+				</div><!-- .modal -->
 			</div>
 
 		</div>
@@ -133,4 +192,78 @@
 	</div>
 </div>
 
+<script>
+	let resetTargetEmployeeId = null;
 
+	// Called from each row's "Reset Password" link: openResetPasswordModal(employeeId, fullName, username)
+	function openResetPasswordModal(employeeId, fullName, username) {
+		resetTargetEmployeeId = employeeId;
+		document.getElementById('rpEmployeeName').textContent = fullName;
+		document.getElementById('rpUsername').textContent = username;
+		document.getElementById('newPassword').value = '';
+		document.getElementById('confirmPassword').value = '';
+		document.getElementById('confirmPasswordError').classList.add('d-none');
+		document.getElementById('resetPasswordAlert').classList.add('d-none');
+
+		var modal = new bootstrap.Modal(document.getElementById('resetPasswordModal'));
+		modal.show();
+	}
+
+	function submitPasswordReset() {
+		const newPassword = document.getElementById('newPassword').value;
+		const confirmPassword = document.getElementById('confirmPassword').value;
+		const errorSpan = document.getElementById('confirmPasswordError');
+		const alertBox = document.getElementById('resetPasswordAlert');
+		const btn = document.getElementById('btnConfirmReset');
+
+		errorSpan.classList.add('d-none');
+		alertBox.classList.add('d-none');
+
+		if (newPassword.length < 8) {
+			alertBox.textContent = 'Password must be at least 8 characters.';
+			alertBox.className = 'alert alert-danger mb-3';
+			return;
+		}
+		if (newPassword !== confirmPassword) {
+			errorSpan.classList.remove('d-none');
+			return;
+		}
+		if (!resetTargetEmployeeId) {
+			alertBox.textContent = 'No employee selected. Please close and try again.';
+			alertBox.className = 'alert alert-danger mb-3';
+			return;
+		}
+
+		btn.classList.add('disabled');
+		const originalHtml = btn.innerHTML;
+		btn.innerHTML = '<em class="icon ni ni-swap"></em> Resetting...';
+
+		fetch('/HRMS/Employee/ResetPassword', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ employeeId: resetTargetEmployeeId, newPassword: newPassword })
+		})
+		.then(res => res.json())
+		.then(data => {
+			btn.classList.remove('disabled');
+			btn.innerHTML = originalHtml;
+
+			if (data.success) {
+				alertBox.textContent = 'Password reset successfully.';
+				alertBox.className = 'alert alert-success mb-3';
+				setTimeout(() => {
+					bootstrap.Modal.getInstance(document.getElementById('resetPasswordModal')).hide();
+				}, 1200);
+			} else {
+				alertBox.textContent = data.message || 'Something went wrong. Please try again.';
+				alertBox.className = 'alert alert-danger mb-3';
+			}
+		})
+		.catch(() => {
+			btn.classList.remove('disabled');
+			btn.innerHTML = originalHtml;
+			alertBox.textContent = 'Network error. Please try again.';
+			alertBox.className = 'alert alert-danger mb-3';
+		});
+	}
+</script>
