@@ -166,5 +166,20 @@ namespace TSSC.Unified.ViewModel
 
         [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
+
+        [Display(Name = "Prefix")]
+        public string? Prefix { get; set; }
+
+        [Display(Name = "Branch")]
+        public int? BranchId { get; set; }
+
+        [Display(Name = "Sub Branch")]
+        public int? SubBranchId { get; set; }
+
+        [Display(Name = "Notice Period (Days)")]
+        public int? NoticePeriod { get; set; }
+        public string? BranchName { get; set; }
+
+        public string? SubBranchName { get; set; }
     }
 }

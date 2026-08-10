@@ -19,353 +19,447 @@
     }
 </style>
 @section Styles {
-    <link rel="stylesheet" href="~/assets/css/style.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/css/EmployeeDashboard.css" asp-append-version="true" />
 }
-<div class="nk-content-body">
-    <div class="nk-block-head nk-block-head-sm">
-        <div class="nk-block-between g-3">
-            <div class="nk-block-head-content">
-                <h3 class="nk-block-title page-title d-flex align-items-center gap-2">
-                    <em class="icon ni ni-monitor text-primary"></em>
-                    Dashboard
-                </h3>
-                <div class="nk-block-des text-soft">
-                    <p> Welcome to HRMS Dashboard.</p>
+<div class="container-fluid">
+	<div class="row">
+		@* <aside class="sidebar col-md-3 col-lg-2 p-3">
+				<ul class="nav flex-column">
+					<div class="nav-group-label">Main</div>
+					<li class="nav-item"><a class="nav-link" href="dashboard.html" data-page="dashboard.html">🏠 Dashboard</a></li>
+					<div class="nav-group-label">Attendance</div>
+					<li class="nav-item"><a class="nav-link" href="attendance.html" data-page="attendance.html">🕘 Mark Attendance</a></li>
+					<li class="nav-item"><a class="nav-link" href="regularization.html" data-page="regularization.html">↻ Regularization</a></li>
+					<div class="nav-group-label">Requests</div>
+					<li class="nav-item"><a class="nav-link" href="leave-request.html" data-page="leave-request.html">🗓 Leave Request</a></li>
+					<li class="nav-item"><a class="nav-link" href="od-request.html" data-page="od-request.html">🧭 OD Request</a></li>
+					<div class="nav-group-label">Resources</div>
+					<li class="nav-item"><a class="nav-link" href="hr-policy.html" data-page="hr-policy.html">📄 HR Policy Docs</a></li>
+				</ul>
+			</aside> *@
+
+        <main class="col-md-12 col-lg-12 p-4">
+
+            <!-- Dashboard Header -->
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-4 mb-5">
+
+                <div>
+                    <h1 class="fs-4 text-primary fw-bold mb-1">
+                        Welcome, @ViewBag.EmployeeName 👋
+                    </h1>
+                    <div class="mt-0 mb-4">
+                        <div class="d-flex flex-wrap align-items-center gap-2 text-muted small">
+
+                            <!-- Date -->
+                            <span class="d-flex align-items-center">
+                                <em class="icon ni ni-calendar-alt me-1"></em>
+                                @DateTime.Today.ToString("dddd, dd MMMM yyyy")
+                            </span>
+
+                            <span class="text-light">•</span>
+
+                            <!-- Status -->
+                            @if (ViewBag.TodayInTime != null)
+                            {
+                                <span class="d-flex align-items-center text-success">
+                                    <em class="icon ni ni-check-circle me-1"></em> Present
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="d-flex align-items-center text-warning">
+                                    <em class="icon ni ni-clock me-1"></em> Not marked
+                                </span>
+                            }
+
+                            <span class="text-light">•</span>
+
+                            <!-- In / Out -->
+                            <span>
+                                In: @(ViewBag.TodayInTime != null ? ((DateTime)ViewBag.TodayInTime).ToString("hh:mm tt") : "--")
+                            </span>
+
+                            <span class="text-light">•</span>
+
+                            <span>
+                                Out: @(ViewBag.TodayOutTime != null ? ((DateTime)ViewBag.TodayOutTime).ToString("hh:mm tt") : "--")
+                            </span>
+
+                        </div>
+                    </div>
+                    @* <div class="mt-0 mb-6 pb-4">
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+
+                            <!-- Date -->
+                            <div class="d-flex align-items-center">
+                                <em class="icon ni ni-calendar-alt text-primary me-2"></em>
+
+                                <span class="fw-semibold">
+                                    @DateTime.Today.ToString("dddd, dd MMMM yyyy")
+                                </span>
+                            </div>
+
+                            <!-- Attendance -->
+                            <span class="text-success">
+                                <em class="icon ni ni-check-circle"></em>
+                                <span class="fw-semibold ms-1">Attendance Active</span>
+                            </span>
+
+                        </div>
+                    </div> *@
                 </div>
-            </div>
-            <div class="nk-block-head-content">
-                <a href="#" class="btn btn-primary">
-                    <em class="icon ni ni-download-cloud"></em>
-                    <span>Download Report</span>
+
+                <a asp-controller="Employee"
+                   asp-action="EmployeeList"
+                   class="btn btn-primary">
+                    <em class="icon ni ni-users me-1"></em>
+                    Manage Employees
                 </a>
+
             </div>
-        </div>
-    </div><!-- .nk-block-head -->
 
-    <div class="nk-block mt-4">
-        <div class="row g-gs">
-            <div class="col-sm-6 col-lg-3">
-                <div class="card card-bordered kpi-card" style="position:relative;overflow:hidden;">
-                    <span class="kpi-accent" style="background-color:#6576ff;"></span>
-                    <div class="card-inner">
-                        <div class="card-title-group align-start mb-2">
-                            <div class="card-title">
-                                <h6 class="title">Total Employees</h6>
+
+            <!-- HR KPI Cards -->
+            <div class="row g-3 mb-4">
+
+                <!-- Total Employees -->
+                <div class="col-6 col-lg-3">
+                    <div class="card card-stat h-100 border-0 shadow-sm">
+
+                        <div class="card-body">
+
+                            <span class="badge bg-primary-subtle text-primary mb-2">
+                                Workforce
+                            </span>
+
+                            <div class="stat-num">
+                                @ViewBag.TotalEmployees
                             </div>
-                            <div class="card-tools">
-                                <em class="icon-circle icon-circle-lg bg-primary-dim">
-                                    <em class="icon ni ni-users text-primary"></em>
-                                </em>
+
+                            <div class="small text-muted">
+                                Total employees
                             </div>
+
                         </div>
-                        <div class="align-end flex-sm-wrap g-2">
-                            <div class="nk-sale-data">
-                                <span class="amount">1,284</span>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
-            </div><!-- .col -->
 
-            <div class="col-sm-6 col-lg-3">
-                <div class="card card-bordered kpi-card" style="position:relative;overflow:hidden;">
-                    <span class="kpi-accent" style="background-color:#1ee0ac;"></span>
-                    <div class="card-inner">
-                        <div class="card-title-group align-start mb-2">
-                            <div class="card-title">
-                                <h6 class="title">Attendance Today</h6>
+
+                <!-- Present Today -->
+                <div class="col-6 col-lg-3">
+                    <div class="card card-stat h-100 border-0 shadow-sm">
+
+                        <div class="card-body">
+
+                            <span class="badge bg-success-subtle text-success mb-2">
+                                Present
+                            </span>
+
+                            <div class="stat-num">
+                                @ViewBag.PresentToday
                             </div>
-                            <div class="card-tools">
-                                <em class="icon-circle icon-circle-lg bg-success-dim">
-                                    <em class="icon ni ni-clock text-success"></em>
-                                </em>
+
+                            <div class="small text-muted">
+                                Employees present today
                             </div>
+
                         </div>
-                        <div class="align-end flex-sm-wrap g-2">
-                            <div class="nk-sale-data">
-                                <span class="amount">96.8%</span>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
-            </div><!-- .col -->
 
-            <div class="col-sm-6 col-lg-3">
-                <div class="card card-bordered kpi-card" style="position:relative;overflow:hidden;">
-                    <span class="kpi-accent" style="background-color:#f4bd0e;"></span>
-                    <div class="card-inner">
-                        <div class="card-title-group align-start mb-2">
-                            <div class="card-title">
-                                <h6 class="title">Employees on Leave</h6>
+
+                <!-- Employees on Leave -->
+                <div class="col-6 col-lg-3">
+                    <div class="card card-stat h-100 border-0 shadow-sm">
+
+                        <div class="card-body">
+
+                            <span class="badge bg-warning-subtle text-warning-emphasis mb-2">
+                                On Leave
+                            </span>
+
+                            <div class="stat-num">
+                                @ViewBag.EmployeesOnLeave
                             </div>
-                            <div class="card-tools">
-                                <em class="icon-circle icon-circle-lg bg-warning-dim">
-                                    <em class="icon ni ni-calendar-alt text-warning"></em>
-                                </em>
+
+                            <div class="small text-muted">
+                                Employees on leave today
                             </div>
+
                         </div>
-                        <div class="align-end flex-sm-wrap g-2">
-                            <div class="nk-sale-data">
-                                <span class="amount">18</span>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
-            </div><!-- .col -->
 
-            <div class="col-sm-6 col-lg-3">
-                <div class="card card-bordered kpi-card" style="position:relative;overflow:hidden;">
-                    <span class="kpi-accent" style="background-color:#09c2de;"></span>
-                    <div class="card-inner">
-                        <div class="card-title-group align-start mb-2">
-                            <div class="card-title">
-                                <h6 class="title">Pending Leave Requests</h6>
+
+                <!-- Pending Requests -->
+                <div class="col-6 col-lg-3">
+                    <div class="card card-stat h-100 border-0 shadow-sm">
+
+                        <div class="card-body">
+
+                            <span class="badge bg-danger-subtle text-danger mb-2">
+                                Action Required
+                            </span>
+
+                            <div class="stat-num">
+                                @ViewBag.PendingLeaveRequests
                             </div>
-                            <div class="card-tools">
-                                <em class="icon-circle icon-circle-lg bg-info-dim">
-                                    <em class="icon ni ni-calendar-check text-info"></em>
-                                </em>
+
+                            <div class="small text-muted">
+                                Leave requests pending approval
                             </div>
+
                         </div>
-                        <div class="align-end flex-sm-wrap g-2">
-                            <div class="nk-sale-data">
-                                <span class="amount">4</span>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
-            </div><!-- .col -->
-        </div><!-- .row -->
-    </div><!-- .nk-block -->
 
-    <div class="nk-block">
-        <div class="row g-gs">
-            <div class="col-lg-8">
-                <div class="card card-bordered h-100">
-                    <div class="card-inner">
-                        <div class="card-title-group mb-3">
-                            <div class="card-title">
-                                <h6 class="title">Attendance Overview</h6>
+            </div>
+
+
+            <!-- HR Dashboard Content -->
+            <div class="row g-3">
+
+                <!-- Recent Leave Requests -->
+                <div class="col-lg-8">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-body">
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                                <h3 class="fs-6 text-primary fw-bold mb-0">
+                                    Recent Leave Requests
+                                </h3>
+
+                                <a asp-controller="LeaveManagement"
+                                   asp-action="MyLeaves"
+                                   class="btn btn-sm btn-outline-primary">
+                                    View All
+                                </a>
+
                             </div>
+
+                            <div class="table-responsive">
+
+                                <table class="table table-sm align-middle mb-0">
+
+                                    <thead>
+                                        <tr class="text-muted small text-uppercase">
+                                            <th>Employee</th>
+                                            <th>Leave Type</th>
+                                            <th>Dates</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                        <tr>
+                                            <td>
+                                                <strong>Ravi Kumar</strong>
+                                            </td>
+
+                                            <td>
+                                                Casual Leave
+                                            </td>
+
+                                            <td>
+                                                08 Aug 2026
+                                            </td>
+
+                                            <td>
+                                                <span class="badge bg-warning-subtle text-warning-emphasis">
+                                                    Pending
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>
+                                                <strong>Manoj Kumar</strong>
+                                            </td>
+
+                                            <td>
+                                                Sick Leave
+                                            </td>
+
+                                            <td>
+                                                06 Aug 2026
+                                            </td>
+
+                                            <td>
+                                                <span class="badge bg-success-subtle text-success">
+                                                    Approved
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>
+                                                <strong>Priya Sharma</strong>
+                                            </td>
+
+                                            <td>
+                                                Earned Leave
+                                            </td>
+
+                                            <td>
+                                                04 Aug 2026
+                                            </td>
+
+                                            <td>
+                                                <span class="badge bg-success-subtle text-success">
+                                                    Approved
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>
+                                                <strong>Amit Singh</strong>
+                                            </td>
+
+                                            <td>
+                                                Casual Leave
+                                            </td>
+
+                                            <td>
+                                                02 Aug 2026
+                                            </td>
+
+                                            <td>
+                                                <span class="badge bg-danger-subtle text-danger">
+                                                    Rejected
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
                         </div>
-                        <div style="height:280px;">
-                            <canvas id="attendanceChart"></canvas>
-                        </div>
+
                     </div>
-                </div>
-            </div><!-- .col -->
 
-            <div class="col-lg-4">
-                <div class="card card-bordered h-100">
-                    <div class="card-inner">
-                        <div class="card-title-group mb-3">
-                            <div class="card-title">
-                                <h6 class="title">Employee Distribution</h6>
-                            </div>
+                </div>
+
+
+                <!-- Quick Actions -->
+                <div class="col-lg-4">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-body d-grid">
+
+                            <h3 class="fs-6 text-primary fw-bold mb-2">
+                                Quick Actions
+                            </h3>
+
+                            <a asp-controller="Employee"
+                               asp-action="EmployeeList"
+                               class="btn btn-outline-primary">
+
+                                <em class="icon ni ni-users me-1"></em>
+                                Employee Management
+
+                            </a>
+
+                            <a asp-controller="LeaveManagement"
+                               asp-action="MyLeaves"
+                               class="btn btn-outline-primary">
+
+                                <em class="icon ni ni-calendar-check me-1"></em>
+                                Manage Leave Requests
+
+                            </a>
+
+                            <a asp-controller="LeaveAdjustment"
+                               asp-action="Index"
+                               class="btn btn-outline-primary">
+
+                                <em class="icon ni ni-plus me-1"></em>
+                                Adjust Leave Balance
+
+                            </a>
+
+                            <a asp-controller="HRPolicy"
+                               asp-action="Index"
+                               class="btn btn-outline-primary">
+
+                                <em class="icon ni ni-file-docs me-1"></em>
+                                Manage HR Policies
+
+                            </a>
+
                         </div>
-                        <div style="height:280px;">
-                            <canvas id="empChart"></canvas>
-                        </div>
+
                     </div>
-                </div>
-            </div><!-- .col -->
-        </div><!-- .row -->
-    </div><!-- .nk-block -->
 
-    <div class="nk-block">
-        <div class="row g-gs">
-            <div class="col-lg-4">
-                <div class="card card-bordered h-100">
-                    <div class="card-inner">
-                        <div class="card-title-group mb-2">
-                            <div class="card-title">
-                                <h6 class="title">New Employees</h6>
-                            </div>
-                        </div>
-                        <ul class="nk-activity">
-                            <li class="nk-activity-item">
-                                <div class="nk-activity-data">
-                                    <div class="label">Rahul Sharma</div>
-                                </div>
-                            </li>
-                            <li class="nk-activity-item">
-                                <div class="nk-activity-data">
-                                    <div class="label">Priya Singh</div>
-                                </div>
-                            </li>
-                            <li class="nk-activity-item">
-                                <div class="nk-activity-data">
-                                    <div class="label">Amit Verma</div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
-            </div><!-- .col -->
 
-            <div class="col-lg-4">
-                <div class="card card-bordered h-100">
-                    <div class="card-inner">
-                        <div class="card-title-group mb-2">
-                            <div class="card-title">
-                                <h6 class="title">Pending Leave Requests</h6>
-                            </div>
-                        </div>
-                        <ul class="nk-activity">
-                            <li class="nk-activity-item">
-                                <div class="nk-activity-data d-flex justify-content-between align-items-center w-100">
-                                    <div class="label">Rahul Sharma <span class="text-soft">— Annual</span></div>
-                                    <span class="badge badge-dim bg-warning-dim text-warning">Pending</span>
-                                </div>
-                            </li>
-                            <li class="nk-activity-item">
-                                <div class="nk-activity-data d-flex justify-content-between align-items-center w-100">
-                                    <div class="label">Priya Singh <span class="text-soft">— Medical</span></div>
-                                    <span class="badge badge-dim bg-warning-dim text-warning">Pending</span>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div><!-- .col -->
+            </div>
 
-            <div class="col-lg-4">
-                <div class="card card-bordered h-100">
-                    <div class="card-inner">
-                        <div class="card-title-group mb-2">
-                            <div class="card-title">
-                                <h6 class="title">Today's Birthdays</h6>
-                            </div>
-                        </div>
-                        <ul class="nk-activity">
-                            <li class="nk-activity-item">
-                                <div class="nk-activity-data">
-                                    <div class="label">Neha Gupta</div>
-                                </div>
-                            </li>
-                            <li class="nk-activity-item">
-                                <div class="nk-activity-data">
-                                    <div class="label">Rohit Sharma</div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div><!-- .col -->
-        </div><!-- .row -->
-    </div><!-- .nk-block -->
-
-    <div class="nk-block">
-        <div class="row g-gs">
-            <div class="col-lg-8">
-                <div class="card card-bordered h-100">
-                    <div class="card-inner">
-                        <div class="card-title-group mb-2">
-                            <div class="card-title">
-                                <h6 class="title">Recent HR Activities</h6>
-                            </div>
-                        </div>
-                        <table class="table table-orders">
-                            <thead class="tb-odr-head">
-                                <tr class="tb-odr-item">
-                                    <th class="tb-odr-info">Activity</th>
-                                    <th class="tb-odr-total">Time</th>
-                                    <th class="tb-odr-action">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="tb-odr-body">
-                                <tr class="tb-odr-item">
-                                    <td class="tb-odr-info">Employee Added</td>
-                                    <td class="tb-odr-total">10:00 AM</td>
-                                    <td class="tb-odr-action"><span class="badge badge-dim bg-info-dim text-info">New</span></td>
-                                </tr>
-                                <tr class="tb-odr-item">
-                                    <td class="tb-odr-info">Leave Approved</td>
-                                    <td class="tb-odr-total">11:15 AM</td>
-                                    <td class="tb-odr-action"><span class="badge badge-dim bg-success-dim text-success">Approved</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div><!-- .col -->
-
-            <div class="col-lg-4">
-                <div class="card card-bordered h-100">
-                    <div class="card-inner">
-                        <div class="card-title-group mb-2">
-                            <div class="card-title">
-                                <h6 class="title">Quick Actions</h6>
-                            </div>
-                        </div>
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <a href="/HRMS/Employee/Create" class="btn btn-primary w-100">Add Employee</a>
-                            </div>
-                            <div class="col-6">
-                                <a href="/HRMS/Attendance/ViewAll" class="btn w-100" style="background-color:#1ee0ac;border-color:#1ee0ac;color:#fff;">Attendance</a>
-                            </div>
-                            <div class="col-6">
-                                <a href="/HRMS/Approvals/Pending" class="btn w-100" style="background-color:#f4bd0e;border-color:#f4bd0e;color:#fff;">Approvals</a>
-                            </div>
-                            <div class="col-6">
-                                <a href="/HRMS/Employee/EmployeeList" class="btn w-100" style="background-color:#09c2de;border-color:#09c2de;color:#fff;">Employee List</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div><!-- .col -->
-        </div><!-- .row -->
-    </div><!-- .nk-block -->
-</div><!-- .nk-content-body -->
-
+        </main>
+	</div>
+</div>
 <script>
-    // Uses Chart.js — already bundled with the DashLite theme, no extra include needed.
-    document.addEventListener("DOMContentLoaded", function () {
-        var attendanceCtx = document.getElementById("attendanceChart");
-        if (attendanceCtx) {
-            new Chart(attendanceCtx, {
-                type: "line",
-                data: {
-                    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-                    datasets: [{
-                        label: "Attendance %",
-                        data: [94, 95, 93, 97, 96.8, 90],
-                        borderColor: "#6576ff",
-                        backgroundColor: "rgba(101,118,255,0.08)",
-                        tension: 0.35,
-                        fill: true,
-                        pointRadius: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: false, min: 80, max: 100 } }
-                }
-            });
-        }
-
-        var empCtx = document.getElementById("empChart");
-        if (empCtx) {
-            new Chart(empCtx, {
-                type: "doughnut",
-                data: {
-                    labels: ["Training", "Operations", "Finance", "IT", "Other"],
-                    datasets: [{
-                        data: [35, 25, 15, 15, 10],
-                        backgroundColor: ["#6576ff", "#1ee0ac", "#f4bd0e", "#ff63a5", "#dee2ea"]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: "bottom" } }
-                }
-            });
-        }
+    // Highlight active sidebar link
+    document.addEventListener('DOMContentLoaded', () => {
+      const path = location.pathname.split('/').pop() || 'dashboard.html';
+      document.querySelectorAll('.sidebar a[data-page]').forEach(a => {
+        if (a.getAttribute('data-page') === path) a.classList.add('active');
+      });
     });
+
+    // Bootstrap-style validation + fake submit -> redirect to confirmation page
+    function handleFormSubmit(formId, redirectUrl, refPrefix) {
+      const form = document.getElementById(formId);
+      if (!form) return;
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!form.checkValidity()) {
+          form.classList.add('was-validated');
+          return;
+        }
+        const ref = refPrefix + '-' + Math.floor(100000 + Math.random() * 900000);
+        sessionStorage.setItem('lastRef', ref);
+        sessionStorage.setItem('lastSubmitTime', new Date().toLocaleString('en-IN', {
+          day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        }));
+        window.location.href = redirectUrl;
+      }, false);
+    }
+
+    function fillReference(refLabel) {
+      const refEl = document.getElementById('refNumber');
+      const timeEl = document.getElementById('refTime');
+      if (refEl) refEl.textContent = sessionStorage.getItem('lastRef') || (refLabel + '-482913');
+      if (timeEl) timeEl.textContent = sessionStorage.getItem('lastSubmitTime') || new Date().toLocaleString('en-IN');
+    }
+
+    function handleLoginSubmit(formId, redirectUrl) {
+      const form = document.getElementById(formId);
+      if (!form) return;
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!form.checkValidity()) {
+          form.classList.add('was-validated');
+          return;
+        }
+        window.location.href = redirectUrl;
+      }, false);
+    }
+
 </script>
 
 

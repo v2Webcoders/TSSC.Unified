@@ -4,7 +4,7 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
 	Layout = "_Layout";
-    ViewData["Title"] = Model.PolicyId == 0 ? "Add HR Policy" : "Edit HR Policy";
+    ViewData["Title"] = Model.PolicyId == 0 ? "Add Policy" : "Edit Policy";
 }
 
 
@@ -13,7 +13,7 @@
     <div class="nk-block-between">
         <div class="nk-block-head-content">
             <h3 class="nk-block-title page-title">
-                @(Model.PolicyId == 0 ? "Add HR Policy" : "Edit HR Policy")
+                @(Model.PolicyId == 0 ? "Add Policy" : "Edit Policy")
             </h3>
             @* <div class="nk-block-des">
                 <p>Upload and manage HR policy documents.</p>
@@ -23,7 +23,7 @@
         <div class="nk-block-head-content">
             <a asp-action="Index" class="btn btn-primary">
                 <em class="icon ni ni-file-docs"></em>
-                <span>HR Policy List</span>
+                <span> Policy List</span>
             </a>
         </div>
     </div>
@@ -45,7 +45,23 @@
                  class="alert alert-danger"></div>
 
             <div class="row g-4">
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Policy Type <span class="text-danger">*</span>
+                    </label>
 
+                    <select asp-for="PolicyType" class="form-select">
+                        <option value="">Select Policy Type</option>
+                        <option>HR</option>
+                        <option>Leave</option>
+                        <option>Attendance</option>
+                        <option>IT</option>
+                        <option>Finance</option>
+                        <option>Other</option>
+                    </select>
+
+                    <span asp-validation-for="PolicyType" class="text-danger"></span>
+                </div>
                 <div class="col-md-6">
                     <label class="form-label">
                         Policy Title <span class="text-danger">*</span>

@@ -10,7 +10,7 @@
 <div class="nk-block-head nk-block-head-sm">
     <div class="nk-block-between">
         <div class="nk-block-head-content">
-            <h3 class="nk-block-title page-title">HR Policy List</h3>
+            <h3 class="nk-block-title page-title">Policy List</h3>
         </div>
 
         <div class="nk-block-head-content">
@@ -27,7 +27,7 @@
                             <a asp-action="Create"
                                class="btn btn-primary">
                                 <em class="icon ni ni-plus"></em>
-                                <span>Add HR Policy</span>
+                                <span>Add Policy</span>
                             </a>
                         </li>
 
@@ -53,6 +53,7 @@
                         <tr>
                             <th width="60">S.No.</th>
                             <th>Policy Title</th>
+                            <th>Policy Type</th>
                             <th>Description</th>
                             <th>Document</th>
                             <th>Created By</th>
@@ -73,7 +74,9 @@
                                 <td>
                                     @item.PolicyTitle
                                 </td>
-
+                                <td>
+                                    @item.PolicyType
+                                </td>
                                 <td>
                                     @(string.IsNullOrEmpty(item.Description)
                                         ? "-"

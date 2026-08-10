@@ -1,0 +1,411 @@
+﻿@using TSSC.Unified.ViewModel
+@model LeaveRequestVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+	Layout = "_Layout";
+	ViewData["Title"] = Model.LeaveRequestId == 0 ? "Apply Leave" : "Edit Leave Request";
+}
+
+
+
+<div class="nk-block-head">
+	<div class="nk-block-between">
+
+		<div class="nk-block-head-content">
+			<h3 class="nk-block-title page-title">
+				@(Model.LeaveRequestId == 0 ? "Apply Leave" : "Edit Leave Request")
+			</h3>
+		</div>
+
+
+		<div class="nk-block-head-content">
+			<a asp-action="MyLeaves" asp-controller="LeaveRequest" class="btn btn-primary">
+				<em class="icon ni ni-list"></em>
+				<span> My Leave Requests</span>
+			</a>
+		</div>
+
+	</div>
+</div>
+
+<div class="card card-bordered">
+
+	<div class="card-inner">
+
+		<form asp-action="Create"
+			  method="post"
+			  enctype="multipart/form-data">
+
+			@Html.AntiForgeryToken()
+
+			@Html.HiddenFor(x => x.LeaveRequestId)
+			<input asp-for="EmployeeId" type="hidden" />
+			<div asp-validation-summary="ModelOnly"
+				 class="alert alert-danger"></div>
+
+
+			<div class="row g-4">
+
+
+				<!-- Employee Name -->
+				<div class="col-md-6">
+
+					<label class="form-label">
+						Employee Name
+					</label>
+
+					<input class="form-control"
+						   value="@Model.EmployeeName"
+						   readonly disabled/>
+
+				</div>
+
+
+				<!-- Department -->
+				<div class="col-md-6">
+
+					<label class="form-label">
+						Department
+					</label>
+
+					<input class="form-control"
+						   value="@Model.DepartmentName"
+						   readonly disabled />
+
+				</div>
+
+
+
+				<!-- Leave Type -->
+				<div class="col-md-6">
+
+					<label class="form-label">
+						Leave Type <span class="text-danger">*</span>
+					</label>
+
+					<select asp-for="LeaveTypeId"
+							class="form-select"
+							asp-items="@(new SelectList(ViewBag.LeaveTypes,"LeaveTypeId","LeaveTypeName"))">
+
+						<option value="">
+							Select Leave Type
+						</option>
+
+					</select>
+
+					<span asp-validation-for="LeaveTypeId"
+						  class="text-danger"></span>
+
+				</div>
+
+
+
+				<!-- Leave Duration -->
+				<div class="col-md-6">
+
+					<label class="form-label">
+						Leave Duration
+						<span class="text-danger">*</span>
+					</label>
+
+					<select asp-for="LeaveDuration"
+							class="form-select">
+
+						<option value="Full">
+							Full Day
+						</option>
+
+						<option value="FirstHalf">
+							First Half
+						</option>
+
+						<option value="SecondHalf">
+							Second Half
+						</option>
+
+					</select>
+
+				</div>
+
+
+
+
+				<!-- From Date -->
+				<div class="col-md-4">
+
+					<label class="form-label">
+						From Date <span class="text-danger">*</span>
+					</label>
+
+					<input asp-for="FromDate"
+						   id="FromDate"
+						   type="date"
+						   class="form-control" />
+
+					<span asp-validation-for="FromDate"
+						  class="text-danger"></span>
+
+				</div>
+
+
+
+				<!-- To Date -->
+				<div class="col-md-4">
+
+					<label class="form-label">
+						To Date <span class="text-danger">*</span>
+					</label>
+
+					<input asp-for="ToDate"
+						   id="ToDate"
+						   type="date"
+						   class="form-control" />
+
+					<span asp-validation-for="ToDate"
+						  class="text-danger"></span>
+
+				</div>
+
+
+
+				<!-- Total Days -->
+				<div class="col-md-4">
+
+					<label class="form-label">
+						Total Days
+					</label>
+
+					<input asp-for="TotalDays"
+						   id="TotalDays"
+						   class="form-control"/>
+							<span asp-validation-for="TotalDays" class="text-danger"></span>
+
+				</div>
+
+
+
+
+				<!-- Reason -->
+				<div class="col-md-12">
+
+					<label class="form-label">
+						Leave Reason <span class="text-danger">*</span>
+					</label>
+
+					<textarea asp-for="Reason"
+							  class="form-control"
+							  rows="4"
+							  placeholder="Enter reason for leave"></textarea>
+
+
+					<span asp-validation-for="Reason"
+						  class="text-danger"></span>
+
+				</div>
+
+
+
+
+				<!-- Contact -->
+				<div class="col-md-6">
+
+					<label class="form-label">
+						Contact During Leave
+					</label>
+
+					<input asp-for="EmergencyContact"
+						   class="form-control"
+						   placeholder="Enter contact number" />
+
+				</div>
+
+
+
+
+				<!-- Attachment -->
+				<div class="col-md-6">
+
+					<label class="form-label">
+						Attachment
+					</label>
+
+					<input asp-for="AttachmentFile"
+						   id="AttachmentFile"
+						   type="file"
+						   class="form-control"
+						   accept=".pdf,.jpg,.png" />
+
+					<small class="text-muted">
+						Allowed PDF, JPG, PNG (Max 5 MB)
+					</small>
+
+
+					@if (!string.IsNullOrEmpty(Model.Attachment))
+					{
+							<div class="mt-2">
+
+								<a href="~/uploads/leaves/@Model.Attachment"
+								   target="_blank"
+								   class="btn btn-sm btn-outline-info">
+
+									<em class="icon ni ni-file-docs"></em>
+									View Attachment
+
+								</a>
+
+							</div>
+					}
+
+				</div>
+
+
+
+
+				@if (Model.LeaveRequestId > 0)
+				{
+
+						<div class="col-md-6">
+
+							<label class="form-label">
+								Status
+							</label>
+
+							<input asp-for="Status"
+								   class="form-control"
+								   readonly />
+
+						</div>
+
+				}
+
+
+			</div>
+
+
+			<hr />
+
+
+			<div class="text-end">
+
+				<button type="submit"
+						class="btn btn-primary">
+
+					<em class="icon ni ni-send"></em>
+
+					@(Model.LeaveRequestId == 0
+							? "Submit Leave Request"
+							: "Update Request")
+
+				</button>
+
+
+				<a asp-action="Index"
+				   class="btn btn-light">
+
+					Cancel
+
+				</a>
+
+			</div>
+
+
+		</form>
+
+	</div>
+
+</div>
+
+
+
+@section Scripts {
+
+@* <script>
+
+	        function calculateDays()
+	        {
+	            let fromDate = new Date($("#FromDate").val());
+	            let toDate = new Date($("#ToDate").val());
+
+
+	            if(fromDate && toDate && toDate >= fromDate)
+	            {
+	                let days =
+	                    Math.floor((toDate - fromDate) /
+	                    (1000 * 60 * 60 * 24)) + 1;
+
+
+	                $("#TotalDays").val(days);
+	            }
+	            else
+	            {
+	                $("#TotalDays").val("");
+	            }
+	        }
+
+
+	        $("#FromDate,#ToDate").change(function(){
+
+	            calculateDays();
+
+	        });
+
+
+
+	        $("#AttachmentFile").change(function(){
+
+	            if(this.files.length > 0)
+	            {
+	                if(this.files[0].size > 5242880)
+	                {
+	                    alert("File size should be less than 5 MB");
+	                    this.value="";
+	                }
+	            }
+
+	        });
+
+
+	    </script> *@
+			<script>
+			function calculateDays() {
+
+				let from = $("#FromDate").val();
+				let to = $("#ToDate").val();
+
+				// Keep Total Days blank until both dates are selected
+				if (!from || !to) {
+					$("#TotalDays").val("");
+					return;
+				}
+
+				let fromDate = new Date(from);
+				let toDate = new Date(to);
+
+				if (toDate >= fromDate) {
+					let days = Math.floor((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1;
+					$("#TotalDays").val(days);
+				} else {
+					$("#TotalDays").val("");
+				}
+			}
+
+			// $(document).ready(function () {
+			// 	$("#TotalDays").val("");   // Keep blank on page load
+			// });
+					$(document).ready(function () {
+			calculateDays();
+		});
+			$("#FromDate, #ToDate").on("change", function () {
+				calculateDays();
+			});
+
+			$("#AttachmentFile").on("change", function () {
+				if (this.files.length > 0 && this.files[0].size > 5242880) {
+					alert("File size should be less than 5 MB.");
+					this.value = "";
+				}
+			});
+		</script>
+}

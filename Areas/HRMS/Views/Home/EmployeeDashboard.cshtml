@@ -45,10 +45,53 @@
 			</aside> *@
 
 			<main class="col-md-12 col-lg-12 p-4">
-				<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-5">
+
+				
+
+				<div class="d-flex flex-wrap justify-content-between align-items-start gap-4 mb-5">
+
 					<div>
-						<h1 class="fs-4 text-primary fw-bold mb-1">Welcome, Ravi 👋</h1>
-						<p class="text-muted small mb-0">Here's what's happening with your attendance and requests today — Monday, 27 July 2026.</p>
+					<h1 class="fs-4 text-primary fw-bold mb-1">  Welcome, @ViewBag.EmployeeName 👋</h1>
+					<div class="mt-0 mb-4">
+						<div class="d-flex flex-wrap align-items-center gap-2 text-muted small">
+
+							<!-- Date -->
+							<span class="d-flex align-items-center">
+								<em class="icon ni ni-calendar-alt me-1"></em>
+								@DateTime.Today.ToString("dddd, dd MMMM yyyy")
+							</span>
+
+							<span class="text-light">•</span>
+
+							<!-- Status -->
+							@if (ViewBag.TodayInTime != null)
+							{
+								<span class="d-flex align-items-center text-success">
+									<em class="icon ni ni-check-circle me-1"></em> Present
+								</span>
+							}
+							else
+							{
+								<span class="d-flex align-items-center text-warning">
+									<em class="icon ni ni-clock me-1"></em> Not marked
+								</span>
+							}
+
+							<span class="text-light">•</span>
+
+							<!-- In / Out -->
+							<span>
+								In: @(ViewBag.TodayInTime != null ? ((DateTime)ViewBag.TodayInTime).ToString("hh:mm tt") : "--")
+							</span>
+
+							<span class="text-light">•</span>
+
+							<span>
+								Out: @(ViewBag.TodayOutTime != null ? ((DateTime)ViewBag.TodayOutTime).ToString("hh:mm tt") : "--")
+							</span>
+
+						</div>
+					</div>
 					</div>
 					<a class="btn btn-secondary text-white" href="attendance.html">Mark Today's Attendance</a>
 				</div>
@@ -111,7 +154,10 @@
 					</div>
 					<div class="col-lg-4">
 						<div class="card border-0 shadow-sm h-100">
-						<div class="card-body d-grid ">
+
+
+							<div class="card-body d-grid ">
+
 								<h3 class="fs-6 text-primary fw-bold mb-2">Quick Actions</h3>
 								<a class="btn btn-outline-primary" href="regularization.html">↻ Regularize Attendance</a>
 								<a class="btn btn-outline-primary" href="leave-request.html">🗓 Apply for Leave</a>

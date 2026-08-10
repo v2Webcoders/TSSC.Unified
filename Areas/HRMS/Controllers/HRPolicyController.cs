@@ -17,7 +17,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace QUIZAPP.Areas.HRMS.Controllers
 {
     [Area("HRMS")]
-    [Authorize(Roles = "HR")]
+    [Authorize]
     public class HRPolicyController : Controller
     {
         
@@ -39,6 +39,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             _roleManager = roleManager;
             _environment = environment;
         }
+        [Authorize(Roles = "HR")]
         public async Task<IActionResult> Create(int? id)
         {
             HRPolicyVM model = new HRPolicyVM();
@@ -54,6 +55,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 {
                     PolicyId = policy.PolicyId,
                     PolicyTitle = policy.PolicyTitle,
+                    PolicyType = policy.PolicyType,   
                     Description = policy.Description,
                     PolicyDocument = policy.PolicyDocument,
                     IsActive = policy.IsActive,
@@ -69,6 +71,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "HR")]
         public async Task<IActionResult> Create(HRPolicyVM model)
         {
             if (!ModelState.IsValid)
@@ -103,22 +106,26 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 }
             }
 
-            // Make only one policy active
+            // Make only one policy active for the selected Policy Type
             if (model.IsActive)
             {
                 var activePolicies = await _context.HRPolicies
-                    .Where(x => x.IsActive && x.PolicyId != model.PolicyId)
+                    .Where(x => x.IsActive
+                             && x.PolicyType == model.PolicyType
+                             && x.PolicyId != model.PolicyId)
                     .ToListAsync();
 
                 foreach (var item in activePolicies)
+                {
                     item.IsActive = false;
+                }
             }
-
             if (model.PolicyId == 0)
             {
                 var policy = new HRPolicy
                 {
                     PolicyTitle = model.PolicyTitle,
+                    PolicyType = model.PolicyType,          // Added
                     Description = model.Description,
                     PolicyDocument = fileName,
                     IsActive = true,                     // Always active for new policy
@@ -139,7 +146,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
                 policy.PolicyTitle = model.PolicyTitle;
                 policy.Description = model.Description;
-
+                policy.PolicyType = model.PolicyType;       // Added
                 if (!string.IsNullOrEmpty(fileName))
                     policy.PolicyDocument = fileName;
 
@@ -154,6 +161,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+        [Authorize(Roles = "HR")]
         public async Task<IActionResult> Index()
         {
             var model = await _context.HRPolicies
@@ -164,6 +172,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             return View(model);
         }
         [HttpGet]
+        [Authorize(Roles = "HR")]
         public async Task<IActionResult> Delete(int id)
         {
             var policy = await _context.HRPolicies.FindAsync(id);
@@ -194,6 +203,17 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             TempData["SuccessMessage"] = "HR Policy deleted successfully.";
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // Employee Policy View
+        
+        public IActionResult EmployeePolicies()
+        {
+            var policies = _context.HRPolicies
+                .Where(x => x.IsActive)
+                .ToList();
+
+            return View(policies);
         }
     }
 

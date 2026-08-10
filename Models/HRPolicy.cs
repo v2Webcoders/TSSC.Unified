@@ -11,6 +11,9 @@ namespace TSSC.Unified.Models
         [Required]
         public string PolicyTitle { get; set; }
 
+        [Required]
+        public string PolicyType { get; set; }
+
         public string? Description { get; set; }
 
         public string? PolicyDocument { get; set; }
@@ -34,6 +37,11 @@ namespace TSSC.Unified.Models
         [Display(Name = "Policy Title")]
         [StringLength(200)]
         public string PolicyTitle { get; set; }
+
+        [Required(ErrorMessage = "Please select Policy Type.")]
+        [Display(Name = "Policy Type")]
+        public string PolicyType { get; set; }
+
 
         [Display(Name = "Description")]
         [DataType(DataType.MultilineText)]

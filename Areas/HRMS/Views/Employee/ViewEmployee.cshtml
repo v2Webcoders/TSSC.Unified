@@ -165,25 +165,49 @@
                     <label class="form-label text-muted mb-1">Department</label>
                     <p class="fw-medium mb-0">@Val(Model.DepartmentName)</p>
                 </div>
+
                 <div class="col-md-4">
                     <label class="form-label text-muted mb-1">Designation</label>
                     <p class="fw-medium mb-0">@Val(Model.DesignationName)</p>
                 </div>
+
                 <div class="col-md-4">
                     <label class="form-label text-muted mb-1">Reporting Manager</label>
                     <p class="fw-medium mb-0">@Val(Model.ReportingManagerName)</p>
                 </div>
+
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Branch</label>
+                    <p class="fw-medium mb-0">@Val(Model.BranchName)</p>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Sub Branch</label>
+                    <p class="fw-medium mb-0">@Val(Model.SubBranchName)</p>
+                </div>
+
                 <div class="col-md-4">
                     <label class="form-label text-muted mb-1">Joining Date</label>
-                    <p class="fw-medium mb-0">@(Model.JoiningDate.HasValue ? Model.JoiningDate.Value.ToString("dd-MMM-yyyy") : "—")</p>
+                    <p class="fw-medium mb-0">
+                        @(Model.JoiningDate.HasValue ? Model.JoiningDate.Value.ToString("dd-MMM-yyyy") : "—")
+                    </p>
                 </div>
+
                 <div class="col-md-4">
                     <label class="form-label text-muted mb-1">Employee Type</label>
                     <p class="fw-medium mb-0">@Val(Model.EmployeeType)</p>
                 </div>
+
                 <div class="col-md-4">
                     <label class="form-label text-muted mb-1">Employment Status</label>
                     <p class="fw-medium mb-0">@Val(Model.EmploymentStatus)</p>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Notice Period</label>
+                    <p class="fw-medium mb-0">
+                        @(Model.NoticePeriod.HasValue ? $"{Model.NoticePeriod} Days" : "—")
+                    </p>
                 </div>
             </div>
 
@@ -348,6 +372,10 @@
                 <div class="col-md-4">
                     <label class="form-label text-muted mb-1">Username</label>
                     <p class="fw-medium mb-0">@Val(Model.Username)</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted mb-1">Password</label>
+                    <p class="fw-medium mb-0">@Val(Model.Password)</p>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted mb-1">Role</label>

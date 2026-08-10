@@ -16,21 +16,30 @@ namespace QUIZAPP
 
         }
         public DbSet<AppUser> AppUser { get; set; }
-
         internal DbSet<LookupMaster> LookupMaster { get; set; }
-
         internal DbSet<State> State { get; set; }
         internal DbSet<City> City { get; set; }
         public DbSet<Dealer> Dealer { get; set; }
         public DbSet<UserLoginHistory> UserLoginHistory { get; set; }
         public DbSet<Employee> Employee { get; set; }
-
         public DbSet<Department> Department { get; set; }
 
         public DbSet<Designation> Designation { get; set; }
         public DbSet<HRPolicy> HRPolicies { get; set; }
-        public DbSet<Tasks>Tasks { get; set; }
+
+        public DbSet<Branch> Branch { get; set; }
+
+        public DbSet<SubBranch> SubBranch { get; set; }
+        public DbSet<LeaveType> LeaveType { get; set; }
+        public DbSet<LeaveRequest> LeaveRequest { get; set; }
+
+        public DbSet<Tasks> Tasks { get; set; }
         public DbSet<LetterRegister> LetterRegister { get; set; }
+        public DbSet<EmployeeLeaveBalance> EmployeeLeaveBalance { get; set; }
+
+        public DbSet<LeaveAdjustment> LeaveAdjustment { get; set; }
+        public DbSet<LeavePolicy> LeavePolicy { get; set; }
+
 
     }
 }

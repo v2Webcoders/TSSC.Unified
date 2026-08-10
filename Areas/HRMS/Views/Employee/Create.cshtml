@@ -4,32 +4,26 @@
 @{
 	Layout = "_Layout";
 }
-@* <div class="nk-block-head nk-block-head-lg wide-sm">
-	<div class="nk-block-head-content">
-		<h2 class="nk-block-title fw-normal">
-			@(Model.EmployeeId > 0 ? "Edit Employee" : "Add Employee")
-		</h2>
-	</div>
-</div> *@
+
 <div class="nk-block-head nk-block-head-sm">
-<div class="nk-block-between">
-	<div class="nk-block-head-content">
-		<h3 class="nk-block-title page-title">@(Model.EmployeeId > 0 ? "Edit Employee" : "Add Employee")</h3>
-		<div class="nk-block-des text-soft">
-			@* <p>You have total 95 pages/posts.</p> *@
-		</div>
-	</div><!-- .nk-block-head-content -->
-	<div class="nk-block-head-content">
-		@* <a href="html/cms/page-post-add.html" class="btn btn-icon btn-primary d-md-none"><em class="icon ni ni-plus"></em></a> *@
+	<div class="nk-block-between">
+		<div class="nk-block-head-content">
+			<h3 class="nk-block-title page-title">@(Model.EmployeeId > 0 ? "Edit Employee" : "Add Employee")</h3>
+			<div class="nk-block-des text-soft">
+				@* <p>You have total 95 pages/posts.</p> *@
+			</div>
+		</div><!-- .nk-block-head-content -->
+		<div class="nk-block-head-content">
+			@* <a href="html/cms/page-post-add.html" class="btn btn-icon btn-primary d-md-none"><em class="icon ni ni-plus"></em></a> *@
 			<a asp-action="EmployeeList"
 			   asp-controller="Employee"
 			   class="btn btn-primary d-none d-md-inline-flex">
 				<em class="icon ni ni-users"></em>&nbsp; Employee List
 			</a>
-		@* <a href="html/cms/page-post-add.html" class="btn btn-primary d-none d-md-inline-flex"><em class="icon ni ni-plus"></em><span>Add Page/Post</span></a> *@
-	</div><!-- .nk-block-head-content -->
-</div><!-- .nk-block-between -->
-								</div>
+			@* <a href="html/cms/page-post-add.html" class="btn btn-primary d-none d-md-inline-flex"><em class="icon ni ni-plus"></em><span>Add Page/Post</span></a> *@
+		</div><!-- .nk-block-head-content -->
+	</div><!-- .nk-block-between -->
+</div>
 <div class="nk-block nk-block-lg">
 	<div class="card card-preview">
 
@@ -53,7 +47,6 @@
 				<div class="row gy-4">
 					<div class="col-md-12">
 						<div class="text-end mb-3">
-							
 						</div>
 					</div>
 
@@ -74,7 +67,7 @@
 										</h5>
 									</div>
 								</div>
-								
+
 								<div class="col-lg-9">
 									<div class="row gy-3">
 
@@ -86,7 +79,7 @@
 										<div class="col-md-4">
 											<label class="form-label">First Name <span class="text-danger">*</span></label>
 											<input asp-for="FirstName" class="form-control" />
-											
+
 										</div>
 
 										<div class="col-md-4">
@@ -121,6 +114,7 @@
 												<option>AB-</option>
 												<option>O+</option>
 												<option>O-</option>
+												<option>NA</option>
 											</select>
 										</div>
 
@@ -164,156 +158,96 @@
 
 								</div>
 
-								@* <!-- ============= Basic Information ============= -->
-								<div id="sec-basic" class="col-12 mb-4">
-									<div style="border-left:4px solid #D9622F;padding-left:12px;">
-										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
-											<em class="ni ni-user-alt"></em> Basic Information
-										</h5>
-									</div>
-								</div>
-								
-								<div class="col-md-4">
-									<label class="form-label">Employee Code <span class="text-danger">*</span></label>
-									<input asp-for="EmployeeCode" class="form-control" />
-									<span asp-validation-for="EmployeeCode" class="text-danger"></span>
-								</div>
 
-								<div class="col-md-4">
-									<label class="form-label">First Name <span class="text-danger">*</span></label>
-									<input asp-for="FirstName" class="form-control" />
-									<span asp-validation-for="FirstName" class="text-danger"></span>
-								</div>
-
-
-
-								<div class="col-md-4">
-									<label class="form-label">Last Name</label>
-									<input asp-for="LastName" class="form-control" />
-								</div>
-
-								<div class="col-md-4">
-									<label class="form-label">Gender</label>
-									<select asp-for="Gender" class="form-select">
-										<option value="">Select Gender</option>
-										<option>Male</option>
-										<option>Female</option>
-										<option>Other</option>
-									</select>
-								</div>
-
-								<div class="col-md-4">
-									<label class="form-label">Date of Birth</label>
-									<input asp-for="DOB" type="date" class="form-control" />
-								</div>
-
-								<div class="col-md-4">
-									<label class="form-label">Blood Group</label>
-									<select asp-for="BloodGroup" class="form-select">
-										<option value="">Select</option>
-										<option>A+</option>
-										<option>A-</option>
-										<option>B+</option>
-										<option>B-</option>
-										<option>AB+</option>
-										<option>AB-</option>
-										<option>O+</option>
-										<option>O-</option>
-									</select>
-								</div>
-
-								<div class="col-md-4">
-									<label class="form-label">Marital Status</label>
-									<select asp-for="MaritalStatus" class="form-select">
-										<option value="">Select</option>
-										<option>Single</option>
-										<option>Married</option>
-										<option>Divorced</option>
-										<option>Widowed</option>
-									</select>
-								</div> *@
 
 								<!-- ============= Official Information ============= -->
 								<div id="sec-official" class="col-12 mb-4 mt-5">
 									<div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
 										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
-											<em class="ni ni-building"></em> Official Information
+											<em class="ni ni-building"></em>
+											Official Information
 										</h5>
 									</div>
 								</div>
-								<div class="col-md-4">
-									<label class="form-label">Department<span class="text-danger">*</span></label>
-									<select asp-for="DepartmentId"
-											asp-items="ViewBag.Departments"
-											class="form-select">
+
+								<div class="col-md-3">
+									<label class="form-label">Branch <span class="text-danger"></span></label>
+									<select asp-for="BranchId" asp-items="ViewBag.Branches" class="form-select">
+										<option value="">Select Branch</option>
+									</select>
+								</div>
+
+								<div class="col-md-3">
+									<label class="form-label">Sub Branch</label>
+									<select asp-for="SubBranchId" asp-items="ViewBag.SubBranches" class="form-select">
+										<option value="">Select Sub Branch</option>
+									</select>
+								</div>
+
+								<div class="col-md-3">
+									<label class="form-label">Department <span class="text-danger">*</span></label>
+									<select asp-for="DepartmentId" asp-items="ViewBag.Departments" class="form-select">
 										<option value="">Select Department</option>
 									</select>
 								</div>
 
-								<div class="col-md-4">
-									<label class="form-label">Designation<span class="text-danger">*</span></label>
-									<select asp-for="DesignationId"
-											asp-items="ViewBag.Designations"
-											class="form-control">
+								<div class="col-md-3">
+									<label class="form-label">Designation <span class="text-danger">*</span></label>
+									<select asp-for="DesignationId" asp-items="ViewBag.Designations" class="form-select">
 										<option value="">Select Designation</option>
 									</select>
 								</div>
-								<div class="col-md-4">
+
+								<div class="col-md-3">
 									<label class="form-label">Reporting Manager</label>
-									<select asp-for="ReportingManagerId"
-											asp-items="ViewBag.Managers"
-											class="form-control">
+									<select asp-for="ReportingManagerId" asp-items="ViewBag.Managers" class="form-select">
 										<option value="">Select Manager</option>
 									</select>
 								</div>
 
-								<div class="col-md-4">
-									<label class="form-label">Joining Date</label>
+								<div class="col-md-3">
+									<label class="form-label">Joining Date <span class="text-danger">*</span></label>
 									<input asp-for="JoiningDate" type="date" class="form-control" />
 								</div>
 
-								<div class="col-md-4">
-									<div class="form-group">
-										<label class="form-label">
-											Employee Type <span class="text-danger">*</span>
-										</label>
-
-										<select asp-for="EmployeeType" class="form-select">
-											<option value="">-- Select Employee Type --</option>
-											<option value="Permanent">Permanent</option>
-											<option value="Probation">Probation</option>
-											<option value="Contract">Contract</option>
-											<option value="Temporary">Temporary</option>
-											<option value="Internship">Internship</option>
-											<option value="Consultant">Consultant</option>
-											<option value="Part-Time">Part-Time</option>
-										</select>
-
-										<span asp-validation-for="EmployeeType" class="text-danger"></span>
-									</div>
+								<div class="col-md-3">
+									<label class="form-label">Employee Type <span class="text-danger">*</span></label>
+									<select asp-for="EmployeeType" class="form-select">
+										<option value="">Select Employee Type</option>
+										<option>Permanent</option>
+										<option>Probation</option>
+										<option>Contract</option>
+										<option>Temporary</option>
+										<option>Internship</option>
+										<option>Consultant</option>
+										<option>Part-Time</option>
+									</select>
 								</div>
 
-								<div class="col-md-4">
-									<div class="form-group">
-										<label class="form-label">
-											Employment Status <span class="text-danger">*</span>
-										</label>
+								<div class="col-md-3">
+									<label class="form-label">Employment Status <span class="text-danger">*</span></label>
+									<select asp-for="EmploymentStatus" class="form-select">
+										<option value="">Select Status</option>
+										<option>Active</option>
+										<option>On Probation</option>
+										<option>On Leave</option>
+										<option>Notice Period</option>
+										<option>Resigned</option>
+										<option>Relieved</option>
+										<option>Terminated</option>
+									</select>
+								</div>
 
-										<select asp-for="EmploymentStatus" class="form-select">
-											<option value="">-- Select Employment Status --</option>
-											<option value="Active">Active</option>
-											<option value="On Probation">On Probation</option>
-											<option value="On Leave">On Leave</option>
-											<option value="Notice Period">Notice Period</option>
-											<option value="Suspended">Suspended</option>
-											<option value="Resigned">Resigned</option>
-											<option value="Relieved">Relieved</option>
-											<option value="Terminated">Terminated</option>
-											<option value="Retired">Retired</option>
-										</select>
-
-										<span asp-validation-for="EmploymentStatus" class="text-danger"></span>
-									</div>
+								<div class="col-md-3">
+									<label class="form-label">Notice Period</label>
+									<select asp-for="NoticePeriod" class="form-select">
+										<option value="">Select</option>
+										<option value="0">Immediate</option>
+										<option value="15">15 Days</option>
+										<option value="30">30 Days</option>
+										<option value="60">60 Days</option>
+										<option value="90">90 Days</option>
+									</select>
 								</div>
 
 								<!-- ============= Contact Information ============= -->
@@ -475,7 +409,7 @@
 								<div id="sec-login" class="col-12 mb-4 mt-5">
 									<div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
 										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
-											<em class="ni ni-signin"></em> Login Information 
+											<em class="ni ni-signin"></em> Login Information
 										</h5>
 									</div>
 								</div>
@@ -483,23 +417,7 @@
 									<label class="form-label">Username</label>
 									<input asp-for="Username" class="form-control bg-light" />
 								</div>
-								@* @if (Model.EmployeeId > 0)
-								{
-									<div class="col-md-4">
-										<label class="form-label">Username</label>
-										<input asp-for="Username" class="form-control bg-light" readonly />
-									</div>
-								}
-								else
-								{
-									<div class="col-md-4">
-										<label class="form-label">
-											Username <span class="text-danger">*</span>
-										</label>
-										<input asp-for="Username" class="form-control" />
-										<span asp-validation-for="Username" class="text-danger"></span>
-									</div>
-								} *@
+
 
 								@if (Model.EmployeeId == 0)
 								{
@@ -516,15 +434,6 @@
 										<span asp-validation-for="Password" class="text-danger"></span>
 									</div>
 								}
-
-								@* <div class="col-md-4">
-									<label class="form-label">Role<span class="text-danger">*</span></label>
-									<select asp-for="RoleId"
-											asp-items="ViewBag.Roles"
-											class="form-select">
-										<option value="">Select Role</option>
-									</select>
-								</div> *@
 								@if (Model.EmployeeId > 0)
 								{
 									<div class="col-md-4">
@@ -552,7 +461,7 @@
 											<option value="">Select Role</option>
 										</select>
 
-										
+
 									</div>
 								}
 								<!-- ================= Status ================= -->
@@ -597,9 +506,7 @@
 									</a>
 
 								</div>
-
 							</div>
-
 						</form>
 					</div>
 				</div>

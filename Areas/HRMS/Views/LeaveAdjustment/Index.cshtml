@@ -1,0 +1,136 @@
+﻿@model IEnumerable<TSSC.Unified.Models.LeaveAdjustment>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+	Layout = "_Layout";
+	ViewData["Title"] = "Leave Adjustment History";
+	int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+	<div class="nk-block-between">
+
+		<div class="nk-block-head-content">
+			<h3 class="nk-block-title page-title">Leave Adjustment History</h3>
+		</div>
+
+		<div class="nk-block-head-content">
+			<div class="toggle-wrap nk-block-tools-toggle">
+
+				<a href="#"
+				   class="btn btn-icon btn-trigger toggle-expand me-n1"
+				   data-target="pageMenu">
+					<em class="icon ni ni-more-v"></em>
+				</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="nk-block nk-block-lg">
+	<div class="card card-preview">
+		<div class="card-inner">
+			<div class="table-responsive">
+				<table class="datatable-init-export table table-tranx table_custom table-bordered">
+					<thead>
+						<tr>
+							<th width="60">S.No.</th>
+							<th>Employee</th>
+							<th>Leave Type</th>
+							<th>Adjustment</th>
+							<th>Days</th>
+							<th>Reason</th>
+							<th>Adjusted By</th>
+							<th>Adjusted On</th>
+							<th width="100">Action</th>
+						</tr>
+					</thead>
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @serial
+                                </td>
+
+                                <!-- Employee -->
+                                <td>
+                                    @($"{item.Employee?.FirstName} {item.Employee?.LastName}")
+                                </td>
+
+                                <!-- Leave Type -->
+                                <td>
+                                    @item.LeaveType?.LeaveTypeName
+                                </td>
+
+                                <!-- Adjustment Type -->
+                                <td>
+                                    @if (item.AdjustmentType == "Credit")
+                                    {
+                                        <span class="badge badge-dot bg-success">
+                                            Credit
+                                        </span>
+                                    }
+                                    else if (item.AdjustmentType == "Deduct")
+                                    {
+                                        <span class="badge badge-dot bg-danger">
+                                            Deduct
+                                        </span>
+                                    }
+                                </td>
+
+                                <!-- Days -->
+                                <td>
+                                    @item.Days
+                                </td>
+
+                                <!-- Reason -->
+                                <td>
+                                    @(string.IsNullOrEmpty(item.Reason)
+                                        ? "-"
+                                        : (item.Reason.Length > 50
+                                        ? item.Reason.Substring(0, 50) + "..."
+                                        : item.Reason))
+                                </td>
+
+                                <!-- Adjusted By -->
+                                <td>
+                                    @($"{item.AdjustedByEmployee?.FirstName} {item.AdjustedByEmployee?.LastName}")
+                                </td>
+
+                                <!-- Adjusted On -->
+                                <td>
+                                    @item.AdjustedOn.ToString("dd-MMM-yyyy hh:mm tt")
+                                </td>
+
+                                <!-- Action -->
+                                <td>
+                                    <div class="btn-group">
+
+                                        <a asp-action="Details"
+                                           asp-route-id="@item.LeaveAdjustmentId"
+                                           class="btn btn-sm btn-outline-info"
+                                           title="View">
+
+                                            <em class="icon ni ni-eye"></em>
+
+                                        </a>
+
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                            serial++;
+                        }
+
+                    </tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+
