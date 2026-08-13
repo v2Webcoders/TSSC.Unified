@@ -16,161 +16,690 @@
         : new List<string>();
 
     var employee = currentUser != null
-        ? Context.Employee.FirstOrDefault(x => x.ApplicationUserId == currentUser.Id)
+        ? Context.Employee.FirstOrDefault(
+            x => x.ApplicationUserId == currentUser.Id)
         : null;
 
     bool isHR = roles.Contains("HR");
 
     bool isReportingManager = employee != null &&
-        Context.Employee.Any(x => x.ReportingManagerId == employee.EmployeeId);
+        Context.Employee.Any(
+            x => x.ReportingManagerId == employee.EmployeeId);
 }
 
 <ul class="nk-menu">
 
+    <!-- ===================================================== -->
+    <!-- PANEL -->
+    <!-- ===================================================== -->
+
     <li class="nk-menu-heading">
-        <h6 class="overline-title">Employee Panel</h6>
+        <h6 class="overline-title text-primary-alt">
+            @(isHR ? "HR Manager Panel" : "Employee Panel")
+        </h6>
     </li>
 
-    <!-- Dashboard -->
+    <!-- ===================================================== -->
+    <!-- DASHBOARD -->
+    <!-- ===================================================== -->
+
     <li class="nk-menu-item">
-        <a href="/HRMS/Home/" class="nk-menu-link">
+
+        <a href="/HRMS/Home/"
+           class="nk-menu-link">
+
             <span class="nk-menu-icon">
                 <em class="icon ni ni-monitor"></em>
             </span>
-            <span class="nk-menu-text">Dashboard</span>
-        </a>
-    </li>
 
-    <!-- Attendance & Leave -->
-    <li class="nk-menu-item has-sub">
-        <a href="#" class="nk-menu-link nk-menu-toggle">
-            <span class="nk-menu-icon">
-                <em class="icon ni ni-calendar"></em>
+            <span class="nk-menu-text">
+                Dashboard
             </span>
-            <span class="nk-menu-text">Attendance & Leave</span>
+
         </a>
 
-        <ul class="nk-menu-sub">
-
-            <li class="nk-menu-item">
-                <a href="/HRMS/Attendance/Mark" class="nk-menu-link">
-                    <span class="nk-menu-text">Mark Attendance</span>
-                </a>
-            </li>
-
-            <li class="nk-menu-item">
-                <a href="/HRMS/Attendance/MyAttendance" class="nk-menu-link">
-                    <span class="nk-menu-text">My Attendance</span>
-                </a>
-            </li>
-
-            <li class="nk-menu-item">
-                <a href="/HRMS/Attendance/Regularization" class="nk-menu-link">
-                    <span class="nk-menu-text">Attendance Regularization</span>
-                </a>
-            </li>
-
-            <li class="nk-menu-item">
-                <a href="/HRMS/LeaveRequest/Create" class="nk-menu-link">
-                    <span class="nk-menu-text">Apply Leave</span>
-                </a>
-            </li>
-
-            <li class="nk-menu-item">
-                <a href="/HRMS/LeaveRequest/MyLeaves" class="nk-menu-link">
-                    <span class="nk-menu-text">My Leave Requests</span>
-                </a>
-            </li>
-
-            <li class="nk-menu-item">
-                <a href="/HRMS/LeaveManagement/MyBalance" class="nk-menu-link">
-                    <span class="nk-menu-text">My Leave Balance</span>
-                </a>
-            </li>
-
-            <li class="nk-menu-item">
-                <a href="/HRMS/Leave/Calendar" class="nk-menu-link">
-                    <span class="nk-menu-text">Holiday Calendar</span>
-                </a>
-            </li>
-
-        </ul>
     </li>
 
-    @if (isReportingManager)
+
+    <!-- ===================================================== -->
+    <!-- EMPLOYEE MANAGEMENT - HR ONLY -->
+    <!-- ===================================================== -->
+    @if (isHR)
     {
         <li class="nk-menu-item has-sub">
-            <a href="#" class="nk-menu-link nk-menu-toggle">
+
+            <a href="#"
+               class="nk-menu-link nk-menu-toggle">
+
                 <span class="nk-menu-icon">
                     <em class="icon ni ni-users"></em>
                 </span>
-                <span class="nk-menu-text">Task Management</span>
+
+                <span class="nk-menu-text">
+                    Employee Management
+                </span>
+
             </a>
 
+
             <ul class="nk-menu-sub">
-                <li class="nk-menu-item">
-                    <a href="/HRMS/Task/Create" class="nk-menu-link">
-                        <span class="nk-menu-text">Assign New Task</span>
-                    </a>
-                </li>
 
                 <li class="nk-menu-item">
-                    <a href="/HRMS/Task/TaskList" class="nk-menu-link">
-                        <span class="nk-menu-text">All Tasks List</span>
+
+                    <a href="/HRMS/Employee/Create"
+                       class="nk-menu-link">
+
+                        <span class="nk-menu-text">
+                            Add Employee
+                        </span>
+
                     </a>
+
                 </li>
 
-                <li class="nk-menu-item">
-                    <a href="/HRMS/Task/CompletedTask" class="nk-menu-link">
-                        <span class="nk-menu-text">Completed Tasks</span>
-                    </a>
-                </li>
 
                 <li class="nk-menu-item">
-                    <a href="/HRMS/Task/ClosedTask" class="nk-menu-link">
-                        <span class="nk-menu-text">Closed Tasks</span>
+
+                    <a href="/HRMS/Employee/EmployeeList"
+                       class="nk-menu-link">
+
+                        <span class="nk-menu-text">
+                            Employee List
+                        </span>
+
                     </a>
+
                 </li>
+
             </ul>
+
+        </li>
+       
+    }
+
+
+    <!-- ===================================================== -->
+    <!-- ATTENDANCE & LEAVE -->
+    <!-- ===================================================== -->
+
+    <li class="nk-menu-item has-sub">
+
+        <a href="#"
+           class="nk-menu-link nk-menu-toggle">
+
+            <span class="nk-menu-icon">
+                <em class="icon ni ni-calendar"></em>
+            </span>
+
+            <span class="nk-menu-text">
+                Attendance & Leave
+            </span>
+
+        </a>
+
+
+        <ul class="nk-menu-sub">
+
+
+            <!-- ================================================= -->
+            <!-- SELF SERVICE -->
+            <!-- ================================================= -->
+
+            <li class="nk-menu-item">
+
+                <a href="/HRMS/Attendance/MyAttendance"
+                   class="nk-menu-link">
+
+                    <span class="nk-menu-text">
+                        My Attendance
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li class="nk-menu-item">
+
+                <a href="/HRMS/Attendance/Regularization"
+                   class="nk-menu-link">
+
+                    <span class="nk-menu-text">
+                        Attendance Regularization
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li class="nk-menu-item">
+
+                <a href="/HRMS/Attendance/MyRegularizations"
+                   class="nk-menu-link">
+
+                    <span class="nk-menu-text">
+                        My Regularizations
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li class="nk-menu-item">
+
+                <a href="/HRMS/Attendance/ApplyOD"
+                   class="nk-menu-link">
+
+                    <span class="nk-menu-text">
+                        Apply OD
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li class="nk-menu-item">
+
+                <a href="/HRMS/Attendance/MyOD"
+                   class="nk-menu-link">
+
+                    <span class="nk-menu-text">
+                        My OD Requests
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li class="nk-menu-item">
+
+                <a href="/HRMS/LeaveRequest/Create"
+                   class="nk-menu-link">
+
+                    <span class="nk-menu-text">
+                        Apply Leave
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li class="nk-menu-item">
+
+                <a href="/HRMS/LeaveRequest/MyLeaves"
+                   class="nk-menu-link">
+
+                    <span class="nk-menu-text">
+                        My Leave Requests
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li class="nk-menu-item">
+
+                <a href="/HRMS/LeaveManagement/MyBalance"
+                   class="nk-menu-link">
+
+                    <span class="nk-menu-text">
+                        My Leave Balance
+                    </span>
+
+                </a>
+
+            </li>
+           
+            <!-- ================================================= -->
+            <!-- MANAGEMENT SEPARATOR -->
+            <!-- ================================================= -->
+            @* @if (isHR || isReportingManager)
+            {
+                <li class="nk-menu-heading mt-4">
+                    <h6 class="overline-title text-danger-alt">MANAGEMENT</h6>
+                </li>
+            }
+ *@
+
+            <!-- ================================================= -->
+            <!-- MANAGEMENT ITEMS -->
+            <!-- ================================================= -->
+            @if (isHR)
+            {
+                <!-- ATTENDANCE MANAGEMENT -->
+                <hr />
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/Attendance/Index"
+                       class="nk-menu-link">
+
+                       
+
+                        <span class="nk-menu-text">
+                            Attendance Management
+                        </span>
+
+                    </a>
+
+                </li>
+
+
+                <!-- ALL REGULARIZATIONS -->
+
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/Attendance/AllRegularizations"
+                       class="nk-menu-link">
+
+                       
+
+                        <span class="nk-menu-text">
+                            All Regularizations
+                        </span>
+
+                    </a>
+
+                </li>
+
+
+                <!-- ALL OD REQUESTS -->
+
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/Attendance/AllODRequests"
+                       class="nk-menu-link">
+
+                        
+                        <span class="nk-menu-text">
+                            All OD Requests
+                        </span>
+
+                    </a>
+
+                </li>
+
+
+                <!-- LEAVE MANAGEMENT -->
+
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/LeaveManagement/MyLeaves"
+                       class="nk-menu-link">
+
+                       
+                        <span class="nk-menu-text">
+                            Leave Management
+                        </span>
+
+                    </a>
+
+                </li>
+
+
+                <!-- LEAVE BALANCE -->
+
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/LeaveManagement/Balance"
+                       class="nk-menu-link">
+
+                       
+
+                        <span class="nk-menu-text">
+                            Leave Balance
+                        </span>
+
+                    </a>
+
+                </li>
+
+
+                <!-- LEAVE CREDIT / ADJUSTMENT -->
+
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/LeaveAdjustment/Create"
+                       class="nk-menu-link">
+
+                       
+
+                        <span class="nk-menu-text">
+                            Leave Credit / Adjustment
+                        </span>
+
+                    </a>
+
+                </li>
+            }
+
+
+            @if (isReportingManager && !isHR)
+            {
+                <hr />
+                <!-- ============================================= -->
+                <!-- REGULARIZATION REQUESTS -->
+                <!-- ============================================= -->
+
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/Attendance/RegularizationRequests"
+                       class="nk-menu-link">
+
+                        <span class="nk-menu-text">
+                            Regularization Requests
+                        </span>
+
+                    </a>
+
+                </li>
+
+
+                <!-- ============================================= -->
+                <!-- OD REQUESTS -->
+                <!-- ============================================= -->
+
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/Attendance/ODRequests"
+                       class="nk-menu-link">
+
+                        <span class="nk-menu-text">
+                            OD Requests
+                        </span>
+
+                    </a>
+
+                </li>
+            }
+
+        </ul>
+
+    </li>
+
+
+    <!-- ===================================================== -->
+    <!-- TASK MANAGEMENT -->
+    <!-- ===================================================== -->
+    @if (isReportingManager)
+    {
+        <li class="nk-menu-item has-sub">
+
+            <a href="#"
+               class="nk-menu-link nk-menu-toggle">
+
+                <span class="nk-menu-icon">
+                    <em class="icon ni ni-users"></em>
+                </span>
+
+                <span class="nk-menu-text">
+                    Task Management
+                </span>
+
+            </a>
+
+
+            <ul class="nk-menu-sub">
+
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/Task/Create"
+                       class="nk-menu-link">
+
+                        <span class="nk-menu-text">
+                            Assign New Task
+                        </span>
+
+                    </a>
+
+                </li>
+
+
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/Task/TaskList"
+                       class="nk-menu-link">
+
+                        <span class="nk-menu-text">
+                            All Tasks List
+                        </span>
+
+                    </a>
+
+                </li>
+
+
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/Task/CompletedTask"
+                       class="nk-menu-link">
+
+                        <span class="nk-menu-text">
+                            Completed Tasks
+                        </span>
+
+                    </a>
+
+                </li>
+
+
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/Task/ClosedTask"
+                       class="nk-menu-link">
+
+                        <span class="nk-menu-text">
+                            Closed Tasks
+                        </span>
+
+                    </a>
+
+                </li>
+
+            </ul>
+
+        </li>
+    }
+    else 
+    {
+        <li class="nk-menu-item has-sub">
+
+            <a href="#"
+               class="nk-menu-link nk-menu-toggle">
+
+                <span class="nk-menu-icon">
+                    <em class="icon ni ni-list-check"></em>
+                </span>
+
+                <span class="nk-menu-text">
+                    My Tasks & Activities
+                </span>
+
+            </a>
+
+
+            <ul class="nk-menu-sub">
+
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/Task/MyTasks"
+                       class="nk-menu-link">
+
+                        <span class="nk-menu-text">
+                            Assigned Tasks
+                        </span>
+
+                    </a>
+
+                </li>
+
+            </ul>
+
+        </li>
+    }
+
+
+    <!-- ===================================================== -->
+    <!-- POLICIES -->
+    <!-- ===================================================== -->
+    @if (isHR)
+    {
+        <li class="nk-menu-item has-sub">
+
+            <a href="#"
+               class="nk-menu-link nk-menu-toggle">
+
+                <span class="nk-menu-icon">
+                    <em class="icon ni ni-file-docs"></em>
+                </span>
+
+                <span class="nk-menu-text">
+                    Policies & Calendar
+                </span>
+
+            </a>
+
+
+            <ul class="nk-menu-sub">
+
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/HRPolicy"
+                       class="nk-menu-link">
+
+                        <span class="nk-menu-text">
+                            Policy List
+                        </span>
+
+                    </a>
+
+                </li>
+
+
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/HRPolicy/Create"
+                       class="nk-menu-link">
+
+                        <span class="nk-menu-text">
+                            Create Policy
+                        </span>
+
+                    </a>
+
+                </li>
+
+
+                <li class="nk-menu-item">
+
+                    <a href="/HRMS/Calendar/Holidays"
+                       class="nk-menu-link">
+
+                        <span class="nk-menu-text">
+                            Holiday Calendar
+                        </span>
+
+                    </a>
+
+                </li>
+
+            </ul>
+
         </li>
     }
     else
     {
+        <!-- Employee Company Policies -->
+
+        <li class="nk-menu-item">
+
+            <a href="/HRMS/HRPolicy/EmployeePolicies"
+               class="nk-menu-link">
+
+                <span class="nk-menu-icon">
+                    <em class="icon ni ni-file-docs"></em>
+                </span>
+
+                <span class="nk-menu-text">
+                    Company Policies
+                </span>
+
+            </a>
+
+        </li>
+    }
+
+
+    @if (isHR)
+    {
         <li class="nk-menu-item has-sub">
             <a href="#" class="nk-menu-link nk-menu-toggle">
                 <span class="nk-menu-icon">
-                    <em class="icon ni ni-list-check"></em>
+                    <em class="icon ni ni-mail"></em>
                 </span>
-                <span class="nk-menu-text">My Tasks & Activities</span>
+                <span class="nk-menu-text">Letters & Correspondence</span>
             </a>
 
             <ul class="nk-menu-sub">
                 <li class="nk-menu-item">
-                    <a href="/HRMS/Task/MyTasks" class="nk-menu-link">
-                        <span class="nk-menu-text">Assigned Tasks</span>
+                    <a href="/HRMS/Letter/LetterReceive" class="nk-menu-link">
+                        <span class="nk-menu-text">Receive Letter</span>
+                    </a>
+                </li>
+
+                <li class="nk-menu-item">
+                    <a href="/HRMS/Letter/LetterReceiveList" class="nk-menu-link">
+                        <span class="nk-menu-text">Received Letter List</span>
+                    </a>
+                </li>
+
+                <li class="nk-menu-item">
+                    <a href="/HRMS/Letter/LetterSend" class="nk-menu-link">
+                        <span class="nk-menu-text">Send Letter</span>
+                    </a>
+                </li>
+
+                <li class="nk-menu-item">
+                    <a href="/HRMS/Letter/LetterSendList" class="nk-menu-link">
+                        <span class="nk-menu-text">Sent Letter List</span>
                     </a>
                 </li>
             </ul>
         </li>
-    }
 
+    }
     <li class="nk-menu-item">
-        <a href="/HRMS/HRPolicy/EmployeePolicies" class="nk-menu-link">
+        <a href="/HRMS/Calendar/Holidays" class="nk-menu-link">
             <span class="nk-menu-icon">
-                <em class="icon ni ni-file-docs"></em>
+                <em class="icon ni ni-calendar-alt"></em>
             </span>
-            <span class="nk-menu-text">Company Policies</span>
+            <span class="nk-menu-text">Holiday Calendar</span>
         </a>
     </li>
+    <!-- ===================================================== -->
+    <!-- MY PROFILE -->
+    <!-- ===================================================== -->
 
-    <!-- My Profile -->
     <li class="nk-menu-item">
-        <a href="/HRMS/Profile/MyProfile" class="nk-menu-link">
+
+        <a href="/HRMS/Profile/MyProfile"
+           class="nk-menu-link">
+
             <span class="nk-menu-icon">
                 <em class="icon ni ni-user-circle"></em>
             </span>
-            <span class="nk-menu-text">My Profile</span>
+
+            <span class="nk-menu-text">
+                My Profile
+            </span>
+
         </a>
+
     </li>
 
 </ul>

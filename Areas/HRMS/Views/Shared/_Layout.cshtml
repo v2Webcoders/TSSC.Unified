@@ -79,15 +79,15 @@
 					<div class="nk-sidebar-content">
 						<div class="nk-sidebar-menu" data-simplebar>
 
-							@if (User.IsInRole("HR"))
+							@* @if (User.IsInRole("HR"))
 							{
 								<partial name="_HRMenu" />
 							}
 							else 
 							{
 								<partial name="_EmployeeMenu" />
-							}
-
+							} *@
+							<partial name="_EmployeeMenu" />
 						</div><!-- .nk-sidebar-menu -->
 					</div><!-- .nk-sidebar-content -->
 				</div>

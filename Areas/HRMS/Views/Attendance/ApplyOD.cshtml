@@ -1,0 +1,285 @@
+﻿@using TSSC.Unified.Models
+@model ODRequest
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Apply OD";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+
+    <div class="nk-block-head-content">
+
+        <h3 class="nk-block-title page-title">
+            Apply OD
+        </h3>
+
+        <div class="nk-block-des text-soft">
+            <p>Submit an On Duty request for official work.</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="nk-block">
+
+    <div class="card card-preview">
+
+        <div class="card-inner">
+
+            <form asp-action="ApplyOD"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div asp-validation-summary="All"
+                         class="alert alert-danger mb-4">
+                    </div>
+                }
+
+                <div class="row g-4">
+
+                    <!-- OD DATE -->
+                    <div class="col-md-6">
+
+                        <label asp-for="ODDate" class="form-label">
+                            OD Date
+                        </label>
+
+                        <input asp-for="ODDate"
+                               type="date"
+                               class="form-control" />
+
+                        <span asp-validation-for="ODDate"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- OD TYPE -->
+                    <div class="col-md-6">
+
+                        <label asp-for="ODType" class="form-label">
+                            OD Type
+                        </label>
+
+                        <select asp-for="ODType"
+                                class="form-select"
+                                id="ODType">
+
+                            <option value="">-- Select OD Type --</option>
+
+                            <option value="Full Day">
+                                Full Day
+                            </option>
+
+                            <option value="Partial Day">
+                                Partial Day
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="ODType"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- FROM TIME -->
+                    <div class="col-md-6"
+                         id="fromTimeContainer"
+                         style="display:none;">
+
+                        <label asp-for="RequestedFromTime"
+                               class="form-label">
+                            From Time
+                        </label>
+
+                        <input asp-for="RequestedFromTime"
+                               type="datetime-local"
+                               class="form-control" />
+
+                        <span asp-validation-for="RequestedFromTime"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- TO TIME -->
+                    <div class="col-md-6"
+                         id="toTimeContainer"
+                         style="display:none;">
+
+                        <label asp-for="RequestedToTime"
+                               class="form-label">
+                            To Time
+                        </label>
+
+                        <input asp-for="RequestedToTime"
+                               type="datetime-local"
+                               class="form-control" />
+
+                        <span asp-validation-for="RequestedToTime"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- LOCATION -->
+                    <div class="col-md-6">
+
+                        <label asp-for="Location"
+                               class="form-label">
+                            Location
+                        </label>
+
+                        <input asp-for="Location"
+                               class="form-control"
+                               placeholder="Enter official visit location" />
+
+                        <span asp-validation-for="Location"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- PURPOSE -->
+                    <div class="col-md-6">
+
+                        <label asp-for="Purpose"
+                               class="form-label">
+                            Purpose
+                        </label>
+
+                        <input asp-for="Purpose"
+                               class="form-control"
+                               placeholder="Client meeting / Training / Site visit" />
+
+                        <span asp-validation-for="Purpose"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- REASON -->
+                    <div class="col-12">
+
+                        <label asp-for="Reason"
+                               class="form-label">
+                            Remarks / Reason
+                        </label>
+
+                        <textarea asp-for="Reason"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="Enter details"></textarea>
+
+                        <span asp-validation-for="Reason"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ATTACHMENT -->
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Attachment
+                        </label>
+
+                        <input type="file"
+                               name="AttachmentFile"
+                               class="form-control"
+                               accept=".pdf,.jpg,.jpeg,.png" />
+
+                        <small class="text-muted">
+                            PDF, JPG, JPEG or PNG
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="mt-4">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <em class="icon ni ni-send me-1"></em>
+                        Submit OD Request
+
+                    </button>
+
+                    <a asp-action="MyOD"
+                       class="btn btn-light">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    
+
+    <script>
+
+        function toggleODTime()
+        {
+            const type =
+                document.getElementById("ODType").value;
+
+            const from =
+                document.getElementById("fromTimeContainer");
+
+            const to =
+                document.getElementById("toTimeContainer");
+
+
+            if (type === "Partial Day")
+            {
+                from.style.display = "block";
+                to.style.display = "block";
+            }
+            else
+            {
+                from.style.display = "none";
+                to.style.display = "none";
+            }
+        }
+
+
+        document
+            .getElementById("ODType")
+            .addEventListener(
+                "change",
+                toggleODTime);
+
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            toggleODTime);
+
+    </script>
+}

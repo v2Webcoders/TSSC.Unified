@@ -8,6 +8,7 @@ using QUIZAPP.Services;
 using QUIZAPP;
 using QUIZAPP.Models;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using TSSC.Unified.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,7 +45,9 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 //builder.Services.AddScoped<ILookupRepository, Repository>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<UtilityService>();
-
+builder.Services.AddScoped<
+    IAttendanceSyncService,
+    AttendanceSyncService>();
 var app = builder.Build();
 
 

@@ -1,0 +1,487 @@
+﻿@using TSSC.Unified.Models
+@model IEnumerable<AttendanceRegularization>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Attendance Regularization Requests";
+    int serial = 1;
+}
+
+<!-- ========================================= -->
+<!-- PAGE HEADER -->
+<!-- ========================================= -->
+
+<div class="nk-block-head nk-block-head-sm">
+
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+
+            <h3 class="nk-block-title page-title">
+               All Regularizations
+            </h3>
+
+        </div>
+
+
+        <div class="nk-block-head-content">
+
+            <div class="toggle-wrap nk-block-tools-toggle">
+
+                <a href="#"
+                   class="btn btn-icon btn-trigger toggle-expand me-n1"
+                   data-target="pageMenu">
+
+                    <em class="icon ni ni-more-v"></em>
+
+                </a>
+
+
+                <div class="toggle-expand-content"
+                     data-content="pageMenu">
+
+                    <ul class="nk-block-tools g-3">
+
+                       @*  <li class="nk-block-tools-opt">
+
+                            <a asp-action="MyRegularizations"
+                               class="btn btn-primary">
+
+                                <em class="icon ni ni-list"></em>
+
+                                <span>
+                                    My Regularizations
+                                </span>
+
+                            </a>
+
+                        </li> *@
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ========================================= -->
+<!-- STATUS FILTERS -->
+<!-- ========================================= -->
+
+<div class="mb-4">
+
+    <ul class="nav nav-tabs">
+
+        <li class="nav-item">
+
+            <a asp-action="AllRegularizations"
+               asp-route-status="Pending"
+               class="nav-link @(ViewBag.Status == "Pending" ? "active" : "")">
+
+                Pending
+
+                <span class="badge bg-warning ms-1">
+                    @ViewBag.PendingCount
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <li class="nav-item">
+
+            <a asp-action="AllRegularizations"
+               asp-route-status="Approved"
+               class="nav-link @(ViewBag.Status == "Approved" ? "active" : "")">
+
+                Approved
+
+                <span class="badge bg-success ms-1">
+                    @ViewBag.ApprovedCount
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <li class="nav-item">
+
+            <a asp-action="AllRegularizations"
+               asp-route-status="Rejected"
+               class="nav-link @(ViewBag.Status == "Rejected" ? "active" : "")">
+
+                Rejected
+
+                <span class="badge bg-danger ms-1">
+                    @ViewBag.RejectedCount
+                </span>
+
+            </a>
+
+        </li>
+
+    </ul>
+
+</div>
+
+<!-- ========================================= -->
+<!-- REQUEST TABLE -->
+<!-- ========================================= -->
+
+<div class="nk-block nk-block-lg">
+
+    <div class="card card-preview">
+
+        <div class="card-inner">
+
+            <div class="table-responsive">
+
+                <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+                    <thead>
+
+                        <tr>
+
+                            <th width="60">
+                                S.No.
+                            </th>
+
+                            <th>
+                                Employee
+                            </th>
+
+                            <th>
+                                Attendance Date
+                            </th>
+
+                            <th>
+                                Existing In
+                            </th>
+
+                            <th>
+                                Existing Out
+                            </th>
+
+                            <th>
+                                Requested In
+                            </th>
+
+                            <th>
+                                Requested Out
+                            </th>
+
+                            <th>
+                                Reason
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th width="130">
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <!-- ================================= -->
+                                <!-- SERIAL -->
+                                <!-- ================================= -->
+
+                                <td>
+                                    @serial
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- EMPLOYEE -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    <strong>
+                                        @item.Employee?.FirstName
+                                    </strong>
+
+                                    <br />
+
+                                    <small class="text-muted">
+                                        @item.Employee?.EmployeeCode
+                                    </small>
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- ATTENDANCE DATE -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    @(item.AttendanceDate
+                                        .ToString("dd-MMM-yyyy"))
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- EXISTING IN -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    @if (item.ExistingInTime.HasValue)
+                                    {
+                                        @(item.ExistingInTime?.ToString("hh:mm tt") ?? "-")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            -
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- EXISTING OUT -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    @if (item.ExistingOutTime.HasValue)
+                                    {
+                                        @(item.ExistingOutTime?.ToString("hh:mm tt") ?? "-")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger">
+                                            Missing
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- REQUESTED IN -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    @if (item.RequestedInTime.HasValue)
+                                    {
+                                        @(item.RequestedInTime?.ToString("hh:mm tt") ?? "-")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            -
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- REQUESTED OUT -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    @if (item.RequestedOutTime.HasValue)
+                                    {
+                                        @(item.RequestedOutTime?.ToString("hh:mm tt") ?? "-")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            -
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- REASON -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    @(string.IsNullOrEmpty(item.Reason)
+                                        ? "-"
+                                        : (item.Reason.Length > 50
+                                            ? item.Reason.Substring(0, 50) + "..."
+                                            : item.Reason))
+
+                                    @if (!string.IsNullOrEmpty(item.Attachment))
+                                    {
+                                        <br />
+
+                                        <a href="~/uploads/attendance/@item.Attachment"
+                                           target="_blank"
+                                           class="btn btn-sm btn-outline-primary mt-1">
+
+                                            <em class="icon ni ni-file-text"></em>
+
+                                            Attachment
+
+                                        </a>
+                                    }
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- STATUS -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    @if (item.Status == "Approved")
+                                    {
+                                        <span class="badge badge-dot bg-success">
+                                            Approved
+                                        </span>
+
+                                        <br />
+
+                                        <small class="text-muted">
+
+                                            @item.ApprovedDate?
+                                                .ToString("dd-MMM-yyyy hh:mm")
+
+                                        </small>
+                                    }
+                                    else if (item.Status == "Rejected")
+                                    {
+                                        <span class="badge badge-dot bg-danger">
+                                            Rejected
+                                        </span>
+
+                                        <br />
+
+                                        <small class="text-muted">
+
+                                            @(item.ApprovedDate?
+                                                .ToString("dd-MMM-yyyy hh:mm"))
+
+                                        </small>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-dot bg-warning">
+                                            Pending
+                                        </span>
+
+                                        <br />
+
+                                        <small class="text-muted">
+
+                                            Applied:
+                                            @item.CreatedDate
+                                                .ToString("dd-MMM-yyyy hh:mm")
+
+                                        </small>
+                                    }
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- ACTION -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    <div class="btn-group">
+
+                                        @if (item.Status == "Pending")
+                                        {
+                                            <!-- APPROVE -->
+
+                                            <a asp-action="ApproveRegularization"
+                                               asp-route-id="@item.RegularizationId"
+                                               class="btn btn-sm btn-outline-success"
+                                               title="Approve"
+                                               onclick="return confirm('Are you sure you want to approve this attendance regularization request?');">
+                                                <em class="icon ni ni-check"></em>
+                                            </a>
+
+
+                                            <!-- REJECT -->
+
+                                            <a asp-action="RejectRegularization"
+                                               asp-route-id="@item.RegularizationId"
+                                               class="btn btn-sm btn-outline-danger"
+                                               title="Reject"
+                                               onclick="return confirm('Are you sure you want to reject this attendance regularization request?');">
+                                                <em class="icon ni ni-cross"></em>
+                                            </a>
+                                        }
+                                        else if (item.Status == "Approved")
+                                        {
+                                            <!-- ALLOW MANAGER TO REJECT APPROVED REQUEST -->
+
+                                            <a asp-action="RejectRegularization"
+                                               asp-route-id="@item.RegularizationId"
+                                               class="btn btn-sm btn-outline-danger"
+                                               title="Reject"
+                                               onclick="return confirm('This request is already approved. Do you want to change its status to Rejected?');">
+                                                <em class="icon ni ni-cross"></em>
+                                            </a>
+                                        }
+                                        else if (item.Status == "Rejected")
+                                        {
+                                            <!-- ALLOW MANAGER TO APPROVE REJECTED REQUEST -->
+
+                                            <a asp-action="ApproveRegularization"
+                                               asp-route-id="@item.RegularizationId"
+                                               class="btn btn-sm btn-outline-success"
+                                               title="Approve"
+                                               onclick="return confirm('This request is already rejected. Do you want to change its status to Approved?');">
+                                                <em class="icon ni ni-check"></em>
+                                            </a>
+                                        }
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                            serial++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+

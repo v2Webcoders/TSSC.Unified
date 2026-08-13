@@ -35,8 +35,7 @@ namespace TSSC.Unified.Models
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-        // Navigation Property
         [ForeignKey(nameof(EmployeeId))]
-        public virtual Employee Employee { get; set; }
+        public virtual Employee? Employee { get; set; }
     }
 }

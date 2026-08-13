@@ -1,0 +1,600 @@
+﻿@using TSSC.Unified.Models
+@model IEnumerable<ODRequest>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+<!-- ========================================= -->
+<!-- PAGE HEADER -->
+<!-- ========================================= -->
+
+<div class="nk-block-head nk-block-head-sm">
+
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+
+            <h3 class="nk-block-title page-title">
+                All OD Requests
+            </h3>
+
+            <div class="nk-block-des text-soft">
+                <p>
+                    View and manage all employee on-duty requests.
+                </p>
+            </div>
+        </div>
+
+        <div class="nk-block-head-content">
+
+            <div class="toggle-wrap nk-block-tools-toggle">
+
+                <a href="#"
+                   class="btn btn-icon btn-trigger toggle-expand me-n1"
+                   data-target="pageMenu">
+
+                    <em class="icon ni ni-more-v"></em>
+
+                </a>
+
+
+                <div class="toggle-expand-content"
+                     data-content="pageMenu">
+
+                    <ul class="nk-block-tools g-3">
+
+                        <li class="nk-block-tools-opt">
+
+                            <a asp-action="AllODRequests"
+                               asp-route-status="All"
+                               class="btn btn-primary">
+
+                                <em class="icon ni ni-list"></em>
+
+                                <span>
+                                    All OD Requests
+                                </span>
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================= -->
+<!-- STATUS FILTERS -->
+<!-- ========================================= -->
+
+<div class="mb-4">
+
+    <ul class="nav nav-tabs">
+
+        <!-- ALL -->
+
+        <li class="nav-item">
+
+            <a asp-action="AllODRequests"
+               asp-route-status="All"
+               class="nav-link @(ViewBag.Status == "All" ? "active" : "")">
+
+                <em class="icon ni ni-list me-1"></em>
+
+                All
+
+                <span class="badge bg-light text-dark ms-1">
+                    @ViewBag.AllCount
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <!-- PENDING -->
+
+        <li class="nav-item">
+
+            <a asp-action="AllODRequests"
+               asp-route-status="Pending"
+               class="nav-link @(ViewBag.Status == "Pending" ? "active" : "")">
+
+                <em class="icon ni ni-clock me-1"></em>
+
+                Pending
+
+                <span class="badge bg-warning ms-1">
+                    @ViewBag.PendingCount
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <!-- APPROVED -->
+
+        <li class="nav-item">
+
+            <a asp-action="AllODRequests"
+               asp-route-status="Approved"
+               class="nav-link @(ViewBag.Status == "Approved" ? "active" : "")">
+
+                <em class="icon ni ni-check-circle me-1"></em>
+
+                Approved
+
+                <span class="badge bg-success ms-1">
+                    @ViewBag.ApprovedCount
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <!-- REJECTED -->
+
+        <li class="nav-item">
+
+            <a asp-action="AllODRequests"
+               asp-route-status="Rejected"
+               class="nav-link @(ViewBag.Status == "Rejected" ? "active" : "")">
+
+                <em class="icon ni ni-cross-circle me-1"></em>
+
+                Rejected
+
+                <span class="badge bg-danger ms-1">
+                    @ViewBag.RejectedCount
+                </span>
+
+            </a>
+
+        </li>
+
+    </ul>
+
+</div>
+
+
+<!-- ========================================= -->
+<!-- REQUEST TABLE -->
+<!-- ========================================= -->
+
+<div class="nk-block nk-block-lg">
+
+    <div class="card card-preview">
+
+        <div class="card-inner">
+
+            <div class="table-responsive">
+
+                <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+                    <thead>
+
+                        <tr>
+
+                            <th width="60">
+                                S.No.
+                            </th>
+
+                            <th>
+                                Employee
+                            </th>
+
+                            <th>
+                                OD Date
+                            </th>
+
+                            <th>
+                                OD Type
+                            </th>
+
+                            <th>
+                                From Time
+                            </th>
+
+                            <th>
+                                To Time
+                            </th>
+
+                            <th>
+                                Location
+                            </th>
+
+                            <th>
+                                Purpose
+                            </th>
+
+                            <th>
+                                Reason
+                            </th>
+
+                            <th>
+                                Reporting Manager
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th width="130">
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <!-- ================================= -->
+                                <!-- SERIAL -->
+                                <!-- ================================= -->
+
+                                <td>
+                                    @serial
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- EMPLOYEE -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    <strong>
+                                        @item.Employee?.FirstName @item.Employee?.LastName
+                                    </strong>
+
+                                    <br />
+
+                                    <small class="text-muted">
+                                        @item.Employee?.EmployeeCode
+                                    </small>
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- OD DATE -->
+                                <!-- ================================= -->
+
+                                <td style="min-width:30px;">
+
+                                    @(item.ODDate?.ToString("dd-MM-yyyy"))
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- OD TYPE -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    @if (item.ODType == "Full Day")
+                                    {
+                                        <span class="badge bg-primary">
+                                            Full Day
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-info">
+                                            Partial Day
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- FROM TIME -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    @if (item.RequestedFromTime.HasValue)
+                                    {
+                                        @(item.RequestedFromTime.Value
+                                            .ToString("hh:mm tt"))
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            -
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- TO TIME -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    @if (item.RequestedToTime.HasValue)
+                                    {
+                                        @(item.RequestedToTime.Value
+                                            .ToString("hh:mm tt"))
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            -
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- LOCATION -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(item.Location))
+                                    {
+                                        @item.Location
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            -
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- PURPOSE -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(item.Purpose))
+                                    {
+                                        @(item.Purpose.Length > 40
+                                            ? item.Purpose.Substring(0, 40) + "..."
+                                            : item.Purpose)
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            -
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- REASON -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(item.Reason))
+                                    {
+                                        @(item.Reason.Length > 50
+                                            ? item.Reason.Substring(0, 50) + "..."
+                                            : item.Reason)
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            -
+                                        </span>
+                                    }
+
+
+                                    @if (!string.IsNullOrWhiteSpace(item.Attachment))
+                                    {
+                                        <br />
+
+                                        <a href="~/uploads/od/@item.Attachment"
+                                           target="_blank"
+                                           class="btn btn-sm btn-outline-primary mt-1">
+
+                                            <em class="icon ni ni-file-text"></em>
+
+                                            Attachment
+
+                                        </a>
+                                    }
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- REPORTING MANAGER -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    @if (item.Approver != null)
+                                    {
+                                        <strong>
+                                            @item.Approver.FirstName
+                                        </strong>
+
+                                        <br />
+
+                                        <small class="text-muted">
+                                            @item.Approver.EmployeeCode
+                                        </small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            -
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- STATUS -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    @if (item.Status == "Approved")
+                                    {
+                                        <span class="badge badge-dot bg-success">
+                                            Approved
+                                        </span>
+
+                                        @if (item.ApprovedDate.HasValue)
+                                        {
+                                            <br />
+
+                                            <small class="text-muted">
+                                                @(item.ApprovedDate.Value
+                                                    .ToString("dd-MMM-yyyy hh:mm tt"))
+                                            </small>
+                                        }
+                                    }
+                                    else if (item.Status == "Rejected")
+                                    {
+                                        <span class="badge badge-dot bg-danger">
+                                            Rejected
+                                        </span>
+
+                                        @if (item.ApprovedDate.HasValue)
+                                        {
+                                            <br />
+
+                                            <small class="text-muted">
+                                                @item.ApprovedDate.Value
+                                                    .ToString("dd-MMM-yyyy hh:mm tt")
+                                            </small>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-dot bg-warning">
+                                            Pending
+                                        </span>
+
+                                        <br />
+
+                                        <small class="text-muted">
+                                            Applied:
+                                            @item.CreatedDate
+                                                .ToString("dd-MMM-yyyy hh:mm tt")
+                                        </small>
+                                    }
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- ACTION -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    <div class="btn-group">
+
+                                        @if (item.Status == "Pending")
+                                        {
+                                            <!-- APPROVE -->
+
+                                            <a asp-action="ApproveOD"
+                                               asp-route-id="@item.ODRequestId"
+                                               class="btn btn-sm btn-outline-success"
+                                               title="Approve"
+                                               onclick="return confirm('Are you sure you want to approve this OD request?');">
+
+                                                <em class="icon ni ni-check"></em>
+
+                                            </a>
+
+
+                                            <!-- REJECT -->
+
+                                            <a asp-action="RejectOD"
+                                               asp-route-id="@item.ODRequestId"
+                                               class="btn btn-sm btn-outline-danger"
+                                               title="Reject"
+                                               onclick="return confirm('Are you sure you want to reject this OD request?');">
+
+                                                <em class="icon ni ni-cross"></em>
+
+                                            </a>
+                                        }
+                                        else if (item.Status == "Approved")
+                                        {
+                                            <!-- REJECT APPROVED -->
+
+                                            <a asp-action="RejectOD"
+                                               asp-route-id="@item.ODRequestId"
+                                               class="btn btn-sm btn-outline-danger"
+                                               title="Reject"
+                                               onclick="return confirm('This OD request is already approved. Do you want to reject it?');">
+
+                                                <em class="icon ni ni-cross"></em>
+
+                                            </a>
+                                        }
+                                        else if (item.Status == "Rejected")
+                                        {
+                                            <!-- APPROVE REJECTED -->
+
+                                            <a asp-action="ApproveOD"
+                                               asp-route-id="@item.ODRequestId"
+                                               class="btn btn-sm btn-outline-success"
+                                               title="Approve"
+                                               onclick="return confirm('This OD request is rejected. Do you want to approve it?');">
+
+                                                <em class="icon ni ni-check"></em>
+
+                                            </a>
+                                        }
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                            serial++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

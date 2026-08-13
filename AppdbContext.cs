@@ -39,7 +39,10 @@ namespace QUIZAPP
 
         public DbSet<LeaveAdjustment> LeaveAdjustment { get; set; }
         public DbSet<LeavePolicy> LeavePolicy { get; set; }
-
+        public DbSet<EmployeeAttendance> EmployeeAttendance { get; set; }
+        public DbSet<AttendanceRegularization> AttendanceRegularization { get; set; }
+        public DbSet<ODRequest> ODRequest { get; set; }
+        public DbSet<Holiday> Holiday { get; set; }
 
     }
 }

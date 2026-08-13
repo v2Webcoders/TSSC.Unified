@@ -1,0 +1,529 @@
+﻿@using TSSC.Unified.Models
+@model IEnumerable<AttendanceRegularization>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Attendance Regularization Requests";
+    int serial = 1;
+}
+
+<!-- ========================================= -->
+<!-- PAGE HEADER -->
+<!-- ========================================= -->
+
+<div class="nk-block-head nk-block-head-sm">
+
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+
+            <h3 class="nk-block-title page-title">
+                My Regularizations
+            </h3>
+
+            <div class="nk-block-des text-soft">
+                <p>
+                    View your attendance regularization requests and their status.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="nk-block-head-content">
+
+            <div class="toggle-wrap nk-block-tools-toggle">
+
+                <a href="#"
+                   class="btn btn-icon btn-trigger toggle-expand me-n1"
+                   data-target="pageMenu">
+
+                    <em class="icon ni ni-more-v"></em>
+
+                </a>
+
+                <div class="toggle-expand-content"
+                     data-content="pageMenu">
+
+                    <ul class="nk-block-tools g-3">
+
+                        <li class="nk-block-tools-opt">
+
+                            <a asp-area="HRMS"
+                               asp-controller="Attendance"
+                               asp-action="MyAttendance"
+                               class="btn btn-primary">
+
+                                <em class="icon ni ni-edit"></em>
+
+                                <span>
+                                    Regularize Attendance
+                                </span>
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================= -->
+<!-- STATUS TABS -->
+<!-- ========================================= -->
+
+<div class="nk-block">
+
+    <div class="card card-preview">
+
+        <div class="card-inner">
+
+            <ul class="nav nav-tabs mb-4">
+
+                <!-- PENDING -->
+
+                <li class="nav-item">
+
+                    <a asp-area="HRMS"
+                       asp-controller="Attendance"
+                       asp-action="MyRegularizations"
+                       asp-route-status="Pending"
+                       class="nav-link @(ViewBag.Status == "Pending" ? "active" : "")">
+
+                        <em class="icon ni ni-clock me-1"></em>
+
+                        Pending
+
+                        @if (ViewBag.PendingCount > 0)
+                        {
+                            <span class="badge bg-warning ms-1">
+                                @ViewBag.PendingCount
+                            </span>
+                        }
+
+                    </a>
+
+                </li>
+
+
+                <!-- APPROVED -->
+
+                <li class="nav-item">
+
+                    <a asp-area="HRMS"
+                       asp-controller="Attendance"
+                       asp-action="MyRegularizations"
+                       asp-route-status="Approved"
+                       class="nav-link @(ViewBag.Status == "Approved" ? "active" : "")">
+
+                        <em class="icon ni ni-check-circle me-1"></em>
+
+                        Approved
+
+                        @if (ViewBag.ApprovedCount > 0)
+                        {
+                            <span class="badge bg-success ms-1">
+                                @ViewBag.ApprovedCount
+                            </span>
+                        }
+
+                    </a>
+
+                </li>
+
+
+                <!-- REJECTED -->
+
+                <li class="nav-item">
+
+                    <a asp-area="HRMS"
+                       asp-controller="Attendance"
+                       asp-action="MyRegularizations"
+                       asp-route-status="Rejected"
+                       class="nav-link @(ViewBag.Status == "Rejected" ? "active" : "")">
+
+                        <em class="icon ni ni-cross-circle me-1"></em>
+
+                        Rejected
+
+                        @if (ViewBag.RejectedCount > 0)
+                        {
+                            <span class="badge bg-danger ms-1">
+                                @ViewBag.RejectedCount
+                            </span>
+                        }
+
+                    </a>
+
+                </li>
+
+            </ul>
+
+
+            <!-- ========================================= -->
+            <!-- REQUEST TABLE -->
+            <!-- ========================================= -->
+
+            <div class="table-responsive">
+                <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+                    <thead>
+
+                        <tr>
+
+                            <th width="60">
+                                S.No.
+                            </th>
+
+                            <th>
+                                Attendance Date
+                            </th>
+
+                            <th>
+                                Existing In
+                            </th>
+
+                            <th>
+                                Existing Out
+                            </th>
+
+                            <th>
+                                Requested In
+                            </th>
+
+                            <th>
+                                Requested Out
+                            </th>
+
+                            <th>
+                                Reason
+                            </th>
+
+                            <th>
+                                Reporting Manager
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Remarks
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <!-- ================================= -->
+                                    <!-- SERIAL -->
+                                    <!-- ================================= -->
+
+                                    <td>
+                                        @serial
+                                    </td>
+
+
+                                    <!-- ================================= -->
+                                    <!-- ATTENDANCE DATE -->
+                                    <!-- ================================= -->
+
+                                    <td>
+
+                                        <strong>
+                                            @(item.AttendanceDate.ToString("dd MMM yyyy") ?? "-")
+                                        </strong>
+
+                                    </td>
+
+
+                                    <!-- ================================= -->
+                                    <!-- EXISTING IN -->
+                                    <!-- ================================= -->
+
+                                    <td>
+
+                                        @if (item.ExistingInTime.HasValue)
+                                        {
+                                            @(item.ExistingInTime?.ToString("hh:mm tt") ?? "-")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- ================================= -->
+                                    <!-- EXISTING OUT -->
+                                    <!-- ================================= -->
+
+                                    <td>
+
+                                        @if (item.ExistingOutTime.HasValue)
+                                        {
+                                            @(item.ExistingOutTime?.ToString("hh:mm tt") ?? "-")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger">
+                                                Missing
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <!-- ================================= -->
+                                    <!-- REQUESTED IN -->
+                                    <!-- ================================= -->
+
+                                    <td>
+
+                                        @if (item.RequestedInTime.HasValue)
+                                        {
+                                            @(item.RequestedInTime?.ToString("hh:mm tt") ?? "-")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- ================================= -->
+                                    <!-- REQUESTED OUT -->
+                                    <!-- ================================= -->
+
+                                    <td>
+
+                                        @if (item.RequestedOutTime.HasValue)
+                                        {
+                                            @(item.RequestedOutTime?.ToString("hh:mm tt") ?? "-")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- ================================= -->
+                                    <!-- REASON -->
+                                    <!-- ================================= -->
+
+                                    <td>
+
+                                        @if (string.IsNullOrWhiteSpace(item.Reason))
+                                        {
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+                                        }
+                                        else if (item.Reason.Length > 50)
+                                        {
+                                            <span title="@item.Reason">
+                                                @item.Reason.Substring(0, 50)...
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            @item.Reason
+                                        }
+
+
+                                        @if (!string.IsNullOrEmpty(item.Attachment))
+                                        {
+                                            <br />
+
+                                            <a href="~/uploads/attendance/@item.Attachment"
+                                               target="_blank"
+                                               class="btn btn-sm btn-outline-primary mt-1">
+
+                                                <em class="icon ni ni-file-text"></em>
+
+                                                Attachment
+
+                                            </a>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- ================================= -->
+                                    <!-- REPORTING MANAGER -->
+                                    <!-- ================================= -->
+
+                                    <td>
+
+                                        @if (item.Approver != null)
+                                        {
+                                            <strong>
+                                                @item.Approver.FirstName
+                                            </strong>
+
+                                            @if (!string.IsNullOrEmpty(
+                                           item.Approver.EmployeeCode))
+                                            {
+                                                <br />
+
+                                                <small class="text-muted">
+                                                    @item.Approver.EmployeeCode
+                                                </small>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                Not Assigned
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- ================================= -->
+                                    <!-- STATUS -->
+                                    <!-- ================================= -->
+
+                                    <td>
+
+                                        @if (item.Status == "Approved")
+                                        {
+                                            <span class="badge badge-dot bg-success">
+                                                Approved
+                                            </span>
+
+                                            @if (item.ApprovedDate.HasValue)
+                                            {
+                                                <br />
+
+                                                <small class="text-muted">
+                                                    @(item.ApprovedDate
+                                                    .Value
+                                                    .ToString("dd-MMM-yyyy hh:mm tt"))
+                                                </small>
+                                            }
+                                        }
+                                        else if (item.Status == "Rejected")
+                                        {
+                                            <span class="badge badge-dot bg-danger">
+                                                Rejected
+                                            </span>
+
+                                            @if (item.ApprovedDate.HasValue)
+                                            {
+                                                <br />
+
+                                                <small class="text-muted">
+                                                    @(item.ApprovedDate
+                                                    .Value
+                                                    .ToString("dd-MMM-yyyy hh:mm tt"))
+                                                </small>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-dot bg-warning">
+                                                Pending
+                                            </span>
+
+                                            <br />
+
+                                            <small class="text-muted">
+                                                Applied:
+                                                @(item.CreatedDate
+                                                .ToString("dd-MMM-yyyy hh:mm tt"))
+                                            </small>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- ================================= -->
+                                    <!-- APPROVAL REMARKS -->
+                                    <!-- ================================= -->
+
+                                    <td>
+
+                                        @if (!string.IsNullOrWhiteSpace(
+                                       item.ApprovalRemarks))
+                                        {
+                                            @item.ApprovalRemarks
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                </tr>
+
+                                serial++;
+                            }
+                        
+                        @* else
+                        {
+                            <tr>
+
+                                <td colspan="10"
+                                    class="text-center py-5">
+
+                                    <em class="icon ni ni-file-text"
+                                        style="font-size:40px;color:#C9CED6;">
+                                    </em>
+
+                                    <p class="text-muted mt-2 mb-0">
+
+                                        No @ViewBag.Status
+                                        regularization requests found.
+
+                                    </p>
+
+                                </td>
+
+                            </tr> *@
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
