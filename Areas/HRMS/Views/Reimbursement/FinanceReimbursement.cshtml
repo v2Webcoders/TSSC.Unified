@@ -1,0 +1,214 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model IEnumerable<TSSC.Unified.ViewModel.ReimbursementVM>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@* @{
+    Layout = "_Layout";
+    int serial = 1;
+} *@
+@{
+    Layout = "_Layout";
+    int serial = 1;
+
+    //     string status = ViewBag.Status as string
+    //                     ?? "Pending Manager Approval";
+
+    //     string title = status switch
+    //     {
+    //         "Manager Approved" => "Approved Reimbursement List",
+    //         "Rejected" => "Rejected Reimbursement List",
+    //         _ => "Pending Reimbursement List"
+    //     };
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                 Reimbursement List
+            </h3>
+        </div>
+        @if(ViewBag.Status == "Pending"){
+            <div class="nk-block-head-content">
+                <a asp-action="FinanceReimbursement"
+               asp-controller="Reimbursement"
+               asp-route-status="Finance Approved"
+               class="btn btn-primary">
+
+                <em class="icon ni note-icon-orderedlist"></em>
+                Finance Approved List
+
+            </a>
+        </div>}
+        @if (ViewBag.Status == "Finance Approved")
+        {
+            <div class="nk-block-head-content">
+                <a asp-action="FinanceReimbursement"
+                   asp-controller="Reimbursement"
+                   asp-route-status="Pending"
+                   class="btn btn-primary">
+
+                    <em class="icon ni note-icon-orderedlist"></em>
+                    Finance Pending List
+
+                </a>
+            </div>
+        }
+
+    </div>
+</div>
+
+<div class="card card-preview">
+    <div class="card-inner">
+
+        <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Employee</th>
+                    <th>Request Type</th>
+                    <th>Expense Category</th>
+                    <th>Expense Amount</th>
+                    <th>Expense Date</th>
+                    <th>Vendor Name</th>
+                    <th>Payment Mode</th>
+                    <th>Supporting Document</th>
+                    <th>Invoice / Bill</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>
+                            @serial
+                        </td>
+
+                        <td>
+                            @item.EmployeeId
+                        </td>
+
+                        <td>
+                            @item.RequestType
+                        </td>
+
+                        <td>
+                            @item.ExpenseCategory
+                        </td>
+
+                        <td>
+                            ₹ @item.ExpenseAmount.ToString("N2")
+                        </td>
+
+                        <td>
+                            @item.ExpenseDate.ToString("dd-MMM-yyyy")
+                        </td>
+
+                        <td>
+                            @item.VendorName
+                        </td>
+
+                        <td>
+                            @item.PaymentMode
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.SupportingDocument))
+                            {
+                                <a href="@Url.Content(item.SupportingDocument)"
+                                   target="_blank"
+                                   class="btn btn-sm btn-info">
+                                    <em class="icon ni ni-file"></em>
+                                    View File
+                                </a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.InvoiceBill))
+                            {
+                                <a href="@Url.Content(item.InvoiceBill)"
+                                   target="_blank"
+                                   class="btn btn-sm btn-info">
+                                    <em class="icon ni ni-file"></em>
+                                    View Bill
+                                </a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td>
+                            @item.Status
+                        </td>
+
+                        <td>
+                            @if (item.Status == "Manager Approved" && item.FinanceStatus == "Finance Approved")
+                            {
+                                <span class="badge bg-success">
+                                    Approved by Manager
+                                </span>
+                                <span class="badge bg-success">
+                                    Approved by Finance
+                                </span>
+                            }
+                             @if (item.FinanceStatus == "Pending")
+                            {
+                                <form method="post">
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="@item.ReimbursementId" />
+
+                                <input type="text"
+                                       name="remarks"
+                                       class="form-control form-control-sm mb-1"
+                                       placeholder="Finance Remarks" />
+
+                                <button type="submit"
+                                        formaction="@Url.Action("FinanceApprove", "Reimbursement")"
+                                        class="btn btn-sm btn-success">
+
+                                    <em class="icon ni ni-check"></em>
+                                    Approve
+
+                                </button>
+
+                                <button type="submit"
+                                        formaction="@Url.Action("FinanceReject", "Reimbursement")"
+                                        class="btn btn-sm btn-danger">
+
+                                    <em class="icon ni ni-cross"></em>
+                                    Reject
+
+                                </button>
+
+                            </form>}
+                        </td>
+
+                    </tr>
+
+                    serial++;
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+</div>

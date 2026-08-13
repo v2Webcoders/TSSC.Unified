@@ -1,0 +1,219 @@
+﻿@model TSSC.Unified.ViewModel.EmployeeHierarchyVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Employee Hierarchy";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                @(Model.HierarchyId > 0 ? "Update Employee Hierarchy" : "Upload Employee Hierarchy")
+            </h3>
+        </div>
+
+        <div class="nk-block-head-content">
+            <a asp-action="HierarchyView"
+               asp-controller="EmployeeHierarchy"
+               asp-area="HRMS"
+               class="btn btn-primary d-none d-md-inline-flex">
+
+                <em class="icon ni ni-list"></em>
+                &nbsp; View Employee Hierarchy
+
+            </a>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="nk-block nk-block-lg">
+
+    <div class="card card-preview">
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+        }
+
+        @if (TempData["msg"] != null)
+        {
+            <div class="example-alert w-100">
+                <div class="alert alert-success alert-icon">
+
+                    <em class="icon ni ni-check-circle"></em>
+
+                    <strong>@TempData["msg"]</strong>
+
+                </div>
+            </div>
+        }
+
+
+        <div class="card-inner">
+
+            <form asp-action="EmployeeHierarchy"
+                  asp-controller="EmployeeHierarchy"
+                  asp-area="HRMS"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <input type="hidden" asp-for="HierarchyId" />
+                <input type="hidden" asp-for="HierarchyDocument" />
+
+
+                <div class="row gy-3">
+
+                    <!-- Employee Hierarchy Information -->
+
+                    <div class="col-12 mb-4">
+
+                        <div style="border-left:4px solid #D9622F;
+                                    padding:5px 0 5px 12px;">
+
+                            <h5 class="mb-0 d-flex align-items-center gap-2"
+                                style="color:#1B2A4A;">
+
+                                <em class="ni ni-share-alt"></em>
+
+                                Employee Hierarchy Information
+
+                            </h5>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PDF Upload -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+
+                            Upload Employee Hierarchy PDF
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <input asp-for="HierarchyFile"
+                               type="file"
+                               accept=".pdf"
+                               class="form-control" />
+
+                        <span asp-validation-for="HierarchyFile"
+                              class="text-danger">
+                        </span>
+
+
+                        @if (!string.IsNullOrEmpty(Model.HierarchyDocument))
+                        {
+                            <div class="mt-2">
+
+                                <a href="@Url.Content(Model.HierarchyDocument)"
+                                   target="_blank"
+                                   class="btn btn-sm btn-info">
+
+                                    <em class="icon ni ni-file-pdf"></em>
+
+                                    View Current Hierarchy PDF
+
+                                </a>
+
+                            </div>
+                        }
+
+                    </div>
+
+
+                    <!-- Information -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Current Status
+                        </label>
+
+                        <div class="form-control">
+
+                            @if (Model.HierarchyId > 0)
+                            {
+                                <span class="text-success">
+
+                                    <em class="icon ni ni-check-circle"></em>
+
+                                    Hierarchy PDF Uploaded
+
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+
+                                    <em class="icon ni ni-info"></em>
+
+                                    No Hierarchy PDF Uploaded
+
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Buttons -->
+
+                    <div class="col-12 mt-4">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            @if (Model.HierarchyId > 0)
+                            {
+                                <em class="icon ni ni-edit"></em>
+                                <span> Update Hierarchy PDF</span>
+                            }
+                            else
+                            {
+                                <em class="icon ni ni-upload"></em>
+                                <span> Upload Hierarchy PDF</span>
+                            }
+
+                        </button>
+
+
+                        <a asp-action="EmployeeHierarchy"
+                           asp-controller="EmployeeHierarchy"
+                           asp-area="HRMS"
+                           class="btn btn-outline-secondary ms-2">
+
+                            Cancel
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}
