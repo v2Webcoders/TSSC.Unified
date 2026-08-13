@@ -1,0 +1,114 @@
+﻿@model IEnumerable<TSSC.Unified.ViewModel.LetterRegisterVM>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Receive Letter List</h3>
+        </div>
+
+        <div class="nk-block-head-content">
+            <a asp-action="LetterReceive"
+               asp-controller="Letter"
+               class="btn btn-primary">
+                <em class="icon ni ni-plus"></em>
+                Receive Letter
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<div class="card card-preview">
+    <div class="card-inner">
+
+        <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Received Item</th>
+                    <th>Sender Name</th>
+                    <th>Mode</th>
+                    <th>Docket No.</th>
+                    <th>Attachment</th>
+                    <th>Created On</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>@serial</td>
+
+                        <td>@item.ItemName</td>
+
+                        <td>@item.SenderName</td>
+
+                        <td>@item.Mode</td>
+
+                        <td>@item.DocketNo</td>
+
+                        <td>
+
+                            @if (!string.IsNullOrEmpty(item.LetterAttachment))
+                            {
+                                <a href="@item.LetterAttachment" target="_blank">
+                                    View File
+                                </a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+
+                        </td>
+
+                        <td>@item.CreatedOn?.ToString("dd-MMM-yyyy")</td>
+
+                        <td>
+
+                            <div class="btn-group">
+
+                                <a asp-action="LetterReceive"
+                                   asp-route-id="@item.LetterId"
+                                   class="btn btn-sm btn-outline-warning">
+
+                                    <em class="icon ni ni-edit"></em>
+
+                                </a>
+
+                                <a asp-action="Delete"
+                                   asp-route-id="@item.LetterId"
+                                   class="btn btn-sm btn-outline-danger">
+
+                                    <em class="icon ni ni-trash"></em>
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    serial++;
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+</div>

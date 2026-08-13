@@ -30,6 +30,7 @@ namespace TSSC.Unified.ViewModel
         public string? Handover { get; set; }
 
         public DateTime? HandoverDate { get; set; }
+        public DateTime? CreatedOn { get; set; }
 
         public string? Remarks { get; set; }
 

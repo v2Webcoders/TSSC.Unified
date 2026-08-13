@@ -14,10 +14,10 @@
         </div>
 
         <div class="nk-block-head-content">
-            <a asp-action="Index"
+            <a asp-action="LetterReceiveList"
                asp-controller="Letter"
                class="btn btn-primary d-none d-md-inline-flex">
-                <em class="icon ni ni-list"></em>&nbsp; Letter Register
+                <em class="icon ni ni-list"></em>&nbsp; Letter List
             </a>
         </div>
     </div>
@@ -135,6 +135,19 @@
                         <input asp-for="LetterAttachmentFile"
                                type="file"
                                class="form-control" />
+                        @if (!string.IsNullOrEmpty(Model.LetterAttachment))
+                        {
+                            <div class="mt-2">
+                                <a href="@Url.Content(Model.LetterAttachment)"
+                                   target="_blank"
+                                   class="btn btn-sm btn-info">
+                                    <em class="icon ni ni-file"></em>
+                                    View Current Attachment
+                                </a>
+                            </div>
+                        }
+
+                        <input type="hidden" asp-for="LetterAttachment" />
                     </div>
 
                     <div class="col-md-12">
@@ -161,7 +174,7 @@
 
                         </button>
 
-                        <a asp-action="Index"
+                        <a asp-action="LetterReceiveList"
                            asp-controller="Letter"
                            class="btn btn-outline-secondary ms-2">
                             Cancel

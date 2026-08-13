@@ -14,10 +14,10 @@
         </div>
 
         <div class="nk-block-head-content">
-            <a asp-action="Index"
+            <a asp-action="LetterSendList"
                asp-controller="Letter"
                class="btn btn-primary d-none d-md-inline-flex">
-                <em class="icon ni ni-list"></em>&nbsp; Letter Register
+                <em class="icon ni ni-list"></em>&nbsp; Letter List
             </a>
         </div>
     </div>
@@ -56,7 +56,7 @@
                         <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
                             <h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
                                 <em class="ni ni-inbox"></em>
-                                Receive Information
+                                Send Information
                             </h5>
                         </div>
                     </div>
@@ -118,6 +118,19 @@
                         <input asp-for="LetterAttachmentFile"
                                type="file"
                                class="form-control" />
+                        @if (!string.IsNullOrEmpty(Model.LetterAttachment))
+                        {
+                            <div class="mt-2">
+                                <a href="@Url.Content(Model.LetterAttachment)"
+                                   target="_blank"
+                                   class="btn btn-sm btn-info">
+                                    <em class="icon ni ni-file"></em>
+                                    View Current Attachment
+                                </a>
+                            </div>
+                        }
+
+                        <input type="hidden" asp-for="LetterAttachment" />
                     </div>
 
                     <div class="col-md-12">
@@ -144,7 +157,7 @@
 
                         </button>
 
-                        <a asp-action="Index"
+                        <a asp-action="LetterSendList"
                            asp-controller="Letter"
                            class="btn btn-outline-secondary ms-2">
                             Cancel

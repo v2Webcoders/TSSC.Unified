@@ -24,22 +24,6 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             _environment = environment;
         }
         [HttpGet]
-        //public async Task<IActionResult> Create()
-        //{
-        //    ViewBag.EmployeeList = new SelectList(
-        //        await _context.Employee
-        //            .Where(x => x.IsActive)
-        //            .Select(x => new
-        //            {
-        //                x.EmployeeId,
-        //                FullName = x.FirstName + " " + x.LastName
-        //            })
-        //            .ToListAsync(),
-        //        "EmployeeId",
-        //        "FullName");
-
-        //    return View(new TaskVM());
-        //}
         public async Task<IActionResult> Create()
         {
             var currentUser = await _userManager.GetUserAsync(User);
@@ -234,7 +218,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 from t in _context.Tasks
                 join at in _context.Employee on t.AssignedTo equals at.EmployeeId
                 join ab in _context.Employee on t.AssignedBy equals ab.EmployeeId
-
+               
                 select new TaskVM
                 {
                     TaskId = t.TaskId,
