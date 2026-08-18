@@ -125,10 +125,10 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 var policy = new HRPolicy
                 {
                     PolicyTitle = model.PolicyTitle,
-                    PolicyType = model.PolicyType,          // Added
+                    PolicyType = model.PolicyType,         
                     Description = model.Description,
                     PolicyDocument = fileName,
-                    IsActive = true,                     // Always active for new policy
+                    IsActive = true,                     
                     CreatedBy = User.Identity!.Name,
                     CreatedOn = DateTime.Now
                 };

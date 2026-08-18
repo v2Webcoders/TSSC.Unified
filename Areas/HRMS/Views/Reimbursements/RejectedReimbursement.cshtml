@@ -1,0 +1,213 @@
+﻿@model IEnumerable<TSSC.Unified.ViewModel.ReimbursementsVM>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Rejected List";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Rejected List
+            </h3>
+        </div>
+    </div>
+</div>
+
+<div class="nk-content-inner">
+
+    <div class="nk-content-body">
+
+        <div class="card card-bordered">
+
+            <div class="card-inner">
+
+                @if (TempData["msg"] != null)
+                {
+                    <div class="alert alert-success">
+                        @TempData["msg"]
+                    </div>
+                }
+
+                @if (TempData["error"] != null)
+                {
+                    <div class="alert alert-danger">
+                        @TempData["error"]
+                    </div>
+                }
+
+                <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer dtr-inline collapsed">
+
+                    <thead>
+                        <tr>
+
+                            <th>S.No.</th>
+
+                            <th>Request Type</th>
+
+                            <th>Expense Category</th>
+
+                            <th>Amount</th>
+
+                            <th>Expense Date</th>
+
+                            <th>Vendor Name</th>
+
+                            <th>Purpose</th>
+
+                            <th>Supporting Document</th>
+
+                            <th>Invoice / Bill</th>
+
+                            <th>Your Remarks</th>
+
+                            <th>Status</th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @serial
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType
+                                    </td>
+
+                                    <td>
+                                        @item.ExpenseCategory
+                                    </td>
+
+                                    <td>
+                                        ₹ @item.ExpenseAmount.ToString("N2")
+                                    </td>
+
+                                    <td>
+                                        @item.ExpenseDate.ToString("dd-MMM-yyyy")
+                                    </td>
+
+                                    <td>
+                                        @(string.IsNullOrEmpty(item.VendorName)
+                                                                        ? "-"
+                                                                        : item.VendorName)
+                            </td>
+
+                                    <td>
+                                        @item.Purpose
+                                    </td>
+
+                                    <td>
+
+                                @if (!string.IsNullOrEmpty(item.SupportingDocument))
+                                        {
+                                            <a href="@Url.Content(item.SupportingDocument)"
+                                               target="_blank"
+                                               class="btn btn-sm btn-outline-info">
+
+                                                <em class="icon ni ni-file-text"></em>
+                                                View File
+
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+
+                                    </td>
+
+                                    <td>
+
+                                        @if (!string.IsNullOrEmpty(item.InvoiceBill))
+                                        {
+                                            <a href="@Url.Content(item.InvoiceBill)"
+                                               target="_blank"
+                                               class="btn btn-sm btn-outline-info">
+
+                                                <em class="icon ni ni-file-text"></em>
+                                                View File
+
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+
+                                    </td>
+
+                                    <td>
+
+                                        @{
+                                            string remarks = "-";
+
+                                            if (item.Approver2Status == "Rejected")
+                                            {
+                                                remarks = item.Approver2Remarks ?? "-";
+                                            }
+                                            else if (item.Approver3Status == "Rejected")
+                                            {
+                                                remarks = item.Approver3Remarks ?? "-";
+                                            }
+                                            else if (item.Approver4Status == "Rejected")
+                                            {
+                                                remarks = item.Approver4Remarks ?? "-";
+                                            }
+                                        }
+
+                                        @remarks
+
+                                    </td>
+
+                                    <td>
+
+                                        <span class="badge badge-dot bg-danger">
+                                            Rejected
+                                        </span>
+
+                                    </td>
+
+                                </tr>
+
+                                serial++;
+                            }
+                        }
+
+                    </tbody>
+
+                </table>
+
+                @if (Model == null || !Model.Any())
+                {
+                    <div class="text-center mt-5">
+
+                        <em class="icon ni ni-info"
+                            style="font-size: 25px;">
+                        </em>
+
+                        <p class="mt-2">
+                            No rejected Approval found.
+                        </p>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
