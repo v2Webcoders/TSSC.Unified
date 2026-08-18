@@ -1,6 +1,6 @@
 ﻿@using QUIZAPP.ViewModel
-@model DashboardViewModel
-
+@model TSSC.Unified.ViewModel.HRDashboardVM
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
 	Layout = "~/Areas/HRMS/Views/Shared/_Layout.cshtml";
 	ViewData["Title"] = "HRMS DASHBOARD";
@@ -21,22 +21,10 @@
 @section Styles {
     <link rel="stylesheet" href="~/assets/css/EmployeeDashboard.css" asp-append-version="true" />
 }
+
+
 <div class="container-fluid">
-	<div class="row">
-		@* <aside class="sidebar col-md-3 col-lg-2 p-3">
-				<ul class="nav flex-column">
-					<div class="nav-group-label">Main</div>
-					<li class="nav-item"><a class="nav-link" href="dashboard.html" data-page="dashboard.html">🏠 Dashboard</a></li>
-					<div class="nav-group-label">Attendance</div>
-					<li class="nav-item"><a class="nav-link" href="attendance.html" data-page="attendance.html">🕘 Mark Attendance</a></li>
-					<li class="nav-item"><a class="nav-link" href="regularization.html" data-page="regularization.html">↻ Regularization</a></li>
-					<div class="nav-group-label">Requests</div>
-					<li class="nav-item"><a class="nav-link" href="leave-request.html" data-page="leave-request.html">🗓 Leave Request</a></li>
-					<li class="nav-item"><a class="nav-link" href="od-request.html" data-page="od-request.html">🧭 OD Request</a></li>
-					<div class="nav-group-label">Resources</div>
-					<li class="nav-item"><a class="nav-link" href="hr-policy.html" data-page="hr-policy.html">📄 HR Policy Docs</a></li>
-				</ul>
-			</aside> *@
+    <div class="row">
 
         <main class="col-md-12 col-lg-12 p-4">
 
@@ -44,76 +32,93 @@
             <div class="d-flex flex-wrap justify-content-between align-items-start gap-4 mb-5">
 
                 <div>
+
                     <h1 class="fs-4 text-primary fw-bold mb-1">
-                        Welcome, @ViewBag.EmployeeName 👋
+                        Welcome, @Model.EmployeeName 👋
                     </h1>
+
                     <div class="mt-0 mb-4">
+
                         <div class="d-flex flex-wrap align-items-center gap-2 text-muted small">
 
                             <!-- Date -->
                             <span class="d-flex align-items-center">
+
                                 <em class="icon ni ni-calendar-alt me-1"></em>
+
                                 @DateTime.Today.ToString("dddd, dd MMMM yyyy")
+
                             </span>
 
                             <span class="text-light">•</span>
 
+
                             <!-- Status -->
-                            @if (ViewBag.TodayInTime != null)
+                            @if (Model.TodayInTime.HasValue)
                             {
                                 <span class="d-flex align-items-center text-success">
-                                    <em class="icon ni ni-check-circle me-1"></em> Present
+
+                                    <em class="icon ni ni-check-circle me-1"></em>
+
+                                    Present
+
                                 </span>
                             }
                             else
                             {
                                 <span class="d-flex align-items-center text-warning">
-                                    <em class="icon ni ni-clock me-1"></em> Not marked
+
+                                    <em class="icon ni ni-clock me-1"></em>
+
+                                    Not marked
+
                                 </span>
                             }
 
+
                             <span class="text-light">•</span>
 
-                            <!-- In / Out -->
+
+                            <!-- In -->
                             <span>
-                                In: @(ViewBag.TodayInTime != null ? ((DateTime)ViewBag.TodayInTime).ToString("hh:mm tt") : "--")
+
+                                In:
+                                @(Model.TodayInTime.HasValue
+                                    ? Model.TodayInTime.Value.ToString("hh:mm tt")
+                                    : "--")
+
                             </span>
 
+
                             <span class="text-light">•</span>
 
+
+                            <!-- Out -->
                             <span>
-                                Out: @(ViewBag.TodayOutTime != null ? ((DateTime)ViewBag.TodayOutTime).ToString("hh:mm tt") : "--")
+
+                                Out:
+                                @(Model.TodayOutTime.HasValue
+                                    ? Model.TodayOutTime.Value.ToString("hh:mm tt")
+                                    : "--")
+
                             </span>
 
                         </div>
+
                     </div>
-                    @* <div class="mt-0 mb-6 pb-4">
-                        <div class="d-flex flex-wrap align-items-center gap-3">
 
-                            <!-- Date -->
-                            <div class="d-flex align-items-center">
-                                <em class="icon ni ni-calendar-alt text-primary me-2"></em>
-
-                                <span class="fw-semibold">
-                                    @DateTime.Today.ToString("dddd, dd MMMM yyyy")
-                                </span>
-                            </div>
-
-                            <!-- Attendance -->
-                            <span class="text-success">
-                                <em class="icon ni ni-check-circle"></em>
-                                <span class="fw-semibold ms-1">Attendance Active</span>
-                            </span>
-
-                        </div>
-                    </div> *@
                 </div>
 
+
+                <!-- Manage Employees -->
                 <a asp-controller="Employee"
                    asp-action="EmployeeList"
                    class="btn btn-primary">
+
                     <em class="icon ni ni-users me-1"></em>
+
                     Manage Employees
+
                 </a>
 
             </div>
@@ -122,8 +127,10 @@
             <!-- HR KPI Cards -->
             <div class="row g-3 mb-4">
 
+
                 <!-- Total Employees -->
                 <div class="col-6 col-lg-3">
+
                     <div class="card card-stat h-100 border-0 shadow-sm">
 
                         <div class="card-body">
@@ -133,7 +140,7 @@
                             </span>
 
                             <div class="stat-num">
-                                @ViewBag.TotalEmployees
+                                @Model.TotalEmployees
                             </div>
 
                             <div class="small text-muted">
@@ -143,11 +150,13 @@
                         </div>
 
                     </div>
+
                 </div>
 
 
                 <!-- Present Today -->
                 <div class="col-6 col-lg-3">
+
                     <div class="card card-stat h-100 border-0 shadow-sm">
 
                         <div class="card-body">
@@ -157,7 +166,7 @@
                             </span>
 
                             <div class="stat-num">
-                                @ViewBag.PresentToday
+                                @Model.PresentToday
                             </div>
 
                             <div class="small text-muted">
@@ -167,11 +176,13 @@
                         </div>
 
                     </div>
+
                 </div>
 
 
                 <!-- Employees on Leave -->
                 <div class="col-6 col-lg-3">
+
                     <div class="card card-stat h-100 border-0 shadow-sm">
 
                         <div class="card-body">
@@ -181,7 +192,7 @@
                             </span>
 
                             <div class="stat-num">
-                                @ViewBag.EmployeesOnLeave
+                                @Model.EmployeesOnLeave
                             </div>
 
                             <div class="small text-muted">
@@ -191,11 +202,13 @@
                         </div>
 
                     </div>
+
                 </div>
 
 
                 <!-- Pending Requests -->
                 <div class="col-6 col-lg-3">
+
                     <div class="card card-stat h-100 border-0 shadow-sm">
 
                         <div class="card-body">
@@ -205,7 +218,7 @@
                             </span>
 
                             <div class="stat-num">
-                                @ViewBag.PendingLeaveRequests
+                                @Model.PendingLeaveRequests
                             </div>
 
                             <div class="small text-muted">
@@ -215,6 +228,7 @@
                         </div>
 
                     </div>
+
                 </div>
 
             </div>
@@ -222,6 +236,7 @@
 
             <!-- HR Dashboard Content -->
             <div class="row g-3">
+
 
                 <!-- Recent Leave Requests -->
                 <div class="col-lg-8">
@@ -239,105 +254,132 @@
                                 <a asp-controller="LeaveManagement"
                                    asp-action="MyLeaves"
                                    class="btn btn-sm btn-outline-primary">
+
                                     View All
+
                                 </a>
 
                             </div>
+
 
                             <div class="table-responsive">
 
                                 <table class="table table-sm align-middle mb-0">
 
                                     <thead>
+
                                         <tr class="text-muted small text-uppercase">
-                                            <th>Employee</th>
-                                            <th>Leave Type</th>
-                                            <th>Dates</th>
-                                            <th>Status</th>
+
+                                            <th>
+                                                Employee
+                                            </th>
+
+                                            <th>
+                                                Leave Type
+                                            </th>
+
+                                            <th>
+                                                Dates
+                                            </th>
+
+                                            <th>
+                                                Status
+                                            </th>
+
                                         </tr>
+
                                     </thead>
+
 
                                     <tbody>
 
-                                        <tr>
-                                            <td>
-                                                <strong>Ravi Kumar</strong>
-                                            </td>
+                                        @if (Model.RecentLeaveRequests != null &&
+                                             Model.RecentLeaveRequests.Any())
+                                        {
+                                            foreach (var item in Model.RecentLeaveRequests)
+                                            {
+                                                <tr>
 
-                                            <td>
-                                                Casual Leave
-                                            </td>
+                                                    <!-- Employee -->
+                                                    <td>
 
-                                            <td>
-                                                08 Aug 2026
-                                            </td>
+                                                        <strong>
+                                                            @item.EmployeeName
+                                                        </strong>
 
-                                            <td>
-                                                <span class="badge bg-warning-subtle text-warning-emphasis">
-                                                    Pending
-                                                </span>
-                                            </td>
-                                        </tr>
+                                                    </td>
 
-                                        <tr>
-                                            <td>
-                                                <strong>Manoj Kumar</strong>
-                                            </td>
 
-                                            <td>
-                                                Sick Leave
-                                            </td>
+                                                    <!-- Leave Type -->
+                                                    <td>
 
-                                            <td>
-                                                06 Aug 2026
-                                            </td>
+                                                        @item.LeaveType
 
-                                            <td>
-                                                <span class="badge bg-success-subtle text-success">
-                                                    Approved
-                                                </span>
-                                            </td>
-                                        </tr>
+                                                    </td>
 
-                                        <tr>
-                                            <td>
-                                                <strong>Priya Sharma</strong>
-                                            </td>
 
-                                            <td>
-                                                Earned Leave
-                                            </td>
+                                                    <!-- Dates -->
+                                                    <td>
 
-                                            <td>
-                                                04 Aug 2026
-                                            </td>
+                                                        @item.FromDate.ToString("dd MMM yyyy")
 
-                                            <td>
-                                                <span class="badge bg-success-subtle text-success">
-                                                    Approved
-                                                </span>
-                                            </td>
-                                        </tr>
+                                                        @if (item.ToDate != item.FromDate)
+                                                        {
+                                                            <span>
+                                                                -
+                                                                @item.ToDate.ToString("dd MMM yyyy")
+                                                            </span>
+                                                        }
 
-                                        <tr>
-                                            <td>
-                                                <strong>Amit Singh</strong>
-                                            </td>
+                                                    </td>
 
-                                            <td>
-                                                Casual Leave
-                                            </td>
 
-                                            <td>
-                                                02 Aug 2026
-                                            </td>
+                                                    <!-- Status -->
+                                                    <td>
 
-                                            <td>
-                                                <span class="badge bg-danger-subtle text-danger">
-                                                    Rejected
-                                                </span>
-                                            </td>
-                                        </tr>
+                                                        @if (item.Status == "Pending")
+                                                        {
+                                                            <span class="badge bg-warning-subtle text-warning-emphasis">
+                                                                Pending
+                                                            </span>
+                                                        }
+                                                        else if (item.Status == "Approved")
+                                                        {
+                                                            <span class="badge bg-success-subtle text-success">
+                                                                Approved
+                                                            </span>
+                                                        }
+                                                        else if (item.Status == "Rejected")
+                                                        {
+                                                            <span class="badge bg-danger-subtle text-danger">
+                                                                Rejected
+                                                            </span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-light text-muted">
+                                                                @item.Status
+                                                            </span>
+                                                        }
+
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+
+                                                <td colspan="4"
+                                                    class="text-center text-muted py-4">
+
+                                                    No recent leave requests found.
+
+                                                </td>
+
+                                            </tr>
+                                        }
 
                                     </tbody>
 
@@ -363,38 +405,46 @@
                                 Quick Actions
                             </h3>
 
+
                             <a asp-controller="Employee"
                                asp-action="EmployeeList"
                                class="btn btn-outline-primary">
 
                                 <em class="icon ni ni-users me-1"></em>
+
                                 Employee Management
 
                             </a>
+
 
                             <a asp-controller="LeaveManagement"
                                asp-action="MyLeaves"
                                class="btn btn-outline-primary">
 
                                 <em class="icon ni ni-calendar-check me-1"></em>
+
                                 Manage Leave Requests
 
                             </a>
+
 
                             <a asp-controller="LeaveAdjustment"
                                asp-action="Index"
                                class="btn btn-outline-primary">
 
                                 <em class="icon ni ni-plus me-1"></em>
+
                                 Adjust Leave Balance
 
                             </a>
+
 
                             <a asp-controller="HRPolicy"
                                asp-action="Index"
                                class="btn btn-outline-primary">
 
                                 <em class="icon ni ni-file-docs me-1"></em>
+
                                 Manage HR Policies
 
                             </a>
@@ -408,7 +458,8 @@
             </div>
 
         </main>
-	</div>
+
+    </div>
 </div>
 <script>
     // Highlight active sidebar link

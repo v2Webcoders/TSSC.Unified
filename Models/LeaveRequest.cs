@@ -38,5 +38,6 @@
 
         public int? ApproverId { get; set; }      // Reporting Manager
         public LeaveType LeaveType { get; set; }   // <-- Required
+        public virtual Employee? Employee { get; set; }
     }
 }

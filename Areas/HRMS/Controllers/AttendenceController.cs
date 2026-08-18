@@ -6,6 +6,7 @@ using QUIZAPP;
 using QUIZAPP.Models;
 using TSSC.Unified.Models;
 using TSSC.Unified.Services;
+using TSSC.Unified.ViewModel;
 
 namespace TSSC.Unified.Areas.HRMS.Controllers
 {
@@ -72,7 +73,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             try
             {
                 var result =
-                    await _syncService.SyncBiometricAttendanceAsync(fromDate,toDate);
+                    await _syncService.SyncBiometricAttendanceAsync(fromDate, toDate);
 
                 TempData["Success"] =
                     $"Biometric sync completed successfully. " +
@@ -1008,7 +1009,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             var allowedStatuses = new[]
             {
                 "Pending",
-                "Approved",     
+                "Approved",
                 "Rejected"
             };
 
@@ -2003,5 +2004,236 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             return View(requests);
         }
+        [HttpGet]
+        [HttpGet]
+        public async Task<IActionResult> ViewAttendance(
+    int? employeeId,
+    int? month,
+    int? year)
+        {
+            try
+            {
+                // =====================================================
+                // SELECTED MONTH / YEAR
+                // =====================================================
+
+                var selectedYear =
+                    year ?? DateTime.Today.Year;
+
+                var selectedMonth =
+                    month ?? DateTime.Today.Month;
+
+                var selectedEmployeeId =
+                    employeeId ?? 0;
+
+
+                // =====================================================
+                // EMPLOYEE LIST
+                // =====================================================
+
+                var employees = await _context.Employee
+                    .Where(x => x.IsActive)
+                    .OrderBy(x => x.FirstName)
+                    .ThenBy(x => x.LastName)
+                    .ToListAsync();
+
+
+                // =====================================================
+                // SELECTED EMPLOYEE
+                // =====================================================
+
+                Employee? selectedEmployee = null;
+
+                if (selectedEmployeeId > 0)
+                {
+                    selectedEmployee = employees
+                        .FirstOrDefault(x =>
+                            x.EmployeeId == selectedEmployeeId);
+                }
+
+
+                // =====================================================
+                // MONTH RANGE
+                // =====================================================
+
+                var firstDay =
+                    new DateTime(
+                        selectedYear,
+                        selectedMonth,
+                        1);
+
+                var lastDay =
+                    firstDay.AddMonths(1).AddDays(-1);
+
+
+                // =====================================================
+                // ATTENDANCE DATA
+                // =====================================================
+
+                var attendance = new List<EmployeeAttendance>();
+
+                if (selectedEmployeeId>0)
+                {
+                    attendance = await _context.EmployeeAttendance
+                        .Where(x =>
+                            x.AttendanceDate >= firstDay &&
+                            x.AttendanceDate <= lastDay &&
+                            x.EmployeeId == selectedEmployeeId)
+                        .OrderBy(x => x.AttendanceDate)
+                        .ToListAsync();
+                }
+
+
+                // =====================================================
+                // CREATE VIEW MODEL
+                // =====================================================
+
+                var model = new HRAttendanceCalendarVM
+                {
+                    EmployeeId =
+                        selectedEmployeeId > 0
+                            ? selectedEmployeeId
+                            : null,
+
+                    EmployeeName =
+                        selectedEmployee != null
+                            ? $"{selectedEmployee.FirstName} {selectedEmployee.LastName}".Trim()
+                            : null,
+
+                    EmployeeCode =
+                        selectedEmployee?.EmployeeCode,
+
+                    Year = selectedYear,
+
+                    Month = selectedMonth
+                };
+
+
+                // =====================================================
+                // CREATE CALENDAR DAYS
+                // =====================================================
+                if(selectedEmployeeId>0)
+                {
+                    for (
+                    var date = firstDay;
+                    date <= lastDay;
+                    date = date.AddDays(1))
+                    {
+                        var recordsForDay =
+                            attendance
+                                .Where(x =>
+                                    x.AttendanceDate.Date ==
+                                    date.Date)
+                                .ToList();
+
+
+                        // -------------------------------------------------
+                        // If employee selected, there should normally be
+                        // only one attendance record.
+                        // -------------------------------------------------
+
+                        var record =
+                            recordsForDay.FirstOrDefault();
+
+
+                        var day =
+                            new AttendanceCalendarDayVM
+                            {
+                                Date = date,
+
+                                IsCurrentMonth = true
+                            };
+
+
+                        if (record != null)
+                        {
+                            day.Status =
+                                record.AttendanceStatus;
+
+                            day.InTime =
+                                record.InTime;
+
+                            day.OutTime =
+                                record.OutTime;
+
+
+                            // ---------------------------------------------
+                            // WORKING HOURS
+                            // ---------------------------------------------
+
+                            if (
+                                record.InTime.HasValue &&
+                                record.OutTime.HasValue)
+                            {
+                                day.WorkingHours =
+                                    (
+                                        record.OutTime.Value -
+                                        record.InTime.Value
+                                    ).TotalHours;
+                            }
+                        }
+                        else
+                        {
+                            // ---------------------------------------------
+                            // NO ATTENDANCE RECORD
+                            // ---------------------------------------------
+
+                            if (date.DayOfWeek ==
+                                DayOfWeek.Sunday)
+                            {
+                                day.Status = "Weekend";
+                            }
+                            else if (date.Date <= DateTime.Today)
+                            {
+                                day.Status = "Absent";
+                            }
+                        }
+
+
+                        model.Days.Add(day);
+                    }
+                }
+                
+
+
+                // =====================================================
+                // DROPDOWNS
+                // =====================================================
+
+                ViewBag.EmployeeList = employees;
+
+                ViewBag.SelectedEmployeeId =
+                    selectedEmployeeId;
+
+                ViewBag.SelectedMonth =
+                    selectedMonth;
+
+                ViewBag.SelectedYear =
+                    selectedYear;
+
+
+                ViewBag.YearList =
+                    Enumerable
+                        .Range(
+                            DateTime.Today.Year - 2,
+                            5)
+                        .OrderByDescending(x => x)
+                        .ToList();
+
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                // Log exception here
+
+                TempData["Error"] =
+                    "Unable to load attendance.";
+
+                return RedirectToAction("Index", "Home");
+            }
+        }
     }
 }
+
+    

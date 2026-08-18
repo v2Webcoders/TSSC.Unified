@@ -1,0 +1,620 @@
+﻿@using TSSC.Unified.ViewModel
+@model TSSC.Unified.ViewModel.HRAttendanceCalendarVM
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "View Attendance";
+
+    var firstDay =
+        new DateTime(Model.Year, Model.Month, 1);
+
+    var daysInMonth =
+        DateTime.DaysInMonth(Model.Year, Model.Month);
+
+    var startDay =
+        (int)firstDay.DayOfWeek;
+
+    var totalCells =
+        (int)Math.Ceiling((startDay + daysInMonth) / 7.0);
+
+    var previousMonth =
+        firstDay.AddMonths(-1);
+
+    var nextMonth =
+        firstDay.AddMonths(1);
+    var selectedYear = ViewBag.SelectedYear ?? DateTime.Now.Year;
+    var selectedMonth = ViewBag.SelectedMonth ?? DateTime.Now.Month;
+    
+
+    var selectedEmployeeId = ViewBag.SelectedEmployeeId ?? 0;
+
+    
+
+    var yearList =
+        ViewBag.YearList as List<int>
+        ?? new List<int>();
+
+    var employeeList =
+        ViewBag.EmployeeList as List<TSSC.Unified.Models.Employee>
+        ?? new List<TSSC.Unified.Models.Employee>();
+    var selectedEmployee = employeeList
+        .FirstOrDefault(x => x.EmployeeId == selectedEmployeeId);
+}
+<style>
+    /* =========================================
+       ATTENDANCE CALENDAR
+    ========================================= */
+
+    .attendance-calendar-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 25px;
+        padding: 18px 20px;
+        border-bottom: 1px solid #e5e9f2;
+    }
+
+    .calendar-month-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #243b64;
+    }
+
+    .calendar-nav {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #1d6fd1;
+        background: #f1f6fc;
+        text-decoration: none;
+        transition: all .2s ease;
+    }
+
+        .calendar-nav:hover {
+            background: #1d6fd1;
+            color: #fff;
+        }
+
+
+    /* =========================================
+       WEEK DAYS
+    ========================================= */
+
+    .calendar-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        background: #f5f8fc;
+        border-top: 1px solid #e5e9f2;
+        border-bottom: 1px solid #e5e9f2;
+    }
+
+        .calendar-weekdays div {
+            padding: 13px 10px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: #65748b;
+        }
+
+
+    /* =========================================
+       CALENDAR GRID
+    ========================================= */
+
+    .attendance-calendar {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(100px, 1fr));
+        background: #eaf2f7;
+    }
+
+    .calendar-day {
+        position: relative;
+        min-height: 105px;
+        padding: 10px;
+        background: #fff;
+        border-right: 1px solid #e2e8f0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+        .calendar-day.empty {
+            background: #f8fafc;
+        }
+
+    .day-number {
+        text-align: right;
+        font-size: 16px;
+        font-weight: 600;
+        color: #26364f;
+        margin-bottom: 15px;
+    }
+
+
+    /* =========================================
+       ATTENDANCE
+    ========================================= */
+
+    .attendance-status {
+        border-radius: 4px;
+        padding: 7px 8px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+        .attendance-status.present {
+            background: #e4f5c9;
+            color: #557a24;
+            border-left: 3px solid #8ac926;
+        }
+
+    .attendance-time {
+        display: flex;
+        justify-content: space-between;
+        gap: 5px;
+        white-space: nowrap;
+    }
+
+    .working-hours {
+        margin-top: 4px;
+        font-size: 11px;
+        color: #66852e;
+    }
+
+
+    /* =========================================
+       ABSENT
+    ========================================= */
+
+    .attendance-status.absent {
+        background: #ffe8e8;
+        color: #d64040;
+        border-left: 3px solid #e55353;
+    }
+
+
+    /* =========================================
+       WEEKEND
+    ========================================= */
+
+    .attendance-status.weekend {
+        background: #eef1f5;
+        color: #7c8797;
+    }
+
+
+    /* =========================================
+       EMPLOYEE INFO
+    ========================================= */
+
+    .attendance-employee-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 18px;
+        background: #fff;
+        border: 1px solid #e5e9f2;
+        border-radius: 6px;
+    }
+
+        .attendance-employee-info strong {
+            color: #243b64;
+            margin-left: 8px;
+        }
+
+    .employee-code {
+        color: #8491a5;
+        margin-left: 5px;
+    }
+
+
+    /* =========================================
+       LEGEND
+    ========================================= */
+
+    .attendance-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 25px;
+        color: #65748b;
+        font-size: 13px;
+    }
+
+        .attendance-legend span {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+    .legend-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .present-dot {
+        background: #20c997;
+    }
+
+    .absent-dot {
+        background: #e55353;
+    }
+
+    .weekend-dot {
+        background: #adb5bd;
+    }
+
+    .leave-dot {
+        background: #4676e8;
+    }
+
+    .holiday-dot {
+        background: #f0a06a;
+    }
+</style>
+<div class="container-fluid">
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex flex-wrap justify-content-between align-items-start mb-4">
+
+        <div>
+            <h1 class="page-title mb-1">
+                Attendance Management
+            </h1>
+
+            <p class="text-muted mb-0">
+                Organization-wide attendance overview —
+                @firstDay.ToString("MMMM yyyy")
+            </p>
+        </div>
+
+    </div>
+
+
+    
+    <form method="get"
+          asp-action="ViewAttendance"
+          asp-controller="Attendance">
+
+        <div class="row g-3 align-items-end mb-1">
+
+            <!-- EMPLOYEE -->
+
+            <div class="col-md-4">
+
+                <label class="form-label fw-semibold">
+                    Employee
+                </label>
+
+                <select name="employeeId"
+                        class="form-select">
+
+                    <option value="0">
+                        Select Employee
+                    </option>
+
+                    @foreach (var employee in employeeList)
+                    {
+                        <option value="@employee.EmployeeId"
+                                selected="@(selectedEmployeeId == employee.EmployeeId)">
+
+                            @employee.FirstName @employee.LastName
+                            (@employee.EmployeeCode)
+
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+
+            <!-- MONTH -->
+
+            <div class="col-md-3">
+
+                <label class="form-label fw-semibold">
+                    Month
+                </label>
+
+                <select name="month"
+                        class="form-select">
+
+                    @for (int m = 1; m <= 12; m++)
+                    {
+                        <option value="@m"
+                                selected="@(selectedMonth == m)">
+                            @(new DateTime(2000, m, 1).ToString("MMMM"))
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+
+            <!-- YEAR -->
+
+            <div class="col-md-3">
+
+                <label class="form-label fw-semibold">
+                    Year
+                </label>
+
+                <select name="year"
+                        class="form-select">
+
+                    @foreach (var y in yearList)
+                    {
+                        <option value="@y"
+                                selected="@(selectedYear == y)">
+                            @y
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+
+            <!-- SHOW -->
+
+            <div class="col-md-2">
+
+                <button type="submit"
+                        class="btn btn-primary w-100">
+
+                    <em class="icon ni ni-search me-1"></em>
+                    Show
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+    @{
+        
+    }
+
+    @if (selectedEmployee != null)
+    {
+        <div class="attendance-employee-info mb-3">
+
+            <div>
+                <span class="text-muted">
+                    Employee
+                </span>
+
+                <strong>
+                    @selectedEmployee.FirstName @selectedEmployee.LastName
+                </strong>
+
+                <span class="employee-code">
+                    (@selectedEmployee.EmployeeCode)
+                </span>
+            </div>
+
+            <div class="text-muted">
+                @firstDay.ToString("MMMM yyyy")
+            </div>
+
+        </div>
+    }
+    <!-- CALENDAR -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-inner p-0">
+
+            <!-- CALENDAR HEADER -->
+
+            <div class="attendance-calendar-header">
+
+                <a asp-action="ViewAttendance"
+                   asp-route-employeeId="@Model.EmployeeId"
+                   asp-route-month="@previousMonth.Month"
+                   asp-route-year="@previousMonth.Year"
+                   class="calendar-nav">
+
+                    <em class="icon ni ni-chevron-left"></em>
+
+                </a>
+
+
+                <div class="calendar-month-title">
+
+                    @firstDay.ToString("MMMM yyyy")
+
+                </div>
+
+
+                <a asp-action="ViewAttendance"
+                   asp-route-employeeId="@Model.EmployeeId"
+                   asp-route-month="@nextMonth.Month"
+                   asp-route-year="@nextMonth.Year"
+                   class="calendar-nav">
+
+                    <em class="icon ni ni-chevron-right"></em>
+
+                </a>
+
+            </div>
+
+
+            <!-- WEEK DAYS -->
+
+            <div class="calendar-weekdays">
+
+                <div>Sun</div>
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
+
+            </div>
+
+
+            <!-- CALENDAR -->
+            @if (Model.EmployeeId.HasValue)
+            {
+                <!-- CALENDAR -->
+
+                <div class="attendance-calendar">
+
+                    @for (int cell = 0;
+                   cell < totalCells * 7;
+                   cell++)
+                    {
+                        var dayNumber =
+                        cell - startDay + 1;
+
+                        if (dayNumber < 1 ||
+                        dayNumber > daysInMonth)
+                        {
+                            <div class="calendar-day empty"></div>
+                        }
+                        else
+                        {
+                            var currentDate =
+                            new DateTime(
+                            Model.Year,
+                            Model.Month,
+                            dayNumber);
+
+                            var attendance =
+                            Model.Days.FirstOrDefault(x =>
+                            x.Date.Date == currentDate.Date);
+
+                            <div class="calendar-day">
+
+                                <div class="day-number">
+                                    @dayNumber
+                                </div>
+
+                                @if (attendance != null &&
+                               attendance.InTime.HasValue)
+                                {
+                                    <div class="attendance-status present">
+
+                                        <div class="attendance-time">
+
+                                            <span>
+                                                @(attendance.InTime.Value
+                                                .ToString("hh:mm tt"))
+                                            </span>
+
+                                            @if (attendance.OutTime.HasValue)
+                                            {
+                                                <span>
+                                                    -
+                                                    @(attendance.OutTime.Value
+                                                    .ToString("hh:mm tt"))
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span>
+                                                    --
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                        @if (attendance.WorkingHours.HasValue)
+                                        {
+                                            <div class="working-hours">
+                                                @(attendance.WorkingHours.Value
+                                                .ToString("0.0")) hrs
+                                            </div>
+                                        }
+
+                                    </div>
+                                }
+                                else if (attendance != null &&
+                                attendance.Status == "Weekend")
+                                {
+                                    <div class="attendance-status weekend">
+                                        Weekend
+                                    </div>
+                                }
+                                else if (attendance != null &&
+                                attendance.Status == "Absent")
+                                {
+                                    <div class="attendance-status absent">
+                                        Absent
+                                    </div>
+                                }
+
+                            </div>
+                        }
+                    }
+
+                </div>
+            }
+            else
+            {
+                <!-- NO EMPLOYEE SELECTED -->
+
+                <div class="text-center py-5">
+
+                    <em class="icon ni ni-user-list"
+                        style="font-size:45px; color:#D9622F;">
+                    </em>
+
+                    <h5 class="mt-3 mb-2">
+                        Select an Employee
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                        Please select an employee above to view attendance.
+                    </p>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- LEGEND -->
+
+    <div class="attendance-legend mt-3">
+
+        <span>
+            <i class="legend-dot present-dot"></i>
+            Present
+        </span>
+
+        <span>
+            <i class="legend-dot absent-dot"></i>
+            Absent
+        </span>
+
+        <span>
+            <i class="legend-dot weekend-dot"></i>
+            Weekend
+        </span>
+
+        <span>
+            <i class="legend-dot leave-dot"></i>
+            Leave
+        </span>
+
+        <span>
+            <i class="legend-dot holiday-dot"></i>
+            Holiday
+        </span>
+
+    </div>
+
+</div>

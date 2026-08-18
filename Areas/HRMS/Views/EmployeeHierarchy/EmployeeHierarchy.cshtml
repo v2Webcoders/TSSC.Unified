@@ -4,7 +4,7 @@
 
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "Employee Hierarchy";
+    ViewData["Title"] = "Organization Chart";
 }
 
 <div class="nk-block-head nk-block-head-sm">
@@ -12,7 +12,7 @@
 
         <div class="nk-block-head-content">
             <h3 class="nk-block-title page-title">
-                @(Model.HierarchyId > 0 ? "Update Employee Hierarchy" : "Upload Employee Hierarchy")
+                @(Model.HierarchyId > 0 ? "Update Organization Chart" : "Upload Organization Chart")
             </h3>
         </div>
 
@@ -23,7 +23,7 @@
                class="btn btn-primary d-none d-md-inline-flex">
 
                 <em class="icon ni ni-list"></em>
-                &nbsp; View Employee Hierarchy
+                &nbsp; View Organization Chart
 
             </a>
         </div>
@@ -81,7 +81,7 @@
 
                                 <em class="ni ni-share-alt"></em>
 
-                                Employee Hierarchy Information
+                                Organization Chart Information
 
                             </h5>
 
@@ -96,7 +96,7 @@
 
                         <label class="form-label">
 
-                            Upload Employee Hierarchy PDF
+                            Upload Organization Chart PDF
                             <span class="text-danger">*</span>
 
                         </label>
@@ -121,7 +121,7 @@
 
                                     <em class="icon ni ni-file-pdf"></em>
 
-                                    View Current Hierarchy PDF
+                                    View Current Organization Chart PDF
 
                                 </a>
 
@@ -157,7 +157,7 @@
 
                                     <em class="icon ni ni-info"></em>
 
-                                    No Hierarchy PDF Uploaded
+                                    No Organization Chart PDF Uploaded
 
                                 </span>
                             }
@@ -177,12 +177,12 @@
                             @if (Model.HierarchyId > 0)
                             {
                                 <em class="icon ni ni-edit"></em>
-                                <span> Update Hierarchy PDF</span>
+                                <span> Update Organization Chart PDF</span>
                             }
                             else
                             {
                                 <em class="icon ni ni-upload"></em>
-                                <span> Upload Hierarchy PDF</span>
+                                <span> Upload Organization Chart PDF</span>
                             }
 
                         </button>

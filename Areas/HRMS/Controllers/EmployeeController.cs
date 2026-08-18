@@ -10,6 +10,7 @@ using QUIZAPP.Models;
 using QUIZAPP.ViewModel;
 using System;
 using System.Diagnostics;
+using System.Text.Json;
 using TSSC.Unified.Models;
 using TSSC.Unified.ViewModel;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -17,7 +18,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace QUIZAPP.Areas.HRMS.Controllers
 {
     [Area("HRMS")]
-    [Authorize(Roles = "HR")]
+    [Authorize]
     public class EmployeeController : Controller
     {
         
@@ -40,6 +41,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             _environment = environment;
         }
         [HttpGet]
+        [Authorize(Roles = "HR")]
         public async Task<IActionResult> Create(int? id)
         {
             await LoadDropDowns();
@@ -344,6 +346,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "HR")]
         public async Task<IActionResult> Create(EmployeeVM model)
         {
             await LoadDropDowns();
@@ -655,6 +658,8 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 "SubBranchId",
                 "SubBranchName");
         }
+
+        [Authorize(Roles = "HR")]
         public async Task<IActionResult> EmployeeList()
         {
             var employees = await (
@@ -919,6 +924,844 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             // _logger.LogInformation("Password reset for employee {EmployeeId} by {AdminUser}", request.EmployeeId, User.Identity.Name);
 
             return Json(new { success = true });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MyProfile()
+        {
+            try
+            {
+                var currentUser =
+                    await _userManager.GetUserAsync(User);
+
+                if (currentUser == null)
+                    return Unauthorized();
+
+                var employee =
+                    await _context.Employee
+                        .FirstOrDefaultAsync(x =>
+                            x.ApplicationUserId == currentUser.Id);
+
+                if (employee == null)
+                    return NotFound("Employee profile not found.");
+
+                return View(employee);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error loading profile for current user.");
+
+                return StatusCode(
+                    500,
+                    "Unable to load your profile. Please try again later.");
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> UpdateProfile()
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return Unauthorized();
+
+            var employee = await _context.Employee
+                .Include(x => x.Department)
+                .Include(x => x.Designation)
+                .Include(x => x.ReportingManager)
+                .FirstOrDefaultAsync(x =>
+                    x.ApplicationUserId == currentUser.Id);
+
+            if (employee == null)
+                return NotFound("Employee profile not found.");
+
+            var model = new EmployeeVM
+            {
+                EmployeeId = employee.EmployeeId,
+
+                EmployeeCode = employee.EmployeeCode,
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                Gender = employee.Gender,
+
+                DOB = employee.DOB,
+                BloodGroup = employee.BloodGroup,
+                MaritalStatus = employee.MaritalStatus,
+
+                DepartmentId = employee.DepartmentId,
+                DepartmentName = employee.Department?.DepartmentName,
+
+                DesignationId = employee.DesignationId,
+                DesignationName = employee.Designation?.DesignationName,
+
+                ReportingManagerId = employee.ReportingManagerId,
+                ReportingManagerName =
+                    employee.ReportingManager != null
+                        ? $"{employee.ReportingManager.FirstName} {employee.ReportingManager.LastName}".Trim()
+                        : "Not assigned",
+
+                JoiningDate = employee.JoiningDate,
+                EmployeeType = employee.EmployeeType,
+                EmploymentStatus = employee.EmploymentStatus,
+
+                OfficialEmail = employee.OfficialEmail,
+                PersonalEmail = employee.PersonalEmail,
+
+                MobileNo = employee.MobileNo,
+                AlternateMobile = employee.AlternateMobile,
+
+                CurrentAddress = employee.CurrentAddress,
+                PermanentAddress = employee.PermanentAddress,
+
+                AadhaarNo = employee.AadhaarNo,
+                PANNo = employee.PANNo,
+                PassportNo = employee.PassportNo,
+                UANNo = employee.UANNo,
+                PFNo = employee.PFNo,
+                ESICNo = employee.ESICNo,
+
+                BankName = employee.BankName,
+                AccountNo = employee.AccountNo,
+                IFSCCode = employee.IFSCCode,
+
+                CTC = employee.CTC,
+                BasicSalary = employee.BasicSalary,
+                HRA = employee.HRA,
+                SpecialAllowance = employee.SpecialAllowance,
+
+                IsActive = employee.IsActive,
+
+                Prefix = employee.Prefix,
+
+                BranchId = employee.BranchId,
+                SubBranchId = employee.SubBranchId,
+
+                NoticePeriod = employee.NoticePeriod,
+
+
+                ApplicationUserId = employee.ApplicationUserId,
+                PhotoPath = employee.PhotoPath
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateProfile(EmployeeVM model)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return Unauthorized();
+
+            var employee = await _context.Employee
+                .FirstOrDefaultAsync(x =>
+                    x.ApplicationUserId == currentUser.Id);
+
+            if (employee == null)
+                return NotFound("Employee profile not found.");
+
+
+            // =====================================================
+            // REMOVE VALIDATION FOR HR-CONTROLLED FIELDS
+            // =====================================================
+
+            ModelState.Remove(nameof(EmployeeVM.EmployeeCode));
+
+            ModelState.Remove(nameof(EmployeeVM.DepartmentId));
+            ModelState.Remove(nameof(EmployeeVM.DesignationId));
+            ModelState.Remove(nameof(EmployeeVM.ReportingManagerId));
+
+            ModelState.Remove(nameof(EmployeeVM.JoiningDate));
+            ModelState.Remove(nameof(EmployeeVM.EmployeeType));
+            ModelState.Remove(nameof(EmployeeVM.EmploymentStatus));
+
+            ModelState.Remove(nameof(EmployeeVM.OfficialEmail));
+
+            ModelState.Remove(nameof(EmployeeVM.AadhaarNo));
+            ModelState.Remove(nameof(EmployeeVM.PANNo));
+            ModelState.Remove(nameof(EmployeeVM.PassportNo));
+            ModelState.Remove(nameof(EmployeeVM.UANNo));
+            ModelState.Remove(nameof(EmployeeVM.PFNo));
+            ModelState.Remove(nameof(EmployeeVM.ESICNo));
+
+            ModelState.Remove(nameof(EmployeeVM.BankName));
+            ModelState.Remove(nameof(EmployeeVM.AccountNo));
+            ModelState.Remove(nameof(EmployeeVM.IFSCCode));
+
+            ModelState.Remove(nameof(EmployeeVM.CTC));
+            ModelState.Remove(nameof(EmployeeVM.BasicSalary));
+            ModelState.Remove(nameof(EmployeeVM.HRA));
+            ModelState.Remove(nameof(EmployeeVM.SpecialAllowance));
+
+            ModelState.Remove(nameof(EmployeeVM.Username));
+            ModelState.Remove(nameof(EmployeeVM.Password));
+            ModelState.Remove(nameof(EmployeeVM.RoleId));
+
+            ModelState.Remove(nameof(EmployeeVM.IsActive));
+
+            ModelState.Remove(nameof(EmployeeVM.Prefix));
+
+            ModelState.Remove(nameof(EmployeeVM.BranchId));
+            ModelState.Remove(nameof(EmployeeVM.SubBranchId));
+
+            ModelState.Remove(nameof(EmployeeVM.NoticePeriod));
+
+            ModelState.Remove(nameof(EmployeeVM.ApplicationUserId));
+
+            ModelState.Remove(nameof(EmployeeVM.DepartmentName));
+            ModelState.Remove(nameof(EmployeeVM.DesignationName));
+            ModelState.Remove(nameof(EmployeeVM.ReportingManagerName));
+            ModelState.Remove(nameof(EmployeeVM.RoleName));
+            ModelState.Remove(nameof(EmployeeVM.BranchName));
+            ModelState.Remove(nameof(EmployeeVM.SubBranchName));
+
+            ModelState.Remove(nameof(EmployeeVM.PhotoPath));
+
+
+            // =====================================================
+            // VALIDATION
+            // =====================================================
+
+            if (!ModelState.IsValid)
+            {
+                // Restore HR-controlled display values
+                model.EmployeeCode = employee.EmployeeCode;
+
+                model.OfficialEmail = employee.OfficialEmail;
+
+                model.DepartmentId = employee.DepartmentId;
+                model.DesignationId = employee.DesignationId;
+                model.ReportingManagerId = employee.ReportingManagerId;
+
+                model.JoiningDate = employee.JoiningDate;
+
+                model.DepartmentName =
+                    await _context.Department
+                        .Where(x => x.DepartmentId == employee.DepartmentId)
+                        .Select(x => x.DepartmentName)
+                        .FirstOrDefaultAsync();
+
+                model.DesignationName =
+                    await _context.Designation
+                        .Where(x => x.DesignationId == employee.DesignationId)
+                        .Select(x => x.DesignationName)
+                        .FirstOrDefaultAsync();
+
+                var manager = await _context.Employee
+                    .Where(x => x.EmployeeId == employee.ReportingManagerId)
+                    .Select(x => new
+                    {
+                        x.FirstName,
+                        x.LastName
+                    })
+                    .FirstOrDefaultAsync();
+
+                model.ReportingManagerName =
+                    manager != null
+                        ? $"{manager.FirstName} {manager.LastName}".Trim()
+                        : "Not assigned";
+
+                model.IsActive = employee.IsActive;
+
+                model.PhotoPath = employee.PhotoPath;
+
+                return View(model);
+            }
+
+
+            // =====================================================
+            // UPDATE EMPLOYEE PROFILE
+            // =====================================================
+
+            employee.FirstName =
+                model.FirstName?.Trim();
+
+            employee.LastName =
+                model.LastName?.Trim();
+
+            employee.Gender =
+                model.Gender?.Trim();
+
+            employee.DOB =
+                model.DOB;
+
+            employee.BloodGroup =
+                model.BloodGroup?.Trim();
+
+            employee.MaritalStatus =
+                model.MaritalStatus?.Trim();
+
+            employee.PersonalEmail =
+                model.PersonalEmail?.Trim();
+
+            employee.MobileNo =
+                model.MobileNo?.Trim();
+
+            employee.AlternateMobile =
+                model.AlternateMobile?.Trim();
+
+            employee.CurrentAddress =
+                model.CurrentAddress?.Trim();
+
+            employee.PermanentAddress =
+                model.PermanentAddress?.Trim();
+
+
+            // =====================================================
+            // PHOTO
+            // =====================================================
+
+            if (model.Photo != null && model.Photo.Length > 0)
+            {
+                // Handle your existing photo upload logic here.
+                // Example:
+                //
+                // employee.PhotoPath = await SaveEmployeePhoto(model.Photo);
+            }
+
+
+            // =====================================================
+            // SAVE
+            // =====================================================
+
+            await _context.SaveChangesAsync();
+
+
+            TempData["Success"] =
+                "Profile updated successfully.";
+
+
+            return RedirectToAction(nameof(UpdateProfile));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MarkAttendance()
+        {
+            //try
+            {
+                var currentUser =
+                    await _userManager.GetUserAsync(User);
+
+                if (currentUser == null)
+                    return Unauthorized();
+
+
+                var employee =
+                    await _context.Employee
+                        .FirstOrDefaultAsync(x =>
+                            x.ApplicationUserId == currentUser.Id);
+
+
+                if (employee == null)
+                    return NotFound("Employee profile not found.");
+
+
+                var today =
+                    DateTime.Today;
+
+
+                var attendance =
+                    await _context.EmployeeAttendance
+                        .FirstOrDefaultAsync(x =>
+                            x.EmployeeId == employee.EmployeeId &&
+                            x.AttendanceDate == today);
+
+
+                var model =
+                    new EmployeeAttendanceVM
+                    {
+                        EmployeeId =
+                            employee.EmployeeId,
+
+                        EmployeeCode =
+                            employee.EmployeeCode,
+
+                        EmployeeName =
+                            $"{employee.FirstName} {employee.LastName}".Trim(),
+
+                        AttendanceDate =
+                            today,
+
+                        InTime =
+                            attendance?.InTime,
+
+                        OutTime =
+                            attendance?.OutTime,
+
+                        AttendanceStatus =
+                            attendance?.AttendanceStatus
+                            ?? "Not Marked",
+
+                        AttendanceSource =
+                            attendance?.AttendanceSource
+                            ?? "-"
+                    };
+
+
+                return View(model);
+            }
+            //catch (Exception)
+            //{
+            //    TempData["Error"] =
+            //        "Unable to load attendance.";
+
+            //    return RedirectToAction("Index", "Home");
+            //}
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> CheckIn(
+        double latitude,
+        double longitude,
+        double accuracy)
+        {
+            var currentUser =
+                await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "User session expired."
+                });
+            }
+
+            var employee =
+                await _context.Employee
+                    .FirstOrDefaultAsync(x =>
+                        x.ApplicationUserId == currentUser.Id);
+
+            if (employee == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Employee profile not found."
+                });
+            }
+
+            // Get address from coordinates
+            var location =
+                await GetLocationAddress(latitude, longitude);
+
+            // =====================================================
+            // OFFICE LOCATION
+            // =====================================================
+
+            //const double officeLatitude = 28.4515;
+
+            //const double officeLongitude = 77.0718;
+
+            const double officeLatitude = 28.569950;
+            const double officeLongitude = 77.323406;
+            const double allowedRadius = 2000; // 2 km
+
+
+
+
+            // =====================================================
+            // CHECK DISTANCE
+            // =====================================================
+
+            //double distance =
+            //    CalculateDistanceInMeters(
+            //        officeLatitude,
+            //        officeLongitude,
+            //        latitude,
+            //        longitude);
+
+
+            //if (distance > allowedRadius)
+            //{
+            //    return Json(new
+            //    {
+            //        success = false,
+
+            //        message =
+            //            $"You are outside the allowed attendance location. " +
+            //            $"Distance from office: {distance / 1000:F2} km."
+            //    });
+            //}
+
+
+            // =====================================================
+            // TODAY
+            // =====================================================
+
+            var today =
+                DateTime.Today;
+
+
+            var attendance =
+                await _context.EmployeeAttendance
+                    .FirstOrDefaultAsync(x =>
+                        x.EmployeeId == employee.EmployeeId &&
+                        x.AttendanceDate == today);
+
+
+            // =====================================================
+            // CREATE ATTENDANCE
+            // =====================================================
+
+            if (attendance == null)
+            {
+                attendance =
+                    new EmployeeAttendance
+                    {
+                        EmployeeId =
+                            employee.EmployeeId,
+
+                        EmployeeCode =
+                            employee.EmployeeCode,
+
+                        AttendanceDate =
+                            today,
+
+                        InTime =
+                            DateTime.Now,
+
+                        AttendanceStatus =
+                            "Present",
+
+                        AttendanceSource =
+                            "Manual",
+
+                        CreatedDate =
+                            DateTime.Now,
+
+                        CheckInLatitude =
+                            latitude,
+
+                        CheckInLongitude =
+                            longitude,
+
+                        CheckInAccuracy =
+                            accuracy,
+                        CheckInLocation=location
+                    };
+
+                _context.EmployeeAttendance.Add(attendance);
+            }
+            else
+            {
+                // Prevent duplicate check-in
+
+                if (attendance.InTime != null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "You have already checked in today."
+                    });
+                }
+
+
+                attendance.InTime =
+                    DateTime.Now;
+
+                attendance.AttendanceSource =
+                    "Manual";
+
+                attendance.CheckInLatitude =
+                    latitude;
+
+                attendance.CheckInLongitude =
+                    longitude;
+
+                attendance.CheckInAccuracy =
+                    accuracy;
+            }
+
+
+            await _context.SaveChangesAsync();
+
+
+            return Json(new
+            {
+                success = true,
+
+                message =
+                    "Attendance marked successfully.",
+
+                time =
+                    attendance.InTime?
+                        .ToString("hh:mm tt")
+            });
+        }
+        private static double CalculateDistanceInMeters(
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2)
+        {
+            const double earthRadius = 6371000;
+
+            double dLat =
+                DegreesToRadians(lat2 - lat1);
+
+            double dLon =
+                DegreesToRadians(lon2 - lon1);
+
+
+            double a =
+                Math.Sin(dLat / 2) *
+                Math.Sin(dLat / 2)
+                +
+                Math.Cos(
+                    DegreesToRadians(lat1))
+                *
+                Math.Cos(
+                    DegreesToRadians(lat2))
+                *
+                Math.Sin(dLon / 2) *
+                Math.Sin(dLon / 2);
+
+
+            double c =
+                2 *
+                Math.Atan2(
+                    Math.Sqrt(a),
+                    Math.Sqrt(1 - a));
+
+
+            return earthRadius * c;
+        }
+
+
+        private static double DegreesToRadians(
+            double degrees)
+        {
+            return degrees *
+                   Math.PI /
+                   180;
+        }
+
+
+        [HttpPost]
+        
+        public async Task<IActionResult> CheckOut(
+    double latitude,
+    double longitude,
+    double accuracy)
+        {
+            try
+            {
+                var currentUser =
+                    await _userManager.GetUserAsync(User);
+
+                if (currentUser == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Your session has expired. Please login again."
+                    });
+                }
+
+                var employee =
+                    await _context.Employee
+                        .FirstOrDefaultAsync(x =>
+                            x.ApplicationUserId == currentUser.Id);
+
+                if (employee == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Employee profile not found."
+                    });
+                }
+
+                // =====================================================
+                // VALIDATE LOCATION
+                // =====================================================
+
+                if (latitude == 0 || longitude == 0)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Unable to detect your location. Please try again."
+                    });
+                }
+
+                // =====================================================
+                // GET LOCATION ADDRESS
+                // =====================================================
+
+                var location =
+                    await GetLocationAddress(latitude, longitude);
+
+                var today =
+                    DateTime.Today;
+
+                // =====================================================
+                // GET TODAY'S ATTENDANCE
+                // =====================================================
+
+                var attendance =
+                    await _context.EmployeeAttendance
+                        .FirstOrDefaultAsync(x =>
+                            x.EmployeeId == employee.EmployeeId &&
+                            x.AttendanceDate == today);
+
+                // =====================================================
+                // NO CHECK-IN
+                // =====================================================
+
+                if (attendance == null ||
+                    attendance.InTime == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message =
+                            "Please check in before checking out."
+                    });
+                }
+
+                // =====================================================
+                // ALREADY CHECKED OUT
+                // =====================================================
+
+                if (attendance.OutTime != null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+
+                        message =
+                            "You have already checked out today.",
+
+                        time =
+                            attendance.OutTime
+                                .Value
+                                .ToString("hh:mm tt")
+                    });
+                }
+
+                // =====================================================
+                // CHECKOUT
+                // =====================================================
+
+                var now =
+                    DateTime.Now;
+
+                attendance.OutTime =
+                    now;
+
+                // =====================================================
+                // SAVE CHECKOUT LOCATION
+                // =====================================================
+
+                attendance.CheckOutLocation =
+                    location;
+                attendance.CheckOutLatitude = latitude;
+                attendance.CheckOutLongitude = longitude;
+                attendance.CheckOutAccuracy = accuracy;
+                // =====================================================
+                // ATTENDANCE SOURCE / REMARKS
+                // =====================================================
+
+                if (attendance.AttendanceSource == "Biometric")
+                {
+                    attendance.Remarks =
+                        string.IsNullOrWhiteSpace(attendance.Remarks)
+                            ? "Check-out marked manually by employee."
+                            : attendance.Remarks +
+                              " Check-out marked manually by employee.";
+                }
+                else
+                {
+                    attendance.AttendanceSource =
+                        "Manual";
+
+                    attendance.Remarks =
+                        "Check-out marked manually by employee.";
+                }
+
+                // =====================================================
+                // SAVE
+                // =====================================================
+
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+
+                    message =
+                        "Check-out marked successfully.",
+
+                    time =
+                        now.ToString("hh:mm tt"),
+
+                    location =
+                        location,
+
+                    source =
+                        attendance.AttendanceSource
+                });
+            }
+            catch (Exception)
+            {
+                return Json(new
+                {
+                    success = false,
+
+                    message =
+                        "Unable to mark check-out. Please try again."
+                });
+            }
+        }
+
+        private async Task<string> GetLocationAddress(
+    double latitude,
+    double longitude)
+        {
+            try
+            {
+                using var client = new HttpClient();
+
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                    "TSSC-Unified-Portal/1.0");
+
+                var url =
+                    $"https://nominatim.openstreetmap.org/reverse" +
+                    $"?lat={latitude}" +
+                    $"&lon={longitude}" +
+                    $"&format=json";
+
+                var response =
+                    await client.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                    return "Location unavailable";
+
+                var json =
+                    await response.Content.ReadAsStringAsync();
+
+                using var document =
+                    JsonDocument.Parse(json);
+
+                if (document.RootElement.TryGetProperty(
+                    "display_name",
+                    out var displayName))
+                {
+                    return displayName.GetString()
+                           ?? "Location unavailable";
+                }
+
+                return "Location unavailable";
+            }
+            catch
+            {
+                return "Location unavailable";
+            }
         }
     }
 }

@@ -1,0 +1,776 @@
+﻿@using TSSC.Unified.Models
+@model Employee
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+	Layout = "_Layout";
+}
+
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+
+            <h3 class="nk-block-title page-title">
+                My Profile
+            </h3>
+
+            <div class="nk-block-des text-soft">
+                <p>
+                    View your personal and employment information.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="nk-block nk-block-lg">
+
+    <div class="card card-preview">
+
+        <div class="card-inner">
+
+            <div class="preview-block">
+
+                <div class="row gy-4">
+
+
+                    <div class="col-12 profile-section">
+
+                        <div class="profile-section-header">
+
+                            <div class="profile-section-icon personal-icon">
+                                <em class="ni ni-user-alt"></em>
+                            </div>
+
+                            <div class="profile-section-content">
+
+                                <h5 class="profile-section-title">
+                                    Personal Information
+                                </h5>
+
+                                <span class="profile-section-subtitle">
+                                    Your basic personal details
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Employee Code -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            Employee Code
+                        </label>
+
+                        <div class="profile-value">
+
+                            <span>
+                                @Model.EmployeeCode
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- First Name -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            First Name
+                        </label>
+
+                        <div class="profile-value">
+
+                            <span>
+                                @Model.FirstName
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Last Name -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            Last Name
+                        </label>
+
+                        <div class="profile-value">
+
+                            <span>
+                                @Model.LastName
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Official Email -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            Official Email
+                        </label>
+
+                        <div class="profile-value">
+
+                            <em class="ni ni-mail-fill"></em>
+
+                            <span>
+                                @Model.OfficialEmail
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Mobile Number -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            Mobile Number
+                        </label>
+
+                        <div class="profile-value">
+
+                            <em class="ni ni-mobile"></em>
+
+                            <span>
+                                @Model.MobileNo
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Gender -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            Gender
+                        </label>
+
+                        <div class="profile-value">
+
+                            <span>
+                                @Model.Gender
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ===================================================== -->
+                    <!-- EMPLOYMENT INFORMATION -->
+                    <!-- ===================================================== -->
+
+                    <div class="col-12 profile-section">
+
+                        <div class="profile-section-header">
+
+                            <div class="profile-section-icon employment-icon">
+                                <em class="ni ni-briefcase"></em>
+                            </div>
+
+                            <div class="profile-section-content">
+
+                                <h5 class="profile-section-title">
+                                    Employment Information
+                                </h5>
+
+                                <span class="profile-section-subtitle">
+                                    Your role and employment details
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Department -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            Department
+                        </label>
+
+                        <div class="profile-value">
+
+                            <em class="ni ni-building"></em>
+
+                            <span>
+                                @(Model.Department?.DepartmentName ?? "Not available")
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Designation -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            Designation
+                        </label>
+
+                        <div class="profile-value">
+
+                            <em class="ni ni-user-check"></em>
+
+                            <span>
+                                @(Model.Designation?.DesignationName ?? "Not available")
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Date of Joining -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            Date of Joining
+                        </label>
+
+                        <div class="profile-value">
+
+                            <em class="ni ni-calendar-alt"></em>
+
+                            <span>
+
+                                @if (Model.JoiningDate != null)
+                                {
+                                    @Model.JoiningDate?.ToString("dd MMM yyyy")
+                                }
+                                else
+                                {
+                                    <span class="text-soft">
+                                        Not available
+                                    </span>
+                                }
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Reporting Manager -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            Reporting Manager
+                        </label>
+
+                        <div class="profile-value">
+
+                            <em class="ni ni-user-list"></em>
+
+                            <span>
+                                @(Model.ReportingManager != null
+                                    ? $"{Model.ReportingManager.FirstName} {Model.ReportingManager.LastName}".Trim()
+                                    : "Not assigned")
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Employment Status -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            Employment Status
+                        </label>
+
+                        <div class="profile-value">
+
+                            @if (Model.IsActive)
+                            {
+                                <span class="status-wrapper">
+
+                                    <span class="status-dot status-active"></span>
+
+                                    <span class="status-active-text">
+                                        Active
+                                    </span>
+
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-wrapper">
+
+                                    <span class="status-dot status-inactive"></span>
+
+                                    <span class="status-inactive-text">
+                                        Inactive
+                                    </span>
+
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ===================================================== -->
+                    <!-- CONTACT INFORMATION -->
+                    <!-- ===================================================== -->
+
+                    <div class="col-12 profile-section">
+
+                        <div class="profile-section-header">
+
+                            <div class="profile-section-icon contact-icon">
+                                <em class="ni ni-call"></em>
+                            </div>
+
+                            <div class="profile-section-content">
+
+                                <h5 class="profile-section-title">
+                                    Contact Information
+                                </h5>
+
+                                <span class="profile-section-subtitle">
+                                    Your contact and communication details
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Current Address -->
+
+                    <div class="col-md-8">
+
+                        <label class="form-label profile-label">
+                            Current Address
+                        </label>
+
+                        <div class="profile-value">
+
+                            <em class="ni ni-map-pin"></em>
+
+                            <span>
+                                @(string.IsNullOrWhiteSpace(Model.CurrentAddress)
+                                    ? "Not available"
+                                    : Model.CurrentAddress)
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Alternate Mobile -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            Alternate Mobile
+                        </label>
+
+                        <div class="profile-value">
+
+                            <em class="ni ni-mobile"></em>
+
+                            <span>
+                                @(string.IsNullOrWhiteSpace(Model.AlternateMobile)
+                                    ? "Not available"
+                                    : Model.AlternateMobile)
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    /* =========================================================
+           PROFILE FIELD
+           ========================================================= */
+
+    .profile-value {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 13px;
+        background: #f8f9fc;
+        border: 1px solid #e5e9f2;
+        border-radius: 5px;
+        color: #364a63;
+        font-size: 14px;
+        line-height: 1.5;
+        word-break: break-word;
+        transition: all .2s ease;
+    }
+
+
+        .profile-value:hover {
+            background: #f5f7fb;
+            border-color: #d7deea;
+        }
+
+
+        /* =========================================================
+           FIELD ICON
+           ========================================================= */
+
+        .profile-value > em {
+            flex-shrink: 0;
+            color: #8094ae;
+            font-size: 16px;
+        }
+
+
+    /* =========================================================
+           FIELD LABEL
+           ========================================================= */
+
+    .profile-label {
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #8094ae;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+    }
+
+
+    /* =========================================================
+           SECTION DESCRIPTION
+           ========================================================= */
+
+    .text-soft {
+        color: #8094ae;
+    }
+
+
+    /* =========================================================
+           EMPLOYMENT STATUS
+           ========================================================= */
+
+    .status-wrapper {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+
+    .status-active {
+        background-color: #20c997;
+    }
+
+
+    .status-active-text {
+        color: #00a878;
+        font-weight: 600;
+    }
+
+
+    .status-inactive {
+        background-color: #e85347;
+    }
+
+
+    .status-inactive-text {
+        color: #e85347;
+        font-weight: 600;
+    }
+
+    /* =========================================================
+       PROFILE SECTION
+       ========================================================= */
+
+    .profile-section {
+        margin-top: 24px;
+        margin-bottom: 4px;
+        padding-top: 4px;
+    }
+
+
+        /* First section should not have extra top spacing */
+
+        .profile-section:first-child {
+            margin-top: 10;
+        }
+
+
+    /* =========================================================
+       SECTION HEADER
+       ========================================================= */
+
+    .profile-section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 0 0 10px 0;
+        border-bottom: 1px solid #e5e9f2;
+    }
+
+
+    /* =========================================================
+       SECTION ICON
+       ========================================================= */
+
+    .profile-section-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+    }
+
+
+        .profile-section-icon em {
+            font-size: 18px;
+        }
+
+
+    /* Personal */
+
+    .personal-icon {
+        background: #eef4ff;
+        color: #1b4d89;
+    }
+
+
+    /* Employment */
+
+    .employment-icon {
+        background: #fff4ec;
+        color: #d9622f;
+    }
+
+
+    /* Contact */
+
+    .contact-icon {
+        background: #eef9f4;
+        color: #198754;
+    }
+
+
+    /* =========================================================
+       SECTION CONTENT
+       ========================================================= */
+
+    .profile-section-content {
+        min-width: 0;
+        flex: 1;
+    }
+
+
+    /* =========================================================
+       SECTION TITLE
+       ========================================================= */
+
+    .profile-section-title {
+        margin: 0;
+        color: #1b2a4a;
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.3;
+        white-space: normal;
+    }
+
+
+    /* =========================================================
+       SECTION SUBTITLE
+       ========================================================= */
+
+    .profile-section-subtitle {
+        display: block;
+        margin-top: 2px;
+        color: #8094ae;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+
+    /* =========================================================
+       PROFILE FIELDS
+       ========================================================= */
+
+    .profile-value {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 13px;
+        background: #f8f9fc;
+        border: 1px solid #e5e9f2;
+        border-radius: 5px;
+        color: #364a63;
+        font-size: 14px;
+        line-height: 1.5;
+        word-break: break-word;
+    }
+
+
+        .profile-value > em {
+            flex-shrink: 0;
+            color: #8094ae;
+            font-size: 16px;
+        }
+
+
+    /* =========================================================
+       FIELD LABEL
+       ========================================================= */
+
+    .profile-label {
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #8094ae;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+    }
+
+
+    /* =========================================================
+       STATUS
+       ========================================================= */
+
+    .status-wrapper {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+
+    .status-active {
+        background: #20c997;
+    }
+
+
+    .status-active-text {
+        color: #00a878;
+        font-weight: 600;
+    }
+
+
+    .status-inactive {
+        background: #e85347;
+    }
+
+
+    .status-inactive-text {
+        color: #e85347;
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @@media (max-width: 767px) {
+        .profile-section
+
+    {
+        margin-top: 20px;
+    }
+
+    .profile-section-title {
+        font-size: 16px;
+    }
+
+    .profile-section-icon {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+    }
+
+    }
+
+    /* =========================================================
+           MOBILE
+           ========================================================= */
+
+    @@media (max-width: 767px) {
+        .profile-value
+
+    {
+        min-height: 42px;
+    }
+
+    }
+</style>
+

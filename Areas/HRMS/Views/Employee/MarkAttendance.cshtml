@@ -1,0 +1,966 @@
+﻿@using TSSC.Unified.ViewModel
+@model EmployeeAttendanceVM
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Mark Attendance";
+}
+<style>
+    .attendance-btn-loader {
+        width: 18px;
+        height: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+        .attendance-btn-loader .loading-animation.duo-pulse {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            left: 0;
+            top: 0;
+        }
+
+    #btnCheckIn,
+    #btnCheckOut {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+<div class="nk-block nk-block-lg">
+
+    <div class="card card-preview">
+
+        <div class="card-inner">
+
+            <div class="preview-block">
+
+                <div class="row gy-4">
+
+                    <!-- =========================================
+                         HEADER
+                    ========================================== -->
+
+                    <div class="col-12">
+
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+
+                            <div>
+
+                                <h4 class="title mb-1">
+                                    Mark Attendance
+                                </h4>
+
+                                <p class="text-soft mb-0">
+                                    Record your attendance for today.
+                                </p>
+
+                            </div>
+
+                            <span class="badge bg-light-primary text-primary">
+                                @Model.AttendanceDate.ToString("dd MMM yyyy")
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================================
+                         EMPLOYEE INFORMATION
+                    ========================================== -->
+
+                    <div class="col-12">
+
+                        <div class="card border">
+
+                            <div class="card-inner">
+
+                                <div class="row gy-3">
+
+                                    <div class="col-md-4">
+
+                                        <label class="form-label text-soft">
+                                            Employee Code
+                                        </label>
+
+                                        <div class="form-control bg-light">
+                                            @Model.EmployeeCode
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-md-4">
+
+                                        <label class="form-label text-soft">
+                                            Employee Name
+                                        </label>
+
+                                        <div class="form-control bg-light">
+                                            @Model.EmployeeName
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-md-4">
+
+                                        <label class="form-label text-soft">
+                                            Attendance Status
+                                        </label>
+
+                                        <div class="form-control bg-light">
+
+                                            @if (Model.IsCheckedOut)
+                                            {
+                                                <span class="badge bg-success">
+                                                    Completed
+                                                </span>
+                                            }
+                                            else if (Model.IsCheckedIn)
+                                            {
+                                                <span class="badge bg-success">
+                                                    Present
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">
+                                                    Not Marked
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================================
+                         CHECK IN
+                    ========================================== -->
+
+                    <div class="col-md-6">
+
+                        <div class="card border h-100">
+
+                            <div class="card-inner">
+
+                                <div class="d-flex align-items-center gap-2 mb-4">
+
+                                    <div class="icon-circle bg-light-success">
+
+                                        <em class="icon ni ni-login"></em>
+
+                                    </div>
+
+                                    <div>
+
+                                        <h5 class="mb-0">
+                                            Check In
+                                        </h5>
+
+                                        <small class="text-soft">
+                                            Start your work day
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="mb-4">
+
+                                    <label class="form-label">
+                                        Check In Time
+                                    </label>
+
+                                    <div class="form-control bg-light"
+                                         id="checkInTime">
+
+                                        @if (Model.InTime.HasValue)
+                                        {
+                                            @Model.InTime.Value.ToString("hh:mm tt")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-soft">
+                                                Not checked in
+                                            </span>
+                                        }
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="d-flex gap-2 flex-wrap">
+
+                                    @* <button type="button"
+                                            id="btnLocationIn"
+                                            class="btn btn-outline-primary">
+
+                                        <em class="icon ni ni-location me-1"></em>
+
+                                        Get Location
+
+                                    </button> *@
+
+
+                                    <button type="button"
+                                            id="btnCheckIn"
+                                            class="btn btn-primary"
+                                    @(Model.IsCheckedIn ? "disabled" : "")>
+
+                                        <em class="icon ni ni-login me-1"></em>
+
+                                        Check In
+
+                                    </button>
+
+                                </div>
+
+
+                                <small id="locationInStatus"
+                                       class="text-soft d-block mt-3">
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================================
+                         CHECK OUT
+                    ========================================== -->
+
+                    <div class="col-md-6">
+
+                        <div class="card border h-100">
+
+                            <div class="card-inner">
+
+                                <div class="d-flex align-items-center gap-2 mb-4">
+
+                                    <div class="icon-circle bg-light-danger">
+
+                                        <em class="icon ni ni-logout"></em>
+
+                                    </div>
+
+                                    <div>
+
+                                        <h5 class="mb-0">
+                                            Check Out
+                                        </h5>
+
+                                        <small class="text-soft">
+                                            End your work day
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="mb-4">
+
+                                    <label class="form-label">
+                                        Check Out Time
+                                    </label>
+
+                                    <div class="form-control bg-light"
+                                         id="checkOutTime">
+
+                                        @if (Model.OutTime.HasValue)
+                                        {
+                                            @Model.OutTime.Value.ToString("hh:mm tt")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-soft">
+                                                Not checked out
+                                            </span>
+                                        }
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="d-flex gap-2 flex-wrap">
+
+                                   @*  <button type="button"
+                                            id="btnLocationOut"
+                                            class="btn btn-outline-primary">
+
+                                        <em class="icon ni ni-location me-1"></em>
+
+                                        Get Location
+
+                                    </button> *@
+
+
+                                    <button type="button"
+                                            id="btnCheckOut"
+                                            class="btn btn-danger"
+                                    @(!Model.IsCheckedIn || Model.IsCheckedOut ? "disabled" : "")>
+
+                                        <em class="icon ni ni-logout me-1"></em>
+
+                                        Check Out
+
+                                    </button>
+
+                                </div>
+
+
+                                <small id="locationOutStatus"
+                                       class="text-soft d-block mt-3">
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+ 
+@section Scripts {
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // =====================================================
+            // CSRF TOKEN
+            // =====================================================
+
+            const token =
+                document.querySelector(
+                    'input[name="__RequestVerificationToken"]'
+                )?.value;
+
+
+            // =====================================================
+            // LOCATION VARIABLES
+            // =====================================================
+
+            let checkInLocation = null;
+            let checkOutLocation = null;
+
+
+            // =====================================================
+            // GET CURRENT LOCATION
+            // =====================================================
+
+            function getCurrentLocation() {
+
+                return new Promise((resolve, reject) => {
+
+                    if (!navigator.geolocation) {
+
+                        reject(
+                            "Geolocation is not supported by this browser."
+                        );
+
+                        return;
+                    }
+
+
+                    navigator.geolocation.getCurrentPosition(
+
+                        function (position) {
+
+                            const location = {
+
+                                latitude:
+                                    position.coords.latitude,
+
+                                longitude:
+                                    position.coords.longitude,
+
+                                accuracy:
+                                    position.coords.accuracy
+
+                            };
+
+
+                            console.log(
+                                "Captured Location:",
+                                location
+                            );
+
+
+                            resolve(location);
+
+                        },
+
+                        function (error) {
+
+                            let message =
+                                "Unable to get your location.";
+
+                            switch (error.code) {
+
+                                case error.PERMISSION_DENIED:
+
+                                    message =
+                                        "Location permission was denied. Please allow location access.";
+
+                                    break;
+
+                                case error.POSITION_UNAVAILABLE:
+
+                                    message =
+                                        "Your current location is unavailable.";
+
+                                    break;
+
+                                case error.TIMEOUT:
+
+                                    message =
+                                        "Location request timed out. Please try again.";
+
+                                    break;
+
+                            }
+
+
+                            reject(message);
+
+                            console.error(
+                                "Geolocation Error:",
+                                error
+                            );
+
+                        },
+
+                        {
+
+                            enableHighAccuracy: true,
+
+                            timeout: 15000,
+
+                            maximumAge: 0
+
+                        }
+
+                    );
+
+                });
+
+            }
+
+
+            // =====================================================
+            // GET LOCATION - CHECK IN
+            // =====================================================
+
+           
+
+            // =====================================================
+            // CHECK IN
+            // =====================================================
+
+                   // =====================================================
+        // CHECK IN
+        // =====================================================
+
+        document
+            .getElementById("btnCheckIn")
+            ?.addEventListener("click", async function () {
+
+                const button = this;
+
+                const originalHtml =
+                    button.innerHTML;
+
+                button.disabled = true;
+
+                        button.innerHTML = `
+            <span class="d-inline-flex align-items-center justify-content-center gap-2" style="white-space: nowrap;">
+                <span class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </span>
+                Check In
+            </span>
+        `;
+
+                try {
+
+                    // =================================================
+                    // GET LOCATION AUTOMATICALLY
+                    // =================================================
+
+                    const location =
+                        await getCurrentLocation();
+
+
+                    console.log(
+                        "Check-In Location:",
+                        location
+                    );
+
+
+                    // =================================================
+                    // SHOW LOCATION
+                    // =================================================
+
+                    const status =
+                        document.getElementById(
+                            "locationInStatus"
+                        );
+
+
+                    if (status) {
+
+                        status.innerHTML = `
+                            <div class="location-success mt-4">
+                                <em class="icon ni ni-check-circle me-1"></em>
+                                Location detected
+                            </div>
+
+                            <div class="location-coordinates">
+                                Latitude:
+                                ${location.latitude.toFixed(6)}
+                                <br>
+
+                                Longitude:
+                                ${location.longitude.toFixed(6)}
+                                <br>
+
+                                Accuracy:
+                                ${Math.round(location.accuracy)} meters
+                            </div>
+                        `;
+
+                    }
+
+
+                    // =================================================
+                    // CHANGE BUTTON TEXT
+                    // =================================================
+
+                                   
+
+
+                    // =================================================
+                    // SEND LOCATION TO SERVER
+                    // =================================================
+
+                    const formData =
+                        new FormData();
+
+
+                    formData.append(
+                        "__RequestVerificationToken",
+                        token
+                    );
+
+
+                    formData.append(
+                        "latitude",
+                        location.latitude
+                    );
+
+
+                    formData.append(
+                        "longitude",
+                        location.longitude
+                    );
+
+
+                    formData.append(
+                        "accuracy",
+                        location.accuracy
+                    );
+
+
+                    const response =
+                        await fetch(
+                            '@Url.Action("CheckIn", "Employee")',
+                            {
+                                method: "POST",
+                                body: formData
+                            }
+                        );
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            `Server error: ${response.status}`
+                        );
+
+                    }
+
+
+                    const result =
+                        await response.json();
+
+
+                    // =================================================
+                    // SUCCESS
+                    // =================================================
+
+                    if (result.success) {
+
+                        document
+                            .getElementById("checkInTime")
+                            .innerText =
+                                result.time;
+
+
+                        button.innerHTML =
+                            '<em class="icon ni ni-check me-1"></em> Checked In';
+
+
+                        button.classList.remove(
+                            "btn-primary"
+                        );
+
+
+                        button.classList.add(
+                            "btn-success"
+                        );
+
+
+                        // Enable checkout
+
+                        const checkOutButton =
+                            document.getElementById(
+                                "btnCheckOut"
+                            );
+
+
+                        if (checkOutButton) {
+
+                            checkOutButton.disabled =
+                                false;
+
+                        }
+
+
+                        alert(
+                            result.message
+                        );
+
+                    }
+                    else {
+
+                        button.disabled =
+                            false;
+
+                        button.innerHTML =
+                            originalHtml;
+
+
+                        alert(
+                            result.message
+                        );
+
+                    }
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Check-In Error:",
+                        error
+                    );
+
+
+                    button.disabled =
+                        false;
+
+
+                    button.innerHTML =
+                        originalHtml;
+
+
+                    alert(
+                        typeof error === "string"
+                            ? error
+                            : "Unable to mark check-in."
+                    );
+
+                }
+
+            });
+
+
+            // =====================================================
+            // CHECK OUT
+            // =====================================================
+
+                   // =====================================================
+        // CHECK OUT
+        // =====================================================
+
+        document
+            .getElementById("btnCheckOut")
+            ?.addEventListener("click", async function () {
+
+                const button = this;
+
+
+                if (button.disabled)
+                    return;
+
+
+                const originalHtml =
+                    button.innerHTML;
+
+
+                button.disabled = true;
+
+
+                                       // Use min-width, not width — prevents shrinking, still allows growing for longer content
+        button.style.minWidth = button.offsetWidth + 'px';
+        button.disabled = true;
+
+        button.innerHTML = `
+            <span class="d-inline-flex align-items-center justify-content-center gap-2" style="white-space: nowrap;">
+                <span class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </span>
+                Checking Out...
+            </span>
+        `;
+
+        // ... after your async action completes:
+        // button.style.minWidth = '';
+        // button.disabled = false;
+        // button.innerHTML = 'Check Out';
+
+        // ... after your async action completes:
+        // button.style.minWidth = '';
+        // button.disabled = false;
+        // button.innerHTML = 'Check Out';
+
+        // ... after your async action completes:
+        // button.style.width = '';
+        // button.disabled = false;
+        // button.innerHTML = 'Check Out';
+
+
+                try {
+
+                    // =================================================
+                    // GET LOCATION AUTOMATICALLY
+                    // =================================================
+
+                    const location =
+                        await getCurrentLocation();
+
+
+                    console.log(
+                        "Check-Out Location:",
+                        location
+                    );
+
+
+                    // =================================================
+                    // SHOW LOCATION
+                    // =================================================
+
+                    const status =
+                        document.getElementById(
+                            "locationOutStatus"
+                        );
+
+
+                    if (status) {
+
+                        status.innerHTML = `
+                            <div class="location-success mt-4">
+                                <em class="icon ni ni-check-circle me-1"></em>
+                                Location detected
+                            </div>
+
+                            <div class="location-coordinates">
+                                Latitude:
+                                ${location.latitude.toFixed(6)}
+                                <br>
+
+                                Longitude:
+                                ${location.longitude.toFixed(6)}
+                                <br>
+
+                                Accuracy:
+                                ${Math.round(location.accuracy)} meters
+                            </div>
+                        `;
+
+                    }
+
+
+                    // =================================================
+                    // CHANGE BUTTON TEXT
+                    // =================================================
+
+        //                     button.innerHTML = `
+        //     <span class="spinner-border spinner-border-sm me-1" role="status">
+        //         <span class="visually-hidden">Loading...</span>
+        //     </span>
+        //     Check-Out...
+        // `;
+
+
+                    // =================================================
+                    // SEND LOCATION TO SERVER
+                    // =================================================
+
+                    const formData =
+                        new FormData();
+
+
+                    formData.append(
+                        "__RequestVerificationToken",
+                        token
+                    );
+
+
+                    formData.append(
+                        "latitude",
+                        location.latitude
+                    );
+
+
+                    formData.append(
+                        "longitude",
+                        location.longitude
+                    );
+
+
+                    formData.append(
+                        "accuracy",
+                        location.accuracy
+                    );
+
+
+                    const response =
+                        await fetch(
+                            '@Url.Action("CheckOut", "Employee")',
+                            {
+                                method: "POST",
+                                body: formData
+                            }
+                        );
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            `Server error: ${response.status}`
+                        );
+
+                    }
+
+
+                    const result =
+                        await response.json();
+
+
+                    // =================================================
+                    // SUCCESS
+                    // =================================================
+
+                    if (result.success) {
+
+                        document
+                            .getElementById("checkOutTime")
+                            .innerText =
+                                result.time;
+
+
+                        button.innerHTML =
+                            '<em class="icon ni ni-check me-1"></em> Checked Out';
+
+
+                        button.classList.remove(
+                            "btn-danger"
+                        );
+
+
+                        button.classList.add(
+                            "btn-success"
+                        );
+
+
+                        alert(
+                            result.message
+                        );
+
+                    }
+                    else {
+
+                        button.disabled =
+                            false;
+
+                        button.innerHTML =
+                            originalHtml;
+
+
+                        alert(
+                            result.message
+                        );
+
+                    }
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Check-Out Error:",
+                        error
+                    );
+
+
+                    button.disabled =
+                        false;
+
+
+                    button.innerHTML =
+                        originalHtml;
+
+
+                    alert(
+                        typeof error === "string"
+                            ? error
+                            : "Unable to mark check-out."
+                    );
+
+                }
+
+            });
+
+        });
+
+    </script>
+}
+
