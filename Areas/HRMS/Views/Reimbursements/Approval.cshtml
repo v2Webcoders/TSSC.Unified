@@ -1,0 +1,327 @@
+﻿@model List<TSSC.Unified.ViewModel.ReimbursementsVM>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Pending Approval";
+
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+
+            <h3 class="nk-block-title page-title">
+                Pending Approval
+            </h3>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="nk-content-inner">
+
+    <div class="nk-content-body">
+
+        <div class="card card-bordered">
+
+            <div class="card-inner">
+
+
+                @* ================= SUCCESS MESSAGE ================= *@
+
+                @if (TempData["msg"] != null)
+                {
+                    <div class="example-alert w-100">
+
+                        <div class="alert alert-success alert-icon">
+
+                            <em class="icon ni ni-check-circle"></em>
+
+                            <strong>
+                                @TempData["msg"]
+                            </strong>
+
+                        </div>
+
+                    </div>
+                }
+
+
+                @* ================= ERROR MESSAGE ================= *@
+
+                @if (TempData["error"] != null)
+                {
+                    <div class="example-alert w-100">
+
+                        <div class="alert alert-danger alert-icon">
+
+                            <em class="icon ni ni-cross-circle"></em>
+
+                            <strong>
+                                @TempData["error"]
+                            </strong>
+
+                        </div>
+
+                    </div>
+                }
+
+
+                @* ================= TABLE ================= *@
+
+                <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer dtr-inline collapsed">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>S.No.</th>
+
+                            <th>Request Type</th>
+
+                            <th>Expense Category</th>
+
+                            <th>Expense Amount</th>
+
+                            <th>Expense Date</th>
+
+                            <th>Vendor Name</th>
+
+                            <th>Payment Mode</th>
+
+                            <th>Purpose</th>
+
+                            <th>Employee Remarks</th>
+
+                            <th>Supporting Document</th>
+
+                            <th>Invoice / Bill</th>
+
+                            <th width="180">Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @serial
+                                    </td>
+
+
+                                    <td>
+                                        @item.RequestType
+                                    </td>
+
+
+                                    <td>
+                                        @item.ExpenseCategory
+                                    </td>
+
+
+                                    <td>
+                                        ₹ @item.ExpenseAmount.ToString("N2")
+                                    </td>
+
+
+                                    <td>
+                                        @item.ExpenseDate.ToString("dd-MMM-yyyy")
+                                    </td>
+
+
+                                    <td>
+
+                                        @(string.IsNullOrEmpty(item.VendorName)
+                                                                        ? "-"
+                                                                        : item.VendorName)
+
+                                    </td>
+
+
+                                    <td>
+
+                                        @(string.IsNullOrEmpty(item.PaymentMode)
+                                                                        ? "-"
+                                                                        : item.PaymentMode)
+
+                                    </td>
+
+
+                                    <td>
+
+                                        @(string.IsNullOrEmpty(item.Purpose)
+                                                                        ? "-"
+                                                                        : item.Purpose)
+
+                                    </td>
+
+
+                                    <td>
+
+                                        @(string.IsNullOrEmpty(item.Remarks)
+                                                                        ? "-"
+                                                                        : item.Remarks)
+
+                            </td>
+
+
+                                    @* ================= SUPPORTING DOCUMENT ================= *@
+
+                                    <td>
+
+                                @if (!string.IsNullOrEmpty(item.SupportingDocument))
+                                        {
+                                            <a href="@Url.Content(item.SupportingDocument)"
+                                               target="_blank"
+                                               class="btn btn-sm btn-outline-info">
+
+                                                <em class="icon ni ni-file-text"></em>
+
+                                                View File
+
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+
+                                    </td>
+
+
+                                    @* ================= INVOICE / BILL ================= *@
+
+                                    <td>
+
+                                        @if (!string.IsNullOrEmpty(item.InvoiceBill))
+                                        {
+                                            <a href="@Url.Content(item.InvoiceBill)"
+                                               target="_blank"
+                                               class="btn btn-sm btn-outline-info">
+
+                                                <em class="icon ni ni-file-text"></em>
+
+                                                View Bill
+
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+
+                                    </td>
+
+
+                                    @* ================= APPROVE / REJECT ================= *@
+
+                                    <td>
+
+                                        <form asp-action="ApproveReject"
+                                              asp-controller="Reimbursements"
+                                              asp-area="HRMS"
+                                              method="post">
+
+                                            @Html.AntiForgeryToken()
+
+
+                                            <input type="hidden"
+                                                   name="reimbursementId"
+                                                   value="@item.ReimbursementId" />
+
+
+                                            <textarea name="remarks"
+                                              class="form-control mb-2"
+                                              rows="2"
+                                              placeholder="Enter your remarks"></textarea>
+
+
+                                            <div class="btn-group"
+                                                 role="group">
+
+
+                                                @* APPROVE *@
+
+                                                <button type="submit"
+                                                        name="actionType"
+                                                        value="Approve"
+                                                        class="btn btn-sm btn-outline-success"
+                                                        title="Approve">
+
+                                                    <em class="icon ni ni-check"></em>
+
+                                                </button>
+
+
+                                                @* REJECT *@
+
+                                                <button type="submit"
+                                                        name="actionType"
+                                                        value="Reject"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        title="Reject">
+
+                                                    <em class="icon ni ni-cross"></em>
+
+                                                </button>
+
+
+                                            </div>
+
+                                        </form>
+
+                                    </td>
+
+                                </tr>
+
+                                serial++;
+                            }
+                        }
+
+                    </tbody>
+
+                </table>
+
+
+                @* ================= EMPTY MESSAGE ================= *@
+
+                @if (Model == null || !Model.Any())
+                {
+                    <div class="text-center py-4">
+
+                        <em class="icon ni ni-info"
+                            style="font-size: 25px;"></em>
+
+                        <h6 class="mt-2">
+
+                            No aaproval pending for approval.
+
+                        </h6>
+
+                    </div>
+                }
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

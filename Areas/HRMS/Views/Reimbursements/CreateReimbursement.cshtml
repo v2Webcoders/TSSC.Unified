@@ -1,0 +1,553 @@
+﻿@model TSSC.Unified.ViewModel.ReimbursementsVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Apply for Approval";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                @(Model.ReimbursementId > 0
+                                ? "Edit Approval"
+                                : "Apply Approval")
+            </h3>
+        </div>
+
+        <div class="nk-block-head-content">
+            <a asp-action="MyReimbursement"
+               asp-controller="Reimbursements"
+               asp-area="HRMS"
+               class="btn btn-primary d-none d-md-inline-flex">
+
+                <em class="icon ni ni-list"></em>
+                &nbsp; My Approval list
+
+            </a>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="nk-block nk-block-lg">
+
+    <div class="card card-preview">
+
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            @Html.ValidationSummary(
+            false,
+                "",
+                new { @class = "alert alert-danger" }
+                )
+                }
+
+
+        @if (TempData["msg"] != null)
+        {
+            <div class="example-alert w-100">
+
+                <div class="alert alert-success alert-icon">
+
+                    <em class="icon ni ni-check-circle"></em>
+
+                    <strong>
+                        @TempData["msg"]
+                    </strong>
+
+                </div>
+
+            </div>
+        }
+
+
+        <div class="card-inner">
+
+            <form asp-action="CreateReimbursement"
+                  asp-controller="Reimbursements"
+                  asp-area="HRMS"
+                  method="post"
+                  enctype="multipart/form-data">
+
+
+                <input type="hidden"
+                       asp-for="ReimbursementId" />
+
+                <input type="hidden"
+                       asp-for="EmployeeId" />
+
+
+                <div class="row gy-3">
+
+
+                    <!-- ===================================== -->
+                    <!-- REIMBURSEMENT INFORMATION -->
+                    <!-- ===================================== -->
+
+                    <div class="col-12 mb-4">
+
+                        <div style="border-left:4px solid #D9622F;
+                                    padding:5px 0 5px 12px;">
+
+                            <h5 class="mb-0 d-flex align-items-center gap-2"
+                                style="color:#1B2A4A;">
+
+                                <em class="ni ni-wallet"></em>
+
+                                Approval Information
+
+                            </h5>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Request Type -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Request Type
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <select asp-for="RequestType"
+                                asp-items="Model.RequestTypeList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Request Type
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="RequestType"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Expense Category -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Expense Category
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <select asp-for="ExpenseCategory"
+                                asp-items="Model.ExpenseCategoryList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Expense Category
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="ExpenseCategory"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Expense Amount -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Expense Amount
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input asp-for="ExpenseAmount"
+                               type="number"
+                               step="0.01"
+                               class="form-control"
+                               placeholder="Enter Expense Amount" />
+
+                        <span asp-validation-for="ExpenseAmount"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Expense Date -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Expense Date
+                        </label>
+
+                        <input asp-for="ExpenseDate"
+                               type="date"
+                               class="form-control" />
+
+                        <span asp-validation-for="ExpenseDate"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Vendor Name -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Vendor Name
+                        </label>
+
+                        <input asp-for="VendorName"
+                               class="form-control"
+                               placeholder="Enter Vendor Name" />
+
+                    </div>
+
+
+                    <!-- Payment Mode -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Payment Mode
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <select asp-for="PaymentMode"
+                                asp-items="Model.PaymentModeList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Payment Mode
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="PaymentMode"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Purpose -->
+
+                    <div class="col-md-12">
+
+                        <label class="form-label">
+                            Purpose
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <textarea asp-for="Purpose"
+                                  rows="4"
+                                  class="form-control"
+                                  placeholder="Enter purpose of approval"></textarea>
+
+                        <span asp-validation-for="Purpose"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ===================================== -->
+                    <!-- APPROVAL SELECTION -->
+                    <!-- ===================================== -->
+
+                    <div class="col-12 mt-3 mb-3">
+
+                        <div style="border-left:4px solid #D9622F;
+                                    padding:5px 0 5px 12px;">
+
+                            <h5 class="mb-0 d-flex align-items-center gap-2"
+                                style="color:#1B2A4A;">
+
+                                <em class="icon ni ni-users"></em>
+
+                                Approval Selection
+
+                            </h5>
+
+                        </div>
+
+                    </div>
+                    <!-- Approver 1 -->
+
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            Approver 1
+                        </label>
+
+                        <input type="text"
+                               asp-for="Approver1Name"
+                               class="form-control"
+                               readonly />
+
+                        <input type="hidden"
+                               asp-for="Approver1Id" />
+                    </div>
+
+                    <!-- Approver Department -->
+@* 
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Approver Department
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <select asp-for="ApproverDepartmentId"
+                                asp-items="Model.DepartmentList"
+                                class="form-select"
+                                id="ApproverDepartment">
+
+                            <option value="">
+                                Select Department
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="ApproverDepartmentId"
+                              class="text-danger">
+                        </span>
+
+                    </div> *@
+
+
+                   
+
+
+                    <!-- Approver 2 -->
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Approver 2
+                        </label>
+
+                        <select asp-for="Approver2Id"
+                                asp-items="Model.ApproverList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Approver 2
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="Approver2Id"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Approver 3 -->
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Approver 3
+                        </label>
+
+                        <select asp-for="Approver3Id"
+                                asp-items="Model.ApproverList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Approver 3
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="Approver3Id"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Approver 4 -->
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Approver 4
+                        </label>
+
+                        <select asp-for="Approver4Id"
+                                asp-items="Model.ApproverList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Approver 4
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="Approver4Id"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ===================================== -->
+                    <!-- DOCUMENTS -->
+                    <!-- ===================================== -->
+                    <!-- Supporting Document -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Supporting Document
+                        </label>
+
+                        <input asp-for="SupportingDocumentFile"
+                               type="file"
+                               class="form-control" />
+
+                        @if (!string.IsNullOrEmpty(Model.SupportingDocument))
+                        {
+                            <div class="mt-2">
+
+                                <a href="@Url.Content(Model.SupportingDocument)"
+                                   target="_blank"
+                                   class="btn btn-sm btn-info">
+
+                                    <em class="icon ni ni-file"></em>
+
+                                    View Current Document
+
+                                </a>
+
+                            </div>
+                        }
+
+                        <input type="hidden"
+                               asp-for="SupportingDocument" />
+
+                    </div>
+
+
+                    <!-- Invoice / Bill -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Invoice / Bill
+                        </label>
+
+                        <input asp-for="InvoiceBillFile"
+                               type="file"
+                               class="form-control" />
+
+                        @if (!string.IsNullOrEmpty(Model.InvoiceBill))
+                        {
+                            <div class="mt-2">
+
+                                <a href="@Url.Content(Model.InvoiceBill)"
+                                   target="_blank"
+                                   class="btn btn-sm btn-info">
+
+                                    <em class="icon ni ni-file"></em>
+
+                                    View Current Invoice
+
+                                </a>
+
+                            </div>
+                        }
+
+                        <input type="hidden"
+                               asp-for="InvoiceBill" />
+
+                    </div>
+
+
+                    <!-- Remarks -->
+
+                    <div class="col-md-12">
+
+                        <label class="form-label">
+                            Remarks
+                        </label>
+
+                        <textarea asp-for="Remarks"
+                                  rows="4"
+                                  class="form-control"
+                                  placeholder="Enter remarks"></textarea>
+
+                    </div>
+                    <!-- BUTTONS -->
+                    <!-- ===================================== -->
+
+                    <div class="col-12 mt-4">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            @if (Model.ReimbursementId > 0)
+                            {
+                                <em class="icon ni ni-edit"></em>
+
+                                <span>
+                                    Update Reimbursement
+                                </span>
+                            }
+                            else
+                            {
+                                <em class="icon ni ni-save"></em>
+
+                                <span>
+                                    Submit Approval
+                                </span>
+                            }
+
+                        </button>
+
+
+                        <a asp-action="MyReimbursement"
+                           asp-controller="Reimbursement"
+                           asp-area="HRMS"
+                           class="btn btn-outline-secondary ms-2">
+
+                            Cancel
+
+                        </a>
+
+                    </div>
+
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    @{
+        
+    }
+
+
+   
+
+}

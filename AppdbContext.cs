@@ -46,7 +46,7 @@ namespace QUIZAPP
         public DbSet<Holiday> Holiday { get; set; }
 
         public DbSet<Reimbursement> Reimbursement { get; set; }
-
+        public DbSet<Reimbursements> Reimbursements { get; set; }
         public DbSet<EmployeeHierarchy> EmployeeHierarchy { get; set; }
 
     }

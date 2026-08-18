@@ -120,13 +120,16 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 .FirstOrDefaultAsync(x => x.TaskId == id);
 
             if (task == null)
+            {
                 return NotFound();
+            }
 
-            ViewBag.EmployeeList = new SelectList(_context.Employee
-                .Where(x => x.IsActive),
+            ViewBag.EmployeeList = new SelectList(
+                _context.Employee.Where(x => x.IsActive),
                 "EmployeeId",
                 "FirstName",
-                task.AssignedTo);
+                task.AssignedTo
+            );
 
             TaskVM model = new TaskVM
             {
@@ -140,47 +143,66 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 Attachment = task.Attachment
             };
 
-            return View("Create", model);
+            return View("EditTask", model);
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditTask(TaskVM model)
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.EmployeeList = new SelectList(_context.Employee
-                    .Where(x => x.IsActive),
+                ViewBag.EmployeeList = new SelectList(
+                    _context.Employee.Where(x => x.IsActive),
                     "EmployeeId",
                     "FirstName",
-                    model.AssignedTo);
+                    model.AssignedTo
+                );
 
-                return View("Create", model);
+                return View("EditTask", model);
             }
 
             var task = await _context.Tasks
                 .FirstOrDefaultAsync(x => x.TaskId == model.TaskId);
 
             if (task == null)
+            {
                 return NotFound();
+            }
 
             task.TaskName = model.TaskName;
             task.TaskDescription = model.TaskDescription;
             task.AssignedTo = model.AssignedTo;
             task.Deadline = model.Deadline;
             task.Remarks = model.Remarks;
-            task.Status = model.Status;
+
+            // Reopen task ka status Reopen hi rahe
+            task.Status = "Reopen";
+
+            task.IsClosed = false;
             task.UpdatedOn = DateTime.Now;
 
-            if (model.AttachmentFile != null)
+            if (model.AttachmentFile != null &&
+                model.AttachmentFile.Length > 0)
             {
-                string folder = Path.Combine(_environment.WebRootPath, "Uploads", "Tasks");
+                string folder = Path.Combine(
+                    _environment.WebRootPath,
+                    "Uploads",
+                    "Tasks"
+                );
 
                 if (!Directory.Exists(folder))
+                {
                     Directory.CreateDirectory(folder);
+                }
 
                 string fileName = Guid.NewGuid() +
                                   Path.GetExtension(model.AttachmentFile.FileName);
 
-                using (var stream = new FileStream(Path.Combine(folder, fileName), FileMode.Create))
+                string filePath = Path.Combine(folder, fileName);
+
+                using (var stream = new FileStream(
+                    filePath,
+                    FileMode.Create))
                 {
                     await model.AttachmentFile.CopyToAsync(stream);
                 }
@@ -190,7 +212,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["msg"] = "Task Updated Successfully";
+            TempData["msg"] = "Task reopened and updated successfully.";
 
             return RedirectToAction("TaskList");
         }
@@ -451,5 +473,46 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             return View("CompletedTask", model);
         }
+        [HttpGet]
+        public async Task<IActionResult> ReopenTask(int id)
+        {
+            var task = await _context.Tasks
+                .FirstOrDefaultAsync(x => x.TaskId == id);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            // Task reopen status
+            task.Status = "Reopen";
+            task.IsClosed = false;
+            task.UpdatedOn = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            // Same task edit page par jayega
+            return RedirectToAction("EditTask", new { id = task.TaskId });
+        }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> ReopenTask(int id)
+        //{
+        //    var task = await _context.Tasks
+        //        .FirstOrDefaultAsync(x => x.TaskId == id);
+
+        //    if (task == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    // Status change
+        //    task.Status = "Reopen";
+
+        //    await _context.SaveChangesAsync();
+
+        //    // Manager ko Edit page par bhejo
+        //    return RedirectToAction("EditTask", new { id = task.TaskId });
+        //}
     }
 }
