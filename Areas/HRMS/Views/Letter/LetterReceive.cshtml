@@ -120,7 +120,12 @@
 
                     <div class="col-md-4">
                         <label class="form-label">Handover To</label>
-                        <input asp-for="Handover" class="form-control" />
+                        @* <input asp-for="Handover" class="form-control" /> *@
+                        <select asp-for="Handover"
+                                asp-items="Model.EmployeeList"
+                                class="form-select">
+                            <option value="">Select Employee</option>
+                        </select>
                     </div>
 
                     <div class="col-md-4">

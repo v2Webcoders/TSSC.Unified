@@ -1,0 +1,213 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Generate Certificates";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+
+            <h3 class="nk-block-title page-title">
+                Generate Certificates
+            </h3>
+
+            <div class="nk-block-des text-soft">
+            </div>
+
+        </div>
+
+        <div class="nk-block-head-content">
+
+            <a href="/HRMS/Certificate/Index"
+               class="btn btn-primary d-none d-md-inline-flex">
+
+                <em class="icon ni ni-list"></em>&nbsp;
+                Certificate List
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="card card-bordered">
+
+    <div class="card-inner">
+
+        <div class="preview-block">
+
+            <div class="row gy-4">
+
+                <div class="col-sm-12">
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="example-alert w-100 mb-3">
+
+                            <div class="alert alert-danger alert-icon">
+
+                                <em class="icon ni ni-cross-circle"></em>
+
+                                <strong>
+                                    @TempData["Error"]
+                                </strong>
+
+                            </div>
+
+                        </div>
+                    }
+
+
+                    <form asp-area="HRMS"
+                          asp-controller="Certificate"
+                          asp-action="BulkGenerate"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        @Html.AntiForgeryToken()
+
+
+                        <input type="hidden"
+                               name="certificateId"
+                               value="@ViewBag.CertificateId" />
+
+
+                        <div class="row gy-3">
+
+                            <!-- ================= Company Name ================= -->
+
+                            <div class="col-md-12">
+
+                                <label class="form-label">
+                                    Company Name
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       value="@ViewBag.CompanyName"
+                                       readonly />
+
+                            </div>
+
+
+                            <!-- ================= Excel Upload ================= -->
+
+                            <div class="col-12 mt-3 mb-2">
+
+                                <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
+
+                                    <h5 class="mb-0 d-flex align-items-center gap-2"
+                                        style="color:#1B2A4A;">
+
+                                        <em class="ni ni-file-xls"></em>
+
+                                        Excel Upload
+
+                                    </h5>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-12">
+
+                                <label class="form-label">
+                                    Upload Excel File
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="file"
+                                       name="excelFile"
+                                       class="form-control"
+                                       accept=".xlsx"
+                                       required />
+
+                            </div>
+
+
+                            <!-- ================= Excel Format ================= -->
+
+                            <div class="col-md-12">
+
+                                <div class="alert alert-info">
+
+                                    <strong>
+                                        Excel Format
+                                    </strong>
+
+                                    <p class="mb-1">
+                                        Excel first row must contain these columns:
+                                    </p>
+
+                                    <code>
+                                        CertificateNo, CompanyName, Description, StartDate, EndDate
+                                    </code>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ================= Sample Excel ================= -->
+
+                            <div class="col-md-12">
+
+                                <a href="/HRMS/Certificate/DownloadSampleExcel"
+                                   class="btn btn-outline-success">
+
+                                    <em class="icon ni ni-download"></em>
+
+                                    <span>
+                                        Download Sample Excel
+                                    </span>
+
+                                </a>
+
+                            </div>
+
+
+                            <!-- ================= Buttons ================= -->
+
+                            <div class="col-12 mt-4">
+
+                                <button type="submit"
+                                        class="btn btn-primary">
+
+                                    <em class="icon ni ni-file-pdf"></em>
+
+                                    <span>
+                                        Generate Certificates & Download ZIP
+                                    </span>
+
+                                </button>
+
+
+                                <a href="/HRMS/Certificate/Index"
+                                   class="btn btn-outline-secondary ms-2">
+
+                                    Cancel
+
+                                </a>
+
+                            </div>
+
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -49,5 +49,16 @@ namespace QUIZAPP
         public DbSet<Reimbursements> Reimbursements { get; set; }
         public DbSet<EmployeeHierarchy> EmployeeHierarchy { get; set; }
 
+
+        //for certificate generation--------------------------------------------------------------
+        public DbSet<Certificate> Certificate { get; set; }
+        //public DbSet<CertificateTemplate> CertificateTemplates { get; set; }
+
+        //public DbSet<CertificateTemplateField> CertificateTemplateFields { get; set; }
+
+        //public DbSet<Certificate> Certificates { get; set; }
+        //----------------------------------------------------------------------------------------
+
+
     }
 }
