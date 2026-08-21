@@ -28,6 +28,80 @@
 	var isFinanceEmployee = currentUser != null
 	&& employee != null
 	&& employee.DepartmentId == 25;
+
+
+	//for reimbursement system
+	// =====================================
+	// REIMBURSEMENT SIDE MENU
+	// =====================================
+	var isCEO = currentUser != null
+		&& employee != null
+		&& employee.DepartmentId == 22;
+	bool showReimbursementApproverMenu = false;
+
+	if (employee != null)
+	{
+		var employeeId = employee.EmployeeId;
+
+		// =====================================
+		// APPROVER 2
+		// Directly menu show
+		// =====================================
+
+		var isApprover2 = Context.Reimbursements.Any(x =>
+			x.IsActive &&
+			x.Approver2Id == employeeId
+		);
+
+
+		// =====================================
+		// APPROVER 3
+		// Menu तभी show होगा जब Approver2 Approved हो
+		// =====================================
+
+		var isApprover3 = Context.Reimbursements.Any(x =>
+			x.IsActive &&
+			x.Approver3Id == employeeId &&
+			x.Approver2Status == "Approved"
+		);
+
+
+		// =====================================
+		// APPROVER 4
+		// Menu तभी show होगा जब Approver2 और
+		// Approver3 दोनों Approved हों
+		// =====================================
+
+		var isApprover4 = Context.Reimbursements.Any(x =>
+			x.IsActive &&
+			x.Approver4Id == employeeId &&
+			x.Approver2Status == "Approved" &&
+			x.Approver3Status == "Approved"
+		);
+
+		//=====================================
+		// CEO APPROVER
+		// Menu तभी show होगा जब Approver2,
+		// Approver3 ,  Approver4  Approved हों
+		// =====================================
+
+		var isCeoApprover = Context.Reimbursements.Any(x =>
+			x.IsActive &&
+			x.Approver4Id == employeeId &&
+			x.Approver2Status == "Approved" &&
+			x.Approver3Status == "Approved" &&
+				x.Approver4Status == "Approved"
+		);
+		// किसी भी condition के true होने पर
+		// तीनों menu show होंगे
+
+		showReimbursementApproverMenu =
+			isApprover2 ||
+			isApprover3 ||
+			isApprover4 ||
+			isCEO ||
+		isCeoApprover;
+	}
 }
 <style>
 	.nk-menu-item + .nk-menu-heading {
@@ -60,7 +134,7 @@
 		   class="nk-menu-link ">
 
 			<span class="nk-menu-icon">
-				<em class="icon ni ni-dashboard"></em>
+				<em class="icon ni ni-monitor"></em>
 			</span>
 
 			<span class="nk-menu-text">
@@ -119,7 +193,7 @@
 				   class="nk-menu-link">
 
 					<span class="nk-menu-text">
-						My Attendance
+						View Attendance
 					</span>
 
 				</a>
@@ -260,7 +334,7 @@
 		   class="nk-menu-link">
 
 			<span class="nk-menu-icon">
-				<em class="icon ni ni-list-check"></em>
+				<em class="icon ni ni-table-view"></em>
 			</span>
 
 			<span class="nk-menu-text">
@@ -272,60 +346,126 @@
 	</li>
 
 
-	<!-- My Reimbursements -->
+	@if (!isCEO)
+	{
+		<li class="nk-menu-item has-sub">
 
-	<li class="nk-menu-item has-sub">
+			<a href="#"
+			   class="nk-menu-link nk-menu-toggle">
 
-		<a href="#"
-		   class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-check-circle-cut"></em>
+				</span>
 
-			<span class="nk-menu-icon">
-				<em class="icon ni ni-coin"></em>
-			</span>
+				<span class="nk-menu-text">
+					Internal Approvals
+				</span>
 
-			<span class="nk-menu-text">
-				My Approvals
-			</span>
+			</a>
 
-		</a>
+			<ul class="nk-menu-sub">
 
-		<ul class="nk-menu-sub">
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursements"
+					   asp-action="CreateReimbursement"
+					   class="nk-menu-link">
 
-			<li class="nk-menu-item">
+						<span class="nk-menu-text">
+							Apply for Approval
+						</span>
 
-				<a asp-area="HRMS"
-				   asp-controller="Reimbursement"
-				   asp-action="Create"
-				   class="nk-menu-link">
+					</a>
+				</li>
 
-					<span class="nk-menu-text">
-						Add Approval Request
-					</span>
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursements"
+					   asp-action="MyReimbursement"
+					   class="nk-menu-link">
 
-				</a>
+						<span class="nk-menu-text">
+							My Approval List
+						</span>
 
-			</li>
+					</a>
+				</li>
+
+			</ul>
+
+		</li>
+	}
 
 
-			<li class="nk-menu-item">
+	@if (User.IsInRole("Letter"))
+	{
+		<!-- Letters -->
 
-				<a asp-area="HRMS"
-				   asp-controller="Reimbursement"
-				   asp-action="MyReimbursement"
-				   class="nk-menu-link">
+		<li class="nk-menu-item has-sub">
 
-					<span class="nk-menu-text">
-						My Approval Requests
-					</span>
+			<a href="#"
+			   class="nk-menu-link nk-menu-toggle">
 
-				</a>
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-mail"></em>
+				</span>
 
-			</li>
+				<span class="nk-menu-text">
+					Letters
+				</span>
 
-		</ul>
+			</a>
 
-	</li>
+			<ul class="nk-menu-sub">
 
+				<li class="nk-menu-item">
+					<a href="/HRMS/Letter/LetterReceive"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Receive Letter
+						</span>
+
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/Letter/LetterReceiveList"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Received Letter List
+						</span>
+
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/Letter/LetterSend"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Send Letter
+						</span>
+
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/Letter/LetterSendList"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Sent Letter List
+						</span>
+
+					</a>
+				</li>
+
+			</ul>
+
+		</li>
+	}
 
 	<!-- My Profile -->
 
@@ -548,11 +688,11 @@
 			   class="nk-menu-link nk-menu-toggle">
 
 				<span class="nk-menu-icon">
-					<em class="icon ni ni-file-docs"></em>
+					<em class="icon ni ni-policy-fill"></em>
 				</span>
 
 				<span class="nk-menu-text">
-					HR Policies
+					Company Policies
 				</span>
 
 			</a>
@@ -611,83 +751,7 @@
 		</li>
 
 
-		<!-- Letters -->
-
-		<li class="nk-menu-item has-sub">
-
-			<a href="#"
-			   class="nk-menu-link nk-menu-toggle">
-
-				<span class="nk-menu-icon">
-					<em class="icon ni ni-mail"></em>
-				</span>
-
-				<span class="nk-menu-text">
-					Letters
-				</span>
-
-			</a>
-
-			<ul class="nk-menu-sub">
-
-				<li class="nk-menu-item">
-
-					<a href="/HRMS/Letter/LetterReceive"
-					   class="nk-menu-link">
-
-						<span class="nk-menu-text">
-							Receive Letter
-						</span>
-
-					</a>
-
-				</li>
-
-
-				<li class="nk-menu-item">
-
-					<a href="/HRMS/Letter/LetterReceiveList"
-					   class="nk-menu-link">
-
-						<span class="nk-menu-text">
-							Received Letters
-						</span>
-
-					</a>
-
-				</li>
-
-
-				<li class="nk-menu-item">
-
-					<a href="/HRMS/Letter/LetterSend"
-					   class="nk-menu-link">
-
-						<span class="nk-menu-text">
-							Send Letter
-						</span>
-
-					</a>
-
-				</li>
-
-
-				<li class="nk-menu-item">
-
-					<a href="/HRMS/Letter/LetterSendList"
-					   class="nk-menu-link">
-
-						<span class="nk-menu-text">
-							Sent Letters
-						</span>
-
-					</a>
-
-				</li>
-
-			</ul>
-
-		</li>
+		
 
 
 		<!-- Organization Chart -->
@@ -732,7 +796,7 @@
 			   class="nk-menu-link nk-menu-toggle">
 
 				<span class="nk-menu-icon">
-					<em class="icon ni ni-check-circle"></em>
+					<em class="icon ni ni-calendar-check-fill"></em>
 				</span>
 
 				<span class="nk-menu-text">
@@ -783,7 +847,7 @@
 			   class="nk-menu-link nk-menu-toggle">
 
 				<span class="nk-menu-icon">
-					<em class="icon ni ni-list-check"></em>
+					<em class="icon ni ni-list-index-fill"></em>
 				</span>
 
 				<span class="nk-menu-text">
@@ -852,82 +916,77 @@
 			</ul>
 
 		</li>
+		@if (showReimbursementApproverMenu)
+		{
+			<li class="nk-menu-item has-sub">
+
+				<a href="#"
+				   class="nk-menu-link nk-menu-toggle">
+
+					<span class="nk-menu-icon">
+						<em class="icon ni ni-check-circle-cut"></em>
+					</span>
+
+					<span class="nk-menu-text">
+						Internal Approvals
+					</span>
+
+				</a>
+
+				<ul class="nk-menu-sub">
+
+					<li class="nk-menu-item">
+
+						<a asp-area="HRMS"
+						   asp-controller="Reimbursements"
+						   asp-action="Approval"
+						   class="nk-menu-link">
+
+							<span class="nk-menu-text">
+								Pending Approval
+							</span>
+
+						</a>
+
+					</li>
 
 
-		<!-- Reimbursement Approval -->
+					<li class="nk-menu-item">
 
-		<li class="nk-menu-item has-sub">
+						<a asp-area="HRMS"
+						   asp-controller="Reimbursements"
+						   asp-action="ApprovedReimbursement"
+						   class="nk-menu-link">
 
-			<a href="#"
-			   class="nk-menu-link nk-menu-toggle">
+							<span class="nk-menu-text">
+								Approved Approvals
+							</span>
 
-				<span class="nk-menu-icon">
-					<em class="icon ni ni-coin"></em>
-				</span>
+						</a>
 
-				<span class="nk-menu-text">
-					Approval Management
-				</span>
-
-			</a>
-
-			<ul class="nk-menu-sub">
-
-				<li class="nk-menu-item">
-
-					<a asp-area="HRMS"
-					   asp-controller="Reimbursement"
-					   asp-action="ManagerReimbursement"
-					   asp-route-status="Pending Manager Approval"
-					   class="nk-menu-link">
-
-						<span class="nk-menu-text">
-							Pending Requests
-						</span>
-
-					</a>
-
-				</li>
+					</li>
 
 
-				<li class="nk-menu-item">
+					<li class="nk-menu-item">
 
-					<a asp-area="HRMS"
-					   asp-controller="Reimbursement"
-					   asp-action="ManagerReimbursement"
-					   asp-route-status="Manager Approved"
-					   class="nk-menu-link">
+						<a asp-area="HRMS"
+						   asp-controller="Reimbursements"
+						   asp-action="RejectedReimbursement"
+						   class="nk-menu-link">
 
-						<span class="nk-menu-text">
-							Approved Requests
-						</span>
+							<span class="nk-menu-text">
+								Rejected Approvals
+							</span>
 
-					</a>
+						</a>
 
-				</li>
+					</li>
 
+				</ul>
 
-				<li class="nk-menu-item">
-
-					<a asp-area="HRMS"
-					   asp-controller="Reimbursement"
-					   asp-action="ManagerReimbursement"
-					   asp-route-status="Rejected"
-					   class="nk-menu-link">
-
-						<span class="nk-menu-text">
-							Rejected Requests
-						</span>
-
-					</a>
-
-				</li>
-
-			</ul>
-
-		</li>
+			</li>
+		}
 	}
-
 
 	<!-- ===================================================== -->
 	<!-- FINANCE - FINANCE ROLE ONLY -->
@@ -939,26 +998,6 @@
 			<h6 class="overline-title">
 				Finance
 			</h6>
-
-		</li>
-
-
-		<li class="nk-menu-item">
-
-			<a asp-area="HRMS"
-			   asp-controller="Reimbursement"
-			   asp-action="FinanceReimbursement"
-			   class="nk-menu-link">
-
-				<span class="nk-menu-icon">
-					<em class="icon ni ni-coin"></em>
-				</span>
-
-				<span class="nk-menu-text">
-					Reimbursement Management
-				</span>
-
-			</a>
 
 		</li>
 	}
@@ -983,7 +1022,7 @@
 		   class="nk-menu-link">
 
 			<span class="nk-menu-icon">
-				<em class="icon ni ni-file-docs"></em>
+				<em class="icon ni ni-policy-fill"></em>
 			</span>
 
 			<span class="nk-menu-text">

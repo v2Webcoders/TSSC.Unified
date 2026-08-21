@@ -146,10 +146,11 @@
     }
 
         .attendance-status.present {
-            background: #e4f5c9;
-            color: #557a24;
-            border-left: 3px solid #8ac926;
+            background: #E3FBF3;
+            color: #0B6B4F;
+            border-left: 3px solid #1EE0AC;
         }
+
 
     .attendance-time {
         display: flex;
@@ -254,6 +255,32 @@
 
     .holiday-dot {
         background: #f0a06a;
+    }
+
+    .attendance-source-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: help;
+        background: #ffffff;
+        color: #495057;
+        border: 1px solid #d5dae0;
+    }
+
+    .attendance-time {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .time-separator {
+        color: #8A93A8;
+        flex-shrink: 0;
     }
 </style>
 <div class="container-fluid">
@@ -514,8 +541,9 @@
 
                                             @if (attendance.OutTime.HasValue)
                                             {
+                                                <span class="time-separator">–</span>
                                                 <span>
-                                                    -
+                                                
                                                     @(attendance.OutTime.Value
                                                     .ToString("hh:mm tt"))
                                                 </span>
@@ -537,6 +565,39 @@
                                             </div>
                                         }
 
+                                        @if (!string.IsNullOrWhiteSpace(attendance.AttendanceSource))
+                                        {
+                                            var source = attendance.AttendanceSource.Trim();
+
+                                            if (source.Equals("Manual", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <span class="attendance-source-badge"
+                                                      title="Manual Attendance&#10;Location: @attendance.CheckInLocation">
+                                                    M
+                                                </span>
+                                            }
+                                            else if (source.Equals("Biometric", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <span class="attendance-source-badge"
+                                                      title="Biometric Attendance">
+                                                    B
+                                                </span>
+                                            }
+                                            else if (source.Equals("Regularized", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <span class="attendance-source-badge"
+                                                      title="Regularized Attendance">
+                                                    R
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="attendance-source-badge"
+                                                      title="@source">
+                                                    @source.Substring(0, 1).ToUpper()
+                                                </span>
+                                            }
+                                        }
                                     </div>
                                 }
                                 else if (attendance != null &&

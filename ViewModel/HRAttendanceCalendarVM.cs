@@ -35,5 +35,6 @@
         public string? CheckInLocation { get; set; }
 
         public string? CheckOutLocation { get; set; }
+        public string? AttendanceSource { get; set; }
     }
 }

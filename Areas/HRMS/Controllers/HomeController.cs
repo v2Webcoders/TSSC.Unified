@@ -1,5 +1,4 @@
-﻿using ClosedXML.Excel;
-using DocumentFormat.OpenXml.InkML;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,22 +8,33 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Security.Claims;
+using System.Xml.Linq;
 using TSSC.Unified.ViewModel;
+using iText.IO.Image;
+using iText.Kernel.Colors;
+using iText.Kernel.Geom;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Layout.Properties;
+using Paragraph = iText.Layout.Element.Paragraph;
 
 namespace QUIZAPP.Areas.HRMS.Controllers
 {
     [Area("HRMS")]
-    [Authorize(Roles = "HR, Employee")]
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
         private readonly AppdbContext _db;
         private readonly IConfiguration _configuration;
-        public HomeController(ILogger<HomeController> logger, AppdbContext db, IConfiguration configuration)
+        private readonly IWebHostEnvironment _environment;
+        public HomeController(ILogger<HomeController> logger, AppdbContext db, IConfiguration configuration, IWebHostEnvironment environment)
         {
             _logger = logger;
             _db = db;
             _configuration = configuration;
+            _environment = environment;
         }
 
         //public async Task<IActionResult> Index()
@@ -86,7 +96,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             // =====================================================
             // HR DASHBOARD
             // =====================================================
-            
+
             if (User.IsInRole("HR"))
             {
                 var today = DateTime.Today;
@@ -204,7 +214,8 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             // EMPLOYEE DASHBOARD
             // =====================================================
 
-            if (User.IsInRole("Employee"))
+            //if (User.IsInRole("Employee"))
+            else
             {
                 if (employee == null)
                     return NotFound();
@@ -341,7 +352,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                     "EmployeeDashboard",
                     model);
             }
-            return View();
+            //return View();
         }
         public IActionResult EmployeeDashboard()
         {
@@ -601,6 +612,163 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 });
             }
         }
+
+        
+
+        public IActionResult GenerateCertificate()
+        {
+            // ------------------------------------------------
+            // STATIC SAMPLE DATA
+            // ------------------------------------------------
+
+            string companyName = "One Point One Solutions Limited";
+            string startDate = "14-December-2022";
+            string endDate = "13-December-2027";
+
+            // ------------------------------------------------
+            // TEMPLATE PATH
+            // ------------------------------------------------
+
+            string templatePath = System.IO.Path.Combine(
+                _environment.WebRootPath,
+                "Templates",
+                "ONE_POINT_ONE_SOLUTION_LTD.png"
+            );
+
+            if (!System.IO.File.Exists(templatePath))
+            {
+                return NotFound(
+                    "Certificate template not found: " + templatePath
+                );
+            }
+
+            // ------------------------------------------------
+            // CREATE PDF IN MEMORY
+            // ------------------------------------------------
+
+            using (MemoryStream outputStream = new MemoryStream())
+            {
+                // A4 Landscape
+                iText.Kernel.Geom.PageSize pageSize = iText.Kernel.Geom.PageSize.A4.Rotate();
+
+                // ------------------------------------------------
+                // PDF WRITER
+                // ------------------------------------------------
+
+                PdfWriter writer = new PdfWriter(outputStream);
+
+                // ------------------------------------------------
+                // PDF DOCUMENT
+                // ------------------------------------------------
+
+                PdfDocument pdf = new PdfDocument(writer);
+
+                pdf.SetDefaultPageSize(pageSize);
+
+                // ------------------------------------------------
+                // LAYOUT DOCUMENT
+                // ------------------------------------------------
+
+                iText.Layout.Document document = new iText.Layout.Document(pdf);
+
+                // Remove default margins
+                document.SetMargins(0, 0, 0, 0);
+
+                float pageWidth = pageSize.GetWidth();
+                float pageHeight = pageSize.GetHeight();
+
+                // ------------------------------------------------
+                // BACKGROUND IMAGE
+                // ------------------------------------------------
+
+                ImageData imageData =
+                    ImageDataFactory.Create(templatePath);
+
+                Image background =
+                    new Image(imageData);
+
+                background
+                    .ScaleAbsolute(
+                        pageWidth,
+                        pageHeight
+                    )
+                    .SetFixedPosition(
+                        0,
+                        0
+                    );
+
+                document.Add(background);
+
+                // ------------------------------------------------
+                // COMPANY NAME
+                // ------------------------------------------------
+
+                Paragraph company = new Paragraph(companyName)
+                    .SetFontSize(16)
+                    .SetFontColor(ColorConstants.BLACK)
+                    .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                    .SetFixedPosition(
+                        0,
+                        310,
+                        pageWidth
+                    );
+
+                document.Add(company);
+
+                // ------------------------------------------------
+                // DESCRIPTION
+                // ------------------------------------------------
+
+                Paragraph description = new Paragraph(
+                    "Is an Platinum Industry member of Telecom Sector Skill Council for a period"
+                )
+                .SetFontSize(12)
+                .SetFontColor(ColorConstants.DARK_GRAY)
+                .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                .SetFixedPosition(
+                    0,
+                    290,
+                    pageWidth
+                );
+
+                document.Add(description);
+
+                // ------------------------------------------------
+                // DATE
+                // ------------------------------------------------
+
+                string dateText =
+                    $"{startDate}  to  {endDate}";
+
+                Paragraph dates = new Paragraph(dateText)
+                    .SetFontSize(14)
+                    .SetFontColor(ColorConstants.BLACK)
+                    .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                    .SetFixedPosition(
+                        0,
+                        270,
+                        pageWidth
+                    );
+
+                document.Add(dates);
+
+                // ------------------------------------------------
+                // CLOSE DOCUMENT
+                // ------------------------------------------------
+
+                document.Close();
+
+                byte[] pdfBytes = outputStream.ToArray();
+
+                return File(
+                    pdfBytes,
+                    "application/pdf",
+                    "Platinum_Industry_Membership_Certificate.pdf"
+                );
+            }
+        }
+
+
     }
 }
 

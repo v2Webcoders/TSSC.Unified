@@ -136,6 +136,9 @@ namespace QUIZAPP.Controllers
             if (roles.Contains("Employee"))
                 return RedirectToAction("Index", "Home", new { area = "HRMS" });
 
+            if (roles.Contains("Letter"))
+                return RedirectToAction("Index", "Home", new { area = "HRMS" });
+
             return RedirectToAction("Index", "Home");
         }
 

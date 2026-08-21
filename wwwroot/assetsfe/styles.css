@@ -3099,6 +3099,583 @@ i.fas.fa-id-badge {
 
 
 
+/* =========================================================
+   TSSC PORTAL LOGIN PAGE
+   Premium UI + Smooth Animations + Responsive
+========================================================= */
+
+/* ---------- Main Login Area ---------- */
+
+.panel {
+    position: relative;
+    min-height: calc(100vh - 108px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 55px 30px;
+    overflow: hidden;
+    background: radial-gradient( circle at 8% 20%, rgba(207, 232, 248, 0.75) 0, rgba(207, 232, 248, 0.30) 20%, transparent 42% ), radial-gradient( circle at 92% 80%, rgba(255, 238, 221, 0.75) 0, rgba(255, 238, 221, 0.25) 22%, transparent 45% ), #f6fafc;
+}
+
+
+    /* ---------- Decorative Background ---------- */
+
+    .panel::before {
+        content: "";
+        position: absolute;
+        width: 320px;
+        height: 320px;
+        left: -150px;
+        top: 80px;
+        border-radius: 50%;
+        background: rgba(232, 243, 251, 0.65);
+        filter: blur(3px);
+        animation: floatCircle 7s ease-in-out infinite;
+    }
+
+    .panel::after {
+        content: "";
+        position: absolute;
+        width: 280px;
+        height: 280px;
+        right: -130px;
+        bottom: 20px;
+        border-radius: 50%;
+        background: rgba(255, 242, 229, 0.60);
+        filter: blur(4px);
+        animation: floatCircle 9s ease-in-out infinite reverse;
+    }
+
+
+    /* ---------- Login Card ---------- */
+
+    .panel .card {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 700px;
+        padding: 34px 40px 30px;
+        background: rgba(255, 255, 255, 0.97);
+        border: 1px solid rgba(20, 50, 90, 0.06);
+        border-radius: 24px;
+        box-shadow: 0 25px 70px rgba(17, 45, 78, 0.10), 0 5px 20px rgba(17, 45, 78, 0.04);
+        animation: cardAppear .7s cubic-bezier(.22, 1, .36, 1) both;
+    }
+
+
+/* ---------- Portal Badge ---------- */
+
+.status-chip {
+    width: 100%;
+    max-width: 368px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 14px;
+    margin-bottom: 25px;
+    border-radius: 50px;
+    background: #fff1e6;
+    color: #ed7415;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .1px;
+    animation: slideDown .7s ease both;
+    animation-delay: .15s;
+}
+
+
+    /* Pulse Dot */
+
+    .status-chip .pulse {
+        position: relative;
+        width: 7px;
+        height: 7px;
+        min-width: 7px;
+        border-radius: 50%;
+        background: #f47720;
+    }
+
+        .status-chip .pulse::after {
+            content: "";
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            border: 1px solid rgba(244, 119, 32, .35);
+            animation: pulseRing 2s ease-out infinite;
+        }
+
+
+/* ---------- Heading ---------- */
+
+.card-title {
+    margin: 0 0 8px;
+    color: #0c1f3d;
+    font-size: 30px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -.7px;
+    animation: slideUp .7s ease both;
+    animation-delay: .2s;
+}
+
+
+.card-note {
+    margin: 0 0 26px;
+    padding-bottom: 23px;
+    color: #18365d;
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 500;
+    border-bottom: 1px solid #e6ebf1;
+    animation: slideUp .7s ease both;
+    animation-delay: .3s;
+}
+
+
+/* ---------- Form ---------- */
+
+#signinForm {
+    animation: slideUp .7s ease both;
+    animation-delay: .35s;
+}
+
+
+/* ---------- Field ---------- */
+
+.field {
+    margin-bottom: 20px;
+}
+
+
+    .field label {
+        display: block;
+        margin-bottom: 8px;
+        color: #102342;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+
+/* ---------- Input Wrapper ---------- */
+
+.input-wrap {
+    position: relative;
+}
+
+
+    /* ---------- Input Icon ---------- */
+
+    .input-wrap svg {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        width: 19px;
+        height: 19px;
+        transform: translateY(-50%);
+        color: #718096;
+        pointer-events: none;
+        transition: all .25s ease;
+    }
+
+
+    /* ---------- Input ---------- */
+
+    .input-wrap input {
+        width: 100%;
+        height: 54px;
+        padding: 0 16px 0 45px;
+        border: 1px solid #dbe3ed;
+        border-radius: 11px;
+        outline: none;
+        background: #f5f8fc;
+        color: #17243b;
+        font-size: 14px;
+        box-sizing: border-box;
+        transition: border-color .25s ease, background .25s ease, box-shadow .25s ease, transform .25s ease;
+    }
+
+
+        /* Placeholder */
+
+        .input-wrap input::placeholder {
+            color: #8d99aa;
+        }
+
+
+        /* Hover */
+
+        .input-wrap input:hover {
+            border-color: #c7d4e3;
+            background: #f9fbfd;
+        }
+
+
+        /* Focus */
+
+        .input-wrap input:focus {
+            background: #fff;
+            border-color: #f47a20;
+            box-shadow: 0 0 0 3px rgba(244, 122, 32, .10), 0 5px 15px rgba(20, 50, 90, .04);
+        }
+
+
+    /* Icon Focus */
+
+    .input-wrap:focus-within svg {
+        color: #f47720;
+        transform: translateY(-50%) scale(1.08);
+    }
+
+
+/* ---------- Error ---------- */
+
+.error-text {
+    display: block;
+    margin-top: 5px;
+    color: #dc3545;
+    font-size: 12px;
+}
+
+
+/* ---------- Forgot Password ---------- */
+
+.row-between {
+    display: flex;
+    justify-content: flex-start;
+    margin: 1px 0 23px;
+}
+
+
+.link-btn {
+    position: relative;
+    color: #e87317;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color .25s ease;
+}
+
+
+    .link-btn::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -3px;
+        width: 0;
+        height: 1px;
+        background: #e87317;
+        transition: width .25s ease;
+    }
+
+
+    .link-btn:hover {
+        color: #c85f0c;
+    }
+
+
+        .link-btn:hover::after {
+            width: 100%;
+        }
+
+
+/* ---------- Sign In Button ---------- */
+
+.btn-primary {
+    position: relative;
+    width: 100%;
+    height: 55px;
+    overflow: hidden;
+    border: 0;
+    border-radius: 11px;
+    background: #0d2453;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(13, 36, 83, .16);
+    transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+}
+
+
+    /* Button Shine */
+
+    .btn-primary::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -120%;
+        width: 70%;
+        height: 100%;
+        background: linear-gradient( 100deg, transparent, rgba(255,255,255,.16), transparent );
+        transform: skewX(-20deg);
+        transition: left .6s ease;
+    }
+
+
+    .btn-primary:hover {
+        background: #15356f;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 26px rgba(13, 36, 83, .22);
+    }
+
+
+        .btn-primary:hover::before {
+            left: 140%;
+        }
+
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+
+/* ---------- Register ---------- */
+
+.switch-line {
+    margin-top: 22px;
+    padding-top: 0;
+    border: 0;
+    text-align: center;
+    color: #697689;
+    font-size: 14px;
+    animation: fadeIn .7s ease both;
+    animation-delay: .6s;
+}
+
+
+    .switch-line a {
+        color: #e87317;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color .2s ease;
+    }
+
+
+        .switch-line a:hover {
+            color: #c85f0c;
+        }
+
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+
+/* Card */
+
+@keyframes cardAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(25px) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* Heading / Content */
+
+@keyframes slideUp {
+
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* Badge */
+
+@keyframes slideDown {
+
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* Background */
+
+@keyframes floatCircle {
+
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-18px);
+    }
+}
+
+
+/* Pulse */
+
+@keyframes pulseRing {
+
+    0% {
+        transform: scale(.7);
+        opacity: .8;
+    }
+
+    70% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+}
+
+
+/* Fade */
+
+@keyframes fadeIn {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 991px) {
+
+    .panel {
+        min-height: calc(100vh - 90px);
+        padding: 45px 25px;
+    }
+
+        .panel .card {
+            max-width: 620px;
+            padding: 32px;
+        }
+
+    .card-title {
+        font-size: 28px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 575px) {
+
+    .panel {
+        min-height: calc(100vh - 70px);
+        padding: 25px 15px;
+    }
+
+
+        .panel .card {
+            max-width: 100%;
+            padding: 25px 20px 23px;
+            border-radius: 18px;
+        }
+
+
+    .status-chip {
+        max-width: 100%;
+        height: 36px;
+        margin-bottom: 20px;
+        font-size: 13px;
+    }
+
+
+    .card-title {
+        font-size: 25px;
+        letter-spacing: -.4px;
+    }
+
+
+    .card-note {
+        font-size: 14px;
+        line-height: 1.55;
+        margin-bottom: 22px;
+        padding-bottom: 20px;
+    }
+
+
+    .field {
+        margin-bottom: 17px;
+    }
+
+
+        .field label {
+            font-size: 13px;
+        }
+
+
+    .input-wrap input {
+        height: 52px;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+
+
+    .btn-primary {
+        height: 52px;
+    }
+
+
+    .switch-line {
+        font-size: 13px;
+    }
+}
+
+
+/* =========================================================
+   REDUCE MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .panel::before,
+    .panel::after,
+    .panel .card,
+    .status-chip,
+    .card-title,
+    .card-note,
+    #signinForm,
+    .switch-line,
+    .status-chip .pulse::after {
+        animation: none !important;
+    }
+}
+
+
+
+
+
+
+
+
 
 
 

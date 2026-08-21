@@ -12,7 +12,7 @@ using TSSC.Unified.ViewModel;
 namespace TSSC.Unified.Areas.HRMS.Controllers
 {
     [Area("HRMS")]
-    [Authorize(Roles = "HR,Employee")]
+    [Authorize]
     public class LetterController :Controller
     {
         private readonly AppdbContext _context;

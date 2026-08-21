@@ -2171,6 +2171,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                                         record.InTime.Value
                                     ).TotalHours;
                             }
+                            day.AttendanceSource = record.AttendanceSource;
+                            day.CheckInLocation = record.CheckInLocation;
                         }
                         else
                         {
