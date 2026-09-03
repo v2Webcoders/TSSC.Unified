@@ -29,7 +29,7 @@ namespace TSSC.Unified.Models
 
         public int? DelegatedTo { get; set; }
 
-        public string? Handover { get; set; }
+        public int? Handover { get; set; }
 
         public DateTime? HandoverDate { get; set; }
 
@@ -39,5 +39,10 @@ namespace TSSC.Unified.Models
 
         public bool IsActive { get; set; }
         public string? LetterAttachment { get; set; }
+
+        // Received / Not Received
+        public string EmployeeReceiveStatus { get; set; } = "Not Received";
+
+        public DateTime? EmployeeReceiveDate { get; set; }
     }
 }

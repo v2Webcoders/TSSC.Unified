@@ -109,7 +109,32 @@ namespace TSSC.Unified.ViewModel
 
         public DateTime? Approver4ApprovedOn { get; set; }
 
+        // =========================
+        // APPROVER 5
+        // =========================
 
+        public int? Approver5Id { get; set; }
+
+        [StringLength(50)]
+        public string? Approver5Status { get; set; } = "Pending";
+
+        [StringLength(1000)]
+        public string? Approver5Remarks { get; set; }
+
+        public DateTime? Approver5ApprovedOn { get; set; }
+        // =========================
+        // APPROVER 6
+        // =========================
+
+        public int? Approver6Id { get; set; }
+
+        [StringLength(50)]
+        public string? Approver6Status { get; set; } = "Pending";
+
+        [StringLength(1000)]
+        public string? Approver6Remarks { get; set; }
+
+        public DateTime? Approver6ApprovedOn { get; set; }
         // =========================
         // FINANCE
         // =========================
@@ -152,5 +177,7 @@ namespace TSSC.Unified.ViewModel
         public string? Approver2Name { get; set; }
         public string? Approver3Name { get; set; }
         public string? Approver4Name { get; set; }
+        public string? Approver5Name { get; set; }
+        public string? Approver6Name { get; set; }
     }
 }

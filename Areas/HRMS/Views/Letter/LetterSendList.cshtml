@@ -40,6 +40,7 @@
                     <th>Docket No.</th>
                     <th>Attachment</th>
                     <th>Created On</th>
+                    <th>Employee Received Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -76,7 +77,7 @@
                         </td>
 
                         <td>@item.CreatedOn?.ToString("dd-MMM-yyyy")</td>
-
+                        <td>@item.EmployeeReceiveStatus</td>
                         <td>
 
                             <div class="btn-group">

@@ -1,0 +1,157 @@
+﻿@model IEnumerable<TSSC.Unified.ViewModel.LetterRegisterVM>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Letter List</h3>
+        </div>
+
+    </div>
+</div>
+
+<div class="card card-preview">
+    <div class="card-inner">
+
+        <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Received Item</th>
+                    <th>Sender Name</th>
+                    <th>Mode</th>
+                    <th>Docket No.</th>
+                    <th>Handover Date</th>
+                    <th>Attachment</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>@serial</td>
+
+                        <td>@item.ItemName</td>
+
+                        <td>@item.SenderName</td>
+
+                        <td>@item.Mode</td>
+
+                        <td>@item.DocketNo</td>
+
+                        <td>
+                            @item.HandoverDate?.ToString("dd-MMM-yyyy")
+                        </td>
+
+                        <td>
+
+                            @if (!string.IsNullOrEmpty(item.LetterAttachment))
+                            {
+                                <a href="@item.LetterAttachment"
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-primary">
+                                    View File
+                                </a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+
+                        </td>
+
+                        <td>
+
+                            @if (item.EmployeeReceiveStatus == "Received")
+                            {
+                                <span class="badge bg-success">
+                                    Received
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">
+                                    Not Received
+                                </span>
+                            }
+
+                        </td>
+
+                        <td>
+
+                            @if (item.EmployeeReceiveStatus != "Received")
+                            {
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-success"
+                                        onclick="markLetterReceived(@item.LetterId)">
+                                    <em class="icon ni ni-check"></em>
+                                    Received
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="text-success">
+                                    Received
+                                </span>
+                            }
+
+                        </td>
+
+                    </tr>
+
+                    serial++;
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+</div>
+
+
+<script>
+
+    function markLetterReceived(letterId) {
+
+        if (!confirm("Are you sure you have received this letter?")) {
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("MarkAsReceived", "Letter")',
+            type: 'POST',
+            data: {
+                id: letterId
+            },
+            success: function (response) {
+
+                if (response.success) {
+                    location.reload();
+                }
+                else {
+                    alert(response.message);
+                }
+
+            },
+            error: function () {
+                alert("Something went wrong.");
+            }
+        });
+
+    }
+
+</script>

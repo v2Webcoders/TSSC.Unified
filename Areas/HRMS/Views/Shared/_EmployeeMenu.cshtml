@@ -9,1076 +9,1465 @@
 @inject SignInManager<AppUser> SignInManager
 
 @{
-    var currentUser = await UserManager.GetUserAsync(User);
+	var currentUser = await UserManager.GetUserAsync(User);
 
-    var roles = currentUser != null
-        ? await UserManager.GetRolesAsync(currentUser)
-        : new List<string>();
+	var roles = currentUser != null
+		? await UserManager.GetRolesAsync(currentUser)
+		: new List<string>();
 
-    var employee = currentUser != null
-        ? Context.Employee.FirstOrDefault(
-            x => x.ApplicationUserId == currentUser.Id)
-        : null;
+	var employee = currentUser != null
+		? Context.Employee.FirstOrDefault(
+			x => x.ApplicationUserId == currentUser.Id)
+		: null;
 
-    bool isHR = roles.Contains("HR");
+	bool isHR = roles.Contains("HR");
 
-    bool isReportingManager = employee != null &&
-        Context.Employee.Any(
-            x => x.ReportingManagerId == employee.EmployeeId);
-    var isFinanceEmployee = currentUser != null
-    && employee != null
-    && employee.DepartmentId == 25;
-    //for reimbursement system
-    // =====================================
-    // REIMBURSEMENT SIDE MENU
-    // =====================================
-    var isCEO = currentUser != null
-   && employee != null
-   && employee.DepartmentId == 22;
-    bool showReimbursementApproverMenu = false;
+	bool isReportingManager = employee != null &&
+		Context.Employee.Any(
+			x => x.ReportingManagerId == employee.EmployeeId);
+	var isFinanceEmployee = currentUser != null
+	&& employee != null
+	&& employee.DepartmentId == 25 && employee.DesignationId!=50;
 
-    if (employee != null)
-    {
-        var employeeId = employee.EmployeeId;
+	//for employeeletter received
+	var applicationUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-        // =====================================
-        // APPROVER 2
-        // Directly menu show
-        // =====================================
+	var employeeIdd = Context.Employee
+		.Where(x => x.ApplicationUserId.ToString() == applicationUserId && x.IsActive)
+		.Select(x => x.EmployeeId)
+		.FirstOrDefault();
 
-        var isApprover2 = Context.Reimbursements.Any(x =>
-            x.IsActive &&
-            x.Approver2Id == employeeId
-        );
+	var hasHandoverLetter = employeeIdd > 0 &&
+		Context.LetterRegister.Any(x =>
+			x.Handover == employeeIdd &&
+			x.IsActive);
+
+	var isFinanceHead = currentUser != null
+&& employee != null
+&& employee.DesignationId == 50;
+//-----------------------------------------------------------------------------------------
+	//for reimbursement system - internal approval 
+	// =====================================
+	// REIMBURSEMENT SIDE MENU
+	// =====================================
+	var isCEO = currentUser != null
+		&& employee != null
+		&& employee.DepartmentId == 22;
+	bool showReimbursementApproverMenu = false;
+
+	if (employee != null)
+	{
+		var employeeId = employee.EmployeeId;
+
+		// =====================================
+		// APPROVER 2
+		// Directly menu show
+		// =====================================
+
+		var isApprover2 = Context.Reimbursements.Any(x =>
+			x.IsActive &&
+			x.Approver2Id == employeeId
+		);
 
 
-        // =====================================
-        // APPROVER 3
-        // Menu तभी show होगा जब Approver2 Approved हो
-        // =====================================
+		// =====================================
+		// APPROVER 3
+		// Menu तभी show होगा जब Approver2 Approved हो
+		// =====================================
 
-        var isApprover3 = Context.Reimbursements.Any(x =>
-            x.IsActive &&
-            x.Approver3Id == employeeId &&
-            x.Approver2Status == "Approved"
-        );
+		var isApprover3 = Context.Reimbursements.Any(x =>
+			x.IsActive &&
+			x.Approver3Id == employeeId &&
+			x.Approver2Status == "Approved"
+		);
 
 
-        // =====================================
-        // APPROVER 4
-        // Menu तभी show होगा जब Approver2 और
-        // Approver3 दोनों Approved हों
-        // =====================================
+		// =====================================
+		// APPROVER 4
+		// Menu तभी show होगा जब Approver2 और
+		// Approver3 दोनों Approved हों
+		// =====================================
 
-        var isApprover4 = Context.Reimbursements.Any(x =>
-            x.IsActive &&
-            x.Approver4Id == employeeId &&
-            x.Approver2Status == "Approved" &&
-            x.Approver3Status == "Approved"
-        );
+		var isApprover4 = Context.Reimbursements.Any(x =>
+			x.IsActive &&
+			x.Approver4Id == employeeId &&
+			x.Approver2Status == "Approved" &&
+			x.Approver3Status == "Approved"
+		);
+		// =====================================
+		// APPROVER 5
+		// Menu तभी show होगा जब Approver2,3,4 Approved हों
+		// =====================================
 
-        //=====================================
-        // CEO APPROVER 
-        // Menu तभी show होगा जब Approver2,
-        // Approver3 ,  Approver4  Approved हों
-        // =====================================
+		var isApprover5 = Context.Reimbursements.Any(x =>
+			x.IsActive &&
+			x.Approver5Id == employeeId &&
+			x.Approver2Status == "Approved" &&
+			x.Approver3Status == "Approved" &&
+			x.Approver4Status == "Approved"
+		);
+		// =====================================
+		// APPROVER 6
+		// Menu तभी show होगा जब Approver2,3,4,5  Approved हों
+		// =====================================
 
-        var isCeoApprover = Context.Reimbursements.Any(x =>
-            x.IsActive &&
-            x.Approver4Id == employeeId &&
-            x.Approver2Status == "Approved" &&
-            x.Approver3Status == "Approved" &&
-             x.Approver4Status == "Approved" 
-        );
-        // किसी भी condition के true होने पर
-        // तीनों menu show होंगे
+		var isApprover6 = Context.Reimbursements.Any(x =>
+			x.IsActive &&
+			x.Approver6Id == employeeId &&
+			x.Approver2Status == "Approved" &&
+			x.Approver3Status == "Approved" &&
+			x.Approver4Status == "Approved" &&
+			x.Approver5Status == "Approved"
+		);
 
-        showReimbursementApproverMenu =
-            isApprover2 ||
-            isApprover3 ||
-            isApprover4|| 
-            isCEO ||
-        isCeoApprover;
-    }
+		//=====================================
+		// CEO APPROVER
+		// Menu तभी show होगा जब Approver2,
+		// Approver3 ,  Approver4 ,5,6 Approved हों
+		// =====================================
+
+		var isCeoApprover = Context.Reimbursements.Any(x =>
+			x.IsActive &&
+			x.Approver6Id == employeeId &&
+			x.Approver2Status == "Approved" &&
+			x.Approver3Status == "Approved" &&
+			x.Approver4Status == "Approved" &&
+			x.Approver5Status == "Approved" &&
+				x.Approver6Status == "Approved"
+		);
+		// किसी भी condition के true होने पर
+		// तीनों menu show होंगे
+
+		showReimbursementApproverMenu =
+			isApprover2 ||
+			isApprover3 ||
+			isApprover4 ||
+			isApprover5 ||
+			isApprover6 ||
+			isCEO ||
+		isCeoApprover;
+	}
 }
+<style>
+	.nk-menu-item + .nk-menu-heading {
+		padding-top: 1.0rem;
+	}
+
+	.nk-menu-heading-text {
+		color: #8FA8C2 !important;
+		font-size: 12px;
+		font-weight: 625 !important;
+		letter-spacing: 1px;
+		text-transform: uppercase;
+	}
+
+	.nk-menu-heading-content {
+		padding-bottom: 5px;
+		border-bottom: 1px solid #1688B5;
+	}
+
+</style>
 
 <ul class="nk-menu">
 
-    <!-- ===================================================== -->
-    <!-- PANEL -->
-    <!-- ===================================================== -->
+	<!-- ===================================================== -->
+	<!-- DASHBOARD -->
+	<!-- ===================================================== -->
 
-    <li class="nk-menu-heading">
-        <h6 class="overline-title text-primary-alt">
-            @(isHR ? "HR Manager Panel" : "Employee Panel")
-        </h6>
-    </li>
+	<li class="nk-menu-item ">
 
-    <!-- ===================================================== -->
-    <!-- DASHBOARD -->
-    <!-- ===================================================== -->
+		<a href="/HRMS/Home/"
+		   class="nk-menu-link ">
 
-    <li class="nk-menu-item">
+			<span class="nk-menu-icon">
+				<em class="icon ni ni-monitor"></em>
+			</span>
 
-        <a href="/HRMS/Home/"
-           class="nk-menu-link">
+			<span class="nk-menu-text">
+				Dashboard
+			</span>
 
-            <span class="nk-menu-icon">
-                <em class="icon ni ni-monitor"></em>
-            </span>
+		</a>
 
-            <span class="nk-menu-text">
-                Dashboard
-            </span>
 
-        </a>
 
-    </li>
+	</li>
 
 
-    <!-- ===================================================== -->
-    <!-- EMPLOYEE MANAGEMENT - HR ONLY -->
-    <!-- ===================================================== -->
-    @if (isHR)
-    {
-        <li class="nk-menu-item has-sub">
+	<!-- ===================================================== -->
+	<!-- SELF SERVICE - EVERY EMPLOYEE -->
+	<!-- ===================================================== -->
 
-            <a href="#"
-               class="nk-menu-link nk-menu-toggle">
+	<li class="nk-menu-heading">
+		<div class="nk-menu-heading-content">
+			<span class="nk-menu-heading-text">SELF SERVICE</span>
+		</div>
+	</li>
 
-                <span class="nk-menu-icon">
-                    <em class="icon ni ni-users"></em>
-                </span>
 
-                <span class="nk-menu-text">
-                    Employee Management
-                </span>
+	<!-- My Attendance -->
 
-            </a>
+	<li class="nk-menu-item has-sub">
 
+		<a href="#"
+		   class="nk-menu-link nk-menu-toggle">
 
-            <ul class="nk-menu-sub">
+			<span class="nk-menu-icon">
+				<em class="icon ni ni-calendar"></em>
+			</span>
 
-                <li class="nk-menu-item">
+			<span class="nk-menu-text">
+				My Attendance
+			</span>
 
-                    <a href="/HRMS/Employee/Create"
-                       class="nk-menu-link">
+		</a>
 
-                        <span class="nk-menu-text">
-                            Add Employee
-                        </span>
+		<ul class="nk-menu-sub">
+			<li class="nk-menu-item">
 
-                    </a>
+				<a href="/HRMS/Employee/MarkAttendance"
+				   class="nk-menu-link">
 
-                </li>
+					<span class="nk-menu-text">
+						Mark Attendance
+					</span>
+				</a>
+			</li>
+			<li class="nk-menu-item">
 
+				<a href="/HRMS/Attendance/MyAttendance"
+				   class="nk-menu-link">
 
-                <li class="nk-menu-item">
+					<span class="nk-menu-text">
+						View Attendance
+					</span>
 
-                    <a href="/HRMS/Employee/EmployeeList"
-                       class="nk-menu-link">
+				</a>
 
-                        <span class="nk-menu-text">
-                            Employee List
-                        </span>
+			</li>
 
-                    </a>
 
-                </li>
+			<li class="nk-menu-item">
 
-            </ul>
+				<a href="/HRMS/Attendance/Regularization"
+				   class="nk-menu-link">
 
-        </li>
-       
-    }
+					<span class="nk-menu-text">
+						Attendance Regularization
+					</span>
 
+				</a>
 
-    <!-- ===================================================== -->
-    <!-- ATTENDANCE & LEAVE -->
-    <!-- ===================================================== -->
+			</li>
 
-    <li class="nk-menu-item has-sub">
 
-        <a href="#"
-           class="nk-menu-link nk-menu-toggle">
+			<li class="nk-menu-item">
 
-            <span class="nk-menu-icon">
-                <em class="icon ni ni-calendar"></em>
-            </span>
+				<a href="/HRMS/Attendance/MyRegularizations"
+				   class="nk-menu-link">
 
-            <span class="nk-menu-text">
-                Attendance & Leave
-            </span>
+					<span class="nk-menu-text">
+						My Regularizations
+					</span>
 
-        </a>
+				</a>
 
+			</li>
 
-        <ul class="nk-menu-sub">
 
+			<li class="nk-menu-item">
 
-            <!-- ================================================= -->
-            <!-- SELF SERVICE -->
-            <!-- ================================================= -->
+				<a href="/HRMS/Attendance/ApplyOD"
+				   class="nk-menu-link">
 
-            <li class="nk-menu-item">
+					<span class="nk-menu-text">
+						Apply OD
+					</span>
 
-                <a href="/HRMS/Attendance/MyAttendance"
-                   class="nk-menu-link">
+				</a>
 
-                    <span class="nk-menu-text">
-                        My Attendance
-                    </span>
+			</li>
 
-                </a>
 
-            </li>
+			<li class="nk-menu-item">
 
+				<a href="/HRMS/Attendance/MyOD"
+				   class="nk-menu-link">
 
-            <li class="nk-menu-item">
+					<span class="nk-menu-text">
+						My OD Requests
+					</span>
 
-                <a href="/HRMS/Attendance/Regularization"
-                   class="nk-menu-link">
+				</a>
 
-                    <span class="nk-menu-text">
-                        Attendance Regularization
-                    </span>
+			</li>
 
-                </a>
+		</ul>
 
-            </li>
+	</li>
 
 
-            <li class="nk-menu-item">
+	<!-- My Leave -->
 
-                <a href="/HRMS/Attendance/MyRegularizations"
-                   class="nk-menu-link">
+	<li class="nk-menu-item has-sub">
 
-                    <span class="nk-menu-text">
-                        My Regularizations
-                    </span>
+		<a href="#"
+		   class="nk-menu-link nk-menu-toggle">
 
-                </a>
+			<span class="nk-menu-icon">
+				<em class="icon ni ni-calendar-booking"></em>
+			</span>
 
-            </li>
+			<span class="nk-menu-text">
+				My Leave
+			</span>
 
+		</a>
 
-            <li class="nk-menu-item">
+		<ul class="nk-menu-sub">
 
-                <a href="/HRMS/Attendance/ApplyOD"
-                   class="nk-menu-link">
+			<li class="nk-menu-item">
 
-                    <span class="nk-menu-text">
-                        Apply OD
-                    </span>
+				<a href="/HRMS/LeaveRequest/Create"
+				   class="nk-menu-link">
 
-                </a>
+					<span class="nk-menu-text">
+						Apply Leave
+					</span>
 
-            </li>
+				</a>
 
+			</li>
 
-            <li class="nk-menu-item">
 
-                <a href="/HRMS/Attendance/MyOD"
-                   class="nk-menu-link">
+			<li class="nk-menu-item">
 
-                    <span class="nk-menu-text">
-                        My OD Requests
-                    </span>
+				<a href="/HRMS/LeaveRequest/MyLeaves"
+				   class="nk-menu-link">
 
-                </a>
+					<span class="nk-menu-text">
+						My Leave Requests
+					</span>
 
-            </li>
+				</a>
 
+			</li>
 
-            <li class="nk-menu-item">
 
-                <a href="/HRMS/LeaveRequest/Create"
-                   class="nk-menu-link">
+			<li class="nk-menu-item">
 
-                    <span class="nk-menu-text">
-                        Apply Leave
-                    </span>
+				<a href="/HRMS/LeaveManagement/MyBalance"
+				   class="nk-menu-link">
 
-                </a>
+					<span class="nk-menu-text">
+						My Leave Balance
+					</span>
 
-            </li>
+				</a>
 
+			</li>
 
-            <li class="nk-menu-item">
+		</ul>
 
-                <a href="/HRMS/LeaveRequest/MyLeaves"
-                   class="nk-menu-link">
+	</li>
 
-                    <span class="nk-menu-text">
-                        My Leave Requests
-                    </span>
 
-                </a>
+	<!-- My Tasks -->
 
-            </li>
+	<li class="nk-menu-item">
 
+		<a href="/HRMS/Task/MyTasks"
+		   class="nk-menu-link">
 
-            <li class="nk-menu-item">
+			<span class="nk-menu-icon">
+				<em class="icon ni ni-table-view"></em>
+			</span>
 
-                <a href="/HRMS/LeaveManagement/MyBalance"
-                   class="nk-menu-link">
+			<span class="nk-menu-text">
+				My Tasks
+			</span>
 
-                    <span class="nk-menu-text">
-                        My Leave Balance
-                    </span>
+		</a>
 
-                </a>
+	</li>
 
-            </li>
-           
-            <!-- ================================================= -->
-            <!-- MANAGEMENT SEPARATOR -->
-            <!-- ================================================= -->
-            @* @if (isHR || isReportingManager)
-            {
-                <li class="nk-menu-heading mt-4">
-                    <h6 class="overline-title text-danger-alt">MANAGEMENT</h6>
-                </li>
-            }
+
+@* 	@if (!isCEO)
+	{
+		<li class="nk-menu-item has-sub">
+
+			<a href="#"
+			   class="nk-menu-link nk-menu-toggle">
+
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-check-circle-cut"></em>
+				</span>
+
+				<span class="nk-menu-text">
+					Internal Approvals
+				</span>
+
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursements"
+					   asp-action="CreateReimbursement"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Apply for Approval
+						</span>
+
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursements"
+					   asp-action="MyReimbursement"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							My Approval Requests
+						</span>
+
+					</a>
+				</li>
+
+			</ul>
+
+		</li>
+	}
  *@
+	<!-- Letters -->
+	@if (hasHandoverLetter)
+	{
+		<li class="nk-menu-item">
 
-            <!-- ================================================= -->
-            <!-- MANAGEMENT ITEMS -->
-            <!-- ================================================= -->
-            @if (isHR)
-            {
-                <!-- ATTENDANCE MANAGEMENT -->
-                <hr />
-                <li class="nk-menu-item">
+			<a href="/HRMS/Letter/EmployeeLetters"
+			   class="nk-menu-link">
 
-                    <a href="/HRMS/Attendance/Index"
-                       class="nk-menu-link">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-table-view"></em>
+				</span>
 
-                       
+				<span class="nk-menu-text">
+					Recieved Letters
+				</span>
 
-                        <span class="nk-menu-text">
-                            Attendance Management
-                        </span>
+			</a>
 
-                    </a>
+		</li>
 
-                </li>
+		@* <li class="nav-item">
+			<a class="nav-link"
+			   asp-controller="Letter"
+			   asp-action="EmployeeLetters">
+				<i class="fas fa-envelope"></i>
+				<span>Letter</span>
+			</a>
+		</li> *@
+	}
+	@if (User.IsInRole("Letter"))
+	{
+		<!-- Letters -->
 
+		<li class="nk-menu-item has-sub">
 
-                <!-- ALL REGULARIZATIONS -->
+			<a href="#"
+			   class="nk-menu-link nk-menu-toggle">
 
-                <li class="nk-menu-item">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-mail"></em>
+				</span>
 
-                    <a href="/HRMS/Attendance/AllRegularizations"
-                       class="nk-menu-link">
+				<span class="nk-menu-text">
+					Letters
+				</span>
 
-                       
+			</a>
 
-                        <span class="nk-menu-text">
-                            All Regularizations
-                        </span>
+			<ul class="nk-menu-sub">
 
-                    </a>
+				<li class="nk-menu-item">
+					<a href="/HRMS/Letter/LetterReceive"
+					   class="nk-menu-link">
 
-                </li>
+						<span class="nk-menu-text">
+							Receive Letter
+						</span>
 
+					</a>
+				</li>
 
-                <!-- ALL OD REQUESTS -->
+				<li class="nk-menu-item">
+					<a href="/HRMS/Letter/LetterReceiveList"
+					   class="nk-menu-link">
 
-                <li class="nk-menu-item">
+						<span class="nk-menu-text">
+							Received Letter List
+						</span>
 
-                    <a href="/HRMS/Attendance/AllODRequests"
-                       class="nk-menu-link">
+					</a>
+				</li>
 
-                        
-                        <span class="nk-menu-text">
-                            All OD Requests
-                        </span>
+				<li class="nk-menu-item">
+					<a href="/HRMS/Letter/LetterSend"
+					   class="nk-menu-link">
 
-                    </a>
+						<span class="nk-menu-text">
+							Send Letter
+						</span>
 
-                </li>
+					</a>
+				</li>
 
+				<li class="nk-menu-item">
+					<a href="/HRMS/Letter/LetterSendList"
+					   class="nk-menu-link">
 
-                <!-- LEAVE MANAGEMENT -->
+						<span class="nk-menu-text">
+							Sent Letter List
+						</span>
 
-                <li class="nk-menu-item">
+					</a>
+				</li>
 
-                    <a href="/HRMS/LeaveManagement/MyLeaves"
-                       class="nk-menu-link">
+			</ul>
 
-                       
-                        <span class="nk-menu-text">
-                            Leave Management
-                        </span>
+		</li>
+	}
 
-                    </a>
+	<!-- My Profile -->
 
-                </li>
+	<li class="nk-menu-item">
 
+		<a href="/HRMS/Employee/MyProfile"
+		   class="nk-menu-link">
 
-                <!-- LEAVE BALANCE -->
+			<span class="nk-menu-icon">
+				<em class="icon ni ni-user-circle"></em>
+			</span>
 
-                <li class="nk-menu-item">
+			<span class="nk-menu-text">
+				My Profile
+			</span>
 
-                    <a href="/HRMS/LeaveManagement/Balance"
-                       class="nk-menu-link">
+		</a>
 
-                       
+	</li>
 
-                        <span class="nk-menu-text">
-                            Leave Balance
-                        </span>
 
-                    </a>
+	<!-- ===================================================== -->
+	<!-- HR MANAGEMENT - HR ONLY -->
+	<!-- ===================================================== -->
+	@if (isHR)
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">HR MANAGEMENT</span>
+			</div>
+		</li>
 
-                </li>
 
+		<!-- Employee Management -->
 
-                <!-- LEAVE CREDIT / ADJUSTMENT -->
+		<li class="nk-menu-item has-sub">
 
-                <li class="nk-menu-item">
+			<a href="#"
+			   class="nk-menu-link nk-menu-toggle">
 
-                    <a href="/HRMS/LeaveAdjustment/Create"
-                       class="nk-menu-link">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-users"></em>
+				</span>
 
-                       
+				<span class="nk-menu-text">
+					Employee Management
+				</span>
 
-                        <span class="nk-menu-text">
-                            Leave Credit / Adjustment
-                        </span>
+			</a>
 
-                    </a>
+			<ul class="nk-menu-sub">
 
-                </li>
-            }
+				<li class="nk-menu-item">
 
+					<a href="/HRMS/Employee/Create"
+					   class="nk-menu-link">
 
-            @if (isReportingManager && !isHR)
-            {
-                <hr />
-                <!-- ============================================= -->
-                <!-- REGULARIZATION REQUESTS -->
-                <!-- ============================================= -->
+						<span class="nk-menu-text">
+							Add Employee
+						</span>
 
-                <li class="nk-menu-item">
+					</a>
 
-                    <a href="/HRMS/Attendance/RegularizationRequests"
-                       class="nk-menu-link">
+				</li>
 
-                        <span class="nk-menu-text">
-                            Regularization Requests
-                        </span>
 
-                    </a>
+				<li class="nk-menu-item">
 
-                </li>
+					<a href="/HRMS/Employee/EmployeeList"
+					   class="nk-menu-link">
 
+						<span class="nk-menu-text">
+							Employee List
+						</span>
 
-                <!-- ============================================= -->
-                <!-- OD REQUESTS -->
-                <!-- ============================================= -->
+					</a>
 
-                <li class="nk-menu-item">
+				</li>
 
-                    <a href="/HRMS/Attendance/ODRequests"
-                       class="nk-menu-link">
+			</ul>
 
-                        <span class="nk-menu-text">
-                            OD Requests
-                        </span>
+		</li>
 
-                    </a>
 
-                </li>
-            }
+		<!-- Attendance Management -->
 
-        </ul>
+		<li class="nk-menu-item has-sub">
 
-    </li>
+			<a href="#"
+			   class="nk-menu-link nk-menu-toggle">
 
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-calendar"></em>
+				</span>
 
-    <!-- ===================================================== -->
-    <!-- TASK MANAGEMENT -->
-    <!-- ===================================================== -->
-    @if (isReportingManager)
-    {
-        <li class="nk-menu-item has-sub">
+				<span class="nk-menu-text">
+					Attendance Management
+				</span>
 
-            <a href="#"
-               class="nk-menu-link nk-menu-toggle">
+			</a>
 
-                <span class="nk-menu-icon">
-                    <em class="icon ni ni-users"></em>
-                </span>
+			<ul class="nk-menu-sub">
 
-                <span class="nk-menu-text">
-                    Task Management
-                </span>
+				<li class="nk-menu-item">
 
-            </a>
+					<a href="/HRMS/Attendance/ViewAttendance"
+					   class="nk-menu-link">
 
+						<span class="nk-menu-text">
+							Attendance Management
+						</span>
 
-            <ul class="nk-menu-sub">
+					</a>
 
-                <li class="nk-menu-item">
+				</li>
 
-                    <a href="/HRMS/Task/Create"
-                       class="nk-menu-link">
 
-                        <span class="nk-menu-text">
-                            Assign New Task
-                        </span>
+				<li class="nk-menu-item">
 
-                    </a>
+					<a href="/HRMS/Attendance/AllRegularizations"
+					   class="nk-menu-link">
 
-                </li>
+						<span class="nk-menu-text">
+							All Regularizations
+						</span>
 
+					</a>
 
-                <li class="nk-menu-item">
+				</li>
 
-                    <a href="/HRMS/Task/TaskList"
-                       class="nk-menu-link">
 
-                        <span class="nk-menu-text">
-                            All Tasks List
-                        </span>
+				<li class="nk-menu-item">
 
-                    </a>
+					<a href="/HRMS/Attendance/AllODRequests"
+					   class="nk-menu-link">
 
-                </li>
+						<span class="nk-menu-text">
+							All OD Requests
+						</span>
 
+					</a>
 
-                <li class="nk-menu-item">
+				</li>
 
-                    <a href="/HRMS/Task/CompletedTask"
-                       class="nk-menu-link">
+			</ul>
 
-                        <span class="nk-menu-text">
-                            Completed Tasks
-                        </span>
+		</li>
 
-                    </a>
 
-                </li>
+		<!-- Leave Management -->
 
+		<li class="nk-menu-item has-sub">
 
-                <li class="nk-menu-item">
+			<a href="#"
+			   class="nk-menu-link nk-menu-toggle">
 
-                    <a href="/HRMS/Task/ClosedTask"
-                       class="nk-menu-link">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-calendar-booking"></em>
+				</span>
 
-                        <span class="nk-menu-text">
-                            Closed Tasks
-                        </span>
+				<span class="nk-menu-text">
+					Leave Management
+				</span>
 
-                    </a>
+			</a>
 
-                </li>
+			<ul class="nk-menu-sub">
 
-            </ul>
+				<li class="nk-menu-item">
 
-        </li>
-    }
-    else 
-    {
-        <li class="nk-menu-item has-sub">
+					<a href="/HRMS/LeaveManagement/MyLeaves"
+					   class="nk-menu-link">
 
-            <a href="#"
-               class="nk-menu-link nk-menu-toggle">
+						<span class="nk-menu-text">
+							Leave Requests
+						</span>
 
-                <span class="nk-menu-icon">
-                    <em class="icon ni ni-list-check"></em>
-                </span>
+					</a>
 
-                <span class="nk-menu-text">
-                    My Tasks & Activities
-                </span>
+				</li>
 
-            </a>
 
+				<li class="nk-menu-item">
 
-            <ul class="nk-menu-sub">
+					<a href="/HRMS/LeaveManagement/Balance"
+					   class="nk-menu-link">
 
-                <li class="nk-menu-item">
+						<span class="nk-menu-text">
+							Leave Balance
+						</span>
 
-                    <a href="/HRMS/Task/MyTasks"
-                       class="nk-menu-link">
+					</a>
 
-                        <span class="nk-menu-text">
-                            Assigned Tasks
-                        </span>
+				</li>
 
-                    </a>
 
-                </li>
+				<li class="nk-menu-item">
 
-            </ul>
+					<a href="/HRMS/LeaveAdjustment/Create"
+					   class="nk-menu-link">
 
-        </li>
-    }
+						<span class="nk-menu-text">
+							Leave Credit / Adjustment
+						</span>
 
+					</a>
 
- @*    <li class="nk-menu-item has-sub">
-        <a href="#" class="nk-menu-link nk-menu-toggle">
-            <span class="nk-menu-icon">
-                <em class="icon ni ni-check-circle-cut"></em>
-            </span>
-            <span class="nk-menu-text">Reimbursements</span>
-        </a>
-        <ul class="nk-menu-sub">
-@*             @if (isReportingManager)
-            {
-                <li class="nk-menu-item">
+				</li>
 
-                    <a asp-area="HRMS"
-                       asp-controller="Reimbursement"
-                       asp-route-status="Pending Manager Approval"
-                       asp-action="ManagerReimbursement"
-                       class="nk-menu-link">
+			</ul>
 
-                        <span class="nk-menu-text">
-                            Reimbursement Request
-                        </span>
+		</li>
 
-                    </a>
 
-                </li>
-                <li class="nk-menu-item">
+		<!-- HR Policies -->
 
-                    <a asp-area="HRMS"
-                       asp-controller="Reimbursement"
-                       asp-route-status="Manager Approved"
-                       asp-action="ManagerReimbursement"
-                       class="nk-menu-link">
+		<li class="nk-menu-item has-sub">
 
-                        <span class="nk-menu-text">
-                            Approved Reimbursement
-                        </span>
+			<a href="#"
+			   class="nk-menu-link nk-menu-toggle">
 
-                    </a>
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-policy-fill"></em>
+				</span>
 
-                </li>
-                <li class="nk-menu-item">
+				<span class="nk-menu-text">
+					Company Policies
+				</span>
 
-                    <a asp-area="HRMS"
-                       asp-controller="Reimbursement"
-                       asp-route-status="Rejected"
-                       asp-action="ManagerReimbursement"
-                       class="nk-menu-link">
+			</a>
 
-                        <span class="nk-menu-text">
-                            Reject Reimbursement
-                        </span>
+			<ul class="nk-menu-sub">
 
-                    </a>
+				<li class="nk-menu-item">
 
-                </li>
-            }
-            @if (isFinanceEmployee)
-            {
-                <li class="nk-menu-item">
-                    <a asp-area="HRMS"
-                       asp-controller="Reimbursement"
-                       asp-action="FinanceReimbursement"
-                       class="nk-menu-link">
+					<a href="/HRMS/HRPolicy"
+					   class="nk-menu-link">
 
-                        <span class="nk-menu-text">
-                            Finance Approval
-                        </span>
+						<span class="nk-menu-text">
+							Policy List
+						</span>
 
-                    </a>
-                </li>
-             }
-                @if (showReimbursementApproval)
-                {
-                    <li class="nk-menu-item">
-                        <a asp-area="HRMS"
-                           asp-controller="Reimbursements"
-                           asp-action="Approval"
-                           class="nk-menu-link">
+					</a>
 
-                            <span class="nk-menu-icon">
-                                <em class="icon ni ni-check-circle"></em>
-                            </span>
+				</li>
 
-                            <span class="nk-menu-text">
-                                Reimbursement Approval
-                            </span>
 
-                        </a>
-                    </li>
-                }
-            @if (showApprovedReimbursement)
-            {
-                <li class="nk-menu-item">
-                    <a asp-action="ApprovedReimbursement"
-                       asp-controller="Reimbursements"
-                       asp-area="HRMS"
-                       class="nk-menu-link">
+				<li class="nk-menu-item">
 
-                        <span class="nk-menu-icon">
-                            <em class="icon ni ni-check-circle"></em>
-                        </span>
+					<a href="/HRMS/HRPolicy/Create"
+					   class="nk-menu-link">
 
-                        <span class="nk-menu-text">
-                            Approved Reimbursement
-                        </span>
+						<span class="nk-menu-text">
+							Create Policy
+						</span>
 
-                    </a>
-                </li>
-            }
-            @if (showRejectedReimbursement)
-            {
-                <li class="nk-menu-item">
-                    <a asp-action="RejectedReimbursement"
-                       asp-controller="Reimbursements"
-                       asp-area="HRMS"
-                       class="nk-menu-link">
+					</a>
 
-                        <span class="nk-menu-icon">
-                            <em class="icon ni ni-cross-circle"></em>
-                        </span>
+				</li>
 
-                        <span class="nk-menu-text">
-                            Rejected Reimbursement
-                        </span>
+			</ul>
 
-                    </a>
-                </li>
-            }
-            <li class="nk-menu-item">
+		</li>
 
-                <a asp-area="HRMS"
-                   asp-controller="Reimbursements"
-                   asp-action="CreateReimbursement"
-                   class="nk-menu-link">
 
-                    <span class="nk-menu-text">
-                        Apply Reimbursement
-                    </span>
+		<!-- Holiday Management -->
 
-                </a>
+		<li class="nk-menu-item">
 
-            </li>
+			<a href="/HRMS/Calendar/Holidays"
+			   class="nk-menu-link">
 
-            <li class="nk-menu-item">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-calendar-alt"></em>
+				</span>
 
-                <a asp-area="HRMS"
-                   asp-controller="Reimbursements"
-                   asp-action="MyReimbursement"
-                   class="nk-menu-link">
+				<span class="nk-menu-text">
+					Holiday Management
+				</span>
 
-                    <span class="nk-menu-text">
-                        My Reimbursements
-                    </span>
+			</a>
 
-                </a>
+		</li>
 
-            </li>
-        </ul>
-    </li> *@
-    <li class="nk-menu-item has-sub">
-        <a href="#" class="nk-menu-link nk-menu-toggle">
 
-            <span class="nk-menu-icon">
-                <em class="icon ni ni-check-circle-cut"></em>
-            </span>
+		
 
-            <span class="nk-menu-text">
-                Internal Approvals
-            </span>
 
-        </a>
+		<!-- Organization Chart -->
 
-        <ul class="nk-menu-sub">
+		<li class="nk-menu-item">
 
-            @if (showReimbursementApproverMenu)
-            {
-                <li class="nk-menu-item">
-                    <a asp-area="HRMS"
-                       asp-controller="Reimbursements"
-                       asp-action="Approval"
-                       class="nk-menu-link">
+			<a href="/HRMS/EmployeeHierarchy/EmployeeHierarchy"
+			   class="nk-menu-link">
 
-                        <span class="nk-menu-text">
-                            Pending Approval
-                        </span>
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-network"></em>
+				</span>
 
-                    </a>
-                </li>
+				<span class="nk-menu-text">
+					Organization Chart
+				</span>
 
-                <li class="nk-menu-item">
-                    <a asp-area="HRMS"
-                       asp-controller="Reimbursements"
-                       asp-action="ApprovedReimbursement"
-                       class="nk-menu-link">
+			</a>
 
-                        <span class="nk-menu-text">
-                            Approved Approvals
-                        </span>
+		</li>
 
-                    </a>
-                </li>
+	}
 
-                <li class="nk-menu-item">
-                    <a asp-area="HRMS"
-                       asp-controller="Reimbursements"
-                       asp-action="RejectedReimbursement"
-                       class="nk-menu-link">
 
-                        <span class="nk-menu-text">
-                            Rejected Approvals
-                        </span>
+	<!-- ===================================================== -->
+	<!-- MANAGER - REPORTING MANAGER ONLY -->
+	<!-- ===================================================== -->
+	@if (isReportingManager && !isHR)
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">MANAGEMENT</span>
+			</div>
+		</li>
 
-                    </a>
-                </li>
-            }
-            @if (!isCEO)
-            {
 
-                <li class="nk-menu-item">
+		<!-- Attendance Approvals -->
 
-                    <a asp-area="HRMS"
-                    asp-controller="Reimbursements"
-                    asp-action="CreateReimbursement"
-                    class="nk-menu-link">
+		<li class="nk-menu-item has-sub">
 
-                        <span class="nk-menu-text">
-                            Apply for Approval
-                        </span>
+			<a href="#"
+			class="nk-menu-link nk-menu-toggle">
 
-                    </a>
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-calendar-check-fill"></em>
+				</span>
 
-                </li>
+				<span class="nk-menu-text">
+					Attendance Approvals
+				</span>
 
+			</a>
 
-                <li class="nk-menu-item">
+			<ul class="nk-menu-sub">
 
-                <a asp-area="HRMS"
-                   asp-controller="Reimbursements"
-                   asp-action="MyReimbursement"
-                   class="nk-menu-link">
+				<li class="nk-menu-item">
 
-                    <span class="nk-menu-text">
-                        My Approval list
-                    </span>
+					<a href="/HRMS/Attendance/RegularizationRequests"
+					class="nk-menu-link">
 
-                </a>
+						<span class="nk-menu-text">
+							Regularization Requests
+						</span>
 
-            </li>}
+					</a>
 
-        </ul>
-    </li>
-    <!-- ===================================================== -->
-    <!-- POLICIES -->
-    <!-- ===================================================== -->
-    @if (isHR)
-    {
-        <li class="nk-menu-item has-sub">
+				</li>
 
-            <a href="#"
-               class="nk-menu-link nk-menu-toggle">
 
-                <span class="nk-menu-icon">
-                    <em class="icon ni ni-file-docs"></em>
-                </span>
+				<li class="nk-menu-item">
 
-                <span class="nk-menu-text">
-                    Policies & Calendar
-                </span>
+					<a href="/HRMS/Attendance/ODRequests"
+					class="nk-menu-link">
 
-            </a>
+						<span class="nk-menu-text">
+							OD Requests
+						</span>
 
+					</a>
 
-            <ul class="nk-menu-sub">
+				</li>
 
-                <li class="nk-menu-item">
+			</ul>
 
-                    <a href="/HRMS/HRPolicy"
-                       class="nk-menu-link">
+		</li>
 
-                        <span class="nk-menu-text">
-                            Policy List
-                        </span>
 
-                    </a>
+		<!-- Task Management -->
 
-                </li>
+		<li class="nk-menu-item has-sub">
 
+			<a href="#"
+			class="nk-menu-link nk-menu-toggle">
 
-                <li class="nk-menu-item">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-list-index-fill"></em>
+				</span>
 
-                    <a href="/HRMS/HRPolicy/Create"
-                       class="nk-menu-link">
+				<span class="nk-menu-text">
+					Task Management
+				</span>
 
-                        <span class="nk-menu-text">
-                            Create Policy
-                        </span>
+			</a>
 
-                    </a>
+			<ul class="nk-menu-sub">
 
-                </li>
+				<li class="nk-menu-item">
 
+					<a href="/HRMS/Task/Create"
+					class="nk-menu-link">
 
-                <li class="nk-menu-item">
+						<span class="nk-menu-text">
+							Assign New Task
+						</span>
 
-                    <a href="/HRMS/Calendar/Holidays"
-                       class="nk-menu-link">
+					</a>
 
-                        <span class="nk-menu-text">
-                            Holiday Calendar
-                        </span>
+				</li>
 
-                    </a>
 
-                </li>
+				<li class="nk-menu-item">
 
-            </ul>
+					<a href="/HRMS/Task/TaskList"
+					class="nk-menu-link">
 
-        </li>
-    }
-    else
-    {
-        <!-- Employee Company Policies -->
+						<span class="nk-menu-text">
+							All Tasks
+						</span>
 
-        <li class="nk-menu-item">
+					</a>
 
-            <a href="/HRMS/HRPolicy/EmployeePolicies"
-               class="nk-menu-link">
+				</li>
 
-                <span class="nk-menu-icon">
-                    <em class="icon ni ni-file-docs"></em>
-                </span>
 
-                <span class="nk-menu-text">
-                    Company Policies
-                </span>
+				<li class="nk-menu-item">
 
-            </a>
+					<a href="/HRMS/Task/CompletedTask"
+					class="nk-menu-link">
 
-        </li>
-    }
+						<span class="nk-menu-text">
+							Completed Tasks
+						</span>
 
+					</a>
 
-    @if (isHR)
-    {
-        <li class="nk-menu-item has-sub">
-            <a href="#" class="nk-menu-link nk-menu-toggle">
-                <span class="nk-menu-icon">
-                    <em class="icon ni ni-mail"></em>
-                </span>
-                <span class="nk-menu-text">Letters Management</span>
-            </a>
+				</li>
 
-            <ul class="nk-menu-sub">
-                <li class="nk-menu-item">
-                    <a href="/HRMS/Letter/LetterReceive" class="nk-menu-link">
-                        <span class="nk-menu-text">Receive Letter</span>
-                    </a>
-                </li>
 
-                <li class="nk-menu-item">
-                    <a href="/HRMS/Letter/LetterReceiveList" class="nk-menu-link">
-                        <span class="nk-menu-text">Received Letter List</span>
-                    </a>
-                </li>
+				<li class="nk-menu-item">
 
-                <li class="nk-menu-item">
-                    <a href="/HRMS/Letter/LetterSend" class="nk-menu-link">
-                        <span class="nk-menu-text">Send Letter</span>
-                    </a>
-                </li>
+					<a href="/HRMS/Task/ClosedTask"
+					class="nk-menu-link">
 
-                <li class="nk-menu-item">
-                    <a href="/HRMS/Letter/LetterSendList" class="nk-menu-link">
-                        <span class="nk-menu-text">Sent Letter List</span>
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <!-- Employee Hierarchy -->
-        <li class="nk-menu-item has-sub">
+						<span class="nk-menu-text">
+							Closed Tasks
+						</span>
 
-            <a href="#"
-               class="nk-menu-link nk-menu-toggle">
+					</a>
 
-                <span class="nk-menu-icon">
-                    <em class="icon ni ni-share-alt"></em>
-                </span>
+				</li>
 
-                <span class="nk-menu-text">
-                    Employee Hierarchy
-                </span>
+			</ul>
 
-            </a>
+		</li>
+	}
+	
+	<!-- Internal Approval Management -->
+		
 
+			<li class="nk-menu-item has-sub">
 
-            <ul class="nk-menu-sub">
+				<a href="#"
+				   class="nk-menu-link nk-menu-toggle">
 
-                <li class="nk-menu-item">
+					<span class="nk-menu-icon">
+						<em class="icon ni ni-check-circle-cut"></em>
+					</span>
 
-                    <a href="/HRMS/EmployeeHierarchy/EmployeeHierarchy"
-                       class="nk-menu-link">
+					<span class="nk-menu-text">
+						Internal Approvals
+					</span>
 
-                        <span class="nk-menu-text">
-                            Upload Employee Hierarchy
-                        </span>
+				</a>
 
-                    </a>
+				<ul class="nk-menu-sub">
+			@if (showReimbursementApproverMenu)
+			{
+				<li class="nk-menu-item">
 
-                </li>
+					<a asp-area="HRMS"
+					asp-controller="Reimbursements"
+					asp-action="Approval"
+					class="nk-menu-link">
 
-            </ul>
+						<span class="nk-menu-text">
+							Pending Approvals
+						</span>
 
-        </li>
-    }
-    <li class="nk-menu-item">
-        <a href="/HRMS/Calendar/Holidays" class="nk-menu-link">
-            <span class="nk-menu-icon">
-                <em class="icon ni ni-calendar-alt"></em>
-            </span>
-            <span class="nk-menu-text">Holiday Calendar</span>
-        </a>
-    </li>
-    <!-- Employee Hierarchy -->
-    <li class="nk-menu-item">
+					</a>
 
-        <a href="/HRMS/EmployeeHierarchy/HierarchyView"
-           target="_blank"
-           class="nk-menu-link">
+				</li>
 
-            <span class="nk-menu-icon">
-                <em class="icon ni ni-network"></em>
-            </span>
 
+				<li class="nk-menu-item">
 
-            <span class="nk-menu-text">
-                Employee Hierarchy
-            </span>
+					<a asp-area="HRMS"
+					asp-controller="Reimbursements"
+					asp-action="ApprovedReimbursement"
+					class="nk-menu-link">
 
-        </a>
+						<span class="nk-menu-text">
+							Approved Approvals
+						</span>
 
-    </li>
-    <!-- ===================================================== -->
-    <!-- MY PROFILE -->
-    <!-- ===================================================== -->
+					</a>
 
-    <li class="nk-menu-item">
+				</li>
 
-        <a href="/HRMS/Profile/MyProfile"
-           class="nk-menu-link">
 
-            <span class="nk-menu-icon">
-                <em class="icon ni ni-user-circle"></em>
-            </span>
+				<li class="nk-menu-item">
 
-            <span class="nk-menu-text">
-                My Profile
-            </span>
+					<a asp-area="HRMS"
+					asp-controller="Reimbursements"
+					asp-action="RejectedReimbursement"
+					class="nk-menu-link">
 
-        </a>
+						<span class="nk-menu-text">
+							Rejected Approvals
+						</span>
 
-    </li>
+					</a>
+
+				</li>
+			}
+			@if (!isCEO)
+			{
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					asp-controller="Reimbursements"
+					asp-action="CreateReimbursement"
+					class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Apply for Approval
+						</span>
+
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+				   asp-controller="Reimbursements"
+				   asp-action="MyReimbursement"
+				   class="nk-menu-link">
+
+					<span class="nk-menu-text">
+						My Approval Requests
+					</span>
+
+				</a>
+			</li>}
+		</ul>
+
+			</li>
+		
+
+	
+
+
+@* 	-------------------------for reimbursement process-------------------------- *@
+
+	<li class="nk-menu-item has-sub">
+		<a href="#" class="nk-menu-link nk-menu-toggle">
+			<span class="nk-menu-icon">
+				<em class="icon ni ni-check-circle-cut"></em>
+			</span>
+			<span class="nk-menu-text">Reimbursement(Approval Process)</span>
+		</a>
+		<ul class="nk-menu-sub">
+			@if (isReportingManager)
+			{
+				<li class="nk-menu-item">
+
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="ManagerReimbursement"
+					   asp-route-status="Pending Manager Approval"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Reimbursement Request
+						</span>
+
+					</a>
+
+				</li>
+
+				<li class="nk-menu-item">
+
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="ManagerReimbursement"
+					   asp-route-status="Manager Approved"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Approved Reimbursement
+						</span>
+
+					</a>
+
+				</li>
+
+				<li class="nk-menu-item">
+
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="ManagerReimbursement"
+					   asp-route-status="Rejected"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Reject Reimbursement
+						</span>
+
+					</a>
+
+				</li>
+			}
+			@if (isFinanceEmployee)
+			{
+				<li class="nk-menu-item">
+						<a asp-area="HRMS"
+						   asp-controller="Reimbursement"
+						   asp-route-status="Pending"
+						   asp-action="FinanceReimbursement"
+						   class="nk-menu-link">
+
+							<span class="nk-menu-text">
+								Reimbursement Request
+							</span>
+
+						</a>
+					</li>
+
+					<li class="nk-menu-item">
+						<a asp-area="HRMS"
+						   asp-controller="Reimbursement"
+						   asp-route-status="Finance Approved"
+						   asp-action="FinanceReimbursement"
+						   class="nk-menu-link">
+
+							<span class="nk-menu-text">
+								Approved Reimbursement
+							</span>
+
+						</a>
+					</li>
+
+					<li class="nk-menu-item">
+						<a asp-area="HRMS"
+						   asp-controller="Reimbursement"
+						   asp-route-status="Finance Rejected"
+						   asp-action="FinanceReimbursement"
+						   class="nk-menu-link">
+
+							<span class="nk-menu-text">
+								Reject Reimbursement
+							</span>
+
+						</a>
+					</li>
+			}
+			@if (isHR)
+			{
+				<li class="nk-menu-item">
+
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="HRReimbursement"
+					   asp-route-status="Pending"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Reimbursement Request
+						</span>
+
+					</a>
+
+				</li>
+
+				<li class="nk-menu-item">
+
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="HRReimbursement"
+					   asp-route-status="HR Approved"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Approved Reimbursement
+						</span>
+
+					</a>
+
+				</li>
+
+				<li class="nk-menu-item">
+
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="HRReimbursement"
+					   asp-route-status="HR Rejected"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Reject Reimbursement
+						</span>
+
+					</a>
+
+				</li>
+			}
+			@if (isFinanceHead)
+			{
+				<li class="nk-menu-item">
+
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="FinanceHeadReimbursement"
+					   asp-route-status="Pending"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Reimbursement Request
+						</span>
+
+					</a>
+
+				</li>
+
+				<li class="nk-menu-item">
+
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="FinanceHeadReimbursement"
+					   asp-route-status="Finance Head Approved"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Approved Reimbursement
+						</span>
+
+					</a>
+
+				</li>
+
+				<li class="nk-menu-item">
+
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="FinanceHeadReimbursement"
+					   asp-route-status="Finance Head Rejected"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Reject Reimbursement
+						</span>
+
+					</a>
+
+				</li>
+			}
+			@if (isCEO)
+			{
+				<li class="nk-menu-item">
+
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="CEOReimbursement"
+					   asp-route-status="Pending"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Reimbursement Request
+						</span>
+
+					</a>
+
+				</li>
+
+				<li class="nk-menu-item">
+
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="CEOReimbursement"
+					   asp-route-status="CEO Approved"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Approved Reimbursement
+						</span>
+
+					</a>
+
+				</li>
+
+				<li class="nk-menu-item">
+
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="CEOReimbursement"
+					   asp-route-status="CEO Rejected"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Reject Reimbursement
+						</span>
+
+					</a>
+
+				</li>
+			}
+			@if (!isCEO)
+			{
+				<li class="nk-menu-item">
+
+					<a asp-area="HRMS"
+					asp-controller="Reimbursement"
+					asp-action="Create"
+					class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Apply Reimbursement
+						</span>
+
+					</a>
+
+				</li>
+
+				<li class="nk-menu-item">
+
+				<a asp-area="HRMS"
+				   asp-controller="Reimbursement"
+				   asp-action="MyReimbursement"
+				   class="nk-menu-link">
+
+					<span class="nk-menu-text">
+						My Reimbursements
+					</span>
+
+				</a>
+
+			</li>
+			}
+		</ul>
+	</li>
+	@* 	-------------------------for reimbursement process-------------------------- *@
+	<!-- ===================================================== -->
+	<!-- FINANCE - FINANCE ROLE ONLY -->
+	<!-- ===================================================== -->
+	@if (isFinanceEmployee)
+	{
+		<li class="nk-menu-heading mt-2 pt-3">
+
+			<h6 class="overline-title">
+				Finance
+			</h6>
+
+		</li>
+	}
+
+
+	<!-- ===================================================== -->
+	<!-- COMMON RESOURCES - EVERY EMPLOYEE -->
+	<!-- ===================================================== -->
+
+	<li class="nk-menu-heading">
+		<div class="nk-menu-heading-content">
+			<span class="nk-menu-heading-text">RESOURCES</span>
+		</div>
+	</li>
+
+
+	<!-- Company Policies -->
+
+	<li class="nk-menu-item">
+
+		<a href="/HRMS/HRPolicy/EmployeePolicies"
+		   class="nk-menu-link">
+
+			<span class="nk-menu-icon">
+				<em class="icon ni ni-policy-fill"></em>
+			</span>
+
+			<span class="nk-menu-text">
+				Company Policies
+			</span>
+
+		</a>
+
+	</li>
+
+
+	<!-- Holiday Calendar -->
+
+	<li class="nk-menu-item">
+
+		<a href="/HRMS/Calendar/Holidays"
+		   class="nk-menu-link">
+
+			<span class="nk-menu-icon">
+				<em class="icon ni ni-calendar-alt"></em>
+			</span>
+
+			<span class="nk-menu-text">
+				Holiday Calendar
+			</span>
+
+		</a>
+
+	</li>
+
+
+	<!-- Organization Chart View -->
+
+	<li class="nk-menu-item">
+
+		<a href="/HRMS/EmployeeHierarchy/HierarchyView"
+		   target="_blank"
+		   class="nk-menu-link">
+
+			<span class="nk-menu-icon">
+				<em class="icon ni ni-network"></em>
+			</span>
+
+			<span class="nk-menu-text">
+				Organization Chart
+			</span>
+
+		</a>
+
+	</li>
 
 </ul>

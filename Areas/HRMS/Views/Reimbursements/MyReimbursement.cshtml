@@ -38,7 +38,7 @@
 
         <div class="nk-block-head-content">
             <a asp-action="CreateReimbursement"
-               asp-controller="Reimbursement"
+               asp-controller="Reimbursements"
                asp-area="HRMS"
                class="btn btn-primary">
 
@@ -303,11 +303,68 @@
                                             }
                                         </div>
                                     }
+                                    @if (!string.IsNullOrEmpty(item.Approver5Name))
+                                    {
+                                        <div class="mb-1">
+                                            <strong>5.</strong>
+                                            @item.Approver5Name
 
+                                            <br />
+
+                                            @if (item.Approver5Status == "Approved")
+                                            {
+                                                <span class="badge bg-success">
+                                                    Approved
+                                                </span>
+                                            }
+                                            else if (item.Approver5Status == "Rejected")
+                                            {
+                                                <span class="badge bg-danger">
+                                                    Rejected
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">
+                                                    @item.Approver5Status
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(item.Approver6Name))
+                                    {
+                                        <div class="mb-1">
+                                            <strong>6.</strong>
+                                            @item.Approver6Name
+
+                                            <br />
+
+                                            @if (item.Approver6Status == "Approved")
+                                            {
+                                                <span class="badge bg-success">
+                                                    Approved
+                                                </span>
+                                            }
+                                            else if (item.Approver6Status == "Rejected")
+                                            {
+                                                <span class="badge bg-danger">
+                                                    Rejected
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">
+                                                    @item.Approver6Status
+                                                </span>
+                                            }
+                                        </div>
+                                    }
                                     @if (string.IsNullOrEmpty(item.Approver1Name)
                                                                     && string.IsNullOrEmpty(item.Approver2Name)
                                                                     && string.IsNullOrEmpty(item.Approver3Name)
-                                                                    && string.IsNullOrEmpty(item.Approver4Name))
+                                                                    && string.IsNullOrEmpty(item.Approver4Name)
+                                                                    && string.IsNullOrEmpty(item.Approver5Name)
+                                                                    && string.IsNullOrEmpty(item.Approver6Name))
                                     {
                                         <span>-</span>
                                     }
@@ -319,20 +376,28 @@
                                     <div class="btn-group">
 
                                         <!-- Edit -->
-                                        <a asp-action="CreateReimbursement"
-                                           asp-controller="Reimbursements"
-                                           asp-area="HRMS"
-                                           asp-route-id="@item.ReimbursementId"
-                                           class="btn btn-sm btn-outline-warning"
-                                           title="Edit">
+                                        @if (item.Approver1Status =="Pending" && item.Approver2Status=="Pending"
+                                        && item.Approver3Status =="Pending" && item.Approver4Status=="Pending"
+                                        && item.Approver5Status =="Pending" && item.Approver6Status=="Pending")
+                                        {
+                                            <a asp-action="CreateReimbursement"
+                                            asp-controller="Reimbursements"
+                                            asp-area="HRMS"
+                                            asp-route-id="@item.ReimbursementId"
+                                            class="btn btn-sm btn-outline-warning"
+                                            title="Edit">
 
-                                            <em class="icon ni ni-edit"></em>
+                                                <em class="icon ni ni-edit"></em>
 
-                                        </a>
-
+                                            </a>
+                                        }
                                         <!-- Delete -->
-                                        <form asp-action="DeleteReimbursement"
-                                              asp-controller="Reimbursements"
+                                                 @if (item.Approver1Status == "Pending" && item.Approver2Status == "Pending"
+                                                 && item.Approver3Status == "Pending" && item.Approver4Status == "Pending"
+                                                 && item.Approver5Status == "Pending" && item.Approver6Status == "Pending")
+                                        {
+                                            <form asp-action="DeleteReimbursement"
+                                            asp-controller="Reimbursements"
                                               asp-area="HRMS"
                                               asp-route-id="@item.ReimbursementId"
                                               method="post"
@@ -349,7 +414,7 @@
 
                                             </button>
 
-                                        </form>
+                                        </form>}
 
                                     </div>
                                 </td>

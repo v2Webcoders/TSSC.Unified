@@ -59,11 +59,11 @@
                 <tr>
                     <th>S.No.</th>
                     <th>Employee</th>
-                    <th>Request Type</th>
+                   @*  <th>Request Type</th> *@
                     <th>Expense Category</th>
                     <th>Expense Amount</th>
                     <th>Expense Date</th>
-                    <th>Vendor Name</th>
+                  @*   <th>Vendor Name</th> *@
                     <th>Payment Mode</th>
                     <th>Supporting Document</th>
                     <th>Invoice / Bill</th>
@@ -86,9 +86,9 @@
                             @item.EmployeeId
                         </td>
 
-                        <td>
+                       @*  <td>
                             @item.RequestType
-                        </td>
+                        </td> *@
 
                         <td>
                             @item.ExpenseCategory
@@ -102,9 +102,9 @@
                             @item.ExpenseDate.ToString("dd-MMM-yyyy")
                         </td>
 
-                        <td>
+                      @*   <td>
                             @item.VendorName
-                        </td>
+                        </td> *@
 
                         <td>
                             @item.PaymentMode

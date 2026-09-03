@@ -12,9 +12,9 @@ public class Reimbursement
 
         public int EmployeeId { get; set; }
 
-        [Required]
-        [StringLength(100)]
-        public string RequestType { get; set; }
+        //[Required]
+        //[StringLength(100)]
+        //public string? RequestType { get; set; }
 
         [Required]
         [StringLength(100)]
@@ -27,8 +27,8 @@ public class Reimbursement
         [Required]
         public DateTime ExpenseDate { get; set; }
 
-        [StringLength(200)]
-        public string VendorName { get; set; }
+        //[StringLength(200)]
+        //public string? VendorName { get; set; }
 
         [Required]
         [StringLength(50)]
@@ -44,8 +44,8 @@ public class Reimbursement
         [StringLength(500)]
         public string InvoiceBill { get; set; }
 
-        [StringLength(1000)]
-        public string Remarks { get; set; }
+        //[StringLength(1000)]
+        //public string? Remarks { get; set; }
 
         [Required]
         [StringLength(50)]
@@ -64,8 +64,22 @@ public class Reimbursement
 
         public DateTime? FinanceApprovedOn { get; set; }
 
-        public DateTime? PaidOn { get; set; }
+        public string? HRStatus { get; set; }
 
+        [StringLength(1000)]
+        public string? HRRemarks { get; set; }
+
+        public DateTime? HRApprovedOn { get; set; }
+        public string? FinanceHeadStatus { get; set; }
+
+        public string? FinanceHeadRemarks { get; set; }
+
+        public DateTime? FinanceHeadApprovedOn { get; set; }
+        public string? CEOStatus { get; set; }
+
+        public string? CEORemarks { get; set; }
+
+        public DateTime? CEOApprovedOn { get; set; }
         public DateTime CreatedOn { get; set; }
 
         public DateTime? UpdatedOn { get; set; }

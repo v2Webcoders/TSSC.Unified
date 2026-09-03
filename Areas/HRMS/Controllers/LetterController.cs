@@ -12,7 +12,7 @@ using TSSC.Unified.ViewModel;
 namespace TSSC.Unified.Areas.HRMS.Controllers
 {
     [Area("HRMS")]
-    [Authorize(Roles = "HR,Employee")]
+    [Authorize]
     public class LetterController :Controller
     {
         private readonly AppdbContext _context;
@@ -279,7 +279,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     HandoverDate = x.HandoverDate,
                     LetterAttachment = x.LetterAttachment,
                     Remarks = x.Remarks,
-                    CreatedOn = x.CreatedOn
+                    CreatedOn = x.CreatedOn,
+                   EmployeeReceiveStatus=x.EmployeeReceiveStatus
                 }).ToList();
 
             return View(model);
@@ -300,7 +301,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     HandoverDate = x.HandoverDate,
                     LetterAttachment = x.LetterAttachment,
                     Remarks = x.Remarks,
-                    CreatedOn = x.CreatedOn
+                    CreatedOn = x.CreatedOn,
+                    EmployeeReceiveStatus=x.EmployeeReceiveStatus
                 }).ToList();
 
             return View(model);
@@ -330,6 +332,111 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             {
                 return RedirectToAction("LetterSendList");
             }
+        }
+        [HttpGet]
+        public IActionResult EmployeeLetters()
+        {
+            var applicationUserId = User.FindFirst(
+                System.Security.Claims.ClaimTypes.NameIdentifier
+            )?.Value;
+
+            if (string.IsNullOrEmpty(applicationUserId))
+            {
+                return Unauthorized();
+            }
+
+            var employeeId = _context.Employee
+                .Where(x =>
+                    x.ApplicationUserId.ToString() == applicationUserId &&
+                    x.IsActive)
+                .Select(x => x.EmployeeId)
+                .FirstOrDefault();
+
+            if (employeeId == 0)
+            {
+                return Unauthorized();
+            }
+
+            var letters = _context.LetterRegister
+                .Where(x =>
+                    x.Handover == employeeId &&
+                    x.IsActive)
+                .OrderByDescending(x => x.CreatedOn)
+                .Select(x => new LetterRegisterVM
+                {
+                    LetterId = x.LetterId,
+                    LetterType = x.LetterType,
+                    ItemName = x.ItemName,
+                    SenderName = x.SenderName,
+                    Mode = x.Mode,
+                    DocketNo = x.DocketNo,
+                    HandoverDate = x.HandoverDate,
+                    LetterAttachment = x.LetterAttachment,
+                    EmployeeReceiveStatus = x.EmployeeReceiveStatus,
+                    EmployeeReceiveDate = x.EmployeeReceiveDate,
+                    CreatedOn = x.CreatedOn
+                })
+                .ToList();
+
+            return View(letters);
+        }
+        [HttpPost]
+        public IActionResult MarkAsReceived(int id)
+        {
+            var applicationUserId = User.FindFirst(
+                System.Security.Claims.ClaimTypes.NameIdentifier
+            )?.Value;
+
+            if (string.IsNullOrEmpty(applicationUserId))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "User not logged in."
+                });
+            }
+
+            var employeeId = _context.Employee
+                .Where(x =>
+                    x.ApplicationUserId.ToString() == applicationUserId &&
+                    x.IsActive)
+                .Select(x => x.EmployeeId)
+                .FirstOrDefault();
+
+            if (employeeId == 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Employee not found."
+                });
+            }
+
+            var letter = _context.LetterRegister
+                .FirstOrDefault(x =>
+                    x.LetterId == id &&
+                    x.Handover == employeeId &&
+                    x.IsActive);
+
+            if (letter == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Letter not found."
+                });
+            }
+
+            letter.EmployeeReceiveStatus = "Received";
+            letter.EmployeeReceiveDate = DateTime.Now;
+
+            _context.SaveChanges();
+
+            return Json(new
+            {
+                success = true,
+                message = "Letter received successfully."
+            });
         }
     }
 }

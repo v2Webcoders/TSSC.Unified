@@ -51,8 +51,6 @@
 
   <ItemGroup>
     <Folder Include="Repository\" />
-    <Folder Include="wwwroot\uploads\certificates\generated\" />
-    <Folder Include="wwwroot\uploads\certificates\zip\" />
     <Folder Include="wwwroot\uploads\invoices\" />
   </ItemGroup>
 

@@ -403,6 +403,76 @@
                     </div>
 
 
+                    <!-- Add More Approvers -->
+                    <div class="col-md-4 d-flex align-items-end"
+                         id="addApproverButton">
+
+                        <button type="button"
+                                class="btn btn-outline-primary"
+                                onclick="
+                document.getElementById('addApproverButton').classList.add('d-none');
+                document.getElementById('approver5Container').classList.remove('d-none');
+                document.getElementById('approver6Container').classList.remove('d-none');">
+
+                            <em class="icon ni ni-plus"></em>
+
+                            <span class="ms-1">
+                                Add More Approvers
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- Approver 5 -->
+                    <div class="col-md-4 d-none"
+                         id="approver5Container">
+
+                        <label class="form-label">
+                            Approver 5
+                        </label>
+
+                        <select asp-for="Approver5Id"
+                                asp-items="Model.ApproverList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Approver 5
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="Approver5Id"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Approver 6 -->
+                    <div class="col-md-4 d-none"
+                         id="approver6Container">
+
+                        <label class="form-label">
+                            Approver 6
+                        </label>
+
+                        <select asp-for="Approver6Id"
+                                asp-items="Model.ApproverList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Approver 6
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="Approver6Id"
+                              class="text-danger">
+                        </span>
+
+                    </div>
                     <!-- ===================================== -->
                     <!-- DOCUMENTS -->
                     <!-- ===================================== -->

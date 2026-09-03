@@ -485,34 +485,15 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             }
 
             // Task reopen status
+            task.ReopenTask = true;
             task.Status = "Reopen";
             task.IsClosed = false;
             task.UpdatedOn = DateTime.Now;
 
             await _context.SaveChangesAsync();
 
-            // Same task edit page par jayega
+            
             return RedirectToAction("EditTask", new { id = task.TaskId });
         }
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> ReopenTask(int id)
-        //{
-        //    var task = await _context.Tasks
-        //        .FirstOrDefaultAsync(x => x.TaskId == id);
-
-        //    if (task == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    // Status change
-        //    task.Status = "Reopen";
-
-        //    await _context.SaveChangesAsync();
-
-        //    // Manager ko Edit page par bhejo
-        //    return RedirectToAction("EditTask", new { id = task.TaskId });
-        //}
     }
 }

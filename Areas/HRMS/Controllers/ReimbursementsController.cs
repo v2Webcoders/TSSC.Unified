@@ -32,6 +32,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             _roleManager = roleManager;
             _environment = environment;
         }
+        #region
         private void LoadDropdowns(ReimbursementsVM model)
         {
             model.RequestTypeList = new List<SelectListItem>
@@ -139,6 +140,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
      .OrderBy(x => x.Text)
      .ToList();
         }
+        #endregion
 
         private async Task<string> UploadReimbursementFile(IFormFile file)
         {
@@ -243,6 +245,12 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     // Approver 4
                     Approver4Id = reimbursement.Approver4Id,
                     Approver4Status = reimbursement.Approver4Status,
+                    // Approver 5
+                    Approver5Id = reimbursement.Approver5Id,
+                    Approver5Status = reimbursement.Approver5Status,
+                    // Approver 6
+                    Approver6Id = reimbursement.Approver6Id,
+                    Approver6Status = reimbursement.Approver6Status,
 
                     FinalStatus = reimbursement.FinalStatus,
 
@@ -288,6 +296,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     Approver2Status = "Pending",
                     Approver3Status = "Pending",
                     Approver4Status = "Pending",
+                    Approver5Status = "Pending",
+                    Approver6Status = "Pending",
 
                     FinalStatus = "Pending",
 
@@ -379,6 +389,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 reimbursement.Approver2Id = model.Approver2Id;
                 reimbursement.Approver3Id = model.Approver3Id;
                 reimbursement.Approver4Id = model.Approver4Id;
+                reimbursement.Approver5Id = model.Approver5Id;
+                reimbursement.Approver6Id = model.Approver6Id;
 
                 // Agar approver change kiya gaya hai
                 // to uska status Pending kar do
@@ -391,6 +403,10 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                 reimbursement.Approver4Status =
                     model.Approver4Id.HasValue ? "Pending" : null;
+                reimbursement.Approver5Status =
+                    model.Approver5Id.HasValue ? "Pending" : null;
+                reimbursement.Approver6Status =
+                    model.Approver6Id.HasValue ? "Pending" : null;
 
                 // Creator already approved
                 reimbursement.Approver1Status = "Approved";
@@ -471,6 +487,18 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 Approver4Id = model.Approver4Id,
                 Approver4Status =
                     model.Approver4Id.HasValue
+                        ? "Pending"
+                        : null,
+                // Approver 5
+                Approver5Id = model.Approver5Id,
+                Approver5Status =
+                    model.Approver5Id.HasValue
+                        ? "Pending"
+                        : null,
+                // Approver 6
+                Approver6Id = model.Approver6Id,
+                Approver6Status =
+                    model.Approver6Id.HasValue
                         ? "Pending"
                         : null,
 
@@ -554,6 +582,16 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                      on r.Approver4Id equals a4.EmployeeId
                      into approver4Group
                  from a4 in approver4Group.DefaultIfEmpty()
+                     // Approver 5
+                 join a5 in _context.Employee
+                     on r.Approver5Id equals a5.EmployeeId
+                     into approver5Group
+                 from a5 in approver5Group.DefaultIfEmpty()
+                     // Approver 6
+                 join a6 in _context.Employee
+                     on r.Approver6Id equals a6.EmployeeId
+                     into approver6Group
+                 from a6 in approver6Group.DefaultIfEmpty()
 
                  where r.EmployeeId == employee.EmployeeId
                        && r.IsActive
@@ -640,6 +678,32 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                      Approver4Status = r.Approver4Status,
                      Approver4Remarks = r.Approver4Remarks,
                      Approver4ApprovedOn = r.Approver4ApprovedOn,
+                     // =========================
+                     // APPROVER 5
+                     // =========================
+
+                     Approver5Id = r.Approver5Id,
+
+                     Approver5Name = a5 != null
+                         ? a5.FirstName + " " + a5.LastName
+                         : null,
+
+                     Approver5Status = r.Approver5Status,
+                     Approver5Remarks = r.Approver5Remarks,
+                     Approver5ApprovedOn = r.Approver5ApprovedOn,
+                     // =========================
+                     // APPROVER 6
+                     // =========================
+
+                     Approver6Id = r.Approver6Id,
+
+                     Approver6Name = a6 != null
+                         ? a6.FirstName + " " + a6.LastName
+                         : null,
+
+                     Approver6Status = r.Approver6Status,
+                     Approver6Remarks = r.Approver6Remarks,
+                     Approver6ApprovedOn = r.Approver6ApprovedOn,
 
                      // =========================
                      // FINANCE
@@ -703,10 +767,15 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             bool approver4Updated =
                 reimbursement.Approver4Status == "Approved" ||
                 reimbursement.Approver4Status == "Rejected";
+            bool approver5Updated =
+               reimbursement.Approver5Status == "Approved" ||
+               reimbursement.Approver5Status == "Rejected";
+            bool approver6Updated =
+               reimbursement.Approver6Status == "Approved" ||
+               reimbursement.Approver6Status == "Rejected";
 
 
-            // Agar kisi bhi approver ne approve/reject kar diya
-            if (approver2Updated || approver3Updated || approver4Updated)
+            if (approver2Updated || approver3Updated || approver4Updated || approver5Updated || approver6Updated)
             {
                 TempData["error"] =
                     "Reimbursement cannot be deleted because the approval process has already been updated.";
@@ -792,6 +861,31 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                             x.Approver4Status == "Pending"
                         )
                         ||
+                        // =========================
+                        // APPROVER 5
+                        // =========================
+                        (
+                            x.Approver5Id == employeeId &&
+                            x.Approver1Status == "Approved" &&
+                            x.Approver2Status == "Approved" &&
+                            x.Approver3Status == "Approved" &&
+                            x.Approver4Status == "Approved" &&
+                            x.Approver5Status == "Pending"
+                        )
+                        ||
+                        // =========================
+                        // APPROVER 6
+                        // =========================
+                        (
+                            x.Approver6Id == employeeId &&
+                            x.Approver1Status == "Approved" &&
+                            x.Approver2Status == "Approved" &&
+                            x.Approver3Status == "Approved" &&
+                            x.Approver4Status == "Approved" &&
+                            x.Approver5Status == "Approved" &&
+                            x.Approver6Status == "Pending"
+                        )
+                        ||
                        // =========================
                        // CEO APPROVER 
                        // =========================
@@ -844,7 +938,12 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     Approver4Id = x.Approver4Id,
                     Approver4Status = x.Approver4Status,
 
-                    
+                    Approver5Id = x.Approver5Id,
+                    Approver5Status = x.Approver5Status,
+                    Approver6Id = x.Approver6Id,
+                    Approver6Status = x.Approver6Status,
+
+
                     FinalStatus = x.FinalStatus,
 
                     CreatedOn = x.CreatedOn
@@ -941,6 +1040,41 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 reimbursement.Approver4ApprovedOn = DateTime.Now;
             }
             // =====================================
+            // APPROVER 5
+            // =====================================
+
+            else if (reimbursement.Approver5Id == employeeId &&
+                     reimbursement.Approver1Status == "Approved" &&
+                     reimbursement.Approver2Status == "Approved" &&
+                     reimbursement.Approver3Status == "Approved" &&
+                     reimbursement.Approver4Status == "Approved" &&
+                     reimbursement.Approver5Status == "Pending")
+            {
+                reimbursement.Approver5Status = status;
+
+                reimbursement.Approver5Remarks = remarks;
+
+                reimbursement.Approver5ApprovedOn = DateTime.Now;
+            }
+            // =====================================
+            // APPROVER 6
+            // =====================================
+
+            else if (reimbursement.Approver6Id == employeeId &&
+                     reimbursement.Approver1Status == "Approved" &&
+                     reimbursement.Approver2Status == "Approved" &&
+                     reimbursement.Approver3Status == "Approved" &&
+                     reimbursement.Approver4Status == "Approved" &&
+                     reimbursement.Approver5Status == "Approved" &&
+                     reimbursement.Approver6Status == "Pending")
+            {
+                reimbursement.Approver6Status = status;
+
+                reimbursement.Approver6Remarks = remarks;
+
+                reimbursement.Approver6ApprovedOn = DateTime.Now;
+            }
+            // =====================================
             // CEO APPROVER 
             // =====================================
 
@@ -995,7 +1129,24 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     reimbursement.Status = "Approved";
                     reimbursement.FinalStatus = "Approved";
                 }
+                // =====================================
+                // APPROVER 6
+                // =====================================
 
+                else if (reimbursement.Approver6Id.HasValue)
+                {
+                    reimbursement.Status = "Pending";
+                    reimbursement.FinalStatus = "Pending";
+                }
+                // =====================================
+                // APPROVER 5
+                // =====================================
+
+                else if (reimbursement.Approver5Id.HasValue)
+                {
+                    reimbursement.Status = "Pending";
+                    reimbursement.FinalStatus = "Pending";
+                }
                 // =====================================
                 // APPROVER 4
                 // =====================================
@@ -1079,6 +1230,12 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                         (r.Approver4Id == employeeId &&
                          r.Approver4Status == "Approved")
                           ||
+                          (r.Approver5Id == employeeId &&
+                         r.Approver5Status == "Approved")
+                          ||
+                          (r.Approver6Id == employeeId &&
+                         r.Approver6Status == "Approved")
+                          ||
 
                         (isCEO && r.FinalStatus == "Approved")
                     ))
@@ -1112,6 +1269,12 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                         : r.Approver4Id == employeeId
                             ? r.Approver4Remarks
+
+                            : r.Approver5Id == employeeId
+                            ? r.Approver5Remarks
+
+                            : r.Approver6Id == employeeId
+                            ? r.Approver6Remarks
                         : isCEO
                         ? r.FinalRemarks
                         : null,
@@ -1153,6 +1316,14 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                         (r.Approver4Id == employeeId &&
                          r.Approver4Status == "Rejected")
                          ||
+                          (r.Approver5Id == employeeId &&
+                         r.Approver5Status == "Rejected")
+                         ||
+
+                          (r.Approver6Id == employeeId &&
+                         r.Approver6Status == "Rejected")
+                         ||
+
 
                         // CEO FINAL REJECTION
                         (isCEO &&
@@ -1188,6 +1359,10 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                         : r.Approver4Id == employeeId
                             ? r.Approver4Remarks
+                            : r.Approver5Id == employeeId
+                            ? r.Approver5Remarks
+                            : r.Approver6Id == employeeId
+                            ? r.Approver6Remarks
                         : isCEO
                         ? r.FinalRemarks      
                         : null,

@@ -27,7 +27,7 @@ namespace TSSC.Unified.ViewModel
 
         public int? DelegatedTo { get; set; }
 
-        public string? Handover { get; set; }
+        public int? Handover { get; set; }
 
         public DateTime? HandoverDate { get; set; }
         public DateTime? CreatedOn { get; set; }
@@ -38,5 +38,9 @@ namespace TSSC.Unified.ViewModel
         public IFormFile? LetterAttachmentFile { get; set; }
 
         public string? LetterAttachment { get; set; }
+        // Received / Not Received
+        public string? EmployeeReceiveStatus { get; set; } 
+
+        public DateTime? EmployeeReceiveDate { get; set; }
     }
 }

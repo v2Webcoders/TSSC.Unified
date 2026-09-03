@@ -14,6 +14,7 @@ using Org.BouncyCastle.Tls;
 using QUIZAPP;
 using QUIZAPP.Models;
 using System.IO.Compression;
+using TSSC.Unified.Models;
 
 namespace TSSC.Unified.Areas.Admin.Controllers
 {
@@ -83,16 +84,16 @@ namespace TSSC.Unified.Areas.Admin.Controllers
         // =========================================================
         // BULK GENERATE - POST
         // =========================================================
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> BulkGenerate(int id,IFormFile excelFile)
+        public async Task<IActionResult> BulkGenerate(int id, IFormFile excelFile)
         {
             // =====================================================
-            // VALIDATE FILE
+            // GET CERTIFICATE MASTER
             // =====================================================
+
             var certificate = await _context.Certificate
-        .FirstOrDefaultAsync(x => x.Id == id);
+                .FirstOrDefaultAsync(x => x.Id == id && x.IsActive);
 
             if (certificate == null)
             {
@@ -100,24 +101,35 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                     "Certificate does not exist. ID received: " + id
                 );
             }
+
+
+            // =====================================================
+            // VALIDATE EXCEL FILE
+            // =====================================================
+
             if (excelFile == null || excelFile.Length == 0)
             {
                 TempData["Error"] = "Please upload an Excel file.";
 
-                return RedirectToAction(nameof(BulkGenerate));
+                return RedirectToAction(
+                    nameof(BulkGenerate),
+                    new { id = id }
+                );
             }
 
 
             string extension =
                 Path.GetExtension(excelFile.FileName).ToLower();
 
-
             if (extension != ".xlsx")
             {
                 TempData["Error"] =
                     "Please upload a valid .xlsx Excel file.";
 
-                return RedirectToAction(nameof(BulkGenerate));
+                return RedirectToAction(
+                    nameof(BulkGenerate),
+                    new { id = id }
+                );
             }
 
 
@@ -125,17 +137,13 @@ namespace TSSC.Unified.Areas.Admin.Controllers
             // TEMPLATE PATH
             // =====================================================
 
-            //string templatePath = Path.Combine(
-            //    _environment.WebRootPath,
-            //    "uploads",
-            //    "certificates",
-            //    "templates",
-            //    "ONE_POINT_ONE_SOLUTION_LTD.png"
-            //);
             if (string.IsNullOrWhiteSpace(certificate.TemplateFile))
             {
-                return NotFound("Certificate template is not assigned.");
+                return NotFound(
+                    "Certificate template is not assigned."
+                );
             }
+
 
             string templatePath = Path.Combine(
                 _environment.WebRootPath,
@@ -144,6 +152,7 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                 "templates",
                 certificate.TemplateFile
             );
+
 
             if (!System.IO.File.Exists(templatePath))
             {
@@ -154,28 +163,49 @@ namespace TSSC.Unified.Areas.Admin.Controllers
             }
 
 
-            if (!System.IO.File.Exists(templatePath))
-            {
-                TempData["Error"] =
-                    "Certificate template not found: " +
-                    templatePath;
+            // =====================================================
+            // CREATE GENERATION / BATCH HISTORY
+            // =====================================================
 
-                return RedirectToAction(nameof(BulkGenerate));
-            }
+            var generation = new CertificateGeneration
+            {
+                CertificateId = certificate.Id,
+                GeneratedDate = DateTime.Now,
+                GeneratedBy = User.Identity?.Name,
+                ExcelFileName = excelFile.FileName,
+
+                TotalRecords = 0,
+                SuccessRecords = 0,
+                FailedRecords = 0,
+
+                IsActive = true
+            };
+
+            _context.CertificateGeneration.Add(generation);
+
+            // Save first to get Generation Id
+            await _context.SaveChangesAsync();
+
+
+            // =====================================================
+            // COUNTERS
+            // =====================================================
+
+            int totalRecords = 0;
+            int successRecords = 0;
+            int failedRecords = 0;
 
 
             // =====================================================
             // CREATE ZIP
             // =====================================================
 
-            using (MemoryStream zipStream =
-                   new MemoryStream())
+            using (MemoryStream zipStream = new MemoryStream())
             {
-                using (ZipArchive zip =
-                       new ZipArchive(
-                           zipStream,
-                           ZipArchiveMode.Create,
-                           true))
+                using (ZipArchive zip = new ZipArchive(
+                    zipStream,
+                    ZipArchiveMode.Create,
+                    true))
                 {
                     // =================================================
                     // READ EXCEL
@@ -197,18 +227,18 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                                     "Excel worksheet not found.";
 
                                 return RedirectToAction(
-                                    nameof(BulkGenerate)
+                                    nameof(BulkGenerate),
+                                    new { id = id }
                                 );
                             }
 
 
-                            // =============================================
+                            // =================================================
                             // LAST ROW
-                            // =============================================
+                            // =================================================
 
                             var lastUsedRow =
                                 worksheet.LastRowUsed();
-
 
                             int lastRow =
                                 lastUsedRow?.RowNumber() ?? 0;
@@ -220,14 +250,15 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                                     "Excel does not contain any data.";
 
                                 return RedirectToAction(
-                                    nameof(BulkGenerate)
+                                    nameof(BulkGenerate),
+                                    new { id = id }
                                 );
                             }
 
 
-                            // =============================================
+                            // =================================================
                             // HEADERS
-                            // =============================================
+                            // =================================================
 
                             var headers =
                                 worksheet
@@ -241,23 +272,21 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                                     );
 
 
-                            // =============================================
+                            // =================================================
                             // REQUIRED COLUMNS
-                            // =============================================
+                            // =================================================
 
                             string[] requiredColumns =
                             {
-                                "certificateno",
-                                "companyname",
-                                "description",
-                                "startdate",
-                                "enddate"
-                            };
+                        "certificateno",
+                        "companyname",
+                        "description",
+                        "startdate",
+                        "enddate"
+                    };
 
 
-                            foreach (
-                                string column
-                                in requiredColumns)
+                            foreach (string column in requiredColumns)
                             {
                                 if (!headers.ContainsKey(column))
                                 {
@@ -266,15 +295,16 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                                         column;
 
                                     return RedirectToAction(
-                                        nameof(BulkGenerate)
+                                        nameof(BulkGenerate),
+                                        new { id = id }
                                     );
                                 }
                             }
 
 
-                            // =============================================
+                            // =================================================
                             // PROCESS EVERY EXCEL ROW
-                            // =============================================
+                            // =================================================
 
                             for (
                                 int rowNumber = 2;
@@ -285,9 +315,9 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                                     worksheet.Row(rowNumber);
 
 
-                                // =========================================
+                                // =============================================
                                 // READ EXCEL VALUES
-                                // =========================================
+                                // =============================================
 
                                 string certificateNo =
                                     row.Cell(
@@ -329,9 +359,9 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                                     );
 
 
-                                // =========================================
+                                // =============================================
                                 // SKIP EMPTY ROW
-                                // =========================================
+                                // =============================================
 
                                 if (
                                     string.IsNullOrWhiteSpace(
@@ -340,30 +370,19 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                                     &&
                                     string.IsNullOrWhiteSpace(
                                         companyName
-                                    ))
+                                    )
+                                )
                                 {
                                     continue;
                                 }
 
 
-                                // =========================================
-                                // GENERATE PDF
-                                // =========================================
-
-                                byte[] pdfBytes =
-                                    GenerateCertificatePdf(
-                                        certificateNo,
-                                        companyName,
-                                        description,
-                                        startDate,
-                                        endDate,
-                                        templatePath
-                                    );
+                                totalRecords++;
 
 
-                                // =========================================
+                                // =============================================
                                 // SAFE FILE NAME
-                                // =========================================
+                                // =============================================
 
                                 string safeCertificateNo =
                                     MakeSafeFileName(
@@ -382,32 +401,282 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                                 }
 
 
-                                // =========================================
-                                // ADD PDF TO ZIP
-                                // =========================================
+                                // =================================================
+                                // UNIQUE FILE NAME
+                                // =================================================
 
-                                ZipArchiveEntry entry =
-                                    zip.CreateEntry(
-                                        safeCertificateNo +
-                                        ".pdf",
-                                        CompressionLevel.Fastest
-                                    );
+                                string generatedFileName =
+                                    safeCertificateNo +
+                                    "_" +
+                                    DateTime.Now.ToString(
+                                        "yyyyMMddHHmmssfff"
+                                    ) +
+                                    ".pdf";
 
 
-                                using (
-                                    Stream entryStream =
-                                    entry.Open())
+                                try
                                 {
-                                    await entryStream.WriteAsync(
-                                        pdfBytes,
-                                        0,
-                                        pdfBytes.Length
+                                    // =============================================
+                                    // GENERATE PDF
+                                    // =============================================
+
+                                    byte[] pdfBytes =
+                                        GenerateCertificatePdf(
+                                            certificateNo,
+                                            companyName,
+                                            description,
+                                            startDate,
+                                            endDate,
+                                            templatePath
+                                        );
+
+
+                                    // =============================================
+                                    // SAVE PDF PERMANENTLY
+                                    // =============================================
+
+                                    string generatedFolder =
+                                        Path.Combine(
+                                            _environment.WebRootPath,
+                                            "uploads",
+                                            "certificates",
+                                            "generated"
+                                        );
+
+
+                                    if (!Directory.Exists(
+                                        generatedFolder))
+                                    {
+                                        Directory.CreateDirectory(
+                                            generatedFolder
+                                        );
+                                    }
+
+
+                                    string physicalFilePath =
+                                        Path.Combine(
+                                            generatedFolder,
+                                            generatedFileName
+                                        );
+
+
+                                    await System.IO.File.WriteAllBytesAsync(
+                                        physicalFilePath,
+                                        pdfBytes
                                     );
+
+
+                                    // =============================================
+                                    // RELATIVE FILE PATH
+                                    // =============================================
+
+                                    string generatedRelativePath =
+                                        "/uploads/certificates/generated/" +
+                                        generatedFileName;
+
+
+                                    // =============================================
+                                    // ADD PDF TO ZIP
+                                    // =============================================
+
+                                    ZipArchiveEntry entry =
+                                        zip.CreateEntry(
+                                            generatedFileName,
+                                            CompressionLevel.Fastest
+                                        );
+
+
+                                    using (
+                                        Stream entryStream =
+                                        entry.Open())
+                                    {
+                                        await entryStream.WriteAsync(
+                                            pdfBytes,
+                                            0,
+                                            pdfBytes.Length
+                                        );
+                                    }
+
+
+                                    // =============================================
+                                    // PARSE DATES
+                                    // =============================================
+
+                                    DateTime? parsedStartDate = null;
+                                    DateTime? parsedEndDate = null;
+
+
+                                    if (DateTime.TryParse(
+                                        startDate,
+                                        out DateTime tempStartDate))
+                                    {
+                                        parsedStartDate =
+                                            tempStartDate;
+                                    }
+
+
+                                    if (DateTime.TryParse(
+                                        endDate,
+                                        out DateTime tempEndDate))
+                                    {
+                                        parsedEndDate =
+                                            tempEndDate;
+                                    }
+
+
+                                    // =============================================
+                                    // SAVE GENERATION DETAIL
+                                    // =============================================
+
+                                    var detail =
+                                        new CertificateGenerationDetail
+                                        {
+                                            CertificateGenerationId =
+                                                generation.Id,
+
+                                            CertificateNo =
+                                                certificateNo,
+
+                                            CompanyName =
+                                                companyName,
+
+                                            Description =
+                                                description,
+
+                                            StartDate =
+                                                parsedStartDate,
+
+                                            EndDate =
+                                                parsedEndDate,
+
+                                            GeneratedFileName =
+                                                generatedFileName,
+
+                                            GeneratedFilePath =
+                                                generatedRelativePath,
+
+                                            GeneratedDate =
+                                                DateTime.Now,
+
+                                            IsGenerated =
+                                                true,
+
+                                            ErrorMessage =
+                                                null,
+
+                                            IsActive =
+                                                true
+                                        };
+
+
+                                    _context
+                                        .CertificateGenerationDetail
+                                        .Add(detail);
+
+
+                                    successRecords++;
+                                }
+                                catch (Exception ex)
+                                {
+                                    // =============================================
+                                    // SAVE FAILED RECORD HISTORY
+                                    // =============================================
+
+                                    DateTime? failedStartDate = null;
+                                    DateTime? failedEndDate = null;
+
+
+                                    if (DateTime.TryParse(
+                                        startDate,
+                                        out DateTime tempFailedStart))
+                                    {
+                                        failedStartDate =
+                                            tempFailedStart;
+                                    }
+
+
+                                    if (DateTime.TryParse(
+                                        endDate,
+                                        out DateTime tempFailedEnd))
+                                    {
+                                        failedEndDate =
+                                            tempFailedEnd;
+                                    }
+
+
+                                    var failedDetail =
+                                        new CertificateGenerationDetail
+                                        {
+                                            CertificateGenerationId =
+                                                generation.Id,
+
+                                            CertificateNo =
+                                                certificateNo,
+
+                                            CompanyName =
+                                                companyName,
+
+                                            Description =
+                                                description,
+
+                                            StartDate =
+                                                failedStartDate,
+
+                                            EndDate =
+                                                failedEndDate,
+
+                                            GeneratedFileName =
+                                                generatedFileName,
+
+                                            GeneratedFilePath =
+                                                null,
+
+                                            GeneratedDate =
+                                                DateTime.Now,
+
+                                            IsGenerated =
+                                                false,
+
+                                            ErrorMessage =
+                                                ex.Message,
+
+                                            IsActive =
+                                                true
+                                        };
+
+
+                                    _context
+                                        .CertificateGenerationDetail
+                                        .Add(failedDetail);
+
+
+                                    failedRecords++;
                                 }
                             }
                         }
                     }
                 }
+
+
+                // =====================================================
+                // UPDATE GENERATION / BATCH SUMMARY
+                // =====================================================
+
+                generation.TotalRecords =
+                    totalRecords;
+
+                generation.SuccessRecords =
+                    successRecords;
+
+                generation.FailedRecords =
+                    failedRecords;
+
+
+                // =====================================================
+                // SAVE ALL HISTORY
+                // =====================================================
+
+                await _context.SaveChangesAsync();
 
 
                 // =====================================================
@@ -424,7 +693,8 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                         "No certificates were generated.";
 
                     return RedirectToAction(
-                        nameof(BulkGenerate)
+                        nameof(BulkGenerate),
+                        new { id = id }
                     );
                 }
 
@@ -440,6 +710,362 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                 );
             }
         }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> BulkGenerate(int id,IFormFile excelFile)
+        //{
+        //    // =====================================================
+        //    // VALIDATE FILE
+        //    // =====================================================
+        //    var certificate = await _context.Certificate
+        //.FirstOrDefaultAsync(x => x.Id == id);
+
+        //    if (certificate == null)
+        //    {
+        //        return NotFound(
+        //            "Certificate does not exist. ID received: " + id
+        //        );
+        //    }
+        //    if (excelFile == null || excelFile.Length == 0)
+        //    {
+        //        TempData["Error"] = "Please upload an Excel file.";
+
+        //        return RedirectToAction(nameof(BulkGenerate));
+        //    }
+
+
+        //    string extension =
+        //        Path.GetExtension(excelFile.FileName).ToLower();
+
+
+        //    if (extension != ".xlsx")
+        //    {
+        //        TempData["Error"] =
+        //            "Please upload a valid .xlsx Excel file.";
+
+        //        return RedirectToAction(nameof(BulkGenerate));
+        //    }
+
+
+        //    // =====================================================
+        //    // TEMPLATE PATH
+        //    // =====================================================
+
+        //    //string templatePath = Path.Combine(
+        //    //    _environment.WebRootPath,
+        //    //    "uploads",
+        //    //    "certificates",
+        //    //    "templates",
+        //    //    "ONE_POINT_ONE_SOLUTION_LTD.png"
+        //    //);
+        //    if (string.IsNullOrWhiteSpace(certificate.TemplateFile))
+        //    {
+        //        return NotFound("Certificate template is not assigned.");
+        //    }
+
+        //    string templatePath = Path.Combine(
+        //        _environment.WebRootPath,
+        //        "uploads",
+        //        "certificates",
+        //        "templates",
+        //        certificate.TemplateFile
+        //    );
+
+        //    if (!System.IO.File.Exists(templatePath))
+        //    {
+        //        return NotFound(
+        //            "Certificate template not found: " +
+        //            certificate.TemplateFile
+        //        );
+        //    }
+
+
+        //    if (!System.IO.File.Exists(templatePath))
+        //    {
+        //        TempData["Error"] =
+        //            "Certificate template not found: " +
+        //            templatePath;
+
+        //        return RedirectToAction(nameof(BulkGenerate));
+        //    }
+
+
+        //    // =====================================================
+        //    // CREATE ZIP
+        //    // =====================================================
+
+        //    using (MemoryStream zipStream =
+        //           new MemoryStream())
+        //    {
+        //        using (ZipArchive zip =
+        //               new ZipArchive(
+        //                   zipStream,
+        //                   ZipArchiveMode.Create,
+        //                   true))
+        //        {
+        //            // =================================================
+        //            // READ EXCEL
+        //            // =================================================
+
+        //            using (Stream excelStream =
+        //                   excelFile.OpenReadStream())
+        //            {
+        //                using (XLWorkbook workbook =
+        //                       new XLWorkbook(excelStream))
+        //                {
+        //                    var worksheet =
+        //                        workbook.Worksheets.FirstOrDefault();
+
+
+        //                    if (worksheet == null)
+        //                    {
+        //                        TempData["Error"] =
+        //                            "Excel worksheet not found.";
+
+        //                        return RedirectToAction(
+        //                            nameof(BulkGenerate)
+        //                        );
+        //                    }
+
+
+        //                    // =============================================
+        //                    // LAST ROW
+        //                    // =============================================
+
+        //                    var lastUsedRow =
+        //                        worksheet.LastRowUsed();
+
+
+        //                    int lastRow =
+        //                        lastUsedRow?.RowNumber() ?? 0;
+
+
+        //                    if (lastRow < 2)
+        //                    {
+        //                        TempData["Error"] =
+        //                            "Excel does not contain any data.";
+
+        //                        return RedirectToAction(
+        //                            nameof(BulkGenerate)
+        //                        );
+        //                    }
+
+
+        //                    // =============================================
+        //                    // HEADERS
+        //                    // =============================================
+
+        //                    var headers =
+        //                        worksheet
+        //                            .Row(1)
+        //                            .CellsUsed()
+        //                            .ToDictionary(
+        //                                x => x.GetString()
+        //                                    .Trim()
+        //                                    .ToLower(),
+        //                                x => x.Address.ColumnNumber
+        //                            );
+
+
+        //                    // =============================================
+        //                    // REQUIRED COLUMNS
+        //                    // =============================================
+
+        //                    string[] requiredColumns =
+        //                    {
+        //                        "certificateno",
+        //                        "companyname",
+        //                        "description",
+        //                        "startdate",
+        //                        "enddate"
+        //                    };
+
+
+        //                    foreach (
+        //                        string column
+        //                        in requiredColumns)
+        //                    {
+        //                        if (!headers.ContainsKey(column))
+        //                        {
+        //                            TempData["Error"] =
+        //                                "Missing Excel column: " +
+        //                                column;
+
+        //                            return RedirectToAction(
+        //                                nameof(BulkGenerate)
+        //                            );
+        //                        }
+        //                    }
+
+
+        //                    // =============================================
+        //                    // PROCESS EVERY EXCEL ROW
+        //                    // =============================================
+
+        //                    for (
+        //                        int rowNumber = 2;
+        //                        rowNumber <= lastRow;
+        //                        rowNumber++)
+        //                    {
+        //                        var row =
+        //                            worksheet.Row(rowNumber);
+
+
+        //                        // =========================================
+        //                        // READ EXCEL VALUES
+        //                        // =========================================
+
+        //                        string certificateNo =
+        //                            row.Cell(
+        //                                headers["certificateno"]
+        //                            )
+        //                            .GetString()
+        //                            .Trim();
+
+
+        //                        string companyName =
+        //                            row.Cell(
+        //                                headers["companyname"]
+        //                            )
+        //                            .GetString()
+        //                            .Trim();
+
+
+        //                        string description =
+        //                            row.Cell(
+        //                                headers["description"]
+        //                            )
+        //                            .GetString()
+        //                            .Trim();
+
+
+        //                        string startDate =
+        //                            GetExcelDate(
+        //                                row.Cell(
+        //                                    headers["startdate"]
+        //                                )
+        //                            );
+
+
+        //                        string endDate =
+        //                            GetExcelDate(
+        //                                row.Cell(
+        //                                    headers["enddate"]
+        //                                )
+        //                            );
+
+
+        //                        // =========================================
+        //                        // SKIP EMPTY ROW
+        //                        // =========================================
+
+        //                        if (
+        //                            string.IsNullOrWhiteSpace(
+        //                                certificateNo
+        //                            )
+        //                            &&
+        //                            string.IsNullOrWhiteSpace(
+        //                                companyName
+        //                            ))
+        //                        {
+        //                            continue;
+        //                        }
+
+
+        //                        // =========================================
+        //                        // GENERATE PDF
+        //                        // =========================================
+
+        //                        byte[] pdfBytes =
+        //                            GenerateCertificatePdf(
+        //                                certificateNo,
+        //                                companyName,
+        //                                description,
+        //                                startDate,
+        //                                endDate,
+        //                                templatePath
+        //                            );
+
+
+        //                        // =========================================
+        //                        // SAFE FILE NAME
+        //                        // =========================================
+
+        //                        string safeCertificateNo =
+        //                            MakeSafeFileName(
+        //                                certificateNo
+        //                            );
+
+
+        //                        if (
+        //                            string.IsNullOrWhiteSpace(
+        //                                safeCertificateNo
+        //                            ))
+        //                        {
+        //                            safeCertificateNo =
+        //                                "Certificate_" +
+        //                                rowNumber;
+        //                        }
+
+
+        //                        // =========================================
+        //                        // ADD PDF TO ZIP
+        //                        // =========================================
+
+        //                        ZipArchiveEntry entry =
+        //                            zip.CreateEntry(
+        //                                safeCertificateNo +
+        //                                ".pdf",
+        //                                CompressionLevel.Fastest
+        //                            );
+
+
+        //                        using (
+        //                            Stream entryStream =
+        //                            entry.Open())
+        //                        {
+        //                            await entryStream.WriteAsync(
+        //                                pdfBytes,
+        //                                0,
+        //                                pdfBytes.Length
+        //                            );
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+
+
+        //        // =====================================================
+        //        // ZIP BYTES
+        //        // =====================================================
+
+        //        byte[] zipBytes =
+        //            zipStream.ToArray();
+
+
+        //        if (zipBytes.Length == 0)
+        //        {
+        //            TempData["Error"] =
+        //                "No certificates were generated.";
+
+        //            return RedirectToAction(
+        //                nameof(BulkGenerate)
+        //            );
+        //        }
+
+
+        //        // =====================================================
+        //        // DOWNLOAD ZIP
+        //        // =====================================================
+
+        //        return File(
+        //            zipBytes,
+        //            "application/zip",
+        //            "Certificates.zip"
+        //        );
+        //    }
+        //}
 
 
         // =========================================================
@@ -1126,6 +1752,20 @@ document.Add(descriptionText);
                     );
                 }
             }
+        }
+        [HttpGet]
+        public async Task<IActionResult> CertificateHistory()
+        {
+            var history = await _context.CertificateGenerationDetail
+                .Include(x => x.CertificateGeneration)
+                .Where(x =>
+                    x.IsActive &&
+                    x.CertificateGeneration != null &&
+                    x.CertificateGeneration.IsActive)
+                .OrderByDescending(x => x.CertificateGeneration.GeneratedDate)
+                .ToListAsync();
+
+            return View(history);
         }
     }
 }

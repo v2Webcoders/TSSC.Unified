@@ -13,7 +13,7 @@ using System.Security.Claims;
 namespace QUIZAPP.Areas.HRMS.Controllers
 {
     [Area("HRMS")]
-    [Authorize(Roles = "HR, Employee")]
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
