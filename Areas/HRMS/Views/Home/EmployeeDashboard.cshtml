@@ -96,7 +96,59 @@
 
             </div>
 
+            @if (Model.DOB.HasValue)
+            {
+                var dob = Model.DOB.Value;
 
+                bool isBirthdayToday =
+                dob.Month == DateTime.Today.Month &&
+                dob.Day == DateTime.Today.Day;
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+
+                        <div class="d-flex align-items-center">
+
+                            <div class="rounded-circle bg-primary-subtle
+                            text-primary
+                            d-flex align-items-center
+                            justify-content-center me-3"
+                                 style="width:50px;height:50px;">
+
+                                <em class="icon ni ni-gift fs-5"></em>
+
+                            </div>
+
+                            <div>
+
+                                @if (isBirthdayToday)
+                                {
+                                    <h6 class="mb-1 text-primary">
+                                        🎂 Happy Birthday, @Model.EmployeeName!
+                                    </h6>
+
+                                    <p class="text-muted small mb-0">
+                                        Wishing you a wonderful year ahead.
+                                    </p>
+                                }
+                                else
+                                {
+                                    <h6 class="mb-1">
+                                        🎂 Your Birthday
+                                    </h6>
+
+                                    <p class="text-muted small mb-0">
+                                        @dob.ToString("dd MMMM")
+                                    </p>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            }
             <!-- =========================================
                  EMPLOYEE KPI CARDS
             ========================================== -->
@@ -112,18 +164,21 @@
                         <div class="card-body">
 
                             <span class="badge bg-success-subtle text-success mb-2">
-                                On Track
+                                Attendance
                             </span>
 
-                            <div class="stat-num">
-
-                                @Model.PresentDaysThisMonth /
-                                @Model.WorkingDaysThisMonth
-
+                            <div class="stat-num" data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 title="@Model.PresentDaysThisMonth days present out of @Model.WorkingDaysThisMonth working days this month">
+                         
+                                @Model.PresentDaysThisMonth
+                                
+                                    / @Model.WorkingDaysThisMonth
+                               
                             </div>
 
                             <div class="small text-muted">
-                                Days present this month
+                                Days Present / Working Days — This Month
                             </div>
 
                         </div>
@@ -344,6 +399,16 @@
                                 Quick Actions
                             </h3>
 
+                            <!-- Mark Attendance -->
+                            <a asp-controller="Employee"
+                               asp-action="MarkAttendance"
+                               class="btn btn-primary">
+
+                                <em class="icon ni ni-check-circle me-1"></em>
+
+                                Mark Attendance
+
+                            </a>
 
                             <a asp-controller="Attendance"
                                asp-action="MyAttendance"
@@ -378,7 +443,7 @@
                             </a>
 
 
-                            <a asp-controller="HRPolicy"
+                            @* <a asp-controller="HRPolicy"
                                asp-action="EmployeePolicies"
                                class="btn btn-outline-primary">
 
@@ -386,7 +451,7 @@
 
                                 View HR Policies
 
-                            </a>
+                            </a> *@
 
                         </div>
 

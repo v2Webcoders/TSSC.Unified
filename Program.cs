@@ -48,6 +48,7 @@ builder.Services.AddScoped<UtilityService>();
 builder.Services.AddScoped<
     IAttendanceSyncService,
     AttendanceSyncService>();
+builder.Services.AddHostedService<BiometricAttendanceScheduler>();
 var app = builder.Build();
 
 

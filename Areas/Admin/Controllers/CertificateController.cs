@@ -9,8 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Ocsp;
-using Org.BouncyCastle.Tls;
+
 using QUIZAPP;
 using QUIZAPP.Models;
 using System.IO.Compression;

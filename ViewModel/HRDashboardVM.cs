@@ -24,9 +24,11 @@
         public int PendingRequests { get; set; }
         public int LeaveBalance { get; set; }
         public int AttendanceToRegularize { get; set; }
+        public DateTime? DOB { get; set; }
 
         public List<EmployeeRecentRequestVM> RecentRequests { get; set; }
             = new();
+        public List<EmployeeBirthdayVM>? Birthdays { get; set; } = new();
     }
     public class RecentLeaveRequestVM
     {

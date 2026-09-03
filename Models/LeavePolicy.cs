@@ -23,6 +23,7 @@ namespace TSSC.Unified.Models
         public bool IsActive { get; set; } = true;
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public decimal MonthlyAllocation { get; set; } = 0;
 
         // Navigation Property
         [ForeignKey(nameof(LeaveTypeId))]

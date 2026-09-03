@@ -80,7 +80,6 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
         public async Task<IActionResult> Create(int? id)
         {
             var applicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             var employee = await _context.Employee
                 .Include(x => x.Department)
                 .FirstOrDefaultAsync(x => x.ApplicationUserId == applicationUserId);

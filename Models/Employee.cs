@@ -47,13 +47,13 @@ namespace TSSC.Unified.Models
 
         public int? ReportingManagerId { get; set; }
 
-        public DateTime? JoiningDate { get; set; }
+        public DateTime JoiningDate { get; set; }
 
         [StringLength(30)]
-        public string? EmployeeType { get; set; }
+        public string EmployeeType { get; set; }
 
         [StringLength(30)]
-        public string? EmploymentStatus { get; set; }
+        public string EmploymentStatus { get; set; }
 
         // Contact Information
         [StringLength(150)]
@@ -62,9 +62,9 @@ namespace TSSC.Unified.Models
         [StringLength(150)]
         public string? PersonalEmail { get; set; }
 
-        [Required]
+       
         [StringLength(15)]
-        public string MobileNo { get; set; }
+        public string? MobileNo { get; set; }
 
         [StringLength(15)]
         public string? AlternateMobile { get; set; }
@@ -154,6 +154,7 @@ namespace TSSC.Unified.Models
         public int? SubBranchId { get; set; }
 
         public int? NoticePeriod { get; set; }
+        
         [NotMapped]
         public string EmployeeDisplayName
         {
@@ -164,6 +165,14 @@ namespace TSSC.Unified.Models
                     + $" - EMP{EmployeeCode}";
             }
         }
+
+        public string ProfileStatus { get; set; }
+
+        [Display(Name = "Resignation Date")]
+        public DateTime? ResignationDate { get; set; }
+
+        [Display(Name = "Relieving Date")]
+        public DateTime? RelievingDate { get; set; }
     }
     public class Department
     {

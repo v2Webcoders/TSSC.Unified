@@ -6,771 +6,907 @@
 	Layout = "_Layout";
 }
 
-
-@{
-    ViewData["Title"] = "My Profile";
-}
-
 <div class="nk-block-head nk-block-head-sm">
 
-    <div class="nk-block-between">
+	<div class="nk-block-between">
 
-        <div class="nk-block-head-content">
+		<div class="nk-block-head-content">
 
-            <h3 class="nk-block-title page-title">
-                My Profile
-            </h3>
+			<h3 class="nk-block-title page-title">
+				My Profile
+			</h3>
 
-            <div class="nk-block-des text-soft">
-                <p>
-                    View your personal and employment information.
-                </p>
-            </div>
+			<div class="nk-block-des text-soft">
+				<p>
+					View your personal and employment information.
+				</p>
+			</div>
 
-        </div>
+		</div>
 
-    </div>
+	</div>
 
 </div>
 
 
 <div class="nk-block nk-block-lg">
 
-    <div class="card card-preview">
+	<div class="card card-preview">
 
-        <div class="card-inner">
+		<div class="card-inner">
 
-            <div class="preview-block">
+			<div class="preview-block">
 
-                <div class="row gy-4">
 
+				<!-- ================= Profile Header ================= -->
 
-                    <div class="col-12 profile-section">
+				<div class="row align-items-center mb-5 p-4 border rounded-3"
+					 style="border:1px solid #d9dee3 !important;
+            background:#fff;
+            box-shadow:0 2px 8px rgba(0,0,0,0.05);">
 
-                        <div class="profile-section-header">
+					<div class="col-md-3 text-center">
 
-                            <div class="profile-section-icon personal-icon">
-                                <em class="ni ni-user-alt"></em>
-                            </div>
+						<img src="@(string.IsNullOrEmpty(Model.PhotoPath)
+? Url.Content("~/images/no-user.png")
+: Url.Content(Model.PhotoPath))"
+							 class="rounded-circle"
+							 style="width:150px;
+                    height:150px;
+                    object-fit:cover;
+                    border:4px solid #dee2e6;
+                    padding:4px;
+                    background:#fff;" />
 
-                            <div class="profile-section-content">
+					</div>
 
-                                <h5 class="profile-section-title">
-                                    Personal Information
-                                </h5>
+					<div class="col-md-9">
 
-                                <span class="profile-section-subtitle">
-                                    Your basic personal details
-                                </span>
+						<h3 class="mb-1" style="color:#1B2A4A;">
+							@Model.FirstName @Model.LastName
+						</h3>
 
-                            </div>
+						<p class="text-muted mb-2">
+							Employee Code:
+							<strong>@Model.EmployeeCode</strong>
+						</p>
 
-                        </div>
+						<div class="d-flex flex-wrap gap-2">
 
-                    </div>
+							<span class="badge bg-primary">
+								@Model.Designation.DesignationName
+							</span>
 
+							<span class="badge bg-success">
+								@Model.EmploymentStatus
+							</span>
 
-                    <!-- Employee Code -->
+						</div>
 
-                    <div class="col-md-4">
+					</div>
 
-                        <label class="form-label profile-label">
-                            Employee Code
-                        </label>
+				</div>
 
-                        <div class="profile-value">
+				<!-- ================= Personal Information ================= -->
 
-                            <span>
-                                @Model.EmployeeCode
-                            </span>
+				<div class="col-12 mb-4">
 
-                        </div>
+					<div style="border-left:4px solid #D9622F;
+                padding:5px 0 5px 12px;">
 
-                    </div>
+						<h5 class="mb-0 d-flex align-items-center gap-2"
+							style="color:#1B2A4A;">
 
+							<em class="ni ni-user-alt"></em>
+							Personal Information
 
-                    <!-- First Name -->
+						</h5>
 
-                    <div class="col-md-4">
+					</div>
 
-                        <label class="form-label profile-label">
-                            First Name
-                        </label>
+				</div>
 
-                        <div class="profile-value">
+				<div class="row gy-4 mb-5">
 
-                            <span>
-                                @Model.FirstName
-                            </span>
+					<div class="col-md-4">
 
-                        </div>
+						<label class="form-label text-muted">
+							First Name
+						</label>
 
-                    </div>
+						<div class="form-control-plaintext fw-bold"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
+							@Model.FirstName
+						</div>
 
+					</div>
 
-                    <!-- Last Name -->
+					<div class="col-md-4">
 
-                    <div class="col-md-4">
+						<label class="form-label text-muted">
+							Last Name
+						</label>
 
-                        <label class="form-label profile-label">
-                            Last Name
-                        </label>
+						<div class="form-control-plaintext fw-bold"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
+							@Model.LastName
+						</div>
 
-                        <div class="profile-value">
+					</div>
 
-                            <span>
-                                @Model.LastName
-                            </span>
+					<div class="col-md-4">
 
-                        </div>
+						<label class="form-label text-muted">
+							Gender
+						</label>
 
-                    </div>
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
+							@Model.Gender
+						</div>
 
+					</div>
 
-                    <!-- Official Email -->
+					<div class="col-md-4">
 
-                    <div class="col-md-4">
+						<label class="form-label text-muted">
+							Date of Birth
+						</label>
 
-                        <label class="form-label profile-label">
-                            Official Email
-                        </label>
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
+							@(Model.DOB?.ToString("dd MMM yyyy") ?? "-")
+						</div>
 
-                        <div class="profile-value">
+					</div>
 
-                            <em class="ni ni-mail-fill"></em>
+					<div class="col-md-4">
 
-                            <span>
-                                @Model.OfficialEmail
-                            </span>
+						<label class="form-label text-muted">
+							Blood Group
+						</label>
 
-                        </div>
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
+							@(string.IsNullOrEmpty(Model.BloodGroup)
+														? "-"
+														: Model.BloodGroup)
+						</div>
 
-                    </div>
+					</div>
 
+					<div class="col-md-4">
 
-                    <!-- Mobile Number -->
+						<label class="form-label text-muted">
+							Marital Status
+						</label>
 
-                    <div class="col-md-4">
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
+							@(string.IsNullOrEmpty(Model.MaritalStatus)
+														? "-"
+														: Model.MaritalStatus)
+						</div>
 
-                        <label class="form-label profile-label">
-                            Mobile Number
-                        </label>
+					</div>
 
-                        <div class="profile-value">
+				</div>
 
-                            <em class="ni ni-mobile"></em>
 
-                            <span>
-                                @Model.MobileNo
-                            </span>
+				<!-- ================= Contact Information ================= -->
 
-                        </div>
+				<div class="col-12 mb-4">
 
-                    </div>
+					<div style="border-left:4px solid #D9622F;
+                padding:5px 0 5px 12px;">
 
+						<h5 class="mb-0 d-flex align-items-center gap-2"
+							style="color:#1B2A4A;">
 
-                    <!-- Gender -->
+							<em class="ni ni-call"></em>
+							Contact Information
 
-                    <div class="col-md-4">
+						</h5>
 
-                        <label class="form-label profile-label">
-                            Gender
-                        </label>
+					</div>
 
-                        <div class="profile-value">
+				</div>
 
-                            <span>
-                                @Model.Gender
-                            </span>
+				<div class="row gy-4 mb-5">
 
-                        </div>
+					<div class="col-md-6">
 
-                    </div>
+						<label class="form-label text-muted">
+							Personal Email
+						</label>
 
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
 
-                    <!-- ===================================================== -->
-                    <!-- EMPLOYMENT INFORMATION -->
-                    <!-- ===================================================== -->
+							@(string.IsNullOrEmpty(Model.PersonalEmail)
+														? "-"
+														: Model.PersonalEmail)
 
-                    <div class="col-12 profile-section">
+						</div>
 
-                        <div class="profile-section-header">
+					</div>
 
-                            <div class="profile-section-icon employment-icon">
-                                <em class="ni ni-briefcase"></em>
-                            </div>
+					<div class="col-md-6">
 
-                            <div class="profile-section-content">
+						<label class="form-label text-muted">
+							Mobile Number
+						</label>
 
-                                <h5 class="profile-section-title">
-                                    Employment Information
-                                </h5>
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
 
-                                <span class="profile-section-subtitle">
-                                    Your role and employment details
-                                </span>
+							@(string.IsNullOrEmpty(Model.MobileNo)
+														? "-"
+														: Model.MobileNo)
 
-                            </div>
+						</div>
 
-                        </div>
+					</div>
 
-                    </div>
+					<div class="col-md-6">
 
+						<label class="form-label text-muted">
+							Alternate Mobile
+						</label>
 
-                    <!-- Department -->
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
 
-                    <div class="col-md-4">
+							@(string.IsNullOrEmpty(Model.AlternateMobile)
+														? "-"
+														: Model.AlternateMobile)
 
-                        <label class="form-label profile-label">
-                            Department
-                        </label>
+						</div>
 
-                        <div class="profile-value">
+					</div>
 
-                            <em class="ni ni-building"></em>
+				</div>
 
-                            <span>
-                                @(Model.Department?.DepartmentName ?? "Not available")
-                            </span>
 
-                        </div>
+				<!-- ================= Address ================= -->
 
-                    </div>
+				<div class="col-12 mb-4">
 
+					<div style="border-left:4px solid #D9622F;
+                padding:5px 0 5px 12px;">
 
-                    <!-- Designation -->
+						<h5 class="mb-0 d-flex align-items-center gap-2"
+							style="color:#1B2A4A;">
 
-                    <div class="col-md-4">
+							<em class="ni ni-map-pin"></em>
+							Address
 
-                        <label class="form-label profile-label">
-                            Designation
-                        </label>
+						</h5>
 
-                        <div class="profile-value">
+					</div>
 
-                            <em class="ni ni-user-check"></em>
+				</div>
 
-                            <span>
-                                @(Model.Designation?.DesignationName ?? "Not available")
-                            </span>
+				<div class="row gy-4 mb-5">
 
-                        </div>
+					<div class="col-md-6">
 
-                    </div>
+						<label class="form-label text-muted">
+							Current Address
+						</label>
 
+						<div class="border rounded p-3"
+							 style="min-height:100px;
+                    border-color:#e5e9f2 !important;
+                    border-left:3px solid #D9622F !important;">
 
-                    <!-- Date of Joining -->
+							@(string.IsNullOrEmpty(Model.CurrentAddress)
+														? "-"
+														: Model.CurrentAddress)
 
-                    <div class="col-md-4">
+						</div>
 
-                        <label class="form-label profile-label">
-                            Date of Joining
-                        </label>
+					</div>
 
-                        <div class="profile-value">
+					<div class="col-md-6">
 
-                            <em class="ni ni-calendar-alt"></em>
+						<label class="form-label text-muted">
+							Permanent Address
+						</label>
 
-                            <span>
+						<div class="border rounded p-3"
+							 style="min-height:100px;
+                    border-color:#e5e9f2 !important;
+                    border-left:3px solid #D9622F !important;">
 
-                                @if (Model.JoiningDate != null)
-                                {
-                                    @Model.JoiningDate?.ToString("dd MMM yyyy")
-                                }
-                                else
-                                {
-                                    <span class="text-soft">
-                                        Not available
-                                    </span>
-                                }
+							@(string.IsNullOrEmpty(Model.PermanentAddress)
+														? "-"
+														: Model.PermanentAddress)
 
-                            </span>
+						</div>
 
-                        </div>
+					</div>
 
-                    </div>
+				</div>
 
 
-                    <!-- Reporting Manager -->
+				<!-- ================= Identity Details ================= -->
 
-                    <div class="col-md-4">
+				<div class="col-12 mb-4">
 
-                        <label class="form-label profile-label">
-                            Reporting Manager
-                        </label>
+					<div style="border-left:4px solid #D9622F;
+                padding:5px 0 5px 12px;">
 
-                        <div class="profile-value">
+						<h5 class="mb-0 d-flex align-items-center gap-2"
+							style="color:#1B2A4A;">
 
-                            <em class="ni ni-user-list"></em>
+							<em class="ni ni-shield-check"></em>
+							Identity Details
 
-                            <span>
-                                @(Model.ReportingManager != null
-                                    ? $"{Model.ReportingManager.FirstName} {Model.ReportingManager.LastName}".Trim()
-                                    : "Not assigned")
-                            </span>
+						</h5>
 
-                        </div>
+					</div>
 
-                    </div>
+				</div>
 
+				<div class="row gy-4 mb-5">
 
-                    <!-- Employment Status -->
+					<div class="col-md-4">
 
-                    <div class="col-md-4">
+						<label class="form-label text-muted">
+							Aadhaar Number
+						</label>
 
-                        <label class="form-label profile-label">
-                            Employment Status
-                        </label>
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
 
-                        <div class="profile-value">
+							@(string.IsNullOrEmpty(Model.AadhaarNo)
+														? "-"
+														: Model.AadhaarNo)
 
-                            @if (Model.IsActive)
-                            {
-                                <span class="status-wrapper">
+						</div>
 
-                                    <span class="status-dot status-active"></span>
+					</div>
 
-                                    <span class="status-active-text">
-                                        Active
-                                    </span>
+					<div class="col-md-4">
 
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="status-wrapper">
+						<label class="form-label text-muted">
+							PAN Number
+						</label>
 
-                                    <span class="status-dot status-inactive"></span>
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
 
-                                    <span class="status-inactive-text">
-                                        Inactive
-                                    </span>
+							@(string.IsNullOrEmpty(Model.PANNo)
+														? "-"
+														: Model.PANNo)
 
-                                </span>
-                            }
+						</div>
 
-                        </div>
+					</div>
 
-                    </div>
+					<div class="col-md-4">
 
+						<label class="form-label text-muted">
+							Passport Number
+						</label>
 
-                    <!-- ===================================================== -->
-                    <!-- CONTACT INFORMATION -->
-                    <!-- ===================================================== -->
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
 
-                    <div class="col-12 profile-section">
+							@(string.IsNullOrEmpty(Model.PassportNo)
+														? "-"
+														: Model.PassportNo)
 
-                        <div class="profile-section-header">
+						</div>
 
-                            <div class="profile-section-icon contact-icon">
-                                <em class="ni ni-call"></em>
-                            </div>
+					</div>
 
-                            <div class="profile-section-content">
+					<div class="col-md-4">
 
-                                <h5 class="profile-section-title">
-                                    Contact Information
-                                </h5>
+						<label class="form-label text-muted">
+							UAN Number
+						</label>
 
-                                <span class="profile-section-subtitle">
-                                    Your contact and communication details
-                                </span>
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
 
-                            </div>
+							@(string.IsNullOrEmpty(Model.UANNo)
+														? "-"
+														: Model.UANNo)
 
-                        </div>
+						</div>
 
-                    </div>
+					</div>
 
-                    <!-- Current Address -->
+					<div class="col-md-4">
 
-                    <div class="col-md-8">
+						<label class="form-label text-muted">
+							PF Number
+						</label>
 
-                        <label class="form-label profile-label">
-                            Current Address
-                        </label>
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
 
-                        <div class="profile-value">
+							@(string.IsNullOrEmpty(Model.PFNo)
+														? "-"
+														: Model.PFNo)
 
-                            <em class="ni ni-map-pin"></em>
+						</div>
 
-                            <span>
-                                @(string.IsNullOrWhiteSpace(Model.CurrentAddress)
-                                    ? "Not available"
-                                    : Model.CurrentAddress)
-                            </span>
+					</div>
 
-                        </div>
+					<div class="col-md-4">
 
-                    </div>
+						<label class="form-label text-muted">
+							ESIC Number
+						</label>
 
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
 
-                    <!-- Alternate Mobile -->
+							@(string.IsNullOrEmpty(Model.ESICNo)
+														? "-"
+														: Model.ESICNo)
 
-                    <div class="col-md-4">
+						</div>
 
-                        <label class="form-label profile-label">
-                            Alternate Mobile
-                        </label>
+					</div>
 
-                        <div class="profile-value">
+				</div>
 
-                            <em class="ni ni-mobile"></em>
 
-                            <span>
-                                @(string.IsNullOrWhiteSpace(Model.AlternateMobile)
-                                    ? "Not available"
-                                    : Model.AlternateMobile)
-                            </span>
+				<!-- ================= Official Information ================= -->
 
-                        </div>
+				<div class="col-12 mb-4">
 
-                    </div>
+					<div style="border-left:4px solid #D9622F;
+                padding:5px 0 5px 12px;">
 
+						<h5 class="mb-0 d-flex align-items-center gap-2"
+							style="color:#1B2A4A;">
 
-                </div>
+							<em class="ni ni-briefcase"></em>
+							Official Information
 
-            </div>
+						</h5>
 
-        </div>
+					</div>
 
-    </div>
+				</div>
+
+				<div class="row gy-4 mb-5">
+
+					<div class="col-md-4">
+
+						<label class="form-label text-muted">
+							Employee Code
+						</label>
+
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
+
+							@Model.EmployeeCode
+
+						</div>
+
+					</div>
+
+					<div class="col-md-4">
+
+						<label class="form-label text-muted">
+							Department
+						</label>
+
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
+
+							@Model.Department.DepartmentName
+
+						</div>
+
+					</div>
+
+					<div class="col-md-4">
+
+						<label class="form-label text-muted">
+							Designation
+						</label>
+
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
+
+							@Model.Designation.DesignationName
+
+						</div>
+
+					</div>
+
+					<div class="col-md-4">
+
+						<label class="form-label text-muted">
+							Date of Joining
+						</label>
+
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
+
+							@(Model.JoiningDate.ToString("dd MMM yyyy") ?? "-")
+
+						</div>
+
+					</div>
+
+					<div class="col-md-4">
+
+						<label class="form-label text-muted">
+							Employment Status
+						</label>
+
+						<div class="form-control-plaintext"
+							 style="border-bottom:1px solid #e5e9f2;
+                    padding-bottom:8px;">
+
+							@Model.EmploymentStatus
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+	</div>
 
 </div>
 
 
 <style>
 
-    /* =========================================================
-           PROFILE FIELD
-           ========================================================= */
+	/* =========================================================
+				   PROFILE FIELD
+				   ========================================================= */
 
-    .profile-value {
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 13px;
-        background: #f8f9fc;
-        border: 1px solid #e5e9f2;
-        border-radius: 5px;
-        color: #364a63;
-        font-size: 14px;
-        line-height: 1.5;
-        word-break: break-word;
-        transition: all .2s ease;
-    }
+	.profile-value {
+		min-height: 44px;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 10px 13px;
+		background: #f8f9fc;
+		border: 1px solid #e5e9f2;
+		border-radius: 5px;
+		color: #364a63;
+		font-size: 14px;
+		line-height: 1.5;
+		word-break: break-word;
+		transition: all .2s ease;
+	}
 
 
-        .profile-value:hover {
-            background: #f5f7fb;
-            border-color: #d7deea;
-        }
+		.profile-value:hover {
+			background: #f5f7fb;
+			border-color: #d7deea;
+		}
 
 
-        /* =========================================================
-           FIELD ICON
-           ========================================================= */
+		/* =========================================================
+				   FIELD ICON
+				   ========================================================= */
 
-        .profile-value > em {
-            flex-shrink: 0;
-            color: #8094ae;
-            font-size: 16px;
-        }
+		.profile-value > em {
+			flex-shrink: 0;
+			color: #8094ae;
+			font-size: 16px;
+		}
 
 
-    /* =========================================================
-           FIELD LABEL
-           ========================================================= */
+	/* =========================================================
+				   FIELD LABEL
+				   ========================================================= */
 
-    .profile-label {
-        font-size: 12px;
-        font-weight: 600;
-        margin-bottom: 6px;
-        color: #8094ae;
-        text-transform: uppercase;
-        letter-spacing: .03em;
-    }
+	.profile-label {
+		font-size: 12px;
+		font-weight: 600;
+		margin-bottom: 6px;
+		color: #8094ae;
+		text-transform: uppercase;
+		letter-spacing: .03em;
+	}
 
 
-    /* =========================================================
-           SECTION DESCRIPTION
-           ========================================================= */
+	/* =========================================================
+				   SECTION DESCRIPTION
+				   ========================================================= */
 
-    .text-soft {
-        color: #8094ae;
-    }
+	.text-soft {
+		color: #8094ae;
+	}
 
 
-    /* =========================================================
-           EMPLOYMENT STATUS
-           ========================================================= */
+	/* =========================================================
+				   EMPLOYMENT STATUS
+				   ========================================================= */
 
-    .status-wrapper {
-        display: inline-flex;
-        align-items: center;
-        gap: 9px;
-    }
+	.status-wrapper {
+		display: inline-flex;
+		align-items: center;
+		gap: 9px;
+	}
 
 
-    .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        display: inline-block;
-    }
+	.status-dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		display: inline-block;
+	}
 
 
-    .status-active {
-        background-color: #20c997;
-    }
+	.status-active {
+		background-color: #20c997;
+	}
 
 
-    .status-active-text {
-        color: #00a878;
-        font-weight: 600;
-    }
+	.status-active-text {
+		color: #00a878;
+		font-weight: 600;
+	}
 
 
-    .status-inactive {
-        background-color: #e85347;
-    }
+	.status-inactive {
+		background-color: #e85347;
+	}
 
 
-    .status-inactive-text {
-        color: #e85347;
-        font-weight: 600;
-    }
+	.status-inactive-text {
+		color: #e85347;
+		font-weight: 600;
+	}
 
-    /* =========================================================
-       PROFILE SECTION
-       ========================================================= */
+	/* =========================================================
+			   PROFILE SECTION
+			   ========================================================= */
 
-    .profile-section {
-        margin-top: 24px;
-        margin-bottom: 4px;
-        padding-top: 4px;
-    }
+	.profile-section {
+		margin-top: 24px;
+		margin-bottom: 4px;
+		padding-top: 4px;
+	}
 
 
-        /* First section should not have extra top spacing */
+		/* First section should not have extra top spacing */
 
-        .profile-section:first-child {
-            margin-top: 10;
-        }
+		.profile-section:first-child {
+			margin-top: 10;
+		}
 
 
-    /* =========================================================
-       SECTION HEADER
-       ========================================================= */
+	/* =========================================================
+			   SECTION HEADER
+			   ========================================================= */
 
-    .profile-section-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        width: 100%;
-        padding: 0 0 10px 0;
-        border-bottom: 1px solid #e5e9f2;
-    }
+	.profile-section-header {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		width: 100%;
+		padding: 0 0 10px 0;
+		border-bottom: 1px solid #e5e9f2;
+	}
 
 
-    /* =========================================================
-       SECTION ICON
-       ========================================================= */
+	/* =========================================================
+			   SECTION ICON
+			   ========================================================= */
 
-    .profile-section-icon {
-        width: 38px;
-        height: 38px;
-        min-width: 38px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 6px;
-    }
+	.profile-section-icon {
+		width: 38px;
+		height: 38px;
+		min-width: 38px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 6px;
+	}
 
 
-        .profile-section-icon em {
-            font-size: 18px;
-        }
+		.profile-section-icon em {
+			font-size: 18px;
+		}
 
 
-    /* Personal */
+	/* Personal */
 
-    .personal-icon {
-        background: #eef4ff;
-        color: #1b4d89;
-    }
+	.personal-icon {
+		background: #eef4ff;
+		color: #1b4d89;
+	}
 
 
-    /* Employment */
+	/* Employment */
 
-    .employment-icon {
-        background: #fff4ec;
-        color: #d9622f;
-    }
+	.employment-icon {
+		background: #fff4ec;
+		color: #d9622f;
+	}
 
 
-    /* Contact */
+	/* Contact */
 
-    .contact-icon {
-        background: #eef9f4;
-        color: #198754;
-    }
+	.contact-icon {
+		background: #eef9f4;
+		color: #198754;
+	}
 
 
-    /* =========================================================
-       SECTION CONTENT
-       ========================================================= */
+	/* =========================================================
+			   SECTION CONTENT
+			   ========================================================= */
 
-    .profile-section-content {
-        min-width: 0;
-        flex: 1;
-    }
+	.profile-section-content {
+		min-width: 0;
+		flex: 1;
+	}
 
 
-    /* =========================================================
-       SECTION TITLE
-       ========================================================= */
+	/* =========================================================
+			   SECTION TITLE
+			   ========================================================= */
 
-    .profile-section-title {
-        margin: 0;
-        color: #1b2a4a;
-        font-size: 18px;
-        font-weight: 600;
-        line-height: 1.3;
-        white-space: normal;
-    }
+	.profile-section-title {
+		margin: 0;
+		color: #1b2a4a;
+		font-size: 18px;
+		font-weight: 600;
+		line-height: 1.3;
+		white-space: normal;
+	}
 
 
-    /* =========================================================
-       SECTION SUBTITLE
-       ========================================================= */
+	/* =========================================================
+			   SECTION SUBTITLE
+			   ========================================================= */
 
-    .profile-section-subtitle {
-        display: block;
-        margin-top: 2px;
-        color: #8094ae;
-        font-size: 12px;
-        line-height: 1.4;
-    }
+	.profile-section-subtitle {
+		display: block;
+		margin-top: 2px;
+		color: #8094ae;
+		font-size: 12px;
+		line-height: 1.4;
+	}
 
 
-    /* =========================================================
-       PROFILE FIELDS
-       ========================================================= */
+	/* =========================================================
+			   PROFILE FIELDS
+			   ========================================================= */
 
-    .profile-value {
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 13px;
-        background: #f8f9fc;
-        border: 1px solid #e5e9f2;
-        border-radius: 5px;
-        color: #364a63;
-        font-size: 14px;
-        line-height: 1.5;
-        word-break: break-word;
-    }
+	.profile-value {
+		min-height: 44px;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 10px 13px;
+		background: #f8f9fc;
+		border: 1px solid #e5e9f2;
+		border-radius: 5px;
+		color: #364a63;
+		font-size: 14px;
+		line-height: 1.5;
+		word-break: break-word;
+	}
 
 
-        .profile-value > em {
-            flex-shrink: 0;
-            color: #8094ae;
-            font-size: 16px;
-        }
+		.profile-value > em {
+			flex-shrink: 0;
+			color: #8094ae;
+			font-size: 16px;
+		}
 
 
-    /* =========================================================
-       FIELD LABEL
-       ========================================================= */
+	/* =========================================================
+			   FIELD LABEL
+			   ========================================================= */
 
-    .profile-label {
-        font-size: 12px;
-        font-weight: 600;
-        margin-bottom: 6px;
-        color: #8094ae;
-        text-transform: uppercase;
-        letter-spacing: .03em;
-    }
+	.profile-label {
+		font-size: 12px;
+		font-weight: 600;
+		margin-bottom: 6px;
+		color: #8094ae;
+		text-transform: uppercase;
+		letter-spacing: .03em;
+	}
 
 
-    /* =========================================================
-       STATUS
-       ========================================================= */
+	/* =========================================================
+			   STATUS
+			   ========================================================= */
 
-    .status-wrapper {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
+	.status-wrapper {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+	}
 
 
-    .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        display: inline-block;
-    }
+	.status-dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		display: inline-block;
+	}
 
 
-    .status-active {
-        background: #20c997;
-    }
+	.status-active {
+		background: #20c997;
+	}
 
 
-    .status-active-text {
-        color: #00a878;
-        font-weight: 600;
-    }
+	.status-active-text {
+		color: #00a878;
+		font-weight: 600;
+	}
 
 
-    .status-inactive {
-        background: #e85347;
-    }
+	.status-inactive {
+		background: #e85347;
+	}
 
 
-    .status-inactive-text {
-        color: #e85347;
-        font-weight: 600;
-    }
+	.status-inactive-text {
+		color: #e85347;
+		font-weight: 600;
+	}
 
 
-    /* =========================================================
-       MOBILE
-       ========================================================= */
+	/* =========================================================
+			   MOBILE
+			   ========================================================= */
 
-    @@media (max-width: 767px) {
-        .profile-section
+	@@media (max-width: 767px) {
+		.profile-section {
+			margin-top: 20px;
+		}
 
-    {
-        margin-top: 20px;
-    }
+		.profile-section-title {
+			font-size: 16px;
+		}
 
-    .profile-section-title {
-        font-size: 16px;
-    }
+		.profile-section-icon {
+			width: 34px;
+			height: 34px;
+			min-width: 34px;
+		}
+	}
 
-    .profile-section-icon {
-        width: 34px;
-        height: 34px;
-        min-width: 34px;
-    }
+	/* =========================================================
+				   MOBILE
+				   ========================================================= */
 
-    }
-
-    /* =========================================================
-           MOBILE
-           ========================================================= */
-
-    @@media (max-width: 767px) {
-        .profile-value
-
-    {
-        min-height: 42px;
-    }
-
-    }
+	@@media (max-width: 767px) {
+		.profile-value {
+			min-height: 42px;
+		}
+	}
 </style>
 

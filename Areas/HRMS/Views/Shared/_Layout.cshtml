@@ -8,7 +8,7 @@
 
 @{
 	var currentUser = await UserManager.GetUserAsync(User);
-	var name = currentUser?.Name ?? currentUser?.UserName ?? "User";
+	//var name = currentUser?.Name ?? currentUser?.UserName ?? "User";
 	var email = currentUser?.Email ?? "No email";
 	var mobile = currentUser?.MobileNo ?? "NA";
 	//var role = currentUser?.UserRole ?? "HR Manager";
@@ -20,7 +20,7 @@
 	var employee = currentUser != null
 		? Context.Employee.FirstOrDefault(x => x.ApplicationUserId == currentUser.Id)
 		: null;
-
+	var name = employee.FirstName + " " + employee.LastName;
 	bool isReportingManager = employee != null &&
 		Context.Employee.Any(x => x.ReportingManagerId == employee.EmployeeId);
 

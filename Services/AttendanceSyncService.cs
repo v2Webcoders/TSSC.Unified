@@ -55,24 +55,55 @@ namespace TSSC.Unified.Services
             // OPTIMIZED SQL QUERY
             // =====================================================
 
-            const string sql = @"
-    SELECT
-        UserId,
-        CAST(LogDate AS DATE) AS AttendanceDate,
-        MIN(LogDate) AS InTime,
-        MAX(LogDate) AS OutTime,
-        COUNT(*) AS PunchCount
-    FROM DeviceLogs_8_2026
-    WHERE LogDate >= @FromDate
-      AND LogDate < @ToDate
-    GROUP BY
-        UserId,
-        CAST(LogDate AS DATE)
-    ORDER BY
-        AttendanceDate,
-        UserId;
-";
+            //    const string sql = @"
+            //    SELECT
+            //        UserId,
+            //        CAST(LogDate AS DATE) AS AttendanceDate,
+            //        MIN(LogDate) AS InTime,
+            //        MAX(LogDate) AS OutTime,
+            //        COUNT(*) AS PunchCount
+            //    FROM DeviceLogs_8_2026
+            //    WHERE LogDate >= @FromDate
+            //      AND LogDate < @ToDate
+            //    GROUP BY
+            //        UserId,
+            //        CAST(LogDate AS DATE)
+            //    ORDER BY
+            //        AttendanceDate,
+            //        UserId;
+            //";
 
+
+            // =====================================================
+            // BIOMETRIC TABLE NAME
+            // Example: DeviceLogs_8_2026
+            // =====================================================
+
+            var tableName =
+                $"DeviceLogs_{startDate.Month}_{startDate.Year}";
+
+
+            // =====================================================
+            // SQL
+            // =====================================================
+
+                var sql = $@"
+                SELECT
+                    UserId,
+                    CAST(LogDate AS DATE) AS AttendanceDate,
+                    MIN(LogDate) AS InTime,
+                    MAX(LogDate) AS OutTime,
+                    COUNT(*) AS PunchCount
+                FROM [{tableName}]
+                WHERE LogDate >= @FromDate
+                  AND LogDate < @ToDate
+                GROUP BY
+                    UserId,
+                    CAST(LogDate AS DATE)
+                ORDER BY
+                    AttendanceDate,
+                    UserId;
+            ";
 
             // =====================================================
             // READ FROM BIOMETRIC DATABASE
@@ -237,12 +268,12 @@ namespace TSSC.Unified.Services
 
                         AttendanceStatus =
                         missingPunch
-                            ? "Present - Out Punch Missing"
+                            ? "Present - Check Out Missing"
                             : "Present",
 
                                             Remarks =
                         missingPunch
-                            ? "Employee punched in but has not punched out."
+                            ? "Employee checked in but has not checked out."
                             : "Attendance synchronized from biometric device.",
 
                         AttendanceSource =
@@ -279,12 +310,12 @@ namespace TSSC.Unified.Services
 
                     attendance.AttendanceStatus =
                         missingPunch
-                            ? "Present - Out Punch Missing"
+                            ? "Present - Check Out Missing"
                             : "Present";
 
                     attendance.Remarks =
                         missingPunch
-                            ? "Employee punched in but has not punched out."
+                            ? "Employee checked in but has not checked out."
                             : "Attendance synchronized from biometric device.";
 
                     attendance.AttendanceSource =

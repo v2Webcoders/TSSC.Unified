@@ -56,7 +56,7 @@
 							<th>Mobile</th>
 							<th>Email</th>
 							<th>Status</th>
-							<th width="120">Action</th>
+							<th>Action</th>
 						</tr>
 					</thead>
 
@@ -106,12 +106,28 @@
 											<em class="icon ni ni-eye"></em>
 										</a>
 
-										<a asp-action="Create"
-										   asp-route-id="@item.EmployeeId"
-										   class="btn btn-sm btn-outline-warning" data-bs-toggle="tooltip" data-bs-placement="top"
-										   title="Edit">
-											<em class="icon ni ni-edit"></em>
-										</a>
+										@if (item.ProfileStatus == "Submitted")
+										{
+											<a asp-action="Edit"
+											   asp-route-id="@item.EmployeeId"
+											   class="btn btn-sm btn-outline-warning"
+											   data-bs-toggle="tooltip"
+											   data-bs-placement="top"
+											   title="Review Profile">
+												<em class="icon ni ni-user-check"></em>
+											</a>
+										}
+										else
+										{
+											<a asp-action="Edit"
+											   asp-route-id="@item.EmployeeId"
+											   class="btn btn-sm btn-outline-warning"
+											   data-bs-toggle="tooltip"
+											   data-bs-placement="top"
+											   title="Edit">
+												<em class="icon ni ni-edit"></em>
+											</a>
+										}
 										<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Reset Password"
 										   onclick="openResetPasswordModal(@item.EmployeeId, '@item.FirstName @item.LastName', '@item.Username')">
 											<em class="icon ni ni-lock-alt"></em>

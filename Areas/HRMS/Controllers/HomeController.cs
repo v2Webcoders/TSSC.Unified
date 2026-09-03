@@ -37,43 +37,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             _environment = environment;
         }
 
-        //public async Task<IActionResult> Index()
-        //{
-        //    var applicationUserId =
-        //        User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        //    var employee = await _db.Employee
-        //        .FirstOrDefaultAsync(x =>
-        //            x.ApplicationUserId == applicationUserId);
-
-        //    ViewBag.EmployeeName = employee?.FirstName ?? "Employee";
-        //    ViewBag.EmployeeCode = employee?.EmployeeCode;
-        //    if (User.IsInRole("HR"))
-        //    {
-        //        var attendance = await GetTodayAttendance(
-        //            employee.EmployeeCode);
-
-        //        ViewBag.TodayInTime = attendance.InTime;
-        //        ViewBag.TodayOutTime = attendance.OutTime;
-        //        return View("Index");
-        //    }
-
-        //    if (User.IsInRole("Employee"))
-        //    {
-        //        if (employee == null)
-        //            return NotFound();
-
-        //        var attendance = await GetTodayAttendance(
-        //            employee.EmployeeCode);
-
-        //        ViewBag.TodayInTime = attendance.InTime;
-        //        ViewBag.TodayOutTime = attendance.OutTime;
-
-        //        return View("EmployeeDashboard");
-        //    }
-
-        //    return View();
-        //}
+        
 
         public async Task<IActionResult> Index()
         {
@@ -110,6 +74,60 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                     EmployeeCode =
                employee?.EmployeeCode
                 };
+
+
+                // =================================================
+                // EMPLOYEE BIRTHDAYS - TODAY + NEXT 6 DAYS
+                // =================================================
+
+                var employees = await _db.Employee
+                    .Where(x =>
+                        x.IsActive &&
+                        x.DOB.HasValue)
+                    .ToListAsync();
+
+                model.Birthdays = employees
+                    .Select(x =>
+                    {
+                        var dob = x.DOB!.Value;
+
+                        var birthday = new DateTime(
+                            today.Year,
+                            dob.Month,
+                            dob.Day);
+
+                        if (birthday < today)
+                        {
+                            birthday = birthday.AddYears(1);
+                        }
+
+                        return new
+                        {
+                            Employee = x,
+                            Birthday = birthday
+                        };
+                    })
+                    .Where(x =>
+                        x.Birthday >= today &&
+                        x.Birthday <= today.AddDays(6))
+                    .OrderBy(x => x.Birthday)
+                    .Select(x => new EmployeeBirthdayVM
+                    {
+                        EmployeeName =
+                            x.Employee.FirstName + " " +
+                            x.Employee.LastName,
+
+                        DOB = x.Employee.DOB!.Value,
+
+                        PhotoPath =
+                            x.Employee.PhotoPath,
+
+                        IsToday =
+                            x.Birthday.Date == today
+                    })
+                    .ToList();
+
+
 
                 // =================================================
                 // TODAY'S ATTENDANCE FOR LOGGED-IN HR
@@ -219,7 +237,14 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             {
                 if (employee == null)
                     return NotFound();
-
+                if (employee.ProfileStatus == "Pending")
+                {
+                    return RedirectToAction("EditProfile", "Employee");
+                }
+                if (employee.ProfileStatus == "Submitted")
+                {
+                    return RedirectToAction("ProfileSubmitted", "Employee");
+                }
                 var today = DateTime.Today;
 
                 var attendance =
@@ -239,7 +264,8 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                         attendance.InTime,
 
                     TodayOutTime =
-                        attendance.OutTime
+                        attendance.OutTime,
+                    DOB = employee.DOB
                 };
 
 
@@ -274,6 +300,13 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 // WORKING DAYS THIS MONTH
                 // =================================================
 
+                var holidays = await _db.Holiday
+                .Where(x => x.HolidayDate >= firstDayOfMonth &&
+                            x.HolidayDate <= today &&
+                            x.Status=="Published")
+                .Select(x => x.HolidayDate.Date)
+                .ToListAsync();
+
                 var workingDays = 0;
 
                 for (
@@ -281,14 +314,15 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                     date <= today;
                     date = date.AddDays(1))
                 {
-                    if (date.DayOfWeek != DayOfWeek.Sunday)
+                    // Exclude Sunday and holidays
+                    if (date.DayOfWeek != DayOfWeek.Sunday &&
+                        !holidays.Contains(date.Date))
                     {
                         workingDays++;
                     }
                 }
 
-                model.WorkingDaysThisMonth =
-                    workingDays;
+                model.WorkingDaysThisMonth = workingDays;
 
 
                 // =================================================

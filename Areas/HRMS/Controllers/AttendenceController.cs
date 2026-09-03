@@ -182,7 +182,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             ViewBag.MissingPunchCount =
                 attendance.Count(x =>
                     x.AttendanceStatus ==
-                    "Present - Out Punch Missing");
+                    "Present - Check Out Missing");
 
             ViewBag.AbsentCount = 0;
 

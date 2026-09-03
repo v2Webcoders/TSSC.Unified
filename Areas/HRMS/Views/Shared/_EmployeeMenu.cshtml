@@ -90,7 +90,7 @@
 			x.Approver4Id == employeeId &&
 			x.Approver2Status == "Approved" &&
 			x.Approver3Status == "Approved" &&
-				x.Approver4Status == "Approved"
+			x.Approver4Status == "Approved"
 		);
 		// किसी भी condition के true होने पर
 		// तीनों menu show होंगे
@@ -385,7 +385,7 @@
 					   class="nk-menu-link">
 
 						<span class="nk-menu-text">
-							My Approval List
+							My Approval Requests
 						</span>
 
 					</a>
@@ -498,7 +498,55 @@
 			</div>
 		</li>
 
+		<li class="nk-menu-item has-sub">
 
+			<a href="#"
+			   class="nk-menu-link nk-menu-toggle">
+
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-setting"></em>
+				</span>
+
+				<span class="nk-menu-text">
+					Master Data
+				</span>
+
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<!-- Department -->
+				<li class="nk-menu-item">
+
+					<a href="/HRMS/Department/Index"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Department
+						</span>
+
+					</a>
+
+				</li>
+
+
+				<!-- Designation -->
+				<li class="nk-menu-item">
+
+					<a href="/HRMS/Designation/Index"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Designation
+						</span>
+
+					</a>
+
+				</li>
+
+			</ul>
+
+		</li>
 		<!-- Employee Management -->
 
 		<li class="nk-menu-item has-sub">
@@ -575,7 +623,7 @@
 					   class="nk-menu-link">
 
 						<span class="nk-menu-text">
-							Attendance Management
+							Employee Attendance
 						</span>
 
 					</a>
@@ -762,11 +810,11 @@
 			   class="nk-menu-link">
 
 				<span class="nk-menu-icon">
-					<em class="icon ni ni-network"></em>
+					<em class="icon ni ni-upload"></em>
 				</span>
 
 				<span class="nk-menu-text">
-					Organization Chart
+					Manage Organization Chart
 				</span>
 
 			</a>

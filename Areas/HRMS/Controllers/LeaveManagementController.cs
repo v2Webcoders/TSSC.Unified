@@ -164,6 +164,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             return View(balances);
         }
+
         [HttpGet]
         public async Task<IActionResult> MyBalance()
         {
@@ -184,6 +185,197 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 .ToListAsync();
 
             return View(balances);
+        }
+
+
+        //MONTHLY SERVICE
+        public async Task<IActionResult> AllocateMonthlyLeaves()
+        {
+            try
+            {
+                var today = DateTime.Today;
+
+                // =====================================================
+                // CURRENT MONTH
+                // =====================================================
+
+                var monthStart = new DateTime(
+                    today.Year,
+                    today.Month,
+                    1);
+
+
+                // =====================================================
+                // GET ACTIVE LEAVE POLICIES
+                // =====================================================
+
+                var leavePolicies = await _context.LeavePolicy
+                    .Where(x =>
+                        x.IsActive &&
+                        x.EffectiveFrom <= today &&
+                        (x.EffectiveTo == null ||
+                         x.EffectiveTo >= today))
+                    .ToListAsync();
+
+                if (!leavePolicies.Any())
+                {
+                    TempData["Error"] =
+                        "No active leave policies found.";
+
+                    return RedirectToAction("Index");
+                }
+
+
+                // =====================================================
+                // GET ACTIVE EMPLOYEES
+                // =====================================================
+
+                var employees = await _context.Employee
+                    .Where(x => x.IsActive)
+                    .ToListAsync();
+
+
+                int creditedEmployees = 0;
+                decimal totalCredited = 0m;
+
+
+                // =====================================================
+                // PROCESS EACH EMPLOYEE
+                // =====================================================
+
+                foreach (var employee in employees)
+                {
+                    var joiningDate = employee.JoiningDate;
+
+
+                    // =================================================
+                    // EMPLOYEE JOINED IN CURRENT MONTH
+                    // =================================================
+
+                    if (joiningDate >= monthStart)
+                    {
+                        // Joining-month allocation is handled
+                        // during employee activation.
+
+                        continue;
+                    }
+
+
+                    // =================================================
+                    // PROCESS EACH LEAVE POLICY
+                    // =================================================
+
+                    foreach (var policy in leavePolicies)
+                    {
+                        // =============================================
+                        // FIND EXISTING BALANCE
+                        // =============================================
+
+                        var leaveBalance =
+                            await _context.EmployeeLeaveBalance
+                                .FirstOrDefaultAsync(x =>
+                                    x.EmployeeId ==
+                                        employee.EmployeeId &&
+                                    x.LeaveTypeId ==
+                                        policy.LeaveTypeId);
+
+
+                        // =============================================
+                        // IF BALANCE DOES NOT EXIST
+                        // =============================================
+
+                        if (leaveBalance == null)
+                        {
+                            leaveBalance =
+                                new EmployeeLeaveBalance
+                                {
+                                    EmployeeId =
+                                        employee.EmployeeId,
+
+                                    LeaveTypeId =
+                                        policy.LeaveTypeId,
+
+                                    OpeningBalance =
+                                        policy.MonthlyAllocation,
+
+                                    UsedLeaves = 0,
+
+                                    Adjustment = 0,
+
+                                    LastUpdated =
+                                        DateTime.Now
+                                };
+
+                            _context.EmployeeLeaveBalance
+                                .Add(leaveBalance);
+
+                            creditedEmployees++;
+
+                            totalCredited +=
+                                policy.MonthlyAllocation;
+
+                            continue;
+                        }
+
+
+                        // =============================================
+                        // PREVENT DUPLICATE MONTHLY CREDIT
+                        // =============================================
+
+                        if (leaveBalance.LastUpdated.Year ==
+                                today.Year &&
+                            leaveBalance.LastUpdated.Month ==
+                                today.Month)
+                        {
+                            continue;
+                        }
+
+
+                        // =============================================
+                        // ADD MONTHLY ALLOCATION
+                        // =============================================
+
+                        leaveBalance.Adjustment +=
+                            policy.MonthlyAllocation;
+
+
+                        leaveBalance.LastUpdated =
+                            DateTime.Now;
+
+
+                        creditedEmployees++;
+
+                        totalCredited +=
+                            policy.MonthlyAllocation;
+                    }
+                }
+
+
+                // =====================================================
+                // SAVE
+                // =====================================================
+
+                await _context.SaveChangesAsync();
+
+
+                // =====================================================
+                // SUCCESS
+                // =====================================================
+
+                TempData["Success"] =
+                    $"Monthly leave allocation completed successfully. " +
+                    $"{creditedEmployees} employee leave balances " +
+                    $"credited with a total of {totalCredited:0.##} leaves.";
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception)
+            {
+                TempData["Error"] =
+                    "Unable to complete monthly leave allocation.";
+
+                return RedirectToAction("Index");
+            }
         }
     }
 }

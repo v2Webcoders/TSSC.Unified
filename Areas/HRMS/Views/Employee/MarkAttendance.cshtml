@@ -80,7 +80,7 @@
 
                     <div class="col-12">
 
-                        <div class="card border">
+                       @*  <div class="card border">
 
                             <div class="card-inner">
 
@@ -147,8 +147,47 @@
 
                             </div>
 
+                        </div> *@
+                        <div class="card border">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Employee Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3 mb-md-0">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label class="form-label text-soft small">Employee Code</label>
+                                                <div class="text-dark fw-semibold">@Model.EmployeeCode</div>
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label text-soft small">Employee Name</label>
+                                                <div class="text-dark fw-semibold">@Model.EmployeeName</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 d-flex align-items-end">
+                                        <div class="w-100">
+                                            <label class="form-label text-soft small">Attendance Status</label>
+                                            <div>
+                                                @if (Model.IsCheckedOut)
+                                                {
+                                                    <span class="badge bg-success">Completed</span>
+                                                }
+                                                else if (Model.IsCheckedIn)
+                                                {
+                                                    <span class="badge bg-success">Present</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning">Not Marked</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
                     </div>
 
 
@@ -228,12 +267,12 @@
                                             class="btn btn-primary"
                                     @(Model.IsCheckedIn ? "disabled" : "")>
 
-                                        <em class="icon ni ni-login me-1"></em>
+                                         <em class="icon ni ni-check-circle"></em>
 
-                                        Check In
+                                         Check In
 
                                     </button>
-
+                                   
                                 </div>
 
 
@@ -324,7 +363,7 @@
                                             class="btn btn-danger"
                                     @(!Model.IsCheckedIn || Model.IsCheckedOut ? "disabled" : "")>
 
-                                        <em class="icon ni ni-logout me-1"></em>
+                                        <em class="icon ni ni-signout"></em>
 
                                         Check Out
 
@@ -350,7 +389,68 @@
         </div>
 
     </div>
+    <!-- Attendance Confirmation Modal -->
+    <div class="modal fade" id="attendanceConfirmModal" tabindex="-1"
+         aria-labelledby="attendanceConfirmModalLabel" aria-hidden="true">
 
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title" id="attendanceConfirmModalLabel">
+                        Confirm Attendance
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                    </button>
+
+                </div>
+
+                <div class="modal-body text-center">
+
+                    <div class="mb-3">
+                        <em class="icon ni ni-check-circle-fill"
+                            style="font-size: 50px;">
+                        </em>
+                    </div>
+
+                    <h5 id="attendanceConfirmTitle">
+                        Confirm Check In
+                    </h5>
+
+                    <p class="text-muted mb-0"
+                       id="attendanceConfirmMessage">
+                        Are you sure you want to mark your attendance?
+                    </p>
+
+                </div>
+
+                <div class="modal-footer justify-content-center">
+
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-primary"
+                            id="btnConfirmAttendance">
+                        Confirm
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 </div>
  
 @section Scripts {
@@ -497,7 +597,13 @@
         document
             .getElementById("btnCheckIn")
             ?.addEventListener("click", async function () {
+                const confirmed = confirm(
+            "Are you sure you want to check in?"
+        );
 
+        if (!confirmed) {
+            return;
+        }
                 const button = this;
 
                 const originalHtml =
@@ -669,10 +775,15 @@
                         }
 
 
-                        alert(
-                            result.message
-                        );
-
+                        // alert(
+                        //     result.message
+                        // );
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: result.message,
+            confirmButtonText: 'OK'
+        });
                     }
                     else {
 
@@ -728,6 +839,13 @@
         document
             .getElementById("btnCheckOut")
             ?.addEventListener("click", async function () {
+                const confirmed = confirm(
+            "Are you sure you want to check out?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
 
                 const button = this;
 
@@ -916,9 +1034,15 @@
                         );
 
 
-                        alert(
-                            result.message
-                        );
+                        // alert(
+                        //     result.message
+                        // );
+                            Swal.fire({
+                            icon: 'success',
+                            title: 'Attendance Marked',
+                            text: result.message,
+                            confirmButtonText: 'OK'
+                        });
 
                     }
                     else {
