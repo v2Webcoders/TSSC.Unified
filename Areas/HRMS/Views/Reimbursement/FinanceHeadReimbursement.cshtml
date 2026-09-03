@@ -1,0 +1,212 @@
+﻿@model IEnumerable<TSSC.Unified.ViewModel.ReimbursementVM>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Finance Head Reimbursement List
+            </h3>
+        </div>
+
+    </div>
+</div>
+
+<div class="card card-preview">
+    <div class="card-inner">
+
+        <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Employee</th>
+                    <th>Expense Category</th>
+                    <th>Expense Amount</th>
+                    <th>Expense Date</th>
+                    <th>Payment Mode</th>
+                    <th>Supporting Document</th>
+                    <th>Invoice / Bill</th>
+                    <th>HR Status</th>
+                    <th>Finance Head Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>
+                            @serial
+                        </td>
+
+                        <td>
+                            @item.EmployeeId
+                        </td>
+
+                        <td>
+                            @item.ExpenseCategory
+                        </td>
+
+                        <td>
+                            ₹ @item.ExpenseAmount.ToString("N2")
+                        </td>
+
+                        <td>
+                            @item.ExpenseDate.ToString("dd-MMM-yyyy")
+                        </td>
+
+                        <td>
+                            @item.PaymentMode
+                        </td>
+
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.SupportingDocument))
+                            {
+                                <a href="@Url.Content(item.SupportingDocument)"
+                                   target="_blank"
+                                   class="btn btn-sm btn-info">
+
+                                    <em class="icon ni ni-file"></em>
+                                    View File
+
+                                </a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.InvoiceBill))
+                            {
+                                <a href="@Url.Content(item.InvoiceBill)"
+                                   target="_blank"
+                                   class="btn btn-sm btn-info">
+
+                                    <em class="icon ni ni-file"></em>
+                                    View Bill
+
+                                </a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+
+                        <td>
+
+                            @if (item.HRStatus == "HR Approved")
+                            {
+                                <span class="badge bg-success">
+                                    Approved by HR
+                                </span>
+                            }
+                            else if (item.HRStatus == "HR Rejected")
+                            {
+                                <span class="badge bg-danger">
+                                    Rejected by HR
+                                </span>
+                            }
+
+                        </td>
+
+                        <td>
+
+                            @if (item.FinanceHeadStatus == "Finance Head Approved")
+                            {
+                                <span class="badge bg-success">
+                                    Approved by Finance Head
+                                </span>
+                            }
+                            else if (item.FinanceHeadStatus == "Finance Head Rejected")
+                            {
+                                <span class="badge bg-danger">
+                                    Rejected by Finance Head
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">
+                                    Finance Head Pending
+                                </span>
+                            }
+
+                        </td>
+
+                        <td>
+
+                            @if (item.FinanceHeadStatus == "Pending")
+                            {
+                                <form method="post">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@item.ReimbursementId" />
+
+                                    <input type="text"
+                                           name="remarks"
+                                           class="form-control form-control-sm mb-1"
+                                           placeholder="Finance Head Remarks"
+                                           required />
+
+                                    <button type="submit"
+                                            formaction="@Url.Action("FinanceHeadApprove", "Reimbursement")"
+                                            class="btn btn-sm btn-success">
+
+                                        <em class="icon ni ni-check"></em>
+                                        Approve
+
+                                    </button>
+
+                                    <button type="submit"
+                                            formaction="@Url.Action("FinanceHeadReject", "Reimbursement")"
+                                            class="btn btn-sm btn-danger">
+
+                                        <em class="icon ni ni-cross"></em>
+                                        Reject
+
+                                    </button>
+
+                                </form>
+                            }
+                            else if (item.FinanceHeadStatus == "Finance Head Approved")
+                            {
+                                <span class="badge bg-success">
+                                    Final Approved
+                                </span>
+                            }
+                            else if (item.FinanceHeadStatus == "Finance Head Rejected")
+                            {
+                                <span class="badge bg-danger">
+                                    Rejected
+                                </span>
+                            }
+
+                        </td>
+
+                    </tr>
+
+                    serial++;
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+</div>

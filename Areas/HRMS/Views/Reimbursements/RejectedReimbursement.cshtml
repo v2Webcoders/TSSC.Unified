@@ -165,6 +165,14 @@
                                             {
                                                 remarks = item.Approver4Remarks ?? "-";
                                             }
+                                            else if (item.Approver5Status == "Rejected")
+                                            {
+                                                remarks = item.Approver5Remarks ?? "-";
+                                            }
+                                            else if (item.Approver6Status == "Rejected")
+                                            {
+                                                remarks = item.Approver6Remarks ?? "-";
+                                            }
                                         }
 
                                         @remarks

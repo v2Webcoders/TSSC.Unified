@@ -52,6 +52,8 @@ namespace QUIZAPP
 
         //for certificate generation--------------------------------------------------------------
         public DbSet<Certificate> Certificate { get; set; }
+        public DbSet<CertificateGeneration> CertificateGeneration { get; set; }
+        public DbSet<CertificateGenerationDetail> CertificateGenerationDetail{ get; set; }
         //public DbSet<CertificateTemplate> CertificateTemplates { get; set; }
 
         //public DbSet<CertificateTemplateField> CertificateTemplateFields { get; set; }

@@ -44,5 +44,6 @@ namespace TSSC.Unified.Models
         [StringLength(500)]
         public string? AttachmentByEmployee { get; set; }
         public bool IsClosed { get; set; }
+        public bool ReopenTask { get; set; }
     }
 }

@@ -8,9 +8,14 @@ namespace TSSC.Unified.ViewModel
         public int ReimbursementId { get; set; }
 
         public int EmployeeId { get; set; }
+        public string EmployeeName { get; set; }
 
-        [Required(ErrorMessage = "Please select Request Type")]
-        public string RequestType { get; set; }
+        public string EmployeeCode { get; set; }
+
+        public string DepartmentName { get; set; }
+
+       // [Required(ErrorMessage = "Please select Request Type")]
+        //public string? RequestType { get; set; }
 
         [Required(ErrorMessage = "Please select Expense Category")]
         public string ExpenseCategory { get; set; }
@@ -22,7 +27,7 @@ namespace TSSC.Unified.ViewModel
         [Required(ErrorMessage = "Please select Expense Date")]
         public DateTime ExpenseDate { get; set; }
 
-        public string VendorName { get; set; }
+        //public string? VendorName { get; set; }
 
         [Required(ErrorMessage = "Please select Payment Mode")]
         public string PaymentMode { get; set; }
@@ -31,14 +36,14 @@ namespace TSSC.Unified.ViewModel
         public string Purpose { get; set; }
 
         // File upload fields
-        public IFormFile SupportingDocumentFile { get; set; }
-        public IFormFile InvoiceBillFile { get; set; }
+        public IFormFile? SupportingDocumentFile { get; set; }
+        public IFormFile? InvoiceBillFile { get; set; }
 
         // These will store file paths - NOT REQUIRED in form
         public string SupportingDocument { get; set; }
         public string InvoiceBill { get; set; }
 
-        public string Remarks { get; set; }
+        //public string? Remarks { get; set; }
 
         // System fields - will be set in controller
         public string Status { get; set; }
@@ -48,13 +53,27 @@ namespace TSSC.Unified.ViewModel
         public string? FinanceStatus { get; set; }
         public string FinanceRemarks { get; set; }
         public DateTime? FinanceApprovedOn { get; set; }
-        public DateTime? PaidOn { get; set; }
+        public string? HRStatus { get; set; }
+
+        [StringLength(1000)]
+        public string? HRRemarks { get; set; }
+
+        public DateTime? HRApprovedOn { get; set; }
+        public string? FinanceHeadStatus { get; set; }
+
+        public string? FinanceHeadRemarks { get; set; }
+
+        public DateTime? FinanceHeadApprovedOn { get; set; }
+        public string? CEOStatus { get; set; }
+
+        public string? CEORemarks { get; set; }
+
+        public DateTime? CEOApprovedOn { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
         public bool IsActive { get; set; }
 
-        // Dropdowns
-        public List<SelectListItem> RequestTypeList { get; set; }
+        // DropdownsctListItem> RequestTypeList { get; set; }
         public List<SelectListItem> ExpenseCategoryList { get; set; }
         public List<SelectListItem> PaymentModeList { get; set; }
     }

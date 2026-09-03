@@ -16,4 +16,5 @@
 
     public bool IsActive { get; set; }
     public string? TemplateFile { get; set; }
+    public string? CertificateType { get; set; }
 }

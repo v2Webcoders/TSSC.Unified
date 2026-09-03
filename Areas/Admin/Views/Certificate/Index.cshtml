@@ -10,11 +10,9 @@
     <div class="nk-block-between">
 
         <div class="nk-block-head-content">
-
             <h3 class="nk-block-title page-title">
                 Certificates
             </h3>
-
         </div>
 
     </div>
@@ -26,161 +24,290 @@
 
     <div class="card-inner">
 
-        <table class="datatable-init-export table table-tranx table_custom table-bordered">
+        <div class="row g-4">
 
-            <thead>
-                <tr>
-                    <th>#</th>
-                  @*   <th>Id No</th> *@
-                    <th>Company Name</th>
-                   @*  <th>Description</th>
-                    <th>Start Date</th>
-                    <th>End Date</th> *@
-                    <th>Action</th>
-                </tr>
-            </thead>
+            <!-- Certificate Type -->
 
-            <tbody>
+            <div class="col-md-5">
 
-                @if (Model != null && Model.Any())
-                {
-                    int count = 1;
+                <div class="form-group">
 
-                    foreach (var item in Model)
-                    {
-                        <tr>
+                    <label class="form-label">
+                        Certificate Type
+                    </label>
 
-                            <td>
-                                @count
-                            </td>
+                    <div class="form-control-wrap">
 
-                           @*  <td>
-                                @item.CertificateNo
-                            </td> *@
+                        <select id="certificateType"
+                                class="form-select">
 
-                            <td>
-                                @item.CompanyName
-                            </td>
-@* 
-                            <td>
-                                @item.Description
-                            </td> *@
-@* 
-                            <td>
-                                @(item.StartDate.HasValue
-                                                        ? item.StartDate.Value.ToString("dd-MMMM-yyyy")
-                                                        : "")
-                                                         </td>
+                            <option value="">
+                                Select Certificate Type
+                            </option>
 
-                            <td>
-                                @(item.EndDate.HasValue
-                                                        ? item.EndDate.Value.ToString("dd-MMMM-yyyy")
-                                                        : "")
-                    </td>
- *@
-                            <td>
+                            @foreach (var type in Model
+                                                        .Where(x => !string.IsNullOrWhiteSpace(x.CertificateType))
+                                                        .Select(x => x.CertificateType)
+                                                        .Distinct()
+                                                        .OrderBy(x => x))
+                            {
+                                <option value="@type">
+                                    @type
+                                </option>
+                            }
 
-                                <div class="btn-group" role="group">
-
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-info"
-                                            title="Preview Template"
-                                            onclick="showTemplatePreview(
-                            '@Url.Content(
-                                                                    "~/uploads/certificates/templates/" + item.TemplateFile
-                                                                )'
-                )">
-
-                                                        <em class="icon ni ni-eye"></em>
-
-                                                    </button>
-
-
-                                                    <a href="/Admin/Certificate/BulkGenerate?id=@item.Id"
-                                                       class="btn btn-sm btn-primary"
-                                                       title="Generate Certificates">
-
-                                                        <em class="icon ni ni-file-pdf"></em>
-
-                                                        <span>Generate Certificates</span>
-
-                                                    </a>
-
-                                                </div>
-
-                                            </td>
-
-                                        </tr>
-
-                                        count++;
-                    }
-                }
-                else
-                {
-                    <tr>
-
-                        <td colspan="7"
-                            class="text-center">
-
-                            No certificates found.
-
-                        </td>
-
-                    </tr>
-                }
-
-                <div class="modal fade"
-                     id="templatePreviewModal"
-                     tabindex="-1"
-                     aria-hidden="true">
-
-                    <div class="modal-dialog modal-xl modal-dialog-centered">
-
-                        <div class="modal-content">
-
-                            <div class="modal-header">
-
-                                <h5 class="modal-title">
-                                    Certificate Preview
-                                </h5>
-
-                                <button type="button"
-                                        class="btn-close"
-                                        data-bs-dismiss="modal">
-                                </button>
-
-                            </div>
-
-                            <div class="modal-body text-center">
-
-                                <img id="templatePreviewImage"
-                                     src=""
-                                     class="img-fluid"
-                                     style="max-width:100%; height:auto;"
-                                     alt="Certificate Template">
-
-                            </div>
-
-                        </div>
+                        </select>
 
                     </div>
 
                 </div>
 
-            </tbody>
+            </div>
 
-        </table>
+
+            <!-- Certificate Name -->
+
+            <div class="col-md-5">
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Certificate Name
+                    </label>
+
+                    <div class="form-control-wrap">
+
+                        <select id="certificateName"
+                                class="form-select"
+                                disabled>
+
+                            <option value="">
+                                Select Certificate Name
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Generate Button -->
+
+            <div class="col-md-2 d-flex align-items-end">
+
+                <div class="form-group w-100">
+
+                    <button type="button"
+                            id="generateCertificateBtn"
+                            class="btn btn-primary w-100"
+                            disabled>
+
+                        <em class="icon ni ni-file-pdf"></em>
+
+                        Generate
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
 </div>
+
+
+<!-- Template Preview Modal -->
+
+<div class="modal fade"
+     id="templatePreviewModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    Certificate Preview
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body text-center">
+
+                <img id="templatePreviewImage"
+                     src=""
+                     class="img-fluid"
+                     style="max-width:100%; height:auto;"
+                     alt="Certificate Template">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script>
+
+    // =====================================================
+    // CERTIFICATE DATA
+    // =====================================================
+
+    var certificates = @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                        Model.Select(x => new
+                        {
+                                id = x.Id,
+                                type = x.CertificateType,
+                                name = x.CompanyName,
+                                template = x.TemplateFile
+                        })
+                )
+        );
+
+
+    // =====================================================
+    // ELEMENTS
+    // =====================================================
+
+    var certificateType =
+        document.getElementById("certificateType");
+
+    var certificateName =
+        document.getElementById("certificateName");
+
+    var generateButton =
+        document.getElementById("generateCertificateBtn");
+
+
+    // =====================================================
+    // CERTIFICATE TYPE CHANGE
+    // =====================================================
+
+    certificateType.addEventListener("change", function () {
+
+        var selectedType = this.value;
+
+
+        // Reset Certificate Name
+
+        certificateName.innerHTML =
+            '<option value="">Select Certificate Name</option>';
+
+        certificateName.disabled = true;
+
+        generateButton.disabled = true;
+
+
+        if (!selectedType) {
+            return;
+        }
+
+
+        // Get certificates for selected type
+
+        var filteredCertificates =
+            certificates.filter(function (item) {
+
+                return item.type === selectedType;
+
+            });
+
+
+        // Add certificates to dropdown
+
+        filteredCertificates.forEach(function (item) {
+
+            var option =
+                document.createElement("option");
+
+            option.value = item.id;
+
+            option.text = item.name;
+
+            certificateName.appendChild(option);
+
+        });
+
+
+        certificateName.disabled = false;
+
+    });
+
+
+    // =====================================================
+    // CERTIFICATE NAME CHANGE
+    // =====================================================
+
+    certificateName.addEventListener("change", function () {
+
+        var certificateId = this.value;
+
+
+        if (!certificateId) {
+
+            generateButton.disabled = true;
+
+            return;
+
+        }
+
+
+        // Enable Generate button
+
+        generateButton.disabled = false;
+
+    });
+
+
+    // =====================================================
+    // GENERATE CERTIFICATE
+    // =====================================================
+
+    generateButton.addEventListener("click", function () {
+
+        var certificateId =
+            certificateName.value;
+
+
+        if (!certificateId) {
+            return;
+        }
+
+
+        window.location.href =
+            "/Admin/Certificate/BulkGenerate?id="
+            + certificateId;
+
+    });
+
+
+    // =====================================================
+    // TEMPLATE PREVIEW
+    // =====================================================
 
     function showTemplatePreview(imageUrl) {
 
         document.getElementById(
             "templatePreviewImage"
         ).src = imageUrl;
+
 
         var modal =
             new bootstrap.Modal(
@@ -189,7 +316,9 @@
                 )
             );
 
+
         modal.show();
+
     }
 
 </script>
