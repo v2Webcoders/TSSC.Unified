@@ -1,0 +1,3034 @@
+﻿@model TSSC.Unified.ViewModel.TrainerRegistrationViewModel
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "~/Views/Shared/_RegistrationLayout.cshtml";
+    ViewData["Title"] = "Trainer Registration";
+}
+
+<div class="reg-hero">
+    <h1 id="formTitle">Trainer Registration</h1>
+
+    <p>
+        Fill in your personal, contact, qualification and professional
+        details across the sections below.
+    </p>
+</div>
+
+
+<div class="form-shell">
+
+    @if (TempData["msg"] != null)
+    {
+        <div class="alert alert-success" style="margin-bottom:20px;">
+            <strong>@TempData["msg"]</strong>
+        </div>
+    }
+
+
+    <div asp-validation-summary="All"
+         class="text-danger">
+    </div>
+
+
+    <form asp-area="Trainer"
+          asp-controller="Trainer"
+          asp-action="Registration"
+          method="post"
+          enctype="multipart/form-data"
+          id="trainerForm">
+
+        @Html.AntiForgeryToken()
+
+
+        <div asp-validation-summary="All"
+             class="text-danger">
+        </div>
+
+
+        <!-- NOTE -->
+
+        <p class="alert alert-primary">
+            Note: Fields marked
+            <span class="req">*</span>
+            are mandatory.
+        </p>
+
+
+        <!-- =====================================================
+             1. BASIC DETAILS
+        ====================================================== -->
+
+        <div class="accordion open" data-step="1">
+
+            <div class="acc-head"
+                 onclick="toggleAcc(this)">
+
+                <div class="left">
+
+                    <div class="step-num">
+                        1
+                    </div>
+
+                    <div class="title">
+                        Basic Details
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="acc-body">
+
+                <div class="form-grid">
+
+
+                    <!-- Candidate Name -->
+
+                    <div class="field">
+
+                        <label asp-for="CandidateName">
+                            Candidate Name
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="CandidateName"
+                               type="text"
+                               placeholder="Enter Candidate Name" />
+
+                        <span asp-validation-for="CandidateName"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- DOB -->
+
+                    <div class="field">
+
+                        <label asp-for="DateOfBirth">
+                            Date of Birth
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="DateOfBirth"
+                               type="date"
+                               class="date-input" />
+
+                        <span asp-validation-for="DateOfBirth"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Gender -->
+
+                    <div class="field">
+
+                        <label asp-for="Gender">
+                            Gender
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="Gender">
+
+                            <option value="">
+                                Select Gender
+                            </option>
+
+                            <option value="Male">
+                                Male
+                            </option>
+
+                            <option value="Female">
+                                Female
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="Gender"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Job Role -->
+
+                    <div class="field">
+
+                        <label asp-for="JobRoleId">
+                            Apply for Job Role
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="JobRoleId"
+                                asp-items="Model.JobRoleList">
+
+                            <option value="">
+                                Select Job Role
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="JobRoleId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- TP -->
+
+                    <div class="field">
+
+                        <label asp-for="TPId">
+                            TP / AB Name
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="TPId">
+
+                            <option value="">
+                                Select TP / AB
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="TPId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- SPOC -->
+
+                    <div class="field">
+
+                        <label asp-for="SPOCName">
+                            SPOC Name
+                        </label>
+
+                        <input asp-for="SPOCName"
+                               type="text"
+                               placeholder="Enter SPOC Name" />
+
+                    </div>
+
+
+                    <!-- SIDH -->
+
+                    <div class="field">
+
+                        <label asp-for="SIDHApplied">
+                            Applied for Training Request on SIDH
+                        </label>
+
+                        <select asp-for="SIDHApplied">
+
+                            <option value="">
+                                Select
+                            </option>
+
+                            <option value="Yes">
+                                Yes
+                            </option>
+
+                            <option value="No">
+                                No
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Scheme -->
+
+                    <div class="field">
+
+                        <label asp-for="Scheme">
+                            Scheme if Any
+                        </label>
+
+                        <input asp-for="Scheme"
+                               type="text"
+                               placeholder="Enter Scheme" />
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             2. CONTACT DETAILS
+        ====================================================== -->
+
+        <div class="accordion open" data-step="2">
+
+            <div class="acc-head"
+                 onclick="toggleAcc(this)">
+
+                <div class="left">
+
+                    <div class="step-num">
+                        2
+                    </div>
+
+                    <div class="title">
+                        Contact Details
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="acc-body">
+
+                <div class="form-grid">
+
+
+                    <!-- ADDRESS -->
+
+                    <div class="field full">
+
+                        <label asp-for="Address">
+                            Address
+                            <span class="req">*</span>
+                        </label>
+
+                        <textarea asp-for="Address"
+                                  placeholder="Enter Address"></textarea>
+
+                        <span asp-validation-for="Address"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- STATE -->
+
+                    <div class="field">
+
+                        <label asp-for="StateId">
+                            State
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="StateId"
+                                asp-items="Model.StateList"
+                                id="StateId">
+
+                            <option value="">
+                                Select State
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="StateId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- DISTRICT -->
+
+                    <div class="field">
+
+                        <label asp-for="DistrictId">
+                            District
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="DistrictId"
+                                asp-items="Model.DistrictList"
+                                id="DistrictId">
+
+                            <option value="">
+                                Select District
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="DistrictId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- CITY -->
+
+                    <div class="field">
+
+                        <label asp-for="CityId">
+                            City
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="CityId"
+                                asp-items="Model.CityList"
+                                id="CityId">
+
+                            <option value="">
+                                Select City
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="CityId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- PINCODE -->
+
+                    <div class="field">
+
+                        <label asp-for="Pincode">
+                            Pin Code
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="Pincode"
+                               type="text"
+                               id="Pincode"
+                               maxlength="6"
+                               inputmode="numeric"
+                               autocomplete="postal-code"
+                               placeholder="Enter Pincode" />
+
+                        <span asp-validation-for="Pincode"
+                              class="text-danger">
+                        </span>
+
+                        <small id="pincodeMessage"></small>
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+
+                    <div class="field">
+
+                        <label asp-for="Email">
+                            Official Email ID
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="Email"
+                               type="email"
+                               placeholder="Enter Email ID" />
+
+                        <span asp-validation-for="Email"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- MOBILE -->
+
+                    <div class="field">
+
+                        <label asp-for="Mobile">
+                            Mobile Number
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="Mobile"
+                               type="text"
+                               maxlength="10"
+                               inputmode="numeric"
+                               placeholder="Enter Mobile Number" />
+
+                        <span asp-validation-for="Mobile"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             3. REFERENCE DETAILS
+        ====================================================== -->
+
+        <div class="accordion open" data-step="3">
+
+            <div class="acc-head"
+                 onclick="toggleAcc(this)">
+
+                <div class="left">
+
+                    <div class="step-num">
+                        3
+                    </div>
+
+                    <div class="title">
+                        Reference Details
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="acc-body">
+
+                <div class="form-grid">
+
+
+                    <div class="field">
+
+                        <label asp-for="ReferenceName">
+                            Name
+                        </label>
+
+                        <input asp-for="ReferenceName"
+                               type="text"
+                               placeholder="Enter Name" />
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="ReferenceDesignation">
+                            Designation
+                        </label>
+
+                        <input asp-for="ReferenceDesignation"
+                               type="text"
+                               placeholder="Enter Designation" />
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="ReferenceOrganization">
+                            Organization
+                        </label>
+
+                        <input asp-for="ReferenceOrganization"
+                               type="text"
+                               placeholder="Enter Organization" />
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="ReferenceEmail">
+                            Email ID
+                        </label>
+
+                        <input asp-for="ReferenceEmail"
+                               type="email"
+                               placeholder="Enter Email ID" />
+
+                        <span asp-validation-for="ReferenceEmail"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="ReferenceMobile">
+                            Mobile Number
+                        </label>
+
+                        <input asp-for="ReferenceMobile"
+                               type="text"
+                               maxlength="10"
+                               inputmode="numeric"
+                               placeholder="Enter Mobile Number" />
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             4. EDUCATION QUALIFICATION
+        ====================================================== -->
+
+        <div class="accordion open" data-step="4">
+
+            <div class="acc-head"
+                 onclick="if (!event.target.closest('button')) toggleAcc(this)">
+
+                <div class="left">
+
+                    <div class="step-num">
+                        4
+                    </div>
+
+                    <div class="title">
+                        Education Qualification
+                    </div>
+
+                </div>
+
+
+                <!-- ADD -->
+
+                <button type="button"
+                        class="section-add-btn add-qualification">
+
+                    <span>+</span>
+                    Add Qualification
+
+                </button>
+
+            </div>
+
+
+            <div class="acc-body">
+
+                <div id="qualificationContainer">
+
+
+                    @for (int i = 0;
+                                        i < Model.Qualifications.Count;
+                                        i++)
+                    {
+
+                        <div class="dynamic-row qualification-row">
+
+                            <div class="form-grid">
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Qualification
+                                    </label>
+
+                                    <input asp-for="Qualifications[i].Qualification"
+                                           type="text"
+                                           placeholder="Enter Qualification" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Board / University
+                                    </label>
+
+                                    <input asp-for="Qualifications[i].Board"
+                                           type="text"
+                                           placeholder="Enter Board / University" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Passing Year
+                                    </label>
+
+                                    <input asp-for="Qualifications[i].PassingYear"
+                                           type="text"
+                                           placeholder="Passing Year" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Percentage / CGPA
+                                    </label>
+
+                                    <input asp-for="Qualifications[i].PercentageOrCGPA"
+                                           type="text"
+                                           placeholder="Percentage / CGPA" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Upload Document
+                                    </label>
+
+                                    <input asp-for="Qualifications[i].File"
+                                           type="file"
+                                           class="pdf-file"
+                                           accept=".pdf,application/pdf" />
+
+                                </div>
+
+
+                                <!-- REMOVE ONLY IF EXTRA ROW -->
+                                @if (i > 0)
+                                {
+
+                                    <div class="field remove-field">
+
+                                        <label>
+                                            &nbsp;
+                                        </label>
+
+                                        <button type="button"
+                                                class="remove-btn remove-qualification">
+
+                                            <span>×</span>
+                                            Remove
+
+                                        </button>
+
+                                    </div>
+
+                                }
+
+                            </div>
+
+                        </div>
+
+                    }
+
+
+                    <!-- SAFETY: ALWAYS ONE ROW -->
+                    @if (Model.Qualifications.Count == 0)
+                    {
+
+                        <div class="dynamic-row qualification-row">
+
+                            <div class="form-grid">
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Qualification
+                                    </label>
+
+                                    <input name="Qualifications[0].Qualification"
+                                           type="text"
+                                           placeholder="Enter Qualification" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Board / University
+                                    </label>
+
+                                    <input name="Qualifications[0].Board"
+                                           type="text"
+                                           placeholder="Enter Board / University" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Passing Year
+                                    </label>
+
+                                    <input name="Qualifications[0].PassingYear"
+                                           type="text"
+                                           placeholder="Passing Year" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Percentage / CGPA
+                                    </label>
+
+                                    <input name="Qualifications[0].PercentageOrCGPA"
+                                           type="text"
+                                           placeholder="Percentage / CGPA" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Upload Document
+                                    </label>
+
+                                    <input name="Qualifications[0].File"
+                                           type="file"
+                                           class="pdf-file"
+                                           accept=".pdf,application/pdf" />
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             5. EXPERIENCE
+        ====================================================== -->
+
+        <div class="accordion open" data-step="5">
+
+            <div class="acc-head"
+                 onclick="if (!event.target.closest('button')) toggleAcc(this)">
+
+                <div class="left">
+
+                    <div class="step-num">
+                        5
+                    </div>
+
+                    <div class="title">
+                        Experience
+                    </div>
+
+                </div>
+
+
+                <button type="button"
+                        class="section-add-btn add-experience">
+
+                    <span>+</span>
+                    Add Experience
+
+                </button>
+
+            </div>
+
+
+            <div class="acc-body">
+
+                <div id="experienceContainer">
+
+
+                    @for (int i = 0;
+                                        i < Model.Experiences.Count;
+                                        i++)
+                    {
+
+                        <div class="dynamic-row experience-row">
+
+                            <div class="form-grid">
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Organization Name
+                                    </label>
+
+                                    <input asp-for="Experiences[i].OrganizationName"
+                                           type="text"
+                                           placeholder="Organization Name" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Designation
+                                    </label>
+
+                                    <input asp-for="Experiences[i].Designation"
+                                           type="text"
+                                           placeholder="Designation" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        From Date
+                                    </label>
+
+                                    <input asp-for="Experiences[i].FromDate"
+                                           type="date"
+                                           class="date-input" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        To Date
+                                    </label>
+
+                                    <input asp-for="Experiences[i].ToDate"
+                                           type="date"
+                                           class="date-input" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Duration
+                                    </label>
+
+                                    <input asp-for="Experiences[i].Duration"
+                                           type="text"
+                                           placeholder="Duration" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Upload Document
+                                    </label>
+
+                                    <input asp-for="Experiences[i].File"
+                                           type="file"
+                                           class="pdf-file"
+                                           accept=".pdf,application/pdf" />
+
+                                </div>
+
+
+                                @if (i > 0)
+                                {
+
+                                    <div class="field remove-field">
+
+                                        <label>
+                                            &nbsp;
+                                        </label>
+
+                                        <button type="button"
+                                                class="remove-btn remove-experience">
+
+                                            <span>×</span>
+                                            Remove
+
+                                        </button>
+
+                                    </div>
+
+                                }
+
+
+                            </div>
+
+                        </div>
+
+                    }
+
+
+                    <!-- SAFETY: ALWAYS ONE ROW -->
+                    @if (Model.Experiences.Count == 0)
+                    {
+
+                        <div class="dynamic-row experience-row">
+
+                            <div class="form-grid">
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Organization Name
+                                    </label>
+
+                                    <input name="Experiences[0].OrganizationName"
+                                           type="text"
+                                           placeholder="Organization Name" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Designation
+                                    </label>
+
+                                    <input name="Experiences[0].Designation"
+                                           type="text"
+                                           placeholder="Designation" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        From Date
+                                    </label>
+
+                                    <input name="Experiences[0].FromDate"
+                                           type="date"
+                                           class="date-input" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        To Date
+                                    </label>
+
+                                    <input name="Experiences[0].ToDate"
+                                           type="date"
+                                           class="date-input" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Duration
+                                    </label>
+
+                                    <input name="Experiences[0].Duration"
+                                           type="text"
+                                           placeholder="Duration" />
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Upload Document
+                                    </label>
+
+                                    <input name="Experiences[0].File"
+                                           type="file"
+                                           class="pdf-file"
+                                           accept=".pdf,application/pdf" />
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             6. DOCUMENTS
+        ====================================================== -->
+
+        <div class="accordion open" data-step="6">
+
+            <div class="acc-head"
+                 onclick="toggleAcc(this)">
+
+                <div class="left">
+
+                    <div class="step-num">
+                        6
+                    </div>
+
+                    <div class="title">
+                        Documents Upload
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="acc-body">
+
+                <div class="form-grid">
+
+
+                    <div class="field">
+
+                        <label asp-for="AadhaarFile">
+
+                            Aadhaar
+                            <span class="req">*</span>
+
+                        </label>
+
+                        <input asp-for="AadhaarFile"
+                               type="file"
+                               class="pdf-file"
+                               accept=".pdf,application/pdf" />
+
+                        <span asp-validation-for="AadhaarFile"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="PanCardFile">
+
+                            PAN Card Copy
+                            <span class="req">*</span>
+
+                        </label>
+
+                        <input asp-for="PanCardFile"
+                               type="file"
+                               class="pdf-file"
+                               accept=".pdf,application/pdf" />
+
+                        <span asp-validation-for="PanCardFile"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             7. DECLARATION
+        ====================================================== -->
+
+        <div class="accordion open" data-step="7">
+
+            <div class="acc-head"
+                 onclick="toggleAcc(this)">
+
+                <div class="left">
+
+                    <div class="step-num">
+                        7
+                    </div>
+
+                    <div class="title">
+                        Declaration
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="acc-body">
+
+                <div>
+
+                    <label class="check-row">
+
+                        <input asp-for="TermsAccepted"
+                               type="checkbox" />
+
+                        I agree to the Terms &amp; Conditions.
+
+                    </label>
+
+                    <span asp-validation-for="TermsAccepted"
+                          class="text-danger">
+                    </span>
+
+
+                    <br />
+
+
+                    <label class="check-row">
+
+                        <input asp-for="AuthenticityAccepted"
+                               type="checkbox" />
+
+                        I hereby declare that all information and
+                        documents submitted by me are true and authentic
+                        to the best of my knowledge.
+
+                    </label>
+
+                    <span asp-validation-for="AuthenticityAccepted"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             BUTTONS
+        ====================================================== -->
+
+        <div class="form-actions"
+             style="justify-content:flex-end;">
+
+            <button type="reset"
+                    class="btn-outline-secondary"
+                    style="width:auto;flex:0 0 auto;padding:13px 28px;">
+
+                Reset
+
+            </button>
+
+
+            <button type="submit"
+                    class="btn-primary"
+                    style="width:auto;flex:0 0 auto;padding:13px 28px;"
+                    onclick="return confirm('Are you sure you want to submit the Trainer Registration?');">
+
+                Submit Registration
+
+            </button>
+
+        </div>
+
+
+    </form>
+
+</div>
+
+
+<!-- =========================================================
+     PAGE SPECIFIC CSS
+========================================================== -->
+
+<style>
+
+    /* =====================================================
+           DATE INPUT
+           Fixes the small / ugly browser date input.
+        ====================================================== */
+
+    .form-shell .field input[type="date"],
+    .form-shell .date-input {
+        width: 100% !important;
+        min-width: 0 !important;
+        height: 54px !important;
+        min-height: 54px !important;
+        box-sizing: border-box !important;
+        display: block !important;
+        padding: 0 16px !important;
+        border: 1px solid #d9e1ea !important;
+        border-radius: 10px !important;
+        background: #fff !important;
+        font-size: 16px !important;
+        line-height: 1.5 !important;
+        color: #101828 !important;
+        font-family: inherit !important;
+        appearance: auto !important;
+        -webkit-appearance: auto !important;
+    }
+
+
+        .form-shell .field input[type="date"]:focus {
+            outline: none !important;
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .10) !important;
+        }
+
+
+        .form-shell .field input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            opacity: .75;
+        }
+
+
+    /* =====================================================
+           DYNAMIC ROW
+        ====================================================== */
+
+    .dynamic-row {
+        position: relative;
+        margin-bottom: 18px;
+        padding: 18px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+        box-sizing: border-box;
+    }
+
+
+        .dynamic-row + .dynamic-row {
+            margin-top: 15px;
+        }
+
+
+    /* =====================================================
+           ADD BUTTON
+        ====================================================== */
+
+    .section-add-btn {
+        margin-left: auto;
+        border: 0;
+        background: #2563eb;
+        color: #fff;
+        border-radius: 8px;
+        padding: 11px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        white-space: nowrap;
+        transition: all .2s ease;
+        position: relative;
+        z-index: 20;
+    }
+
+
+        .section-add-btn span {
+            font-size: 21px;
+            line-height: 1;
+            font-weight: 700;
+        }
+
+
+        .section-add-btn:hover {
+            background: #1d4ed8;
+        }
+
+
+    /* =====================================================
+           REMOVE BUTTON
+        ====================================================== */
+
+    .remove-btn {
+        width: 100%;
+        height: 54px;
+        border: 1px solid #dc3545;
+        background: #fff;
+        color: #dc3545;
+        border-radius: 8px;
+        padding: 0 15px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+
+
+        .remove-btn:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+
+
+        .remove-btn span {
+            font-size: 19px;
+            font-weight: 700;
+            margin-right: 4px;
+        }
+
+
+    /* =====================================================
+           PINCODE MESSAGE
+        ====================================================== */
+
+    #pincodeMessage {
+        display: block;
+        margin-top: 5px;
+        font-size: 12px;
+        min-height: 16px;
+    }
+
+
+    .text-success {
+        color: #198754 !important;
+    }
+
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+
+
+    .text-info {
+        color: #0d6efd !important;
+    }
+
+
+    /* =====================================================
+           ACCORDION HEADER
+        ====================================================== */
+
+    .acc-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+
+        .acc-head .left {
+            min-width: 0;
+        }
+
+
+    /* =====================================================
+           MOBILE
+        ====================================================== */
+
+    @@media (max-width: 768px) {
+        .acc-head
+
+    {
+        flex-wrap: wrap;
+    }
+
+
+    .section-add-btn {
+        width: 100%;
+        margin-left: 0;
+    }
+
+
+    .dynamic-row {
+        padding: 12px;
+    }
+
+
+    .remove-btn {
+        width: 100%;
+    }
+
+
+    .form-shell .field input[type="date"],
+    .form-shell .date-input {
+        height: 52px !important;
+        min-height: 52px !important;
+    }
+
+    }
+</style>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+
+            /* =====================================================
+               ACCORDION
+            ====================================================== */
+
+            window.toggleAcc = function (element) {
+
+                if (!element) {
+                    return;
+                }
+
+                const accordion =
+                    element.closest(".accordion");
+
+                if (!accordion) {
+                    return;
+                }
+
+                accordion.classList.toggle("open");
+
+            };
+
+
+            /* =====================================================
+               HELPER
+            ====================================================== */
+
+            function getElement(id) {
+
+                return document.getElementById(id);
+
+            }
+
+
+            function setMessage(message, type) {
+
+                const box =
+                    getElement("pincodeMessage");
+
+                if (!box) {
+                    return;
+                }
+
+                box.classList.remove(
+                    "text-danger",
+                    "text-success",
+                    "text-info"
+                );
+
+                if (type) {
+
+                    box.classList.add(type);
+
+                }
+
+                box.textContent =
+                    message || "";
+
+            }
+
+
+            /* =====================================================
+               PDF VALIDATION
+            ====================================================== */
+
+            document.addEventListener(
+                "change",
+                function (event) {
+
+                    const input =
+                        event.target;
+
+                    if (!input.classList.contains("pdf-file")) {
+
+                        return;
+
+                    }
+
+
+                    const file =
+                        input.files &&
+                        input.files[0];
+
+
+                    if (!file) {
+
+                        return;
+
+                    }
+
+
+                    const fileName =
+                        file.name.toLowerCase();
+
+
+                    const isPdf =
+                        file.type === "application/pdf" ||
+                        fileName.endsWith(".pdf");
+
+
+                    if (!isPdf) {
+
+                        alert(
+                            "Only PDF files are allowed."
+                        );
+
+                        input.value = "";
+
+                        return;
+
+                    }
+
+
+                    if (file.size >
+                        5 * 1024 * 1024) {
+
+                        alert(
+                            "PDF file size must not exceed 5 MB."
+                        );
+
+                        input.value = "";
+
+                        return;
+
+                    }
+
+                }
+            );
+
+
+            /* =====================================================
+               REINDEX QUALIFICATIONS
+            ====================================================== */
+
+            function reindexQualifications() {
+
+                const rows =
+                    document.querySelectorAll(
+                        "#qualificationContainer .qualification-row"
+                    );
+
+
+                rows.forEach(
+                    function (row, index) {
+
+                        const controls =
+                            row.querySelectorAll(
+                                "input, select, textarea"
+                            );
+
+
+                        controls.forEach(
+                            function (control) {
+
+                                const name =
+                                    control.getAttribute(
+                                        "name"
+                                    );
+
+
+                                if (!name) {
+
+                                    return;
+
+                                }
+
+
+                                control.setAttribute(
+                                    "name",
+                                    name.replace(
+                                        /Qualifications\[\d+\]/,
+                                        "Qualifications[" +
+                                        index +
+                                        "]"
+                                    )
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+            }
+
+
+            /* =====================================================
+               REINDEX EXPERIENCES
+            ====================================================== */
+
+            function reindexExperiences() {
+
+                const rows =
+                    document.querySelectorAll(
+                        "#experienceContainer .experience-row"
+                    );
+
+
+                rows.forEach(
+                    function (row, index) {
+
+                        const controls =
+                            row.querySelectorAll(
+                                "input, select, textarea"
+                            );
+
+
+                        controls.forEach(
+                            function (control) {
+
+                                const name =
+                                    control.getAttribute(
+                                        "name"
+                                    );
+
+
+                                if (!name) {
+
+                                    return;
+
+                                }
+
+
+                                control.setAttribute(
+                                    "name",
+                                    name.replace(
+                                        /Experiences\[\d+\]/,
+                                        "Experiences[" +
+                                        index +
+                                        "]"
+                                    )
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+            }
+
+
+            /* =====================================================
+               ADD QUALIFICATION
+            ====================================================== */
+
+            document.addEventListener(
+                "click",
+                function (event) {
+
+                    const button =
+                        event.target.closest(
+                            ".add-qualification"
+                        );
+
+
+                    if (!button) {
+
+                        return;
+
+                    }
+
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    const container =
+                        getElement(
+                            "qualificationContainer"
+                        );
+
+
+                    if (!container) {
+
+                        console.error(
+                            "qualificationContainer not found."
+                        );
+
+                        return;
+
+                    }
+
+
+                    const index =
+                        container.querySelectorAll(
+                            ".qualification-row"
+                        ).length;
+
+
+                    const row =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    row.className =
+                        "dynamic-row qualification-row";
+
+
+                    row.innerHTML = `
+
+                        <div class="form-grid">
+
+
+                            <div class="field">
+
+                                <label>
+                                    Qualification
+                                </label>
+
+                                <input
+                                    name="Qualifications[${index}].Qualification"
+                                    type="text"
+                                    placeholder="Enter Qualification" />
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Board / University
+                                </label>
+
+                                <input
+                                    name="Qualifications[${index}].Board"
+                                    type="text"
+                                    placeholder="Enter Board / University" />
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Passing Year
+                                </label>
+
+                                <input
+                                    name="Qualifications[${index}].PassingYear"
+                                    type="text"
+                                    placeholder="Passing Year" />
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Percentage / CGPA
+                                </label>
+
+                                <input
+                                    name="Qualifications[${index}].PercentageOrCGPA"
+                                    type="text"
+                                    placeholder="Percentage / CGPA" />
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Upload Document
+                                </label>
+
+                                <input
+                                    name="Qualifications[${index}].File"
+                                    type="file"
+                                    class="pdf-file"
+                                    accept=".pdf,application/pdf" />
+
+                            </div>
+
+
+                            <div class="field remove-field">
+
+                                <label>
+                                    &nbsp;
+                                </label>
+
+                                <button
+                                    type="button"
+                                    class="remove-btn remove-qualification">
+
+                                    <span>×</span>
+                                    Remove
+
+                                </button>
+
+                            </div>
+
+
+                        </div>
+
+                    `;
+
+
+                    container.appendChild(row);
+
+
+                    reindexQualifications();
+
+                }
+            );
+
+
+            /* =====================================================
+               REMOVE QUALIFICATION
+            ====================================================== */
+
+            document.addEventListener(
+                "click",
+                function (event) {
+
+                    const button =
+                        event.target.closest(
+                            ".remove-qualification"
+                        );
+
+
+                    if (!button) {
+
+                        return;
+
+                    }
+
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    const container =
+                        getElement(
+                            "qualificationContainer"
+                        );
+
+
+                    const row =
+                        button.closest(
+                            ".qualification-row"
+                        );
+
+
+                    if (!container || !row) {
+
+                        return;
+
+                    }
+
+
+                    const rows =
+                        container.querySelectorAll(
+                            ".qualification-row"
+                        );
+
+
+                    /*
+                       NEVER REMOVE THE LAST ROW
+                    */
+
+                    if (rows.length <= 1) {
+
+                        return;
+
+                    }
+
+
+                    row.remove();
+
+
+                    reindexQualifications();
+
+                }
+            );
+
+
+            /* =====================================================
+               ADD EXPERIENCE
+            ====================================================== */
+
+            document.addEventListener(
+                "click",
+                function (event) {
+
+                    const button =
+                        event.target.closest(
+                            ".add-experience"
+                        );
+
+
+                    if (!button) {
+
+                        return;
+
+                    }
+
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    const container =
+                        getElement(
+                            "experienceContainer"
+                        );
+
+
+                    if (!container) {
+
+                        console.error(
+                            "experienceContainer not found."
+                        );
+
+                        return;
+
+                    }
+
+
+                    const index =
+                        container.querySelectorAll(
+                            ".experience-row"
+                        ).length;
+
+
+                    const row =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    row.className =
+                        "dynamic-row experience-row";
+
+
+                    row.innerHTML = `
+
+                        <div class="form-grid">
+
+
+                            <div class="field">
+
+                                <label>
+                                    Organization Name
+                                </label>
+
+                                <input
+                                    name="Experiences[${index}].OrganizationName"
+                                    type="text"
+                                    placeholder="Organization Name" />
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Designation
+                                </label>
+
+                                <input
+                                    name="Experiences[${index}].Designation"
+                                    type="text"
+                                    placeholder="Designation" />
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    From Date
+                                </label>
+
+                                <input
+                                    name="Experiences[${index}].FromDate"
+                                    type="date"
+                                    class="date-input" />
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    To Date
+                                </label>
+
+                                <input
+                                    name="Experiences[${index}].ToDate"
+                                    type="date"
+                                    class="date-input" />
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Duration
+                                </label>
+
+                                <input
+                                    name="Experiences[${index}].Duration"
+                                    type="text"
+                                    placeholder="Duration" />
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Upload Document
+                                </label>
+
+                                <input
+                                    name="Experiences[${index}].File"
+                                    type="file"
+                                    class="pdf-file"
+                                    accept=".pdf,application/pdf" />
+
+                            </div>
+
+
+                            <div class="field remove-field">
+
+                                <label>
+                                    &nbsp;
+                                </label>
+
+                                <button
+                                    type="button"
+                                    class="remove-btn remove-experience">
+
+                                    <span>×</span>
+                                    Remove
+
+                                </button>
+
+                            </div>
+
+
+                        </div>
+
+                    `;
+
+
+                    container.appendChild(row);
+
+
+                    reindexExperiences();
+
+                }
+            );
+
+
+            /* =====================================================
+               REMOVE EXPERIENCE
+            ====================================================== */
+
+            document.addEventListener(
+                "click",
+                function (event) {
+
+                    const button =
+                        event.target.closest(
+                            ".remove-experience"
+                        );
+
+
+                    if (!button) {
+
+                        return;
+
+                    }
+
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    const container =
+                        getElement(
+                            "experienceContainer"
+                        );
+
+
+                    const row =
+                        button.closest(
+                            ".experience-row"
+                        );
+
+
+                    if (!container || !row) {
+
+                        return;
+
+                    }
+
+
+                    const rows =
+                        container.querySelectorAll(
+                            ".experience-row"
+                        );
+
+
+                    /*
+                       NEVER REMOVE THE LAST ROW
+                    */
+
+                    if (rows.length <= 1) {
+
+                        return;
+
+                    }
+
+
+                    row.remove();
+
+
+                    reindexExperiences();
+
+                }
+            );
+
+
+            /* =====================================================
+               LOCATION VARIABLES
+            ====================================================== */
+
+            let isPincodeLoading = false;
+
+
+            /* =====================================================
+               STATE CHANGE
+            ====================================================== */
+
+            const stateSelect =
+                getElement("StateId");
+
+
+            if (stateSelect) {
+
+                stateSelect.addEventListener(
+                    "change",
+                    function () {
+
+                        if (isPincodeLoading) {
+
+                            return;
+
+                        }
+
+
+                        const stateId =
+                            this.value;
+
+
+                        clearDistrict();
+
+                        clearCity();
+
+
+                        if (!stateId) {
+
+                            return;
+
+                        }
+
+
+                        loadDistricts(
+                            stateId
+                        );
+
+                    }
+                );
+
+            }
+
+
+            /* =====================================================
+               DISTRICT CHANGE
+            ====================================================== */
+
+            const districtSelect =
+                getElement("DistrictId");
+
+
+            if (districtSelect) {
+
+                districtSelect.addEventListener(
+                    "change",
+                    function () {
+
+                        if (isPincodeLoading) {
+
+                            return;
+
+                        }
+
+
+                        const districtId =
+                            this.value;
+
+
+                        clearCity();
+
+
+                        if (!districtId) {
+
+                            return;
+
+                        }
+
+
+                        loadCities(
+                            districtId
+                        );
+
+                    }
+                );
+
+            }
+
+
+            /* =====================================================
+               CITY CHANGE
+            ====================================================== */
+
+            const citySelect =
+                getElement("CityId");
+
+
+            if (citySelect) {
+
+                citySelect.addEventListener(
+                    "change",
+                    function () {
+
+                        if (isPincodeLoading) {
+
+                            return;
+
+                        }
+
+
+                        const selectedOption =
+                            this.options[
+                                this.selectedIndex
+                            ];
+
+
+                        if (!selectedOption) {
+
+                            return;
+
+                        }
+
+
+                        const pincode =
+                            selectedOption.getAttribute(
+                                "data-pincode"
+                            );
+
+
+                        if (pincode) {
+
+                            const pincodeInput =
+                                getElement(
+                                    "Pincode"
+                                );
+
+
+                            if (pincodeInput) {
+
+                                pincodeInput.value =
+                                    pincode;
+
+                            }
+
+
+                            setMessage(
+                                "Pincode filled automatically.",
+                                "text-success"
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+            /* =====================================================
+               PINCODE INPUT
+            ====================================================== */
+
+            const pincodeInput =
+                getElement("Pincode");
+
+
+            if (pincodeInput) {
+
+                pincodeInput.addEventListener(
+                    "input",
+                    function () {
+
+                        let pincode =
+                            this.value.replace(
+                                /\D/g,
+                                ""
+                            );
+
+
+                        pincode =
+                            pincode.substring(
+                                0,
+                                6
+                            );
+
+
+                        this.value =
+                            pincode;
+
+
+                        setMessage(
+                            "",
+                            ""
+                        );
+
+
+                        if (pincode.length !== 6) {
+
+                            return;
+
+                        }
+
+
+                        getLocationByPincode(
+                            pincode
+                        );
+
+                    }
+                );
+
+            }
+
+
+            /* =====================================================
+               LOAD DISTRICTS
+            ====================================================== */
+
+            async function loadDistricts(
+                stateId,
+                selectedDistrictId = null,
+                callback = null
+            ) {
+
+                const district =
+                    getElement(
+                        "DistrictId"
+                    );
+
+
+                if (!district) {
+
+                    return;
+
+                }
+
+
+                district.innerHTML =
+                    '<option value="">Loading District...</option>';
+
+
+                district.disabled =
+                    true;
+
+
+                const url =
+                    '@Url.Action(
+                                            "GetDistricts",
+                                            "Trainer",
+                                            new { area = "Trainer" }
+                                    )'
+                +
+                "?stateId="
+                +
+                encodeURIComponent(
+                    stateId
+                );
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            url,
+                            {
+                                method: "GET",
+
+                                headers: {
+                                    "X-Requested-With":
+                                        "XMLHttpRequest"
+                                }
+                            }
+                        );
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            "District request failed: "
+                            +
+                            response.status
+                        );
+
+                    }
+
+
+                    const data =
+                        await response.json();
+
+
+                    district.innerHTML =
+                        '<option value="">Select District</option>';
+
+
+                    if (Array.isArray(data)) {
+
+                        data.forEach(
+                            function (item) {
+
+                                const option =
+                                    document.createElement(
+                                        "option"
+                                    );
+
+
+                                option.value =
+                                    item.id;
+
+
+                                option.textContent =
+                                    item.name;
+
+
+                                district.appendChild(
+                                    option
+                                );
+
+                            }
+                        );
+
+                    }
+
+
+                    district.disabled =
+                        false;
+
+
+                    if (
+                        selectedDistrictId !== null &&
+                        selectedDistrictId !== undefined &&
+                        selectedDistrictId !== ""
+                    ) {
+
+                        district.value =
+                            String(
+                                selectedDistrictId
+                            );
+
+                    }
+
+
+                    if (
+                        typeof callback ===
+                        "function"
+                    ) {
+
+                        callback();
+
+                    }
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "District loading error:",
+                        error
+                    );
+
+
+                    district.disabled =
+                        false;
+
+
+                    district.innerHTML =
+                        '<option value="">Select District</option>';
+
+                }
+
+            }
+
+
+            /* =====================================================
+               LOAD CITIES
+            ====================================================== */
+
+            async function loadCities(
+                districtId,
+                selectedCityId = null
+            ) {
+
+                const city =
+                    getElement(
+                        "CityId"
+                    );
+
+
+                if (!city) {
+
+                    return;
+
+                }
+
+
+                city.innerHTML =
+                    '<option value="">Loading City...</option>';
+
+
+                city.disabled =
+                    true;
+
+
+                const url =
+                    '@Url.Action(
+                                        "GetCities",
+                                        "Trainer",
+                                        new { area = "Trainer" }
+                                )'
+                +
+                "?districtId="
+                +
+                encodeURIComponent(
+                    districtId
+                );
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            url,
+                            {
+                                method: "GET",
+
+                                headers: {
+                                    "X-Requested-With":
+                                        "XMLHttpRequest"
+                                }
+                            }
+                        );
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            "City request failed: "
+                            +
+                            response.status
+                        );
+
+                    }
+
+
+                    const data =
+                        await response.json();
+
+
+                    city.innerHTML =
+                        '<option value="">Select City</option>';
+
+
+                    if (Array.isArray(data)) {
+
+                        data.forEach(
+                            function (item) {
+
+                                const option =
+                                    document.createElement(
+                                        "option"
+                                    );
+
+
+                                option.value =
+                                    item.id;
+
+
+                                option.textContent =
+                                    item.name;
+
+
+                                option.setAttribute(
+                                    "data-pincode",
+                                    item.pincode || ""
+                                );
+
+
+                                city.appendChild(
+                                    option
+                                );
+
+                            }
+                        );
+
+                    }
+
+
+                    city.disabled =
+                        false;
+
+
+                    if (
+                        selectedCityId !== null &&
+                        selectedCityId !== undefined &&
+                        selectedCityId !== ""
+                    ) {
+
+                        city.value =
+                            String(
+                                selectedCityId
+                            );
+
+                    }
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "City loading error:",
+                        error
+                    );
+
+
+                    city.disabled =
+                        false;
+
+
+                    city.innerHTML =
+                        '<option value="">Select City</option>';
+
+                }
+
+            }
+
+
+            /* =====================================================
+               PINCODE → STATE → DISTRICT → CITY
+            ====================================================== */
+
+            async function getLocationByPincode(
+                pincode
+            ) {
+
+                isPincodeLoading =
+                    true;
+
+
+                setMessage(
+                    "Fetching location...",
+                    "text-info"
+                );
+
+
+                const url =
+                    '@Url.Action(
+                                        "GetLocationByPincode",
+                                        "Trainer",
+                                        new { area = "Trainer" }
+                                )'
+                +
+                "?pincode="
+                +
+                encodeURIComponent(
+                    pincode
+                );
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            url,
+                            {
+                                method: "GET",
+
+                                headers: {
+                                    "X-Requested-With":
+                                        "XMLHttpRequest"
+                                }
+                            }
+                        );
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            "Pincode request failed: "
+                            +
+                            response.status
+                        );
+
+                    }
+
+
+                    const result =
+                        await response.json();
+
+
+                    if (
+                        !result ||
+                        !result.success ||
+                        !result.locations ||
+                        result.locations.length === 0
+                    ) {
+
+                        setMessage(
+                            "No location found for this pincode.",
+                            "text-danger"
+                        );
+
+
+                        isPincodeLoading =
+                            false;
+
+
+                        return;
+
+                    }
+
+
+                    const location =
+                        result.locations[0];
+
+
+                    /* STATE */
+
+                    const state =
+                        getElement(
+                            "StateId"
+                        );
+
+
+                    if (state) {
+
+                        state.value =
+                            String(
+                                location.stateId
+                            );
+
+                    }
+
+
+                    /* DISTRICT */
+
+                    await new Promise(
+                        function (resolve) {
+
+                            loadDistricts(
+                                location.stateId,
+                                location.districtId,
+                                resolve
+                            );
+
+                        }
+                    );
+
+
+                    /* CITY */
+
+                    await loadCities(
+                        location.districtId,
+                        location.cityId
+                    );
+
+
+                    setMessage(
+                        "Location found successfully.",
+                        "text-success"
+                    );
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Pincode location error:",
+                        error
+                    );
+
+
+                    setMessage(
+                        "Unable to fetch location.",
+                        "text-danger"
+                    );
+
+                }
+                finally {
+
+                    isPincodeLoading =
+                        false;
+
+                }
+
+            }
+
+
+            /* =====================================================
+               CLEAR DISTRICT
+            ====================================================== */
+
+            function clearDistrict() {
+
+                const district =
+                    getElement(
+                        "DistrictId"
+                    );
+
+
+                if (!district) {
+
+                    return;
+
+                }
+
+
+                district.disabled =
+                    false;
+
+
+                district.innerHTML =
+                    '<option value="">Select District</option>';
+
+            }
+
+
+            /* =====================================================
+               CLEAR CITY
+            ====================================================== */
+
+            function clearCity() {
+
+                const city =
+                    getElement(
+                        "CityId"
+                    );
+
+
+                if (!city) {
+
+                    return;
+
+                }
+
+
+                city.disabled =
+                    false;
+
+
+                city.innerHTML =
+                    '<option value="">Select City</option>';
+
+            }
+
+
+            /* =====================================================
+               MOBILE ONLY NUMBERS
+            ====================================================== */
+
+            const mobile =
+                getElement("Mobile");
+
+
+            if (mobile) {
+
+                mobile.addEventListener(
+                    "input",
+                    function () {
+
+                        this.value =
+                            this.value
+                                .replace(
+                                    /\D/g,
+                                    ""
+                                )
+                                .substring(
+                                    0,
+                                    10
+                                );
+
+                    }
+                );
+
+            }
+
+
+            const referenceMobile =
+                getElement(
+                    "ReferenceMobile"
+                );
+
+
+            if (referenceMobile) {
+
+                referenceMobile.addEventListener(
+                    "input",
+                    function () {
+
+                        this.value =
+                            this.value
+                                .replace(
+                                    /\D/g,
+                                    ""
+                                )
+                                .substring(
+                                    0,
+                                    10
+                                );
+
+                    }
+                );
+
+            }
+
+
+            /* =====================================================
+               INITIAL REINDEX
+            ====================================================== */
+
+            reindexQualifications();
+
+            reindexExperiences();
+
+        });
+
+    </script>
+
+}

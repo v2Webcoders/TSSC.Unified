@@ -41,15 +41,43 @@ namespace QUIZAPP.Models
         [Key]
         public int Id { get; set; }
 
-        [StringLength(100)]
-        public string? CityName { get; set; }
+        [Required]
+        public int DistrictId { get; set; }
 
-        // Foreign key property
+        [ForeignKey(nameof(DistrictId))]
+        public District District { get; set; } = null!;
+
+        [Required]
+        [MaxLength(150)]
+        public string CityName { get; set; } = string.Empty;
+
+        [MaxLength(10)]
+        public string? Pincode { get; set; }
+
+        public DateTime CreatedDate { get; set; }
+
+        public bool IsActive { get; set; }
+    }
+    public class District
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
         public int StateId { get; set; }
 
-        // Navigation property to the related State
         [ForeignKey("StateId")]
-        public State State { get; set; }
+        public State State { get; set; } = null!;
+
+        [Required]
+        [MaxLength(150)]
+        public string DistrictName { get; set; } = string.Empty;
+
+        public DateTime CreatedDate { get; set; }
+
+        public bool IsActive { get; set; }
+
+        public ICollection<City> Cities { get; set; } = new List<City>();
     }
 
 }

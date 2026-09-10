@@ -71,7 +71,7 @@
 
                         @Html.AntiForgeryToken()
 
-
+                        <input type="hidden" name="stateId" value="@ViewBag.StateId" />
                         <input type="hidden"
                                name="certificateId"
                                value="@ViewBag.CertificateId" />

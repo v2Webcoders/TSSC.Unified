@@ -1,0 +1,758 @@
+﻿@model TSSC.Unified.ViewModel.JobRoleViewModel
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+
+    bool isEdit = Model.Id > 0;
+
+    ViewData["Title"] = isEdit
+        ? "Edit Job Role"
+        : "Add Job Role";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+
+            <h3 class="nk-block-title page-title">
+                @(isEdit ? "Edit Job Role" : "Add Job Role")
+            </h3>
+
+        </div>
+
+        <div class="nk-block-head-content">
+
+            <a asp-action="Index"
+               asp-controller="JobRoles"
+               asp-area="HRMS"
+               class="btn btn-primary d-none d-md-inline-flex">
+
+                <em class="icon ni ni-list"></em>
+                &nbsp; Job Role List
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="nk-block nk-block-lg">
+
+    <div class="card card-preview">
+
+        <!-- Validation -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            @Html.ValidationSummary(
+            true,
+                "",
+                new { @class = "alert alert-danger" }
+                )
+                }
+
+
+        <!-- Success Message -->
+        @if (TempData["msg"] != null)
+        {
+            <div class="example-alert w-100">
+
+                <div class="alert alert-success alert-icon">
+
+                    <em class="icon ni ni-check-circle"></em>
+
+                    <strong>
+                        @TempData["msg"]
+                    </strong>
+
+                </div>
+
+            </div>
+        }
+
+
+        <div class="card-inner">
+
+            <form asp-action="@(Model.Id > 0 ? "Edit" : "Add")"
+                  asp-controller="JobRoles"
+                  asp-area="HRMS"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="Id" />
+
+
+                <div class="row gy-3">
+
+
+                    <!-- ========================================= -->
+                    <!-- JOB ROLE INFORMATION -->
+                    <!-- ========================================= -->
+
+                    <div class="col-12 mb-4">
+
+                        <div style="border-left:4px solid #D9622F;
+                                    padding:5px 0 5px 12px;">
+
+                            <h5 class="mb-0 d-flex align-items-center gap-2"
+                                style="color:#1B2A4A;">
+
+                                <em class="ni ni-briefcase"></em>
+
+                                Job Role Information
+
+                            </h5>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- QP Code -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="QPCode"
+                               class="form-label">
+
+                            QP Code
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <input asp-for="QPCode"
+                               class="form-control"
+                               placeholder="Enter QP Code" />
+
+                        <span asp-validation-for="QPCode"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Job Role Title -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="JobRoleTitle"
+                               class="form-label">
+
+                            Job Role Title
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <input asp-for="JobRoleTitle"
+                               class="form-control"
+                               placeholder="Enter Job Role Title" />
+
+                        <span asp-validation-for="JobRoleTitle"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Sub Sector -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="SubSectorId"
+                               class="form-label">
+
+                            Sub Sector
+
+                        </label>
+
+                       @*  <select asp-for="SubSectorId"
+                                class="form-select">
+
+                            <option value="">
+                                Select Sub Sector
+                            </option>
+
+
+                        </select> *@
+                        <select asp-for="SubSectorId" class="form-select">
+                            <option value="">Select Sub Sector</option>
+
+                            @foreach (var item in ViewBag.SubSectors)
+                            {
+                                <option value="@item.Id">
+                                    @item.SubSectorName
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="SubSectorId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- QP Version -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="QPVersion"
+                               class="form-label">
+
+                            QP Version
+
+                        </label>
+
+                        <input asp-for="QPVersion"
+                               class="form-control"
+                               placeholder="Enter QP Version" />
+
+                        <span asp-validation-for="QPVersion"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- NSQF Level -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="NSQFLevel"
+                               class="form-label">
+
+                            NSQF Level
+
+                        </label>
+
+                        <input asp-for="NSQFLevel"
+                               class="form-control"
+                               placeholder="Enter NSQF Level" />
+
+                        <span asp-validation-for="NSQFLevel"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- QP Hours -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="QPHours"
+                               class="form-label">
+
+                            QP Hours
+
+                        </label>
+
+                        <input asp-for="QPHours"
+                               type="number"
+                               step="0.01"
+                               class="form-control"
+                               placeholder="Enter QP Hours" />
+
+                        <span asp-validation-for="QPHours"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Education Qualification -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="EducationQualification"
+                               class="form-label">
+
+                            Education Qualification
+
+                        </label>
+
+                        <input asp-for="EducationQualification"
+                               class="form-control"
+                               placeholder="Enter Education Qualification" />
+
+                        <span asp-validation-for="EducationQualification"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Valid From -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="ValidFrom"
+                               class="form-label">
+
+                            Valid From
+
+                        </label>
+
+                        <input asp-for="ValidFrom"
+                               type="date"
+                               class="form-control" />
+
+                        <span asp-validation-for="ValidFrom"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Valid To -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="ValidTo"
+                               class="form-label">
+
+                            Valid To
+
+                        </label>
+
+                        <input asp-for="ValidTo"
+                               type="date"
+                               class="form-control" />
+
+                        <span asp-validation-for="ValidTo"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Description -->
+
+                    <div class="col-md-12">
+
+                        <label asp-for="Description"
+                               class="form-label">
+
+                            Description
+
+                        </label>
+
+                        <textarea asp-for="Description"
+                                  rows="4"
+                                  class="form-control"
+                                  placeholder="Enter Job Role Description"></textarea>
+
+                        <span asp-validation-for="Description"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ========================================= -->
+                    <!-- JOB ROLE DOCUMENTS -->
+                    <!-- ========================================= -->
+
+                    <div class="col-12 mt-3 mb-3">
+
+                        <div style="border-left:4px solid #D9622F;
+                                    padding:5px 0 5px 12px;">
+
+                            <h5 class="mb-0 d-flex align-items-center gap-2"
+                                style="color:#1B2A4A;">
+
+                                <em class="ni ni-file-text"></em>
+
+                                Job Role Documents
+
+                            </h5>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-12">
+
+                        <div id="documentContainer">
+
+                            <!-- First Document Row -->
+
+                            <div class="document-row">
+
+                                <div class="row gy-3 align-items-end">
+
+                                    <div class="col-md-3">
+
+                                        <label class="form-label">
+                                            Document Type
+                                        </label>
+
+                                        <select name="Documents[0].DocumentType"
+                                                class="form-select document-type">
+
+                                            <option value="">
+                                                Select Document Type
+                                            </option>
+
+                                            <option value="QP">QP</option>
+                                            <option value="MockTest">Mock Test</option>
+                                            <option value="MC">MC</option>
+                                            <option value="FG">FG</option>
+                                            <option value="PH">PH</option>
+                                            <option value="ToolList">Tool List</option>
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <div class="col-md-3">
+
+                                        <label class="form-label">
+                                            Language
+                                        </label>
+
+                                        <select name="Documents[0].Language"
+                                                class="form-select language-select">
+
+                                            <option value="">
+                                                Select Language
+                                            </option>
+
+                                            <option value="English">
+                                                English
+                                            </option>
+
+                                            <option value="Hindi">
+                                                Hindi
+                                            </option>
+
+                                            <option value="Marathi">
+                                                Marathi
+                                            </option>
+
+                                            <option value="RL">
+                                                RL
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <div class="col-md-4">
+
+                                        <label class="form-label">
+                                            Upload File
+                                        </label>
+
+                                        <input type="file"
+                                               name="Documents[0].File"
+                                               class="form-control" 
+                                               accept=".pdf,application/pdf" />
+
+                                    </div>
+
+
+                                    <div class="col-md-2">
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary btn-icon add-document"
+                                                title="Add Document">
+
+                                            <em class="icon ni ni-plus"></em>
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ========================================= -->
+                    <!-- BUTTONS -->
+                    <!-- ========================================= -->
+
+                    <div class="col-12 mt-4">
+
+                        <button type="submit"
+                                class="btn btn-primary"
+                                onclick="return confirm('Are you sure you want to save this Job Role?');">
+
+                            <em class="icon ni ni-save"></em>
+
+                            <span class="ms-1">
+                                Save Job Role
+                            </span>
+
+                        </button>
+
+
+                        <a asp-action="Index"
+                           asp-controller="JobRoles"
+                           asp-area="HRMS"
+                           class="btn btn-outline-secondary ms-2">
+
+                            Cancel
+
+                        </a>
+
+                    </div>
+
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+
+    <script>
+
+        let documentIndex = 1;
+
+        const maxLanguages = 4;
+
+
+        // Add document row
+
+        $(document).on("click", ".add-document", function () {
+
+            const rowCount = $(".document-row").length;
+
+            if (rowCount >= maxLanguages) {
+                return;
+            }
+
+
+            const html = `
+                <div class="document-row mt-3">
+
+                    <div class="row gy-3 align-items-end">
+
+                        <div class="col-md-3">
+
+                            <label class="form-label">
+                                Document Type
+                            </label>
+
+                            <select name="Documents[${documentIndex}].DocumentType"
+                                    class="form-select document-type">
+
+                                <option value="">
+                                    Select Document Type
+                                </option>
+
+                                <option value="QP">QP</option>
+                                <option value="MockTest">Mock Test</option>
+                                <option value="MC">MC</option>
+                                <option value="FG">FG</option>
+                                <option value="PH">PH</option>
+                                <option value="ToolList">Tool List</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-3">
+
+                            <label class="form-label">
+                                Language
+                            </label>
+
+                            <select name="Documents[${documentIndex}].Language"
+                                    class="form-select language-select">
+
+                                <option value="">
+                                    Select Language
+                                </option>
+
+                                <option value="English">
+                                    English
+                                </option>
+
+                                <option value="Hindi">
+                                    Hindi
+                                </option>
+
+                                <option value="Marathi">
+                                    Marathi
+                                </option>
+
+                                <option value="RL">
+                                    RL
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Upload File
+                            </label>
+
+                            <input type="file"
+                                   name="Documents[${documentIndex}].File"
+                                   class="form-control" />
+
+                        </div>
+
+
+                        <div class="col-md-2">
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary btn-icon add-document"
+                                    title="Add Document">
+
+                                <em class="icon ni ni-plus"></em>
+
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger btn-icon remove-document ms-1"
+                                    title="Remove Document">
+
+                                <em class="icon ni ni-trash"></em>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            `;
+
+
+            $("#documentContainer").append(html);
+
+            documentIndex++;
+
+            updateLanguageOptions();
+
+            updateAddButtons();
+
+        });
+
+
+        // Remove document row
+
+        $(document).on("click", ".remove-document", function () {
+
+            $(this)
+                .closest(".document-row")
+                .remove();
+
+            updateLanguageOptions();
+
+            updateAddButtons();
+
+        });
+
+
+        // Prevent duplicate languages
+
+        $(document).on("change", ".language-select", function () {
+
+            updateLanguageOptions();
+
+        });
+
+
+        function updateLanguageOptions() {
+
+            const selectedLanguages = [];
+
+
+            $(".language-select").each(function () {
+
+                const value = $(this).val();
+
+                if (value) {
+                    selectedLanguages.push(value);
+                }
+
+            });
+
+
+            $(".language-select").each(function () {
+
+                const currentValue = $(this).val();
+
+
+                $(this).find("option").each(function () {
+
+                    const optionValue = $(this).val();
+
+
+                    if (
+                        optionValue &&
+                        optionValue !== currentValue &&
+                        selectedLanguages.includes(optionValue)
+                    ) {
+
+                        $(this).prop("disabled", true);
+
+                    }
+                    else {
+
+                        $(this).prop("disabled", false);
+
+                    }
+
+                });
+
+            });
+
+        }
+
+
+        // Maximum 4 rows
+
+        function updateAddButtons() {
+
+            const rowCount = $(".document-row").length;
+
+            if (rowCount >= maxLanguages) {
+
+                $(".add-document").hide();
+
+            }
+            else {
+
+                $(".add-document").show();
+
+            }
+
+        }
+
+    </script>
+
+}

@@ -1,0 +1,230 @@
+﻿@using TSSC.Unified.Models
+@model IEnumerable<JobRole>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+
+    var status = ViewBag.Status?.ToString() ?? "Pending";
+
+    string pageTitle = status switch
+    {
+        "Approved" => "Approved Job Roles",
+        "Rejected" => "Rejected Job Roles",
+        "Archived" => "Archived Job Roles",
+        _ => "Pending Job Approvals"
+    };
+
+    bool isEmployee = ViewBag.IsEmployee == true;
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                @pageTitle
+            </h3>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="nk-block nk-block-lg">
+
+    <div class="card card-bordered">
+
+        <div class="card-inner">
+
+            <div class="table-responsive">
+
+                <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer dtr-inline collapsed">
+
+                    <thead>
+                        <tr>
+                            <th>S.No.</th>
+                            <th>QP Code</th>
+                            <th>Job Role Title</th>
+                            <th>QP Version</th>
+                            <th>NSQF Level</th>
+                            <th>QP Hours</th>
+                            <th>Valid From</th>
+                            <th>Valid To</th>
+                            <th>Status</th>
+
+                            @if (!isEmployee)
+                            {
+                                <th>Action</th>
+                            }
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td>@serial</td>
+
+                                    <td>@item.QPCode</td>
+
+                                    <td>@item.JobRoleTitle</td>
+
+                                    <td>@item.QPVersion</td>
+
+                                    <td>@item.NSQFLevel</td>
+
+                                    <td>@item.QPHours</td>
+
+                                    <td>
+                                        @item.ValidFrom?.ToString("dd-MM-yyyy")
+                                    </td>
+
+                                    <td>
+                                        @item.ValidTo?.ToString("dd-MM-yyyy")
+                                    </td>
+
+                                    <!-- STATUS -->
+                                    <td>
+                                        @if (item.Status == "Approved")
+                                        {
+                                            <span class="text-success">
+                                                <span class="dot bg-success"></span>
+                                                Approved
+                                            </span>
+                                        }
+                                        else if (item.Status == "Rejected")
+                                        {
+                                            <span class="text-danger">
+                                                <span class="dot bg-danger"></span>
+                                                Rejected
+                                            </span>
+                                        }
+                                        else if (item.Status == "Pending")
+                                        {
+                                            <span class="text-warning">
+                                                <span class="dot bg-warning"></span>
+                                                Pending
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                @item.Status
+                                            </span>
+                                        }
+                                    </td>
+
+
+                                    <!-- ACTION -->
+                                    @if (!isEmployee)
+                                    {
+                                        <td>
+
+                                            <div class="btn-group" role="group">
+
+                                                <!-- VIEW -->
+                                                <a asp-area="HRMS"
+                                                   asp-controller="JobRoles"
+                                                   asp-action="Details"
+                                                   asp-route-id="@item.Id"
+                                                   class="btn btn-sm btn-outline-primary"
+                                                   title="View">
+
+                                                    <em class="icon ni ni-eye"></em>
+
+                                                </a>
+
+
+                                                @if (item.Status == "Pending")
+                                                {
+                                                    <!-- APPROVE / REJECT FORM -->
+                                                    <form method="post" class="d-inline">
+
+                                                        @Html.AntiForgeryToken()
+
+                                                        <!-- REMARK -->
+                                                        <input type="text"
+                                                               name="remark"
+                                                               class="form-control form-control-sm d-inline-block"
+                                                               style="width: 200px;"
+                                                               placeholder="Enter remark" />
+
+
+                                                        <!-- APPROVE -->
+                                                        <button type="submit"
+                                                                class="btn btn-sm btn-outline-success"
+                                                                title="Approve"
+                                                                formaction="@Url.Action("Approve", "JobRoles", new { area = "HRMS", id = item.Id })">
+
+                                                            <em class="icon ni ni-check"></em>
+
+                                                        </button>
+
+
+                                                        <!-- REJECT -->
+                                                        <button type="submit"
+                                                                class="btn btn-sm btn-outline-danger"
+                                                                title="Reject"
+                                                                formaction="@Url.Action("Reject", "JobRoles", new { area = "HRMS", id = item.Id })"
+                                                                onclick="return confirm('Are you sure you want to reject this Job Role?');">
+
+                                                            <em class="icon ni ni-cross"></em>
+
+                                                        </button>
+
+                                                    </form>
+                                                }
+
+
+                                                @if (item.Status == "Approved" && item.IsActive)
+                                                {
+                                                    <!-- ARCHIVE -->
+                                                    <form asp-area="HRMS"
+                                                          asp-controller="JobRoles"
+                                                          asp-action="Archive"
+                                                          asp-route-id="@item.Id"
+                                                          method="post"
+                                                          class="d-inline">
+
+                                                        @Html.AntiForgeryToken()
+
+                                                        <button type="submit"
+                                                                class="btn btn-sm btn-outline-warning"
+                                                                title="Archive"
+                                                                onclick="return confirm('Are you sure you want to archive this Job Role?');">
+
+                                                            <em class="icon ni ni-archive"></em>
+
+                                                        </button>
+
+                                                    </form>
+                                                }
+
+                                            </div>
+
+                                        </td>
+                                    }
+                                </tr>
+
+                                serial++;
+                            }
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

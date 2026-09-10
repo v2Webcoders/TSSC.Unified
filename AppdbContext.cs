@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using QUIZAPP.Models;
 using QUIZAPP.Areas.Admin.ViewModels;
 using TSSC.Unified.Models;
+using Microsoft.Identity.Client;
 
 namespace QUIZAPP
 {
@@ -18,6 +19,9 @@ namespace QUIZAPP
         public DbSet<AppUser> AppUser { get; set; }
         internal DbSet<LookupMaster> LookupMaster { get; set; }
         internal DbSet<State> State { get; set; }
+
+        internal DbSet<District> District { get; set; }
+
         internal DbSet<City> City { get; set; }
         public DbSet<Dealer> Dealer { get; set; }
         public DbSet<UserLoginHistory> UserLoginHistory { get; set; }
@@ -47,12 +51,18 @@ namespace QUIZAPP
         public DbSet<Certificate> Certificate { get; set; }
         public DbSet<CertificateGeneration> CertificateGeneration { get; set; }
         public DbSet<CertificateGenerationDetail> CertificateGenerationDetail{ get; set; }
-        //public DbSet<CertificateTemplate> CertificateTemplates { get; set; }
+        //for add JobRole module--------------------------------------------------------------
+        public DbSet<JobRole> JobRoles { get; set; }
+        public DbSet<JobRoleDocument> JobRoleDocuments { get; set; }
+        public DbSet<SubSector> SubSectors { get; set; }
 
-        //public DbSet<CertificateTemplateField> CertificateTemplateFields { get; set; }
+        //for add trainer module--------------------------------------------------------------
+        public DbSet<TrainerRegistration> TrainerRegistration { get; set; }
 
-        //public DbSet<Certificate> Certificates { get; set; }
-        //----------------------------------------------------------------------------------------
+        public DbSet<TrainerRegistrationQualification>TrainerRegistrationQualification{ get; set; }
 
+        public DbSet<TrainerRegistrationExperience>TrainerRegistrationExperience{ get; set; }
+
+        public DbSet<TrainerRegistrationDocument>TrainerRegistrationDocument{ get; set; }
     }
 }

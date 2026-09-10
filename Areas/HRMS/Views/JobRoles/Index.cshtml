@@ -1,0 +1,183 @@
+﻿@using TSSC.Unified.Models
+@model IEnumerable<JobRole>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Job Roles";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Job Role List</h3>
+        </div>
+
+        <div class="nk-block-head-content">
+            <div class="toggle-wrap nk-block-tools-toggle">
+                <a asp-area="HRMS"
+                   asp-controller="JobRoles"
+                   asp-action="Add"
+                   class="btn btn-primary">
+                    <em class="icon ni ni-plus"></em>
+                    <span>Add Job Role</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="nk-content-inner">
+    <div class="nk-content-body">
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-icon">
+                <em class="icon ni ni-check-circle"></em>
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <div class="card card-bordered">
+
+            <div class="card-inner">
+
+                <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer dtr-inline collapsed">
+
+                    <thead>
+                        <tr>
+                            <th>S.No.</th>
+                            <th>QP Code</th>
+                            <th>Job Role Title</th>
+                            <th>QP Version</th>
+                            <th>NSQF Level</th>
+                            <th>QP Hours</th>
+                            <th>Valid From</th>
+                            <th>Valid To</th>
+                            <th>Status</th>
+                            <th width="120">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @serial
+                                </td>
+
+                                <td>
+                                    @item.QPCode
+                                </td>
+
+                                <td>
+                                    @item.JobRoleTitle
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrEmpty(item.QPVersion) ? "-" : item.QPVersion)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrEmpty(item.NSQFLevel) ? "-" : item.NSQFLevel)
+                                </td>
+
+                                <td>
+                                    @(item.QPHours.HasValue
+                                                                    ? item.QPHours.Value.ToString("0.##")
+                                                                    : "-")
+                                                                      </td>
+
+                                <td>
+                                    @(item.ValidFrom.HasValue
+                                                                    ? item.ValidFrom.Value.ToString("dd-MMM-yyyy")
+                                                                    : "-")
+                                                                      </td>
+
+                                <td>
+                                    @(item.ValidTo.HasValue
+                                                                    ? item.ValidTo.Value.ToString("dd-MMM-yyyy")
+                                                                    : "-")
+                            </td>
+
+                                <td>
+
+                                @if (item.Status == "Approved" || item.Status == "Active")
+                                    {
+                                        <span class="badge badge-dot bg-success">
+                                            @item.Status
+                                        </span>
+                                    }
+                                    else if (item.Status == "Submitted" ||
+                                    item.Status == "Under Verification")
+                                    {
+                                        <span class="badge badge-dot bg-info">
+                                            @item.Status
+                                        </span>
+                                    }
+                                    else if (item.Status == "Rejected")
+                                    {
+                                        <span class="badge badge-dot bg-danger">
+                                            @item.Status
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-dot bg-warning">
+                                            @item.Status
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td>
+
+                                    <div class="btn-group" role="group">
+
+                                        <a asp-area="HRMS"
+                                           asp-controller="JobRoles"
+                                           asp-action="Details"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-info"
+                                           title="View">
+
+                                            <em class="icon ni ni-eye"></em>
+
+                                        </a>
+    @if (item.Status == "Pending")
+                                        {
+                                            <a asp-area="HRMS"
+                                            asp-controller="JobRoles"
+                                            asp-action="Edit"
+                                            asp-route-id="@item.Id"
+                                            class="btn btn-sm btn-outline-primary"
+                                            title="Edit">
+
+                                                <em class="icon ni ni-edit"></em>
+
+                                            </a>
+                                        }
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                            serial++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
