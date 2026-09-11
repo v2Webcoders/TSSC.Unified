@@ -18,6 +18,7 @@ using iText.Layout;
 using iText.Layout.Element;
 using iText.Layout.Properties;
 using Paragraph = iText.Layout.Element.Paragraph;
+using TSSC.Unified.Services;
 
 namespace QUIZAPP.Areas.HRMS.Controllers
 {
@@ -29,12 +30,14 @@ namespace QUIZAPP.Areas.HRMS.Controllers
         private readonly AppdbContext _db;
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _environment;
-        public HomeController(ILogger<HomeController> logger, AppdbContext db, IConfiguration configuration, IWebHostEnvironment environment)
+        private readonly ITodayAttendanceLiveService _todayAttendanceLiveService;
+        public HomeController(ITodayAttendanceLiveService todayAttendanceLiveService, ILogger<HomeController> logger, AppdbContext db, IConfiguration configuration, IWebHostEnvironment environment)
         {
             _logger = logger;
             _db = db;
             _configuration = configuration;
             _environment = environment;
+            _todayAttendanceLiveService = todayAttendanceLiveService;
         }
 
         
@@ -135,15 +138,9 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
                 if (employee != null)
                 {
-                    var attendance =
-                        await GetTodayAttendance(
-                            employee.EmployeeCode);
-
-                    model.TodayInTime =
-                        attendance.InTime;
-
-                    model.TodayOutTime =
-                        attendance.OutTime;
+                    var attendance = await _todayAttendanceLiveService.GetTodayAttendanceAsync(employee.EmployeeCode);
+                    model.TodayInTime = attendance.InTime;
+                    model.TodayOutTime = attendance.OutTime;
                 }
 
 
@@ -226,15 +223,11 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
                 return View("Index", model);
             }
-
-
-            // =====================================================
-            // EMPLOYEE DASHBOARD
-            // =====================================================
-
-            //if (User.IsInRole("Employee"))
             else
             {
+                // =====================================================
+                // EMPLOYEE DASHBOARD
+                // =====================================================
                 if (employee == null)
                     return NotFound();
                 if (employee.ProfileStatus == "Pending")
@@ -247,27 +240,36 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 }
                 var today = DateTime.Today;
 
-                var attendance =
-                    await GetTodayAttendance(
-                        employee.EmployeeCode);
+                //var attendance =
+                //    await GetTodayAttendance(
+                //        employee.EmployeeCode);
 
+
+                //var model = new HRDashboardVM
+                //{
+                //    EmployeeName =
+                //        employee.FirstName,
+
+                //    EmployeeCode =
+                //        employee.EmployeeCode,
+
+                //    TodayInTime =
+                //        attendance.InTime,
+
+                //    TodayOutTime =
+                //        attendance.OutTime,
+                //    DOB = employee.DOB
+                //};
+                var attendance = await _todayAttendanceLiveService.GetTodayAttendanceAsync(employee.EmployeeCode);
 
                 var model = new HRDashboardVM
                 {
-                    EmployeeName =
-                        employee.FirstName,
-
-                    EmployeeCode =
-                        employee.EmployeeCode,
-
-                    TodayInTime =
-                        attendance.InTime,
-
-                    TodayOutTime =
-                        attendance.OutTime,
+                    EmployeeName = employee.FirstName,
+                    EmployeeCode = employee.EmployeeCode,
+                    TodayInTime = attendance.InTime,
+                    TodayOutTime = attendance.OutTime,
                     DOB = employee.DOB
                 };
-
 
                 // =================================================
                 // CURRENT MONTH
@@ -403,60 +405,14 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        //private async Task<(DateTime? InTime, DateTime? OutTime)> GetTodayAttendance(
-        //string employeeCode)
-        //{
-        //    DateTime? inTime = null;
-        //    DateTime? outTime = null;
-
-        //    var connectionString =
-        //        _configuration.GetConnectionString("BiometricConnection");
-
-        //    using var connection = new SqlConnection(connectionString);
-
-        //    await connection.OpenAsync();
-
-        //    var sql = @"
-        //SELECT
-        //    MIN(LogDate) AS InTime,
-        //    CASE
-        //        WHEN COUNT(*) > 1 THEN MAX(LogDate)
-        //        ELSE NULL
-        //    END AS OutTime
-        //FROM etimetracklite1.dbo.DeviceLogs_8_2026
-        //WHERE UserId = @EmployeeCode
-        //  AND CAST(LogDate AS DATE) = @Today";
-
-        //    using var command = new SqlCommand(sql, connection);
-
-        //    command.Parameters.AddWithValue(
-        //        "@EmployeeCode",
-        //        employeeCode);
-
-        //    command.Parameters.AddWithValue(
-        //        "@Today",
-        //        DateTime.Today);
-
-        //    using var reader = await command.ExecuteReaderAsync();
-
-        //    if (await reader.ReadAsync())
-        //    {
-        //        if (reader["InTime"] != DBNull.Value)
-        //            inTime = Convert.ToDateTime(reader["InTime"]);
-
-        //        if (reader["OutTime"] != DBNull.Value)
-        //            outTime = Convert.ToDateTime(reader["OutTime"]);
-        //    }
-
-        //    return (inTime, outTime);
-        //}
+        
         private async Task<(DateTime? InTime, DateTime? OutTime)> GetTodayAttendance(
         string employeeCode)
         {
             DateTime? inTime = null;
             DateTime? outTime = null;
 
-            try
+            //try
             {
                 var connectionString =
                     _configuration.GetConnectionString("BiometricConnection");
@@ -474,26 +430,22 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
                 await connection.OpenAsync();
 
-                var sql = @"
-            SELECT
-                MIN(LogDate) AS InTime,
 
-                CASE
-                    WHEN MAX(LogDate) >= DATEADD(
-                        MINUTE,
-                        30,
-                        MIN(LogDate)
-                    )
-                    THEN MAX(LogDate)
-
-                    ELSE NULL
-                END AS OutTime
-
-            FROM etimetracklite1.dbo.DeviceLogs_8_2026
-
-            WHERE UserId = @EmployeeCode
-              AND LogDate >= @Today
-              AND LogDate < DATEADD(DAY, 1, @Today);";
+                // Exclusive upper boundary
+                var startDate = DateTime.Now;
+                var tableName = $"DeviceLogs_{startDate.Month}_{startDate.Year}";
+                var sql = $@"
+                SELECT
+                    MIN(LogDate) AS InTime,
+                    CASE
+                        WHEN MAX(LogDate) >= DATEADD(MINUTE, 30, MIN(LogDate))
+                        THEN MAX(LogDate)
+                        ELSE NULL
+                    END AS OutTime
+                FROM [{tableName}]
+                WHERE UserId = @EmployeeCode
+                  AND LogDate >= @Today
+                  AND LogDate < DATEADD(DAY, 1, @Today);";
 
                 using var command =
                     new SqlCommand(sql, connection);
@@ -527,24 +479,24 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
                 return (inTime, outTime);
             }
-            catch (SqlException ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Biometric database error while getting attendance for EmployeeCode: {EmployeeCode}",
-                    employeeCode);
+            //catch (SqlException ex)
+            //{
+            //    _logger.LogError(
+            //        ex,
+            //        "Biometric database error while getting attendance for EmployeeCode: {EmployeeCode}",
+            //        employeeCode);
 
-                return (null, null);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Unexpected error while getting biometric attendance for EmployeeCode: {EmployeeCode}",
-                    employeeCode);
+            //    return (null, null);
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.LogError(
+            //        ex,
+            //        "Unexpected error while getting biometric attendance for EmployeeCode: {EmployeeCode}",
+            //        employeeCode);
 
-                return (null, null);
-            }
+            //    return (null, null);
+            //}
         }
 
         [HttpGet]
@@ -582,7 +534,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             SELECT TOP 1
                 UserId,
                 LogDate
-            FROM etimetracklite1.dbo.DeviceLogs_8_2026
+            FROM dbo.DeviceLogs_9_2026
             ORDER BY LogDate DESC;";
 
                 using var command =
@@ -610,7 +562,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                     message = "Biometric database connection successful.",
                     server = serverName,
                     database = databaseName,
-                    table = "etimetracklite1.dbo.DeviceLogs_8_2026",
+                    table = "dbo.DeviceLogs_x_2026",
                     lastUserId = lastUserId,
                     lastLogDate = lastLogDate
                 });

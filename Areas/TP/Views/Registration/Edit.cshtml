@@ -1,0 +1,1375 @@
+﻿@using TSSC.Unified.ViewModel
+@using TSSC.Unified.Models
+@model TPRegistrationEditVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "~/Views/Shared/_RegistrationLayout.cshtml";
+    ViewData["Title"] = "Edit TP Registration";
+
+    var documents = ViewBag.Documents as List<TPRegistrationDocument>
+                    ?? new List<TPRegistrationDocument>();
+
+    string GetDocumentStatus(string documentType)
+    {
+        return documents.Any(x => x.DocumentType == documentType)
+            ? "Uploaded"
+            : "Not Uploaded";
+    }
+}
+
+<div class="reg-hero">
+    <h1 id="formTitle">Edit Training Partner Registration</h1>
+
+    <p>
+        Update the information that was rejected and resubmit your
+        Training Partner application for review.
+    </p>
+</div>
+
+<div class="form-shell">
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <form asp-action="Edit"
+          method="post"
+          enctype="multipart/form-data"
+          id="tpForm">
+
+        @Html.AntiForgeryToken()
+
+        <input asp-for="Id" type="hidden" />
+
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <p class="alert alert-warning">
+            <strong>Correction Required:</strong>
+            Your application was rejected at one or more approval stages.
+            Please update the required information and resubmit the application.
+        </p>
+
+        <p class="alert alert-primary">
+            Note: Fields marked <span class="req">*</span> are mandatory.
+            Existing documents do not need to be uploaded again unless you want
+            to replace them.
+        </p>
+
+        <!-- ========================================================= -->
+        <!-- STEP 1 : BASIC DETAILS -->
+        <!-- ========================================================= -->
+
+        <div class="accordion open" data-step="1">
+
+            <div class="acc-head" onclick="toggleAcc(this)">
+                <div class="left">
+                    <div class="step-num">1</div>
+                    <div class="title">Basic Details</div>
+                </div>
+            </div>
+
+            <div class="acc-body">
+
+                <div class="form-grid">
+
+                    <div class="field">
+                        <label asp-for="OrganizationName">
+                            Organization Name <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="OrganizationName"
+                               type="text" />
+
+                        <span asp-validation-for="OrganizationName"
+                              class="text-danger"></span>
+                    </div>
+
+
+                    <div class="field">
+                        <label asp-for="OrganizationType">
+                            Type of Organization <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="OrganizationType">
+
+                            <option value="">Select</option>
+                            <option value="Proprietorship">Proprietorship</option>
+                            <option value="Partnership">Partnership</option>
+                            <option value="Private Limited">Private Limited</option>
+                            <option value="LLP">LLP</option>
+                            <option value="Society">Society</option>
+                            <option value="Trust">Trust</option>
+                            <option value="Other">Other</option>
+
+                        </select>
+
+                        <span asp-validation-for="OrganizationType"
+                              class="text-danger"></span>
+                    </div>
+
+
+                    <div class="field">
+                        <label asp-for="RegistrationNumber">
+                            Registration Number <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="RegistrationNumber"
+                               type="text" />
+
+                        <span asp-validation-for="RegistrationNumber"
+                              class="text-danger"></span>
+                    </div>
+
+
+                    <div class="field">
+                        <label asp-for="DateOfIncorporation">
+                            Date of Incorporation <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="DateOfIncorporation"
+                               type="text"
+                               placeholder="DD/MM/YYYY" />
+
+                        <span asp-validation-for="DateOfIncorporation"
+                              class="text-danger"></span>
+                    </div>
+
+
+                    <div class="field">
+                        <label asp-for="PANNumber">
+                            PAN Number <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="PANNumber"
+                               type="text"
+                               maxlength="10"
+                               placeholder="ABCDE1234F" />
+
+                        <span asp-validation-for="PANNumber"
+                              class="text-danger"></span>
+                    </div>
+
+
+                    <div class="field">
+                        <label asp-for="GSTNumber">
+                            GST Number (optional)
+                        </label>
+
+                        <input asp-for="GSTNumber"
+                               type="text"
+                               maxlength="15" />
+
+                        <span asp-validation-for="GSTNumber"
+                              class="text-danger"></span>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- ========================================================= -->
+        <!-- STEP 2 : ORGANIZATION PROFILE -->
+        <!-- ========================================================= -->
+
+        <div class="accordion open" data-step="2">
+
+            <div class="acc-head" onclick="toggleAcc(this)">
+                <div class="left">
+                    <div class="step-num">2</div>
+                    <div class="title">Organization Profile</div>
+                </div>
+            </div>
+
+            <div class="acc-body">
+
+                <div class="form-grid">
+
+                    <div class="field">
+                        <label asp-for="SectorExperience">
+                            Sector Experience <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="SectorExperience">
+
+                            <option value="">Select</option>
+                            <option value="Telecom">Telecom</option>
+                            <option value="Multi-sector">Multi-sector</option>
+
+                        </select>
+
+                        <span asp-validation-for="SectorExperience"
+                              class="text-danger"></span>
+                    </div>
+
+
+                    <div class="field">
+                        <label asp-for="YearsOfExperience">
+                            Years of Experience <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="YearsOfExperience"
+                               type="text"
+                               inputmode="numeric" />
+
+                        <span asp-validation-for="YearsOfExperience"
+                              class="text-danger"></span>
+                    </div>
+
+
+                    <div class="field full">
+
+                        <label asp-for="PreviousProjects">
+                            Previous Projects / Work Details
+                        </label>
+
+                        <textarea asp-for="PreviousProjects"></textarea>
+
+                        <span asp-validation-for="PreviousProjects"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="TrainingCentersCount">
+                            Number of Training Centers (if existing)
+                        </label>
+
+                        <input asp-for="TrainingCentersCount"
+                               type="text"
+                               inputmode="numeric" />
+
+                        <span asp-validation-for="TrainingCentersCount"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="TrainersAvailableCount">
+                            Number of Trainers Available
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="TrainersAvailableCount"
+                               type="text"
+                               inputmode="numeric" />
+
+                        <span asp-validation-for="TrainersAvailableCount"
+                              class="text-danger"></span>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- ========================================================= -->
+        <!-- STEP 3 : CONTACT DETAILS -->
+        <!-- ========================================================= -->
+
+        <div class="accordion open" data-step="3">
+
+            <div class="acc-head" onclick="toggleAcc(this)">
+                <div class="left">
+                    <div class="step-num">3</div>
+                    <div class="title">Contact Details</div>
+                </div>
+            </div>
+
+            <div class="acc-body">
+
+                <div class="form-grid">
+
+                    <div class="field full">
+
+                        <label asp-for="RegisteredOfficeAddress">
+                            Registered Office Address
+                            <span class="req">*</span>
+                        </label>
+
+                        <textarea asp-for="RegisteredOfficeAddress"></textarea>
+
+                        <span asp-validation-for="RegisteredOfficeAddress"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="State">
+                            State <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="State"
+                               type="text" />
+
+                        <span asp-validation-for="State"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="District">
+                            District <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="District"
+                               type="text" />
+
+                        <span asp-validation-for="District"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="City">
+                            City <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="City"
+                               type="text" />
+
+                        <span asp-validation-for="City"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="PinCode">
+                            Pin Code <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="PinCode"
+                               type="text"
+                               maxlength="6"
+                               inputmode="numeric" />
+
+                        <span asp-validation-for="PinCode"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="Email">
+                            Official Email ID
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="Email"
+                               type="text"
+                               class="form-control bg-light"
+                               readonly />
+                        <small class="text-muted d-block mt-1">
+                            <em class="icon ni ni-info me-1"></em>
+                            Official email ID cannot be edited.
+                        </small>
+
+                        <span asp-validation-for="Email"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="MobileNumber">
+                            Mobile Number
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="MobileNumber"
+                               type="text"
+                               maxlength="10"
+                               inputmode="numeric" />
+
+                        <span asp-validation-for="MobileNumber"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="field full">
+
+                        <label asp-for="AlternateContactPerson">
+                            Alternate Contact Person
+                        </label>
+
+                        <input asp-for="AlternateContactPerson"
+                               type="text" />
+
+                        <span asp-validation-for="AlternateContactPerson"
+                              class="text-danger"></span>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- ========================================================= -->
+        <!-- STEP 4 : FINANCIAL DETAILS -->
+        <!-- ========================================================= -->
+
+        <div class="accordion open" data-step="4">
+
+            <div class="acc-head" onclick="toggleAcc(this)">
+                <div class="left">
+                    <div class="step-num">4</div>
+                    <div class="title">Financial Details</div>
+                </div>
+            </div>
+
+            <div class="acc-body">
+
+                <div class="form-grid">
+
+                    <div class="field full">
+
+                        <label asp-for="AnnualTurnoverLast3Years">
+                            Annual Turnover (Last 3 Years)
+                            <span class="req">*</span>
+                        </label>
+
+                        <textarea asp-for="AnnualTurnoverLast3Years"
+                                  placeholder="FY 2023-24: ₹... | FY 2024-25: ₹... | FY 2025-26: ₹...">
+                        </textarea>
+
+                        <span asp-validation-for="AnnualTurnoverLast3Years"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="BankAccountNumber">
+                            Bank Account Number
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="BankAccountNumber"
+                               type="text" />
+
+                        <span asp-validation-for="BankAccountNumber"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="IFSCCode">
+                            IFSC Code
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="IFSCCode"
+                               type="text" />
+
+                        <span asp-validation-for="IFSCCode"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="BankName">
+                            Bank Name
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="BankName"
+                               type="text" />
+
+                        <span asp-validation-for="BankName"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <!-- FINANCIAL DOCUMENT -->
+
+                    <div class="field">
+
+                        <label asp-for="FinancialDocuments">
+                            Financial Documents
+                        </label>
+
+                        @{
+                            var financialDoc = documents
+                            .FirstOrDefault(x => x.DocumentType == "Financial Documents");
+                        }
+
+                        @if (financialDoc != null)
+                        {
+                            <div class="mb-2 d-flex align-items-center gap-2">
+
+                                <span class="badge bg-success">
+                                    ✓ Document Uploaded
+                                </span>
+
+                                <a href="@Url.Content(
+                                   $"~/uploads/tp-registrations/{Model.Id}/{financialDoc.FileName}")"
+                                   target="_blank"
+                                   class="d-inline-flex align-items-center text-primary small"
+                                   style="height: 30px;">
+
+                                    <em class="icon ni ni-eye me-1"></em>
+                                    View
+
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-warning text-dark">
+                                    Document Not Uploaded
+                                </span>
+                            </div>
+                        }
+
+                        <input asp-for="FinancialDocuments"
+                               type="file"
+                               accept=".pdf" />
+
+                        <small class="text-soft">
+                            Leave blank to keep the existing document.
+                            Upload only if you want to replace it.
+                        </small>
+
+                        <span asp-validation-for="FinancialDocuments"
+                              class="text-danger"></span>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- ========================================================= -->
+        <!-- STEP 5 : DOCUMENTS -->
+        <!-- ========================================================= -->
+        <div class="accordion open" data-step="5">
+
+            <div class="acc-head" onclick="toggleAcc(this)">
+                <div class="left">
+                    <div class="step-num">5</div>
+                    <div class="title">Documents Upload</div>
+                </div>
+            </div>
+
+            <div class="acc-body">
+
+                <div class="form-grid">
+
+                    <!-- REGISTRATION CERTIFICATE -->
+
+                    <div class="field">
+
+                        <label asp-for="RegistrationCertificate">
+                            Registration Certificate
+                        </label>
+
+                        @{
+                            var registrationDoc = documents
+                            .FirstOrDefault(x =>
+                            x.DocumentType == "Registration Certificate");
+                        }
+
+                        @if (registrationDoc != null)
+                        {
+                            <div class="mb-2 d-flex align-items-center gap-2">
+
+                                <span class="badge bg-success">
+                                    ✓ Document Uploaded
+                                </span>
+
+                                <a href="@Url.Content(
+                            $"~/uploads/tp-registrations/{Model.Id}/{registrationDoc.FileName}")"
+                                   target="_blank"
+                                   class="text-primary">
+                                    View
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-warning text-dark">
+                                    Document Not Uploaded
+                                </span>
+                            </div>
+                        }
+
+                        <input asp-for="RegistrationCertificate"
+                               type="file"
+                               accept=".pdf" />
+
+                        <small class="text-soft">
+                            Leave blank to keep the existing document.
+                            Upload only if you want to replace it.
+                        </small>
+
+                        <span asp-validation-for="RegistrationCertificate"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <!-- PAN CARD -->
+
+                    <div class="field">
+
+                        <label asp-for="PANCardCopy">
+                            PAN Card Copy
+                        </label>
+
+                        @{
+                            var panDoc = documents
+                            .FirstOrDefault(x =>
+                            x.DocumentType == "PAN Card Copy");
+                        }
+
+                        @if (panDoc != null)
+                        {
+                            <div class="mb-2 d-flex align-items-center gap-2">
+
+                                <span class="badge bg-success">
+                                    ✓ Document Uploaded
+                                </span>
+
+                                <a href="@Url.Content(
+                            $"~/uploads/tp-registrations/{Model.Id}/{panDoc.FileName}")"
+                                   target="_blank"
+                                   class="text-primary">
+                                    View
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-warning text-dark">
+                                    Document Not Uploaded
+                                </span>
+                            </div>
+                        }
+
+                        <input asp-for="PANCardCopy"
+                               type="file"
+                               accept=".pdf" />
+
+                        <small class="text-soft">
+                            Leave blank to keep the existing document.
+                            Upload only if you want to replace it.
+                        </small>
+
+                        <span asp-validation-for="PANCardCopy"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <!-- GST CERTIFICATE -->
+
+                    <div class="field">
+
+                        <label asp-for="GSTCertificate">
+                            GST Certificate (optional)
+                        </label>
+
+                        @{
+                            var gstDoc = documents
+                            .FirstOrDefault(x =>
+                            x.DocumentType == "GST Certificate");
+                        }
+
+                        @if (gstDoc != null)
+                        {
+                            <div class="mb-2 d-flex align-items-center gap-2">
+
+                                <span class="badge bg-success">
+                                    ✓ Document Uploaded
+                                </span>
+
+                                <a href="@Url.Content(
+                            $"~/uploads/tp-registrations/{Model.Id}/{gstDoc.FileName}")"
+                                   target="_blank"
+                                   class="text-primary">
+                                    View
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-warning text-dark">
+                                    Document Not Uploaded
+                                </span>
+                            </div>
+                        }
+
+                        <input asp-for="GSTCertificate"
+                               type="file"
+                               accept=".pdf" />
+
+                        <small class="text-soft">
+                            Leave blank to keep the existing document.
+                            Upload only if you want to replace it.
+                        </small>
+
+                        <span asp-validation-for="GSTCertificate"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <!-- ADDRESS PROOF -->
+
+                    <div class="field">
+
+                        <label asp-for="AddressProof">
+                            Address Proof
+                        </label>
+
+                        @{
+                            var addressDoc = documents
+                            .FirstOrDefault(x =>
+                            x.DocumentType == "Address Proof");
+                        }
+
+                        @if (addressDoc != null)
+                        {
+                            <div class="mb-2 d-flex align-items-center gap-2">
+
+                                <span class="badge bg-success">
+                                    ✓ Document Uploaded
+                                </span>
+
+                                <a href="@Url.Content(
+                            $"~/uploads/tp-registrations/{Model.Id}/{addressDoc.FileName}")"
+                                   target="_blank"
+                                   class="text-primary">
+                                    View
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-warning text-dark">
+                                    Document Not Uploaded
+                                </span>
+                            </div>
+                        }
+
+                        <input asp-for="AddressProof"
+                               type="file"
+                               accept=".pdf" />
+
+                        <small class="text-soft">
+                            Leave blank to keep the existing document.
+                            Upload only if you want to replace it.
+                        </small>
+
+                        <span asp-validation-for="AddressProof"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <!-- CANCELLED CHEQUE -->
+
+                    <div class="field">
+
+                        <label asp-for="CancelledCheque">
+                            Cancelled Cheque
+                        </label>
+
+                        @{
+                            var chequeDoc = documents
+                            .FirstOrDefault(x =>
+                            x.DocumentType == "Cancelled Cheque");
+                        }
+
+                        @if (chequeDoc != null)
+                        {
+                            <div class="mb-2 d-flex align-items-center gap-2">
+
+                                <span class="badge bg-success">
+                                    ✓ Document Uploaded
+                                </span>
+
+                                <a href="@Url.Content(
+                            $"~/uploads/tp-registrations/{Model.Id}/{chequeDoc.FileName}")"
+                                   target="_blank"
+                                   class="text-primary">
+                                    View
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-warning text-dark">
+                                    Document Not Uploaded
+                                </span>
+                            </div>
+                        }
+
+                        <input asp-for="CancelledCheque"
+                               type="file"
+                               accept=".pdf,.jpg,.jpeg,.png" />
+
+                        <small class="text-soft">
+                            Leave blank to keep the existing document.
+                            Upload only if you want to replace it.
+                        </small>
+
+                        <span asp-validation-for="CancelledCheque"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <!-- UNDERTAKING -->
+
+                    <div class="field">
+
+                        <label asp-for="UndertakingDocument">
+                            Undertaking
+                        </label>
+
+                        @{
+                            var undertakingDoc = documents
+                            .FirstOrDefault(x =>
+                            x.DocumentType == "Undertaking");
+                        }
+
+                        @if (undertakingDoc != null)
+                        {
+                            <div class="mb-2 d-flex align-items-center gap-2">
+
+                                <span class="badge bg-success">
+                                    ✓ Document Uploaded
+                                </span>
+
+                                <a href="@Url.Content(
+                            $"~/uploads/tp-registrations/{Model.Id}/{undertakingDoc.FileName}")"
+                                   target="_blank"
+                                   class="text-primary">
+                                    View
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-warning text-dark">
+                                    Document Not Uploaded
+                                </span>
+                            </div>
+                        }
+
+                        <input asp-for="UndertakingDocument"
+                               type="file"
+                               accept=".pdf" />
+
+                        <small class="text-soft">
+                            Leave blank to keep the existing document.
+                            Upload only if you want to replace it.
+                        </small>
+
+                        <span asp-validation-for="UndertakingDocument"
+                              class="text-danger"></span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+       @*  <div class="accordion open" data-step="5">
+
+            <div class="acc-head" onclick="toggleAcc(this)">
+                <div class="left">
+                    <div class="step-num">5</div>
+                    <div class="title">Documents Upload</div>
+                </div>
+            </div>
+
+            <div class="acc-body">
+
+                <div class="form-grid">
+
+
+                    <!-- REGISTRATION CERTIFICATE -->
+
+                    <div class="field">
+
+                        <label asp-for="RegistrationCertificate">
+                            Registration Certificate
+                        </label>
+
+                        @if (documents.Any(x =>
+                        x.DocumentType == "Registration Certificate"))
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-success">
+                                    ✓ Document Uploaded
+                                </span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-warning text-dark">
+                                    Document Not Uploaded
+                                </span>
+                            </div>
+                        }
+
+                        <input asp-for="RegistrationCertificate"
+                               type="file"
+                               accept=".pdf" />
+
+                        <small class="text-soft">
+                            Leave blank to keep the existing document.
+                        </small>
+
+                        <span asp-validation-for="RegistrationCertificate"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <!-- PAN CARD -->
+
+                    <div class="field">
+
+                        <label asp-for="PANCardCopy">
+                            PAN Card Copy
+                        </label>
+
+                        @if (documents.Any(x =>
+                        x.DocumentType == "PAN Card Copy"))
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-success">
+                                    ✓ Document Uploaded
+                                </span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-warning text-dark">
+                                    Document Not Uploaded
+                                </span>
+                            </div>
+                        }
+
+                        <input asp-for="PANCardCopy"
+                               type="file"
+                               accept=".pdf" />
+
+                        <small class="text-soft">
+                            Leave blank to keep the existing document.
+                        </small>
+
+                        <span asp-validation-for="PANCardCopy"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <!-- GST -->
+
+                    <div class="field">
+
+                        <label asp-for="GSTCertificate">
+                            GST Certificate (optional)
+                        </label>
+
+                        @if (documents.Any(x =>
+                        x.DocumentType == "GST Certificate"))
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-success">
+                                    ✓ Document Uploaded
+                                </span>
+                            </div>
+                        }
+
+                        <input asp-for="GSTCertificate"
+                               type="file"
+                               accept=".pdf" />
+
+                        <small class="text-soft">
+                            Leave blank to keep the existing document.
+                        </small>
+
+                        <span asp-validation-for="GSTCertificate"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <!-- ADDRESS PROOF -->
+
+                    <div class="field">
+
+                        <label asp-for="AddressProof">
+                            Address Proof
+                        </label>
+
+                        @if (documents.Any(x =>
+                        x.DocumentType == "Address Proof"))
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-success">
+                                    ✓ Document Uploaded
+                                </span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-warning text-dark">
+                                    Document Not Uploaded
+                                </span>
+                            </div>
+                        }
+
+                        <input asp-for="AddressProof"
+                               type="file"
+                               accept=".pdf" />
+
+                        <small class="text-soft">
+                            Leave blank to keep the existing document.
+                        </small>
+
+                        <span asp-validation-for="AddressProof"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <!-- CANCELLED CHEQUE -->
+
+                    <div class="field">
+
+                        <label asp-for="CancelledCheque">
+                            Cancelled Cheque
+                        </label>
+
+                        @if (documents.Any(x =>
+                        x.DocumentType == "Cancelled Cheque"))
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-success">
+                                    ✓ Document Uploaded
+                                </span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-warning text-dark">
+                                    Document Not Uploaded
+                                </span>
+                            </div>
+                        }
+
+                        <input asp-for="CancelledCheque"
+                               type="file"
+                               accept=".pdf,.jpg,.jpeg,.png" />
+
+                        <small class="text-soft">
+                            Leave blank to keep the existing document.
+                        </small>
+
+                        <span asp-validation-for="CancelledCheque"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <!-- UNDERTAKING -->
+
+                    <div class="field">
+
+                        <label asp-for="UndertakingDocument">
+                            Undertaking
+                        </label>
+
+                        @if (documents.Any(x =>
+                        x.DocumentType == "Undertaking"))
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-success">
+                                    ✓ Document Uploaded
+                                </span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-warning text-dark">
+                                    Document Not Uploaded
+                                </span>
+                            </div>
+                        }
+
+                        <input asp-for="UndertakingDocument"
+                               type="file"
+                               accept=".pdf" />
+
+                        <small class="text-soft">
+                            Leave blank to keep the existing document.
+                        </small>
+
+                        <span asp-validation-for="UndertakingDocument"
+                              class="text-danger"></span>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div> *@
+
+
+        <!-- ========================================================= -->
+        <!-- STEP 6 : AUTHORIZED PERSON -->
+        <!-- ========================================================= -->
+
+        <div class="accordion open" data-step="6">
+
+            <div class="acc-head" onclick="toggleAcc(this)">
+                <div class="left">
+                    <div class="step-num">6</div>
+                    <div class="title">Authorized Person Details</div>
+                </div>
+            </div>
+
+            <div class="acc-body">
+
+                <div class="form-grid">
+
+                    <div class="field">
+
+                        <label asp-for="AuthorizedSignatoryName">
+                            Name of Authorized Signatory
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="AuthorizedSignatoryName"
+                               type="text" />
+
+                        <span asp-validation-for="AuthorizedSignatoryName"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="Designation">
+                            Designation
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="Designation"
+                               type="text" />
+
+                        <span asp-validation-for="Designation"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="AuthorizedPersonEmail">
+                            Email ID
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="AuthorizedPersonEmail"
+                               type="text" />
+
+                        <span asp-validation-for="AuthorizedPersonEmail"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label asp-for="AuthorizedPersonMobile">
+                            Mobile Number
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="AuthorizedPersonMobile"
+                               type="text"
+                               maxlength="10"
+                               inputmode="numeric" />
+
+                        <span asp-validation-for="AuthorizedPersonMobile"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <!-- AUTHORIZED PERSON ID -->
+
+                    <div class="field full">
+
+                        <label asp-for="AuthorizedPersonIdProof">
+                            ID Proof (Aadhaar / PAN)
+                        </label>
+
+                        @{
+                            var authorizedPersonIdDoc = documents
+                            .FirstOrDefault(x =>
+                            x.DocumentType == "Authorized Person ID Proof");
+                        }
+
+                        @if (authorizedPersonIdDoc != null)
+                        {
+                            <div class="mb-2 d-flex align-items-center gap-2">
+
+                                <span class="badge bg-success">
+                                    ✓ Document Uploaded
+                                </span>
+
+                                <a href="@Url.Content(
+                $"~/uploads/tp-registrations/{Model.Id}/{authorizedPersonIdDoc.FileName}")"
+                                   target="_blank"
+                                   class="text-primary">
+                                    View
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-warning text-dark">
+                                    Document Not Uploaded
+                                </span>
+                            </div>
+                        }
+
+                        <input asp-for="AuthorizedPersonIdProof"
+                               type="file"
+                               accept=".pdf,.jpg,.jpeg,.png" />
+
+                        <small class="text-soft">
+                            Leave blank to keep the existing document.
+                            Upload only if you want to replace it.
+                        </small>
+
+                        <span asp-validation-for="AuthorizedPersonIdProof"
+                              class="text-danger"></span>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- ========================================================= -->
+        <!-- DECLARATION -->
+        <!-- ========================================================= -->
+
+        <div style="margin-top:24px;">
+
+            <label class="check-row">
+
+                <input asp-for="DeclarationAccepted"
+                       type="checkbox" />
+
+                I accept the Terms &amp; Conditions and declare that the
+                information provided above is true and authentic to the
+                best of my knowledge.
+
+            </label>
+
+            <span asp-validation-for="DeclarationAccepted"
+                  class="text-danger"></span>
+
+        </div>
+
+
+        <!-- ========================================================= -->
+        <!-- ACTIONS -->
+        <!-- ========================================================= -->
+
+        <div class="form-actions"
+             style="justify-content: space-between;">
+
+            <a asp-action="Details"
+               asp-route-id="@Model.Id"
+               class="btn btn-dim btn-outline-secondary"
+               style="width:auto; flex:0 0 auto; padding:13px 28px;">
+
+                Cancel
+
+            </a>
+
+
+            <button type="submit"
+                    class="btn-primary"
+                    style="width:auto; flex:0 0 auto; padding:13px 28px;">
+
+                Resubmit Application
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+}

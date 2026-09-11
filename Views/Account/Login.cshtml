@@ -70,11 +70,11 @@
 					<i class="far fa-user"></i>Login
 				</a>
 				<ul class="dropdown-menu dropdown-menu-end">
-					<li><a class="dropdown-item" href="sign.html"><i class="fas fa-user"></i>Login</a></li>
-					<li><a class="dropdown-item" href="employee-login.html"><i class="fas fa-id-badge"></i>Employee Login</a></li>
+					<li><a class="dropdown-item" href="/Account/Login"><i class="fas fa-user"></i>Login</a></li>
+					<li><a class="dropdown-item" href="/Account/Login"><i class="fas fa-id-badge"></i>Employee Login</a></li>
 				</ul>
 			</div>
-			<a class="chip chip-amber" href="register.html"><i class="fas fa-rocket"></i>Register Now</a>
+			<a class="chip chip-amber" href="/account/category"><i class="fas fa-rocket"></i>Register Now</a>
 		</div>
 	</div>
 
@@ -82,7 +82,7 @@
 	<header class="site-header">
 		<nav class="navbar navbar-expand-xl py-2">
 			<div class="container-fluid px-4">
-				<a class="navbar-brand" href="index.html">
+				<a class="navbar-brand" href="/Account/Login">
 					<img src="https://tsscindia.com/assetsfe/images/logo.png" alt="Telecom Sector Skill Council" class="logo-img">
 				</a>
 
@@ -345,9 +345,9 @@
 			</span>
 		</div>
 	</div>
-	<script src="~/Scripts/jquery-3.7.1.min.js"></script>
+	@* <script src="~/Scripts/jquery-3.7.1.min.js"></script>
 	<script src="~/Scripts/jquery.validate.min.js"></script>
-	<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+	<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script> *@
 	<script>
 		const role = sessionStorage.getItem('regRole');
 		if(role) document.getElementById('formTitle').textContent = role + ' Registration';
@@ -380,8 +380,8 @@
 
 	</script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
-	<script src="~/assets/js/bundle.js?ver=3.4.0"></script>
-	<script src="~/assets/js/scripts.js?ver=3.4.0"></script>
+	@* <script src="~/assets/js/bundle.js?ver=3.4.0"></script>
+	<script src="~/assets/js/scripts.js?ver=3.4.0"></script> *@
 
 </body>
 </html>

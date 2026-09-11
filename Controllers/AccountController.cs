@@ -29,6 +29,12 @@ namespace QUIZAPP.Controllers
         }
         [HttpGet]
         [AllowAnonymous]
+        public IActionResult Category()
+        {
+            return View();
+        }
+        [HttpGet]
+        [AllowAnonymous]
         public IActionResult login()
         {
             var items = new List<SelectListItem>
@@ -41,54 +47,7 @@ namespace QUIZAPP.Controllers
             ViewBag.Title = "Login";
             return View();
         }
-        //[HttpPost]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> Login(LoginViewModel model)
-        //{
-        //    ViewBag.Title = Name + " | Login";
-
-        //    // Validation
-        //    if (!ModelState.IsValid)
-        //    {
-        //        TempData["ErrorMessage"] = "Please enter User Name and Password.";
-        //        return View(model);
-        //    }
-
-        //    var user = await userManager.FindByEmailAsync(model.userid);
-
-        //    if (user == null)
-        //    {
-        //        TempData["ErrorMessage"] = "You have entered an invalid username or password.";
-        //        return View(model);
-        //    }
-
-        //    var result = await signInManager.PasswordSignInAsync(
-        //        model.userid,
-        //        model.Password,
-        //        isPersistent: false,
-        //        lockoutOnFailure: false);
-
-        //    if (!result.Succeeded)
-        //    {
-        //        TempData["ErrorMessage"] = "You have entered an invalid username or password.";
-        //        return View(model);
-        //    }
-
-        //    var roles = await userManager.GetRolesAsync(user);
-        //    var role = roles.FirstOrDefault()?.ToLower();
-
-        //    if (role == "admin")
-        //    {
-        //        return RedirectToAction("Index", "Home", new { area = "Admin" });
-        //    }
-
-        //    if (role == "hr")
-        //    {
-        //        return RedirectToAction("Index", "Home", new { area = "HRMS" });
-        //    }
-
-        //    return RedirectToAction("Index", "Home");
-        //}
+       
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -138,8 +97,11 @@ namespace QUIZAPP.Controllers
 
             if (roles.Contains("Letter"))
                 return RedirectToAction("Index", "Home", new { area = "HRMS" });
+            
+            if (roles.Contains("TrainingPartner"))
+                return RedirectToAction("Index", "Home", new { area = "TP" });
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Home", new { area = "HRMS" });
         }
 
         [HttpGet]

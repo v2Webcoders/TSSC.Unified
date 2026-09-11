@@ -60,15 +60,7 @@ namespace QUIZAPP
 
         //public DbSet<Certificate> Certificates { get; set; }
         //----------------------------------------------------------------------------------------
-        public DbSet<AffiliationApplication> AffiliationApplications
-        {
-            get; set;
-        }
-
-        public DbSet<AffiliationDocument> AffiliationDocuments
-        {
-            get; set;
-        }
-
+        public DbSet<TPRegistration> TPRegistrations { get; set; }
+        public DbSet<TPRegistrationDocument> TPRegistrationDocuments { get; set; }
     }
 }

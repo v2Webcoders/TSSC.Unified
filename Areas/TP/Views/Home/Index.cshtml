@@ -1,0 +1,546 @@
+﻿@model TSSC.Unified.Models.TPRegistration
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+	Layout = "_Layout";
+	ViewData["Title"] = "Training Partner Dashboard";
+}
+<style>
+    /* Accent bar for KPI cards — deliberately NOT using the `border` property,
+           so it never collides with DashLite's own card-bordered hover/box-shadow styling. */
+    .kpi-card .kpi-accent {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        display: block;
+        pointer-events: none; /* never intercepts hover/click on the card itself */
+    }
+</style>
+@section Styles {
+    <link rel="stylesheet" href="~/assets/css/EmployeeDashboard.css" asp-append-version="true" />
+}
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between align-items-center">
+
+        <!-- Header -->
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                <em class="icon ni ni-file-check me-2"></em>
+                Application Status
+            </h3>
+
+            <div class="nk-block-des text-soft">
+                <p>
+                    Track the status of your TP registration application.
+                </p>
+            </div>
+        </div>
+
+        <!-- Application Info -->
+        <div class="nk-block-head-content">
+            <div class="bg-primary-subtle rounded-3 px-3 py-2 text-center">
+                <small class="text-primary fw-semibold d-block">
+                    APPLICATION
+                </small>
+                <strong class="text-primary fs-6">
+                    #@Model.Id
+                </strong>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-inner">
+       
+
+        @{
+            var status = Model.Status ?? "Submitted";
+            var submittedCompleted = true;
+            var reviewCompleted = status == "Approved";
+            var reviewCurrent = status == "Under Review";
+            var approvedCurrent = status == "Approved";
+            var rejected = status == "Rejected";
+        }
+
+        @if (rejected)
+        {
+            <!-- Rejected State -->
+            <div class="alert alert-danger d-flex align-items-start gap-3 mb-0">
+                <em class="icon ni ni-cross-circle flex-shrink-0" style="font-size: 20px; margin-top: 2px;"></em>
+                <div>
+                    <strong class="d-block mb-1">Application Rejected</strong>
+                    <small class="text-muted d-block">
+                        Your TP registration application has been rejected.
+                        <a href="#" class="text-danger fw-500">View details</a>
+                    </small>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="position-relative">
+
+                <!-- Progress Line -->
+                <div style="
+        position: absolute;
+        top: 60px;
+        left: 16.6667%;
+        right: 16.6667%;
+        height: 3px;
+        background: #e5e7eb;
+        z-index: 1;
+        border-radius: 3px;">
+
+                    <div style="
+            height: 100%;
+            width: @(approvedCurrent ? "100%" : reviewCurrent || reviewCompleted ? "50%" : "0%");
+            background: #22c55e;
+            border-radius: 3px;">
+                    </div>
+
+                </div>
+
+                <div class="row g-0">
+                    <!-- Stage 1: Submitted -->
+                    <div class="col-md-4">
+                        <div class="stage-card text-center p-4 position-relative" style="z-index: 3; transition: all 0.3s ease;">
+                            <div class="mb-3">
+                                <span class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center shadow-sm position-relative"
+                                      style="width: 65px; height: 65px; box-shadow: 0 2px 8px rgba(34, 197, 94, 0.15); z-index: 3; background: white;">
+                                    <em class="icon ni ni-check-circle" style="font-size: 32px;"></em>
+                                </span>
+                            </div>
+                            <h6 class="mb-2 fw-bold text-dark">Submitted</h6>
+                            <p class="text-muted small mb-0">Application submitted successfully</p>
+                        </div>
+                    </div>
+
+                    <!-- Stage 2: Under Review -->
+                    <div class="col-md-4">
+                        <div class="stage-card text-center p-4 position-relative @(reviewCurrent ? "active-stage" : "")"
+                             style="z-index: 3; transition: all 0.3s ease;
+                        @(reviewCurrent ? "background: rgba(34, 197, 94, 0.05); border-radius: 8px; border: 2px solid rgba(34, 197, 94, 0.2);" : "")">
+                            <div class="mb-3">
+                                <span class="rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm position-relative"
+                                      style="width: 65px; height: 65px;
+                                 box-shadow: @(reviewCurrent ? "0 2px 12px rgba(245, 158, 11, 0.25)" : "0 2px 8px rgba(34, 197, 94, 0.15)");
+                                 background: @(reviewCurrent ? "#fef3c7" : (reviewCompleted ? "#d1fae5" : "#f3f4f6"));
+                                 color: @(reviewCurrent ? "#f59e0b" : (reviewCompleted ? "#22c55e" : "#9ca3af"));
+                                 z-index: 3;">
+                                    @if (reviewCompleted)
+                                    {
+                                        <em class="icon ni ni-check-circle" style="font-size: 32px;"></em>
+                                    }
+                                    else if (reviewCurrent)
+                                    {
+                                        <em class="icon ni ni-clock" style="font-size: 32px; animation: spin 3s linear infinite;"></em>
+                                    }
+                                    else
+                                    {
+                                        <em class="icon ni ni-help-fill" style="font-size: 32px;"></em>
+                                    }
+                                </span>
+                            </div>
+                            <h6 class="mb-2 fw-bold text-dark">Under Review</h6>
+                            <p class="small mb-0">
+                                @if (reviewCurrent)
+                                {
+                                    <span class="text-warning fw-500">Your application is being reviewed</span>
+                                }
+                                else if (reviewCompleted)
+                                {
+                                    <span class="text-success fw-500">✓ Review completed</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Awaiting review</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Stage 3: Approved -->
+                    <div class="col-md-4">
+                        <div class="stage-card text-center p-4 position-relative"
+                             style="z-index: 3;">
+                            <div class="mb-3">
+                                <span class="rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm position-relative"
+                                      style="width: 65px; height: 65px;
+                                 box-shadow: @(approvedCurrent ? "0 2px 12px rgba(34, 197, 94, 0.25)" : "0 2px 8px rgba(34, 197, 94, 0.15)");
+                                 background: @(approvedCurrent ? "#d1fae5" : "#f3f4f6");
+                                 color: @(approvedCurrent ? "#22c55e" : "#9ca3af");
+                                 z-index: 3;">
+                                    @if (approvedCurrent)
+                                    {
+                                        <em class="icon ni ni-check-circle" style="font-size: 32px;"></em>
+                                    }
+                                    else
+                                    {
+                                        <em class="icon ni ni-check" style="font-size: 32px;"></em>
+                                    }
+                                </span>
+                            </div>
+                            <h6 class="mb-2 fw-bold text-dark">Approved</h6>
+                            <p class="small mb-0">
+                                @if (approvedCurrent)
+                                {
+                                    <span class="text-success fw-500">✓ Registration approved</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Awaiting final approval</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Footer Info -->
+        <div class="mt-5 pt-3 border-top">
+            <small class="text-muted d-flex align-items-center gap-2">
+                <em class="icon ni ni-info-circle" style="font-size: 14px;"></em>
+                Last updated: <strong>@DateTime.Now.ToString("dd MMM yyyy, hh:mm tt")</strong>
+            </small>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-success-subtle {
+        background-color: #d1fae5 !important;
+    }
+
+    .bg-warning-subtle {
+        background-color: #fef3c7 !important;
+    }
+
+    .bg-danger-subtle {
+        background-color: #fee2e2 !important;
+    }
+
+    .bg-primary-subtle {
+        background-color: #dbeafe !important;
+    }
+
+    .text-success {
+        color: #22c55e;
+    }
+
+    .text-warning {
+        color: #f59e0b;
+    }
+
+    .text-danger {
+        color: #ef4444;
+    }
+
+    .card {
+        transition: box-shadow 0.3s ease;
+    }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+        }
+
+    /* Stage Card Hover Effect */
+    .stage-card {
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+        .stage-card:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+    /* Active Stage Styling */
+    .active-stage {
+        background: rgba(34, 197, 94, 0.05) !important;
+        border: 2px solid rgba(34, 197, 94, 0.2) !important;
+        border-radius: 8px;
+    }
+
+    /* Progress Line Animation */
+    .progress-line-container {
+        box-shadow: 0 1px 3px rgba(34, 197, 94, 0.1);
+    }
+
+    /* Clock Spin Animation */
+    @@keyframes spin {
+        from
+
+    {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .stage-card
+
+    {
+        padding: 1.5rem 0.5rem !important;
+    }
+
+    .stage-card h6 {
+        font-size: 0.875rem;
+    }
+
+    }
+</style>
+
+@* <!-- Application Status -->
+<div class="card border-0 shadow-sm mb-4">
+
+    <div class="card-inner">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+                <h3 class="fs-6 text-primary fw-bold mb-1">
+                    <em class="icon ni ni-file-check me-1"></em>
+                    Application Status
+                </h3>
+
+                <p class="text-muted small mb-0">
+                    Track the status of your TP registration application.
+                </p>
+            </div>
+
+            <div class="text-end">
+
+                <span class="badge bg-primary-subtle text-primary">
+                    TP Registration
+                </span>
+
+                <div class="mt-1">
+                    <span class="text-muted small">
+                        Application ID:
+                    </span>
+
+                    <strong class="text-primary">
+                        #@Model.Id
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        @{
+            var status = Model.Status ?? "Submitted";
+
+            var submittedCompleted = true;
+            var reviewCompleted =
+            status == "Approved";
+
+            var reviewCurrent =
+            status == "Under Review";
+
+            var approvedCurrent =
+            status == "Approved";
+
+            var rejected =
+            status == "Rejected";
+        }
+
+
+        @if (rejected)
+        {
+            <!-- Rejected -->
+            <div class="alert alert-danger d-flex align-items-center mb-0">
+
+                <em class="icon ni ni-cross-circle me-2"
+                    style="font-size:24px;"></em>
+
+                <div>
+                    <strong>Application Rejected</strong>
+
+                    <div class="small mt-1">
+                        Your TP registration application has been rejected.
+                    </div>
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="row g-0">
+
+                <!-- Submitted -->
+                <div class="col-md-4">
+
+                    <div class="text-center p-3">
+
+                        <div class="mb-2">
+
+                            <span class="rounded-circle
+                                         bg-success-subtle
+                                         text-success
+                                         d-inline-flex
+                                         align-items-center
+                                         justify-content-center"
+                                  style="width:50px;height:50px;">
+
+                                <em class="icon ni ni-check-circle"
+                                    style="font-size:24px;"></em>
+
+                            </span>
+
+                        </div>
+
+                        <h6 class="mb-1">
+                            Submitted
+                        </h6>
+
+                        <p class="text-muted small mb-0">
+                            Application submitted successfully
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Under Review -->
+                <div class="col-md-4">
+
+                    <div class="text-center p-3">
+
+                        <div class="mb-2">
+
+                            <span class="rounded-circle
+                                @(reviewCurrent
+                                    ? "bg-warning-subtle text-warning"
+                                    : reviewCompleted
+                                        ? "bg-success-subtle text-success"
+                                        : "bg-light text-muted")
+                                d-inline-flex
+                                align-items-center
+                                justify-content-center"
+                                  style="width:50px;height:50px;">
+
+                                @if (reviewCompleted)
+                                {
+                                    <em class="icon ni ni-check-circle"
+                                        style="font-size:24px;"></em>
+                                }
+                                else
+                                {
+                                    <em class="icon ni ni-clock"
+                                        style="font-size:24px;"></em>
+                                }
+
+                            </span>
+
+                        </div>
+
+                        <h6 class="mb-1">
+                            Under Review
+                        </h6>
+
+                        <p class="text-muted small mb-0">
+
+                            @if (reviewCurrent)
+                            {
+                                <span>
+                                    Your application is under review
+                                </span>
+                            }
+                            else if (reviewCompleted)
+                            {
+                                <span>
+                                    Review completed
+                                </span>
+                            }
+                            else
+                            {
+                                <span>
+                                    Awaiting review
+                                </span>
+                            }
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Approved -->
+                <div class="col-md-4">
+
+                    <div class="text-center p-3">
+
+                        <div class="mb-2">
+
+                            <span class="rounded-circle
+                                @(approvedCurrent
+                                    ? "bg-success-subtle text-success"
+                                    : "bg-light text-muted")
+                                d-inline-flex
+                                align-items-center
+                                justify-content-center"
+                                  style="width:50px;height:50px;">
+
+                                @if (approvedCurrent)
+                                {
+                                    <em class="icon ni ni-check-circle"
+                                        style="font-size:24px;"></em>
+                                }
+                                else
+                                {
+                                    <em class="icon ni ni-check"
+                                        style="font-size:24px;"></em>
+                                }
+
+                            </span>
+
+                        </div>
+
+                        <h6 class="mb-1">
+                            Approved
+                        </h6>
+
+                        <p class="text-muted small mb-0">
+
+                            @if (approvedCurrent)
+                            {
+                                <span class="text-success">
+                                    TP registration approved
+                                </span>
+                            }
+                            else
+                            {
+                                <span>
+                                    Awaiting final approval
+                                </span>
+                            }
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+</div> *@
+
+
+
+
+
+

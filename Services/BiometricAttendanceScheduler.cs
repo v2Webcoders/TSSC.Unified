@@ -31,15 +31,15 @@ namespace TSSC.Unified.Services
                     // NEXT 12:00 PM
                     // =============================================
 
-                    //var nextRun = now.Date.AddHours(12);
+                    var nextRun = now.Date.AddHours(12);
 
-                    //if (now >= nextRun)
-                    //{
-                    //    nextRun = nextRun.AddDays(1);
-                    //}
+                    if (now >= nextRun)
+                    {
+                        nextRun = nextRun.AddDays(1);
+                    }
 
                     //FOR TESTING USE THIS LINE
-                    var nextRun = DateTime.Now.AddMinutes(1);
+                    //var nextRun = DateTime.Now.AddMinutes(1);
 
                     var delay = nextRun - now;
 
@@ -92,13 +92,23 @@ namespace TSSC.Unified.Services
                 scope.ServiceProvider
                     .GetRequiredService<IAttendanceSyncService>();
 
+            //var today = DateTime.Today;
+
+            //var result =
+            //    await syncService
+            //        .SyncBiometricAttendanceAsync(
+            //            today,
+            //            today);
             var today = DateTime.Today;
+
+            var fromDate = today.AddDays(-2);
+            var toDate = today;
 
             var result =
                 await syncService
                     .SyncBiometricAttendanceAsync(
-                        today,
-                        today);
+                        fromDate,
+                        toDate);
 
             _logger.LogInformation(
                 "Daily biometric sync completed. " +

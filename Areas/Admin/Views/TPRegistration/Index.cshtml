@@ -1,0 +1,425 @@
+﻿@using TSSC.Unified.Models
+@model IEnumerable<TPRegistration>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+	Layout = "_Layout";
+
+	bool approvedOnly = ViewBag.ApprovedOnly ?? false;
+
+	var pageTitle = approvedOnly
+		? "Approved Training Partners"
+		: "TP Registrations";
+
+	var pageDescription = approvedOnly
+		? "View Training Partners whose affiliation has been finally approved."
+		: "View and manage all Training Partner registration applications.";
+}
+<style>
+	.approval-progress {
+		position: relative;
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		min-width: 190px;
+		padding: 0 5px;
+	}
+
+	/* Line passes exactly through the center of circles */
+	.approval-line {
+		position: absolute;
+		top: 14px;
+		left: 18px;
+		right: 18px;
+		height: 2px;
+		background: #d9dee7;
+		z-index: 0;
+	}
+
+	.approval-step {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		background: transparent;
+	}
+
+	.approval-circle {
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 13px;
+		font-weight: 700;
+		background: #fff;
+		border: 2px solid #d9dee7;
+	}
+
+		.approval-circle.approved {
+			background: #e7f7ee;
+			border-color: #28a745;
+			color: #28a745;
+		}
+
+		.approval-circle.rejected {
+			background: #fdeaea;
+			border-color: #dc3545;
+			color: #dc3545;
+		}
+
+		.approval-circle.pending {
+			background: #fff8e1;
+			border-color: #f0ad00;
+			color: #f0ad00;
+		}
+
+	.approval-step small {
+		margin-top: 5px;
+		font-size: 10px;
+		font-weight: 600;
+		color: #8091a5;
+	}
+</style>
+<div class="nk-block-head">
+	<div class="nk-block-between">
+
+		<div class="nk-block-head-content">
+
+			<h3 class="nk-block-title page-title">
+				@pageTitle
+			</h3>
+
+			<div class="nk-block-des text-soft">
+				<p>
+					@pageDescription
+				</p>
+			</div>
+
+		</div>
+
+	</div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+	<div class="alert alert-success alert-icon">
+		<em class="icon ni ni-check-circle"></em>
+		@TempData["SuccessMessage"]
+	</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+	<div class="alert alert-danger alert-icon">
+		<em class="icon ni ni-alert-circle"></em>
+		@TempData["ErrorMessage"]
+	</div>
+}
+
+<div class="card card-bordered">
+	<div class="card-inner">
+		<div class="table-responsive">
+			<table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Progress</th>
+						<th  style="min-width:150px;">Organization</th>
+						<th>Registration No.</th>
+						<th>Applicant / Signatory</th>
+						<th>Contact Details</th>
+						<th>Submitted On</th>
+
+						<th>Status</th>
+
+						<th>Regional Head</th>
+						<th>Vertical Head</th>
+						<th>Finance</th>
+						<th>CEO</th>
+
+						<th class="text-end">Action</th>
+					</tr>
+				</thead>
+
+				<tbody>
+
+					@{
+						var count = 1;
+					}
+
+					@foreach (var item in Model)
+					{
+						<tr>
+
+							<td>@count</td>
+							<td>
+								<div class="approval-progress">
+
+									<div class="approval-line"></div>
+
+									<!-- Regional Head -->
+									<div class="approval-step">
+										<div class="approval-circle
+                @(item.Regional_Head_Status == "Approved" ? "approved" :
+                  item.Regional_Head_Status == "Rejected" ? "rejected" : "pending")">
+
+											@if (item.Regional_Head_Status == "Approved")
+											{
+												<span>✓</span>
+											}
+											else if (item.Regional_Head_Status == "Rejected")
+											{
+												<span>✕</span>
+											}
+											else
+											{
+												<span>•</span>
+											}
+
+										</div>
+
+										<small>RH</small>
+									</div>
+
+									<!-- Vertical Head -->
+									<div class="approval-step">
+										<div class="approval-circle
+                @(item.Vertical_Head_Status == "Approved" ? "approved" :
+                  item.Vertical_Head_Status == "Rejected" ? "rejected" : "pending")">
+
+											@if (item.Vertical_Head_Status == "Approved")
+											{
+												<span>✓</span>
+											}
+											else if (item.Vertical_Head_Status == "Rejected")
+											{
+												<span>✕</span>
+											}
+											else
+											{
+												<span>•</span>
+											}
+
+										</div>
+
+										<small>VH</small>
+									</div>
+
+									<!-- Finance -->
+									<div class="approval-step">
+										<div class="approval-circle
+                @(item.Finance_Status == "Approved" ? "approved" :
+                  item.Finance_Status == "Rejected" ? "rejected" : "pending")">
+
+											@if (item.Finance_Status == "Approved")
+											{
+												<span>✓</span>
+											}
+											else if (item.Finance_Status == "Rejected")
+											{
+												<span>✕</span>
+											}
+											else
+											{
+												<span>•</span>
+											}
+
+										</div>
+
+										<small>FN</small>
+									</div>
+
+									<!-- CEO -->
+									<div class="approval-step">
+										<div class="approval-circle
+                @(item.CEO_Status == "Approved" ? "approved" :
+                  item.CEO_Status == "Rejected" ? "rejected" : "pending")">
+
+											@if (item.CEO_Status == "Approved")
+											{
+												<span>✓</span>
+											}
+											else if (item.CEO_Status == "Rejected")
+											{
+												<span>✕</span>
+											}
+											else
+											{
+												<span>•</span>
+											}
+
+										</div>
+
+										<small>CEO</small>
+									</div>
+
+								</div>
+							</td>
+							<td>
+								<strong>@item.OrganizationName</strong>
+								<br />
+								<small class="text-soft">
+									@item.OrganizationType
+								</small>
+							</td>
+
+							<td>
+								@item.RegistrationNumber
+							</td>
+
+							<td style="min-width:120px;">
+								@item.AuthorizedSignatoryName
+								<br />
+								<small class="text-soft">
+									@item.Designation
+								</small>
+							</td>
+
+							<td>
+								@item.Email
+								<br />
+								<small class="text-soft">
+									@item.MobileNumber
+								</small>
+							</td>
+
+							<td>
+								@item.CreatedOn.ToString("dd MMM yyyy")
+							</td>
+
+
+							<!-- Overall Status -->
+							<td>
+								@if (item.Status == "Approved")
+								{
+									<span class="badge bg-success">
+										Approved
+									</span>
+								}
+								else if (item.Status == "Rejected")
+								{
+									<span class="badge bg-danger">
+										Rejected
+									</span>
+								}
+								else if (item.Status == "Under Review")
+								{
+									<span class="badge bg-info">
+										Under Review
+									</span>
+								}
+								else if (item.Status == "Submitted")
+								{
+									<span class="badge bg-warning text-dark">
+										Submitted
+									</span>
+								}
+								else
+								{
+									<span class="badge bg-secondary">
+										@item.Status
+									</span>
+								}
+							</td>
+
+
+							<!-- Regional Head Status -->
+							<td>
+								@if (item.Regional_Head_Status == "Approved")
+								{
+									<span class="badge bg-success">Approved</span>
+								}
+								else if (item.Regional_Head_Status == "Rejected")
+								{
+									<span class="badge bg-danger">Rejected</span>
+								}
+								else
+								{
+									<span class="badge bg-warning text-dark">Pending</span>
+								}
+							</td>
+
+
+							<!-- Vertical Head Status -->
+							<td>
+								@if (item.Vertical_Head_Status == "Approved")
+								{
+									<span class="badge bg-success">Approved</span>
+								}
+								else if (item.Vertical_Head_Status == "Rejected")
+								{
+									<span class="badge bg-danger">Rejected</span>
+								}
+								else
+								{
+									<span class="badge bg-warning text-dark">Pending</span>
+								}
+							</td>
+
+
+							<!-- Finance Status -->
+							<td>
+								@if (item.Finance_Status == "Approved")
+								{
+									<span class="badge bg-success">Approved</span>
+								}
+								else if (item.Finance_Status == "Rejected")
+								{
+									<span class="badge bg-danger">Rejected</span>
+								}
+								else
+								{
+									<span class="badge bg-warning text-dark">Pending</span>
+								}
+							</td>
+
+
+							<!-- CEO Status -->
+							<td>
+								@if (item.CEO_Status == "Approved")
+								{
+									<span class="badge bg-success">Approved</span>
+								}
+								else if (item.CEO_Status == "Rejected")
+								{
+									<span class="badge bg-danger">Rejected</span>
+								}
+								else
+								{
+									<span class="badge bg-warning text-dark">Pending</span>
+								}
+							</td>
+
+
+							<!-- Action -->
+							<td class="text-end">
+
+								<a asp-area="Admin"
+								   asp-controller="TPRegistration"
+								   asp-action="Details"
+								   asp-route-id="@item.Id"
+								   class="btn btn-sm btn-primary">
+
+									<em class="icon ni ni-eye"></em>
+									View
+
+								</a>
+
+							</td>
+
+						</tr>
+
+						count++;
+					}
+
+				</tbody>
+
+			</table>
+		</div>
+	</div>
+</div>
