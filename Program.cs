@@ -92,7 +92,10 @@ var app = builder.Build();
 //    "StandardsTeam",
 //    "AssessmentReviewer",
 //    "ProjectManager",
-//    "GrievanceTeam"
+//    "GrievanceTeam",
+//"Trainer",
+//    "Assessor",
+//    "TOTTOAADMIN",
 //};
 
 //    foreach (var role in roles)
@@ -147,6 +150,16 @@ app.UseAuthorization();
 app.UseSession();
 app.UseEndpoints(endpoints =>
 {
+    //added this for registration------------
+    app.MapControllerRoute(
+    name: "trainer",
+    pattern: "Trainer/{action=Registration}/{id?}",
+    defaults: new
+    {
+        area = "Trainer",
+        controller = "Trainer"
+    });
+
     endpoints.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
@@ -157,5 +170,6 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller=Account}/{action=Login}/{id?}");
+
 });
 app.Run();

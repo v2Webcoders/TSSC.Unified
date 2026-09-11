@@ -52,6 +52,12 @@ namespace TSSC.Unified.Areas.Admin.Controllers
             var certificates = await _context.Certificate
                 .OrderByDescending(x => x.Id)
                 .ToListAsync();
+            var states = await _context.State
+       .OrderBy(x => x.StateName)
+       .ToListAsync();
+
+            ViewBag.States = states;
+
 
             return View(certificates);
         }
@@ -61,7 +67,7 @@ namespace TSSC.Unified.Areas.Admin.Controllers
         // BULK GENERATE - GET
         // =========================================================
         [HttpGet]
-        public async Task<IActionResult> BulkGenerate(int id)
+        public async Task<IActionResult> BulkGenerate(int id, int stateId)
         {
             var certificate = await _context.Certificate
                 .FirstOrDefaultAsync(x =>
@@ -75,6 +81,7 @@ namespace TSSC.Unified.Areas.Admin.Controllers
 
             ViewBag.CompanyName = certificate.CompanyName;
             ViewBag.CertificateId = certificate.Id;
+            ViewBag.StateId = stateId;
 
             return View();
         }
@@ -85,7 +92,7 @@ namespace TSSC.Unified.Areas.Admin.Controllers
         // =========================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> BulkGenerate(int id, IFormFile excelFile)
+        public async Task<IActionResult> BulkGenerate(int id, IFormFile excelFile, int stateId)
         {
             // =====================================================
             // GET CERTIFICATE MASTER
@@ -169,6 +176,7 @@ namespace TSSC.Unified.Areas.Admin.Controllers
             var generation = new CertificateGeneration
             {
                 CertificateId = certificate.Id,
+                StateId = stateId,
                 GeneratedDate = DateTime.Now,
                 GeneratedBy = User.Identity?.Name,
                 ExcelFileName = excelFile.FileName,
@@ -1752,6 +1760,21 @@ document.Add(descriptionText);
                 }
             }
         }
+        //[HttpGet]
+        //public async Task<IActionResult> CertificateHistory()
+        //{
+        //    var history = await _context.CertificateGenerationDetail
+        //        .Include(x => x.CertificateGeneration)
+        //        .ThenInclude(x=>x.StateId)
+        //        .Where(x =>
+        //            x.IsActive &&
+        //            x.CertificateGeneration != null &&
+        //            x.CertificateGeneration.IsActive)
+        //        .OrderByDescending(x => x.CertificateGeneration.GeneratedDate)
+        //        .ToListAsync();
+
+        //    return View(history);
+        //}
         [HttpGet]
         public async Task<IActionResult> CertificateHistory()
         {
@@ -1763,6 +1786,9 @@ document.Add(descriptionText);
                     x.CertificateGeneration.IsActive)
                 .OrderByDescending(x => x.CertificateGeneration.GeneratedDate)
                 .ToListAsync();
+
+            ViewBag.States = await _context.State
+                .ToDictionaryAsync(x => x.Id, x => x.StateName);
 
             return View(history);
         }

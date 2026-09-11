@@ -22,5 +22,7 @@
 
         // Navigation Property
         public Certificate? Certificate { get; set; }
+        public int? StateId { get; set; }
+
     }
 }

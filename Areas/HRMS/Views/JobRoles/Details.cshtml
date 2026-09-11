@@ -1,0 +1,327 @@
+﻿@using TSSC.Unified.Models
+@model JobRole
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Job Role Details
+            </h3>
+        </div>
+
+        <div class="nk-block-head-content">
+            <a asp-area="HRMS"
+               asp-controller="JobRoles"
+               asp-action="Index"
+               class="btn btn-primary">
+
+                <em class="icon ni ni-list"></em>
+                <span>Job Role List</span>
+
+            </a>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="nk-block nk-block-lg">
+
+    <div class="card card-bordered">
+
+        <div class="card-inner">
+
+            <!-- JOB ROLE INFORMATION -->
+
+            <div class="nk-block-head">
+                <h5 class="title">
+                    <span style="border-left: 5px solid #D9622F; padding-left: 12px;">
+                        <em class="icon ni ni-briefcase me-1"></em>
+                        Job Role Information
+                    </span>
+                </h5>
+            </div>
+
+            <div class="row gy-3">
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">QP Code</label>
+                        <div class="form-control-wrap">
+                            <div class="form-control bg-light">
+                                @Model.QPCode
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Job Role Title</label>
+                        <div class="form-control-wrap">
+                            <div class="form-control bg-light">
+                                @Model.JobRoleTitle
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Sub Sector</label>
+                        <div class="form-control-wrap">
+                            <div class="form-control bg-light">
+                                @Model.SubSectorId
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">QP Version</label>
+                        <div class="form-control-wrap">
+                            <div class="form-control bg-light">
+                                @Model.QPVersion
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">NSQF Level</label>
+                        <div class="form-control-wrap">
+                            <div class="form-control bg-light">
+                                @Model.NSQFLevel
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">QP Hours</label>
+                        <div class="form-control-wrap">
+                            <div class="form-control bg-light">
+                                @Model.QPHours
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Education Qualification</label>
+                        <div class="form-control-wrap">
+                            <div class="form-control bg-light">
+                                @Model.EducationQualification
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Valid From</label>
+                        <div class="form-control bg-light">
+                            @Model.ValidFrom?.ToString("dd-MM-yyyy")
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Valid To</label>
+                        <div class="form-control bg-light">
+                            @Model.ValidTo?.ToString("dd-MM-yyyy")
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+
+                        <div class="form-control bg-light">
+
+                            @if (Model.Status == "Approved")
+                            {
+                                <span class="text-success">
+                                    <span class="dot bg-success"></span>
+                                    Approved
+                                </span>
+                            }
+                            else if (Model.Status == "Rejected")
+                            {
+                                <span class="text-danger">
+                                    <span class="dot bg-danger"></span>
+                                    Rejected
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-warning">
+                                    <span class="dot bg-warning"></span>
+                                    Pending
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="nk-block-head mt-4">
+                <h5 class="title">
+                    <span style="border-left: 5px solid #D9622F; padding-left: 12px;">
+                        <em class="icon ni ni-file-text me-1"></em>
+                        Description
+                    </span>
+                </h5>
+            </div>
+
+            <div class="row gy-3">
+
+                <div class="col-md-12">
+
+                    <div class="form-control bg-light"
+                         style="min-height: 100px; white-space: pre-wrap;">
+                        @Model.Description
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- DOCUMENTS -->
+
+            <div class="nk-block-head mt-4">
+                <h5 class="title">
+                    <span style="border-left: 5px solid #D9622F; padding-left: 12px;">
+                        <em class="icon ni ni-file-docs me-1"></em>
+                        Documents
+                    </span>
+                </h5>
+            </div>
+
+
+            @if (Model.Documents != null && Model.Documents.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-bordered">
+
+                        <thead>
+                            <tr>
+                                <th>S.No.</th>
+                                <th>Document Type</th>
+                                <th>Language</th>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @{
+                                int docSerial = 1;
+                            }
+
+                            @foreach (var document in Model.Documents)
+                            {
+                                <tr>
+
+                                    <td>@docSerial</td>
+
+                                    <td>
+                                        @document.DocumentType
+                                    </td>
+
+                                    <td>
+                                        @document.Language
+                                    </td>
+
+                                    <td>
+                                        @document.FileName
+                                    </td>
+
+                                    <td>
+
+                                        <a href="@document.FilePath"
+                                           target="_blank"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="View Document">
+
+                                            <em class="icon ni ni-eye"></em>
+
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+
+                                docSerial++;
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-light">
+                    No documents available.
+                </div>
+            }
+
+
+            <!-- BACK BUTTON -->
+
+            <div class="row mt-4">
+
+                <div class="col-md-12 text-end">
+
+                    <a asp-area="HRMS"
+                       asp-controller="JobRoles"
+                       asp-action="Index"
+                       class="btn btn-light">
+
+                        <em class="icon ni ni-arrow-left"></em>
+                        Back to List
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -6,7 +6,6 @@
 }
 
 <div class="nk-block-head nk-block-head-sm">
-
     <div class="nk-block-between">
 
         <div class="nk-block-head-content">
@@ -16,7 +15,6 @@
         </div>
 
     </div>
-
 </div>
 
 
@@ -26,9 +24,11 @@
 
         <div class="row g-4">
 
+            <!-- ========================================= -->
             <!-- Certificate Type -->
+            <!-- ========================================= -->
 
-            <div class="col-md-5">
+            <div class="col-md-3">
 
                 <div class="form-group">
 
@@ -65,9 +65,11 @@
             </div>
 
 
+            <!-- ========================================= -->
             <!-- Certificate Name -->
+            <!-- ========================================= -->
 
-            <div class="col-md-5">
+            <div class="col-md-3">
 
                 <div class="form-group">
 
@@ -94,9 +96,48 @@
             </div>
 
 
-            <!-- Generate Button -->
+            <!-- ========================================= -->
+            <!-- State -->
+            <!-- ========================================= -->
 
-            <div class="col-md-2 d-flex align-items-end">
+            <div class="col-md-3">
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Select State
+                    </label>
+
+                    <div class="form-control-wrap">
+
+                        <select id="certificateState"
+                                class="form-select">
+
+                            <option value="">
+                                Select State
+                            </option>
+
+                            @foreach (var state in ViewBag.States)
+                            {
+                                <option value="@state.Id">
+                                    @state.StateName
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ========================================= -->
+            <!-- Generate Button -->
+            <!-- ========================================= -->
+
+            <div class="col-md-3 d-flex align-items-end">
 
                 <div class="form-group w-100">
 
@@ -122,7 +163,10 @@
 </div>
 
 
+
+<!-- ========================================= -->
 <!-- Template Preview Modal -->
+<!-- ========================================= -->
 
 <div class="modal fade"
      id="templatePreviewModal"
@@ -163,6 +207,7 @@
 </div>
 
 
+
 <script>
 
     // =====================================================
@@ -192,6 +237,9 @@
     var certificateName =
         document.getElementById("certificateName");
 
+    var certificateState =
+        document.getElementById("certificateState");
+
     var generateButton =
         document.getElementById("generateCertificateBtn");
 
@@ -206,12 +254,12 @@
 
 
         // Reset Certificate Name
-
         certificateName.innerHTML =
             '<option value="">Select Certificate Name</option>';
 
         certificateName.disabled = true;
 
+        // Disable Generate
         generateButton.disabled = true;
 
 
@@ -257,19 +305,56 @@
 
     certificateName.addEventListener("change", function () {
 
-        var certificateId = this.value;
+        var certificateId =
+            this.value;
 
 
-        if (!certificateId) {
+        /*
+         * Generate tabhi enable hoga
+         * jab Certificate + State dono selected hon
+         */
+
+        if (!certificateId || !certificateState.value) {
 
             generateButton.disabled = true;
 
             return;
-
         }
 
 
-        // Enable Generate button
+        generateButton.disabled = false;
+
+    });
+
+
+    // =====================================================
+    // STATE CHANGE
+    // =====================================================
+
+    certificateState.addEventListener("change", function () {
+
+        /*
+         * State sirf generation ke liye hai.
+         *
+         * State Certificate Type ya Certificate Name
+         * ko filter nahi karega.
+         */
+
+        var stateId = this.value;
+
+
+        /*
+         * Agar State remove/change hota hai,
+         * Generate button ko dobara validate karo.
+         */
+
+        if (!stateId || !certificateName.value) {
+
+            generateButton.disabled = true;
+
+            return;
+        }
+
 
         generateButton.disabled = false;
 
@@ -285,15 +370,39 @@
         var certificateId =
             certificateName.value;
 
+        var stateId =
+            certificateState.value;
+
+
+        // Certificate validation
 
         if (!certificateId) {
+
+            alert("Please select Certificate Name");
+
             return;
         }
 
 
+        // State validation
+
+        if (!stateId) {
+
+            alert("Please select State");
+
+            return;
+        }
+
+
+        // =================================================
+        // SEND CERTIFICATE ID + STATE ID
+        // =================================================
+
         window.location.href =
-            "/Admin/Certificate/BulkGenerate?id="
-            + certificateId;
+            "/Admin/Certificate/BulkGenerate?id=" +
+            certificateId +
+            "&stateId=" +
+            stateId;
 
     });
 

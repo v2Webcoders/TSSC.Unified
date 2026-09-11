@@ -1,0 +1,235 @@
+﻿@model IEnumerable<TSSC.Unified.Models.TrainerRegistration>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <!-- Page Title -->
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Manage TOT / TOA
+            </h3>
+        </div>
+
+        <!-- Manage Batch Button -->
+        <div class="nk-block-head-content">
+            <div class="toggle-wrap nk-block-tools-toggle">
+
+                <a href="#"
+                   class="btn btn-icon btn-trigger toggle-expand me-n1"
+                   data-target="pageMenu">
+                    <em class="icon ni ni-more-v"></em>
+                </a>
+
+                <div class="toggle-expand-content"
+                     data-content="pageMenu">
+
+                    <ul class="nk-block-tools g-3">
+
+                        <li class="nk-block-tools-opt">
+
+                            <a href="/Trainer/Batch"
+                               class="btn btn-primary">
+
+                                <em class="icon ni ni-list"></em>
+
+                                <span>
+                                    Manage Batch
+                                </span>
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Trainer List -->
+<div class="card card-bordered mt-3">
+
+    <div class="card-inner">
+
+        <div class="table-responsive">
+
+            <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer">
+
+                <thead>
+                    <tr>
+
+                        <th>S.No.</th>
+
+                        <th>Registration No.</th>
+
+                        <th>Candidate</th>
+
+                        <th>Job Role</th>
+
+                        <th>Email</th>
+
+                        <th>Mobile</th>
+
+                        <th>Application Status</th>
+
+                        <th>Created On</th>
+
+                        <th>Actions</th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Model != null)
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <!-- S.No -->
+                                <td>
+                                    @serial
+                                </td>
+
+
+                                <!-- Registration No -->
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(item.RegistrationNo))
+                                    {
+                                        @item.RegistrationNo
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+                                </td>
+
+
+                                <!-- Candidate -->
+                                <td>
+                                    <strong>
+                                        @item.CandidateName
+                                    </strong>
+                                </td>
+
+
+                                <!-- Job Role -->
+                                <td>
+                                    @item.JobRoleId
+                                </td>
+
+
+                                <!-- Email -->
+                                <td>
+                                    @item.Email
+                                </td>
+
+
+                                <!-- Mobile -->
+                                <td>
+                                    @item.Mobile
+                                </td>
+
+
+                                <!-- Status -->
+                                <td>
+
+                                    @if (item.Status == "Approved")
+                                    {
+                                        <span class="badge badge-dot bg-success">
+                                            Approved
+                                        </span>
+                                    }
+                                    else if (item.Status == "Rejected")
+                                    {
+                                        <span class="badge badge-dot bg-danger">
+                                            Rejected
+                                        </span>
+                                    }
+                                    else if (item.Status == "Completed")
+                                    {
+                                        <span class="badge badge-dot bg-success">
+                                            Completed
+                                        </span>
+                                    }
+                                    else if (item.Status == "Under Review")
+                                    {
+                                        <span class="badge badge-dot bg-info">
+                                            Under Review
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-dot bg-warning">
+                                            Pending
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- Created On -->
+                                <td>
+                                    @item.CreatedDate.ToString("dd-MMM-yyyy")
+                                </td>
+
+
+                                <!-- Actions -->
+                                <td>
+
+                                    <div class="btn-group" role="group">
+
+                                        <!-- View -->
+                                        <a asp-action="Details"
+                                           asp-controller="Trainer"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-info"
+                                           title="View Details">
+
+                                            <em class="icon ni ni-eye"></em>
+
+                                        </a>
+
+
+                                        <!-- Edit -->
+                                        <a asp-action="EditRegistration"
+                                           asp-controller="Trainer"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-warning"
+                                           title="Edit">
+
+                                            <em class="icon ni ni-edit"></em>
+
+                                        </a>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                            serial++;
+                        }
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
