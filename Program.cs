@@ -76,35 +76,35 @@ var app = builder.Build();
 //    var userManager = services.GetRequiredService<UserManager<AppUser>>();
 //    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-//   // Seed Roles
-//string[] roles = new[]
-//{
-//    "Employee",
-//    "CEO",
-//    "Finance",
-//    "BusinessHead",
-//    "VerticalHead",
-//    "HR",
-//    "ITAdmin",
-//    "AffiliationTeam",
-//    "RegionalOffice",
-//    "ValidationTeam",
-//    "StandardsTeam",
-//    "AssessmentReviewer",
-//    "ProjectManager",
-//    "GrievanceTeam",
-//"Trainer",
-//    "Assessor",
-//    "TOTTOAADMIN",
-//};
+////    // Seed Roles
+////    string[] roles = new[]
+////    {
+////    "Employee",
+////    "CEO",
+////    "Finance",
+////    "BusinessHead",
+////    "VerticalHead",
+////    "HR",
+////    "ITAdmin",
+////    "AffiliationTeam",
+////    "RegionalOffice",
+////    "ValidationTeam",
+////    "StandardsTeam",
+////    "AssessmentReviewer",
+////    "ProjectManager",
+////    "GrievanceTeam",
+////"Trainer",
+////    "Assessor",
+////    "TOTTOAADMIN",
+////};
 
-//    foreach (var role in roles)
-//    {
-//        if (!await roleManager.RoleExistsAsync(role))
-//        {
-//            await roleManager.CreateAsync(new IdentityRole(role));
-//        }
-//    }
+////    foreach (var role in roles)
+////    {
+////        if (!await roleManager.RoleExistsAsync(role))
+////        {
+////            await roleManager.CreateAsync(new IdentityRole(role));
+////        }
+////    }
 
 //    //// Delete user if needed
 //    var existing = await userManager.FindByNameAsync("hrmanager@tssc.local");
@@ -125,7 +125,7 @@ var app = builder.Build();
 //            Email = adminEmail
 //        };
 
-//        var result = await userManager.CreateAsync(newAdmin, "Localhr@123"); // password must meet Identity rules
+//        var result = await userManager.CreateAsync(newAdmin, "Temphr@12345"); // password must meet Identity rules
 
 //        if (result.Succeeded)
 //        {

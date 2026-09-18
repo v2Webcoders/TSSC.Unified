@@ -39,10 +39,10 @@ public class Reimbursement
         public string Purpose { get; set; }
 
         [StringLength(500)]
-        public string SupportingDocument { get; set; }
+        public string? SupportingDocument { get; set; }
 
         [StringLength(500)]
-        public string InvoiceBill { get; set; }
+        public string? InvoiceBill { get; set; }
 
         //[StringLength(1000)]
         //public string? Remarks { get; set; }

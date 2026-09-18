@@ -1,4 +1,6 @@
-﻿namespace TSSC.Unified.Models
+﻿using QUIZAPP.Models;
+
+namespace TSSC.Unified.Models
 {
     public class CertificateGeneration
     {
@@ -23,6 +25,9 @@
         // Navigation Property
         public Certificate? Certificate { get; set; }
         public int? StateId { get; set; }
+        //public virtual State? State { get; set; }
 
     }
+
+    
 }

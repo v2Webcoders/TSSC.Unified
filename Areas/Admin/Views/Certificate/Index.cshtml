@@ -10,7 +10,7 @@
 
         <div class="nk-block-head-content">
             <h3 class="nk-block-title page-title">
-                Certificates
+                Generate Certificates
             </h3>
         </div>
 
@@ -397,12 +397,23 @@
         // =================================================
         // SEND CERTIFICATE ID + STATE ID
         // =================================================
-
-        window.location.href =
+        if(certificateId==9)
+        {
+           window.location.href =
+            "/Admin/Certificate/BulkGenerateAssessment?id=" +
+            certificateId +
+            "&stateId=" +
+            stateId;
+        }
+        else
+        {
+             window.location.href =
             "/Admin/Certificate/BulkGenerate?id=" +
             certificateId +
             "&stateId=" +
             stateId;
+        }
+        
 
     });
 

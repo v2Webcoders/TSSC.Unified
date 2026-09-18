@@ -323,33 +323,33 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             return View(leaveRequests);
         }
 
-        //public async Task<IActionResult> Approve(int id)
-        //{
-        //    var applicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        //    var employee = await _context.Employee
-        //        .FirstOrDefaultAsync(x => x.ApplicationUserId == applicationUserId);
+        public async Task<IActionResult> ManageLeaves()
+        {
+            var applicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        //    var leave = await _context.LeaveRequest
-        //        .FirstOrDefaultAsync(x => x.LeaveRequestId == id
-        //                              && x.ApproverId == employee.EmployeeId);
+            var employee = await _context.Employee
+                .FirstOrDefaultAsync(x => x.ApplicationUserId == applicationUserId);
 
-        //    if (leave == null)
-        //        return NotFound();
+            if (employee == null)
+            {
+                return NotFound("Employee not found.");
+            }
 
-        //    leave.Status = "Approved";
-        //    leave.ApprovedBy = employee.EmployeeId;
-        //    leave.ApprovedDate = DateTime.Now;
+            ViewBag.EmployeeId = employee.EmployeeId;
 
-        //    await _context.SaveChangesAsync();
+            var leaveRequests = await _context.LeaveRequest
+                .Include(x => x.LeaveType)
+                .Where(x =>  x.ApproverId == employee.EmployeeId)
+                .OrderByDescending(x => x.CreatedDate)
+                .ToListAsync();
 
-        //    TempData["Success"] = "Leave request approved successfully.";
 
-        //    return RedirectToAction(nameof(MyLeaves));
-        //}
+            return View(leaveRequests);
+        }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public async Task<IActionResult> Approve(int id)
         {
             var applicationUserId =
@@ -443,7 +443,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
         //}
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+       
         public async Task<IActionResult> Reject(int id)
         {
             var applicationUserId =

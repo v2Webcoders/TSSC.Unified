@@ -77,6 +77,9 @@ namespace QUIZAPP
         public DbSet<TrainerRegistrationExperience>TrainerRegistrationExperience{ get; set; }
 
         public DbSet<TrainerRegistrationDocument>TrainerRegistrationDocument{ get; set; }
+        public DbSet<CertificateGenerationAssessmentDetail>
+        CertificateGenerationAssessmentDetail
+        { get; set; }
 
     }
 }

@@ -55,6 +55,7 @@
                     <thead>
                         <tr>
                             <th width="60">S.No.</th>
+                            <th>Employee Name</th>
                             <th>Leave Type</th>
                             <th>Duration</th>
                             <th>From Date</th>
@@ -73,7 +74,9 @@
                             <tr>
 
                                 <td>@serial</td>
-
+                                <td>
+                                    @item.Employee?.FirstName @item.Employee?.LastName
+                                </td>
                                 <td>
                                     @item.LeaveType?.LeaveTypeName
                                 </td>

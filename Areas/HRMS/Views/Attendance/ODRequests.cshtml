@@ -464,7 +464,7 @@
                                                 <br />
 
                                                 <small class="text-muted">
-                                                    @item.ApprovedDate.Value.ToString("dd-MMM-yyyy hh:mm tt")
+                                                    @string.Format("{0:dd-MM-yyyy hh:mm tt}", item.ApprovedDate)
                                                 </small>
                                             }
                                         }
@@ -479,7 +479,7 @@
                                                 <br />
 
                                                 <small class="text-muted">
-                                                    @item.ApprovedDate.Value.ToString("dd-MMM-yyyy hh:mm tt")
+                                                    @string.Format("{0:dd-MM-yyyy hh:mm tt}", item.ApprovedDate)
                                                 </small>
                                             }
                                         }
@@ -493,7 +493,7 @@
 
                                             <small class="text-muted">
                                                 Applied:
-                                                @item.CreatedDate.ToString("dd-MMM-yyyy hh:mm tt")
+                                                @string.Format("{0:dd-MM-yyyy hh:mm tt}", item.CreatedDate)
                                             </small>
                                         }
 
