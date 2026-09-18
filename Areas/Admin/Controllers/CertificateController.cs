@@ -1761,21 +1761,6 @@ document.Add(descriptionText);
                 }
             }
         }
-        //[HttpGet]
-        //public async Task<IActionResult> CertificateHistory()
-        //{
-        //    var history = await _context.CertificateGenerationDetail
-        //        .Include(x => x.CertificateGeneration)
-        //        .ThenInclude(x=>x.StateId)
-        //        .Where(x =>
-        //            x.IsActive &&
-        //            x.CertificateGeneration != null &&
-        //            x.CertificateGeneration.IsActive)
-        //        .OrderByDescending(x => x.CertificateGeneration.GeneratedDate)
-        //        .ToListAsync();
-
-        //    return View(history);
-        //}
         [HttpGet]
         public async Task<IActionResult> CertificateHistory()
         {

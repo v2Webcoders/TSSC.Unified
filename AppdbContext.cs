@@ -50,7 +50,7 @@ namespace QUIZAPP
         //for certificate generation--------------------------------------------------------------
         public DbSet<Certificate> Certificate { get; set; }
         public DbSet<CertificateGeneration> CertificateGeneration { get; set; }
-        public DbSet<CertificateGenerationDetail> CertificateGenerationDetail{ get; set; }
+        public DbSet<CertificateGenerationDetail> CertificateGenerationDetail { get; set; }
         //for add JobRole module--------------------------------------------------------------
         public DbSet<JobRole> JobRoles { get; set; }
         public DbSet<JobRoleDocument> JobRoleDocuments { get; set; }
@@ -59,10 +59,15 @@ namespace QUIZAPP
         //for add trainer module--------------------------------------------------------------
         public DbSet<TrainerRegistration> TrainerRegistration { get; set; }
 
-        public DbSet<TrainerRegistrationQualification>TrainerRegistrationQualification{ get; set; }
+        public DbSet<TrainerRegistrationQualification> TrainerRegistrationQualification { get; set; }
 
-        public DbSet<TrainerRegistrationExperience>TrainerRegistrationExperience{ get; set; }
+        public DbSet<TrainerRegistrationExperience> TrainerRegistrationExperience { get; set; }
 
-        public DbSet<TrainerRegistrationDocument>TrainerRegistrationDocument{ get; set; }
+        public DbSet<TrainerRegistrationDocument> TrainerRegistrationDocument { get; set; }
+
+        public DbSet<BatchMaster> BatchMaster { get; set; }
+        public DbSet<BatchMasterTrainer> BatchMasterTrainers { get; set; }
+        public DbSet<ScreeningSchedule> ScreeningSchedule { get; set; }
+        public DbSet<AssessmentAgency> AssessmentAgency { get; set; }
     }
 }

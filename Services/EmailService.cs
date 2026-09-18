@@ -57,7 +57,7 @@ namespace QUIZAPP.Services
             };
 
             mailMessage.To.Add(toEmail);
-            mailMessage.CC.Add("ksubodhs@yahoo.co.in");
+            mailMessage.CC.Add("laxmi.soni@v2web.in");
             try
             {
                 await smtpClient.SendMailAsync(mailMessage);

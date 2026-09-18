@@ -20,7 +20,19 @@ namespace TSSC.Unified.ViewModel
 
         [Required(ErrorMessage = "Please select Job Role.")]
         public int? JobRoleId { get; set; }
+        public int Id { get; set; }
 
+        public string? JobRoleName { get; set; }
+
+        public string? PaymentStatus { get; set; }
+
+        public DateTime? PaymentDate { get; set; }
+
+        public bool PaymentVerified { get; set; }
+
+        public bool FinanceApproved { get; set; }
+
+        public DateTime? FinanceApprovedDate { get; set; }
         public List<SelectListItem> JobRoleList { get; set; }
             = new List<SelectListItem>();
 

@@ -1,0 +1,112 @@
+﻿@model IEnumerable<TSSC.Unified.Models.TrainerRegistration>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Verified Trainers
+            </h3>
+        </div>
+
+    </div>
+</div>
+
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer dtr-inline collapsed">
+
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Registration No.</th>
+                    <th>Trainer Name</th>
+                    <th>Email</th>
+                    <th>Payment Status</th>
+                    <th>Payment Date</th>
+                    <th>Payment Verification</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>
+                            @serial
+                        </td>
+
+                        <td>
+                            @item.RegistrationNo
+                        </td>
+
+                        <td>
+                            @item.CandidateName
+                        </td>
+
+                        <td>
+                            @item.Email
+                        </td>
+
+                        <td>
+                            @if (item.PaymentStatus == "Success")
+                            {
+                                <span class="badge badge-dot bg-success">
+                                    Success
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-dot bg-warning">
+                                    @item.PaymentStatus
+                                </span>
+                            }
+                        </td>
+
+                        <td>
+                            @(item.PaymentDate?.ToString("dd-MMM-yyyy hh:mm tt") ?? "-")
+                        </td>
+
+                        <td>
+                            @if (item.PaymentVerified)
+                            {
+                                <span class="badge badge-dot bg-success">
+                                    Verified
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-dot bg-warning">
+                                    Not Verified
+                                </span>
+                            }
+                        </td>
+
+                    </tr>
+
+                    serial++;
+                }
+
+            </tbody>
+
+        </table>
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center text-muted py-4">
+                No verified trainers found.
+            </div>
+        }
+
+    </div>
+</div>

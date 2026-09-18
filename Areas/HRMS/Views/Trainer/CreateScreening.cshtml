@@ -1,0 +1,273 @@
+﻿@model TSSC.Unified.ViewModel.ScreeningScheduleVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-head-content">
+        <h3 class="nk-block-title page-title">
+            Schedule Screening
+        </h3>
+    </div>
+</div>
+
+<div class="card card-bordered">
+
+    <div class="card-inner">
+
+        <form asp-action="CreateScreening"
+              asp-controller="Trainer"
+              asp-area="HRMS"
+              method="post">
+
+            <!-- IMPORTANT:
+                 Batch and Trainer IDs are submitted through hidden fields
+            -->
+            <input type="hidden" asp-for="BatchId" />
+            <input type="hidden" asp-for="TrainerRegistrationId" />
+
+            <div class="row g-3">
+
+                <!-- Batch -->
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Batch
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           value="@(Model.BatchList?.FirstOrDefault()?.Text ?? "")"
+                           readonly />
+
+                    <span asp-validation-for="BatchId"
+                          class="text-danger"></span>
+
+                </div>
+
+
+                <!-- Trainer -->
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Trainer
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           value="@(Model.TrainerList?.FirstOrDefault()?.Text ?? "")"
+                           readonly />
+
+                    <span asp-validation-for="TrainerRegistrationId"
+                          class="text-danger"></span>
+
+                </div>
+
+
+                <!-- Screening Date -->
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Screening Date
+                    </label>
+
+                    <input asp-for="ScreeningDate"
+                           type="date"
+                           class="form-control" />
+
+                    <span asp-validation-for="ScreeningDate"
+                          class="text-danger"></span>
+
+                </div>
+
+
+                <!-- Start Time -->
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Start Time
+                    </label>
+
+                    <input asp-for="StartTime"
+                           type="time"
+                           class="form-control" />
+
+                    <span asp-validation-for="StartTime"
+                          class="text-danger"></span>
+
+                </div>
+
+
+                <!-- End Time -->
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        End Time
+                    </label>
+
+                    <input asp-for="EndTime"
+                           type="time"
+                           class="form-control" />
+
+                    <span asp-validation-for="EndTime"
+                          class="text-danger"></span>
+
+                </div>
+
+
+                <!-- Screening Mode -->
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Screening Mode
+                    </label>
+
+                    <select asp-for="ScreeningMode"
+                            class="form-select"
+                            id="ScreeningMode">
+
+                        <option value="">
+                            Select Mode
+                        </option>
+
+                        <option value="Online">
+                            Online
+                        </option>
+
+                        <option value="Offline">
+                            Offline
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="ScreeningMode"
+                          class="text-danger"></span>
+
+                </div>
+
+
+                <!-- Location -->
+                <div class="col-md-4"
+                     id="locationDiv">
+
+                    <label class="form-label">
+                        Location
+                    </label>
+
+                    <input asp-for="Location"
+                           class="form-control"
+                           placeholder="Enter screening location" />
+
+                </div>
+
+
+                <!-- Meeting Link -->
+                <div class="col-md-4"
+                     id="meetingLinkDiv">
+
+                    <label class="form-label">
+                        Meeting Link
+                    </label>
+
+                    <input asp-for="MeetingLink"
+                           class="form-control"
+                           placeholder="Enter meeting link" />
+
+                </div>
+
+
+                <!-- Remarks -->
+                <div class="col-md-12">
+
+                    <label class="form-label">
+                        Remarks
+                    </label>
+
+                    <textarea asp-for="Remarks"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Enter remarks"></textarea>
+
+                </div>
+
+
+                <!-- Buttons -->
+                <div class="col-12">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <em class="icon ni ni-calendar"></em>
+
+                        <span>
+                            Schedule Screening
+                        </span>
+
+                    </button>
+
+                    <a asp-action="BatchList"
+                       asp-controller="Trainer"
+                       asp-area="HRMS"
+                       class="btn btn-outline-secondary">
+
+                        Cancel
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        $(document).ready(function () {
+
+            function toggleScreeningMode() {
+
+                var mode = $('#ScreeningMode').val();
+
+                if (mode === 'Online') {
+
+                    $('#meetingLinkDiv').show();
+                    $('#locationDiv').hide();
+
+                }
+                else if (mode === 'Offline') {
+
+                    $('#meetingLinkDiv').hide();
+                    $('#locationDiv').show();
+
+                }
+                else {
+
+                    $('#meetingLinkDiv').show();
+                    $('#locationDiv').show();
+
+                }
+            }
+
+            $('#ScreeningMode').on('change', function () {
+                toggleScreeningMode();
+            });
+
+            toggleScreeningMode();
+
+        });
+
+    </script>
+
+}

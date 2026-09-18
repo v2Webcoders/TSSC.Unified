@@ -12,19 +12,24 @@
 
         <!-- Page Title -->
         <div class="nk-block-head-content">
+
             <h3 class="nk-block-title page-title">
                 Manage TOT / TOA
             </h3>
+
         </div>
 
         <!-- Manage Batch Button -->
         <div class="nk-block-head-content">
+
             <div class="toggle-wrap nk-block-tools-toggle">
 
                 <a href="#"
                    class="btn btn-icon btn-trigger toggle-expand me-n1"
                    data-target="pageMenu">
+
                     <em class="icon ni ni-more-v"></em>
+
                 </a>
 
                 <div class="toggle-expand-content"
@@ -50,44 +55,131 @@
                     </ul>
 
                 </div>
+
             </div>
+
         </div>
 
     </div>
 </div>
+<div class="nk-block-head-content">
+    <ul class="nk-block-tools g-3">
+
+        <li>
+            <a asp-area="HRMS"
+               asp-controller="Trainer"
+               asp-action="RegistrationList"
+               class="btn @(string.IsNullOrEmpty(ViewBag.Status) ? "btn-primary" : "btn-outline-primary")">
+                All
+            </a>
+        </li>
+
+        <li>
+            <a asp-area="HRMS"
+               asp-controller="Trainer"
+               asp-action="RegistrationList"
+               asp-route-status="Pending"
+               class="btn @(ViewBag.Status == "Pending" ? "btn-warning" : "btn-outline-warning")">
+                Pending
+            </a>
+        </li>
+
+        <li>
+            <a asp-area="HRMS"
+               asp-controller="Trainer"
+               asp-action="RegistrationList"
+               asp-route-status="Approved"
+               class="btn @(ViewBag.Status == "Approved" ? "btn-success" : "btn-outline-success")">
+                Approved
+            </a>
+        </li>
+
+        <li>
+            <a asp-area="HRMS"
+               asp-controller="Trainer"
+               asp-action="RegistrationList"
+               asp-route-status="Rejected"
+               class="btn @(ViewBag.Status == "Rejected" ? "btn-danger" : "btn-outline-danger")">
+                Rejected
+            </a>
+        </li>
+
+    </ul>
+</div>
 
 
-<!-- Trainer List -->
+<!-- SUCCESS MESSAGE -->
+@if (TempData["msg"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+
+        <strong>Success!</strong>
+        @TempData["msg"]
+
+        <button type="button"
+                class="close"
+                data-dismiss="alert"
+                aria-label="Close">
+
+            <span aria-hidden="true">&times;</span>
+
+        </button>
+
+    </div>
+}
+
+
+<!-- TRAINER LIST -->
 <div class="card card-bordered mt-3">
 
     <div class="card-inner">
 
         <div class="table-responsive">
 
-            <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer">
+            <table class="datatable-init-export table table-tranx table_custom table-bordered">
 
                 <thead>
+
                     <tr>
 
-                        <th>S.No.</th>
+                        <th>
+                            S.No.
+                        </th>
 
-                        <th>Registration No.</th>
+                        <th>
+                            Registration No.
+                        </th>
 
-                        <th>Candidate</th>
+                        <th>
+                            Candidate
+                        </th>
 
-                        <th>Job Role</th>
+                        <th>
+                            Job Role
+                        </th>
 
-                        <th>Email</th>
+                        <th>
+                            Email
+                        </th>
 
-                        <th>Mobile</th>
+                        <th>
+                            Mobile
+                        </th>
 
-                        <th>Application Status</th>
+                        <th>
+                            Application Status
+                        </th>
 
-                        <th>Created On</th>
+                        <th>
+                            Created On
+                        </th>
 
-                        <th>Actions</th>
+                        <th>
+                            Actions
+                        </th>
 
                     </tr>
+
                 </thead>
 
                 <tbody>
@@ -106,6 +198,7 @@
 
                                 <!-- Registration No -->
                                 <td>
+
                                     @if (!string.IsNullOrWhiteSpace(item.RegistrationNo))
                                     {
                                         @item.RegistrationNo
@@ -114,36 +207,45 @@
                                     {
                                         <span>-</span>
                                     }
+
                                 </td>
 
 
                                 <!-- Candidate -->
                                 <td>
+
                                     <strong>
                                         @item.CandidateName
                                     </strong>
+
                                 </td>
 
 
                                 <!-- Job Role -->
                                 <td>
+
                                     @item.JobRoleId
+
                                 </td>
 
 
                                 <!-- Email -->
                                 <td>
+
                                     @item.Email
+
                                 </td>
 
 
                                 <!-- Mobile -->
                                 <td>
+
                                     @item.Mobile
+
                                 </td>
 
 
-                                <!-- Status -->
+                                <!-- STATUS -->
                                 <td>
 
                                     @if (item.Status == "Approved")
@@ -158,16 +260,16 @@
                                             Rejected
                                         </span>
                                     }
-                                    else if (item.Status == "Completed")
-                                    {
-                                        <span class="badge badge-dot bg-success">
-                                            Completed
-                                        </span>
-                                    }
                                     else if (item.Status == "Under Review")
                                     {
                                         <span class="badge badge-dot bg-info">
                                             Under Review
+                                        </span>
+                                    }
+                                    else if (item.Status == "Completed")
+                                    {
+                                        <span class="badge badge-dot bg-success">
+                                            Completed
                                         </span>
                                     }
                                     else
@@ -182,17 +284,22 @@
 
                                 <!-- Created On -->
                                 <td>
+
                                     @item.CreatedDate.ToString("dd-MMM-yyyy")
+
                                 </td>
 
 
-                                <!-- Actions -->
+                                <!-- ACTIONS -->
                                 <td>
 
-                                    <div class="btn-group" role="group">
+                                    <div class="btn-group"
+                                         role="group">
 
-                                        <!-- View -->
-                                        <a asp-action="Details"
+
+                                        <!-- VIEW -->
+                                        <a asp-area="HRMS"
+                                           asp-action="Details"
                                            asp-controller="Trainer"
                                            asp-route-id="@item.Id"
                                            class="btn btn-sm btn-outline-info"
@@ -201,18 +308,54 @@
                                             <em class="icon ni ni-eye"></em>
 
                                         </a>
+                                        <!-- APPROVE -->
+                                        @if (item.Status != "Approved" && item.Status != "Rejected")
+                                        {
+                                            <form asp-area="HRMS"
+                                                asp-action="ApproveRegistration"
+                                                  asp-controller="Trainer"
+                                                  asp-route-id="@item.Id"
+                                                  method="post"
+                                                  style="display:inline;">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-success"
+                                                        title="Approve"
+                                                        onclick="return confirm('Are you sure you want to approve this trainer?');">
+
+                                                    <em class="icon ni ni-check"></em>
+
+                                                </button>
+
+                                            </form>
+                                        }
 
 
-                                        <!-- Edit -->
-                                        <a asp-action="EditRegistration"
-                                           asp-controller="Trainer"
-                                           asp-route-id="@item.Id"
-                                           class="btn btn-sm btn-outline-warning"
-                                           title="Edit">
+                                        <!-- REJECT -->
+                                        @if (item.Status != "Approved" && item.Status != "Rejected")
+                                        {
+                                            <form asp-area="HRMS"
+                                            asp-action="RejectRegistration"
+                                                  asp-controller="Trainer"
+                                                  asp-route-id="@item.Id"
+                                                  method="post"
+                                                  style="display:inline;">
 
-                                            <em class="icon ni ni-edit"></em>
+                                                @Html.AntiForgeryToken()
 
-                                        </a>
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        title="Reject"
+                                                        onclick="return confirm('Are you sure you want to reject this trainer?');">
+
+                                                    <em class="icon ni ni-cross"></em>
+
+                                                </button>
+
+                                            </form>
+                                        }
 
                                     </div>
 

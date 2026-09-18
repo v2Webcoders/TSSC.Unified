@@ -1,0 +1,370 @@
+﻿@model TSSC.Unified.ViewModel.BatchCreateVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-head-content">
+        <h3 class="nk-block-title page-title">
+            Create Batch
+        </h3>
+    </div>
+</div>
+
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <form asp-action="CreateBatch"
+              asp-controller="Trainer"
+              asp-area="HRMS"
+              method="post">
+
+            <div class="row g-3">
+
+                <!-- Batch Name -->
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Batch Name
+                    </label>
+
+                    <input asp-for="BatchName"
+                           class="form-control"
+                           placeholder="Enter batch name" />
+
+                    <span asp-validation-for="BatchName"
+                          class="text-danger"></span>
+                </div>
+
+
+                <!-- Job Role -->
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Job Role
+                    </label>
+
+                    <select asp-for="JobRoleId"
+                            asp-items="Model.JobRoleList"
+                            class="form-select">
+
+                        <option value="">
+                            Select Job Role
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="JobRoleId"
+                          class="text-danger"></span>
+                </div>
+                
+
+                <!-- TP -->
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Training Partner (TP)
+                    </label>
+
+                    <select asp-for="TPId"
+                            asp-items="Model.TPList"
+                            class="form-select">
+
+                        <option value="">
+                            Select TP
+                        </option>
+
+                    </select>
+                </div>
+
+
+                <!-- Start Date -->
+                <div class="col-md-3">
+                    <label class="form-label">
+                        Start Date
+                    </label>
+
+                    <input asp-for="StartDate"
+                           type="date"
+                           class="form-control" />
+
+                    <span asp-validation-for="StartDate"
+                          class="text-danger"></span>
+                </div>
+
+
+                <!-- End Date -->
+                <div class="col-md-3">
+                    <label class="form-label">
+                        End Date
+                    </label>
+
+                    <input asp-for="EndDate"
+                           type="date"
+                           class="form-control" />
+
+                    <span asp-validation-for="EndDate"
+                          class="text-danger"></span>
+                </div>
+
+
+                <!-- Trainer -->
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Batch Master Trainer
+                    </label>
+
+                    <input asp-for="BatchMasterTrainer"
+                           class="form-control"
+                           placeholder="Enter trainer" />
+                </div>
+
+
+                <!-- Buttons -->
+                <div class="col-12">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <em class="icon ni ni-save"></em>
+
+                        <span>
+                            Create Batch
+                        </span>
+
+                    </button>
+
+                    <a asp-action="RegistrationList"
+                       asp-controller="Trainer"
+                       asp-area="HRMS"
+                       class="btn btn-outline-secondary">
+
+                        Cancel
+
+                    </a>
+
+                </div>
+                <!-- Candidate Selection Grid -->
+                <div class="col-12 mt-4">
+
+                    <div id="trainerSection" style="display:none;">
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Select Trainers</h5>
+
+                            <span id="selectedTrainerCount"
+                                  class="badge bg-primary">
+                                0 Selected
+                            </span>
+                        </div>
+
+                        <div class="card card-bordered">
+                            <div class="card-inner">
+
+                                <div class="table-responsive">
+
+                                    <table class="table table-bordered table-hover">
+
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <input type="checkbox"
+                                                           id="selectAllTrainers" />
+                                                </th>
+                                                <th>S.No.</th>
+                                                <th>Registration No.</th>
+                                                <th>Trainer Name</th>
+                                                <th>Email</th>
+                                                <th>Mobile</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody id="trainerTableBody">
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+
+            // ==========================================
+            // LOAD TRAINERS WHEN JOB ROLE CHANGES
+            // ==========================================
+
+            $('#JobRoleId').on('change', function () {
+
+                var jobRoleId = $(this).val();
+
+                $('#trainerTableBody').empty();
+                $('#trainerSection').hide();
+
+                $('#selectAllTrainers').prop('checked', false);
+                $('#selectedTrainerCount').text('0 Selected');
+
+                if (!jobRoleId) {
+                    return;
+                }
+
+                $.ajax({
+                    url: '/HRMS/Trainer/GetTrainersByJobRole',
+                    type: 'GET',
+                    data: {
+                        jobRoleId: jobRoleId
+                    },
+
+                    success: function (data) {
+
+                        console.log("TRAINER DATA:", data);
+
+                        $('#trainerSection').show();
+
+                        if (!data || data.length === 0) {
+
+                            $('#trainerTableBody').html(`
+                                <tr>
+                                    <td colspan="6"
+                                        class="text-center">
+                                        No approved trainer found.
+                                    </td>
+                                </tr>
+                            `);
+
+                            return;
+                        }
+
+                        $.each(data, function (index, item) {
+
+                            $('#trainerTableBody').append(`
+                                <tr>
+
+                                    <td>
+                                        <input type="checkbox"
+                                               class="trainerCheckbox"
+                                               name="SelectedTrainerIds"
+                                               value="${item.id}" />
+                                    </td>
+
+                                    <td>
+                                        ${index + 1}
+                                    </td>
+
+                                    <td>
+                                        ${item.registrationNo ?? '-'}
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            ${item.trainerName ?? '-'}
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        ${item.email ?? '-'}
+                                    </td>
+
+                                    <td>
+                                        ${item.mobile ?? '-'}
+                                    </td>
+
+                                </tr>
+                            `);
+
+                        });
+
+                    },
+
+                    error: function (xhr) {
+
+                        console.log("STATUS:", xhr.status);
+                        console.log("ERROR:", xhr.responseText);
+
+                        $('#trainerSection').show();
+
+                        $('#trainerTableBody').html(`
+                            <tr>
+                                <td colspan="6"
+                                    class="text-center text-danger">
+                                    Unable to load trainers.
+                                </td>
+                            </tr>
+                        `);
+
+                    }
+                });
+
+            });
+
+
+            // ==========================================
+            // SELECT ALL TRAINERS
+            // ==========================================
+
+            $(document).on('change', '#selectAllTrainers', function () {
+
+                var isChecked = $(this).prop('checked');
+
+                $('.trainerCheckbox').prop(
+                    'checked',
+                    isChecked
+                );
+
+                updateTrainerCount();
+
+            });
+
+
+            // ==========================================
+            // INDIVIDUAL TRAINER CHECKBOX
+            // ==========================================
+
+            $(document).on('change', '.trainerCheckbox', function () {
+
+                var total = $('.trainerCheckbox').length;
+
+                var checked = $('.trainerCheckbox:checked').length;
+
+                $('#selectAllTrainers').prop(
+                    'checked',
+                    total > 0 && total === checked
+                );
+
+                updateTrainerCount();
+
+            });
+
+
+            // ==========================================
+            // UPDATE SELECTED COUNT
+            // ==========================================
+
+            function updateTrainerCount() {
+
+                var count = $('.trainerCheckbox:checked').length;
+
+                $('#selectedTrainerCount').text(
+                    count + ' Selected'
+                );
+
+            }
+
+        });
+    </script>
+}

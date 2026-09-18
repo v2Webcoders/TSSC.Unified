@@ -1,0 +1,68 @@
+﻿@{
+    ViewData["Title"] = "Payment";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-head-content">
+        <h3 class="nk-block-title page-title">
+            Payment
+        </h3>
+
+        <div class="nk-block-des text-soft">
+            Complete your payment to proceed.
+        </div>
+    </div>
+</div>
+
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Trainer Name
+                </label>
+
+                <div class="form-control bg-light">
+                    @ViewBag.TrainerName
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Registration No.
+                </label>
+
+                <div class="form-control bg-light">
+                    @ViewBag.RegistrationNo
+                </div>
+            </div>
+
+        </div>
+
+        <hr class="my-4" />
+
+        <div class="text-center">
+
+            <div class="mb-3">
+                <span class="badge badge-dim bg-warning">
+                    Payment Pending
+                </span>
+            </div>
+
+            <form action="/Trainer/Trainer/CompletePayment"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    Pay
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+</div>

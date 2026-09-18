@@ -840,11 +840,6 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
                 );
             }
 
-
-            // =====================================================
-            // ONLY PDF
-            // =====================================================
-
             string extension =
                 Path.GetExtension(file.FileName)
                     .ToLowerInvariant();
@@ -857,29 +852,14 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
                 );
             }
 
-
-            // =====================================================
-            // UNIQUE FILE NAME
-            // =====================================================
-
             string uniqueFileName =
                 $"{Guid.NewGuid():N}.pdf";
-
-
-            // =====================================================
-            // PHYSICAL PATH
-            // =====================================================
 
             string physicalPath =
                 Path.Combine(
                     uploadFolder,
                     uniqueFileName
                 );
-
-
-            // =====================================================
-            // SAVE FILE
-            // =====================================================
 
             await using (var stream = new FileStream(
                 physicalPath,
@@ -889,76 +869,349 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
             {
                 await file.CopyToAsync(stream);
             }
-
-
-            // Keep path for rollback
             uploadedFiles.Add(physicalPath);
-
-
-            // =====================================================
-            // RETURN WEB PATH
-            // =====================================================
 
             return
                 $"/uploads/trainer-registration/" +
                 $"{Path.GetFileName(uploadFolder)}/" +
                 $"{uniqueFileName}";
         }
-        //public async Task<IActionResult> TestRegistrationEmail(int id = 10)
-        //{
-        //    var application = await _context.TrainerRegistration
-        //        .FirstOrDefaultAsync(x => x.Id == id);
 
-        //    if (application == null)
-        //        return NotFound("Trainer registration was not found.");
+        [HttpGet]
+        public async Task<IActionResult> MyApplication()
+        {
+            var email = User.Identity?.Name;
 
-        //    AppUser? user = null;
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return RedirectToAction("Login", "Account");
+            }
 
-        //    if (!string.IsNullOrWhiteSpace(application.Email))
-        //    {
-        //        user = await _userManager.FindByEmailAsync(application.Email);
-        //    }
+            email = email.Trim().ToLower();
 
-        //    var templatePath1 = Path.Combine(
-        //        _environment.WebRootPath,
-        //        "EmailTemplates",
-        //        "TrainerRegistrationSubmitted.html"
-        //    );
+            // Logged-in trainer
+            var trainer = await _context.TrainerRegistration
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.Email != null &&
+                    x.Email.Trim().ToLower() == email);
 
-        //    var result1 = await _emailService.SendEmailAsync(
-        //        application.Email,
-        //        "Trainer Registration Submitted Successfully",
-        //        templatePath1,
-        //        new Dictionary<string, string>
-        //        {
-        //            ["Name"] = application.CandidateName
-        //        });
+            if (trainer == null)
+            {
+                return NotFound("Trainer application not found.");
+            }
 
-        //    var templatePath2 = Path.Combine(
-        //        _environment.WebRootPath,
-        //        "EmailTemplates",
-        //        "TrainerCredentials.html"
-        //    );
+            // ================================
+            // Dropdown / Master Names
+            // ================================
 
-        //    var result2 = await _emailService.SendEmailAsync(
-        //        application.Email,
-        //        "Trainer Registration Login Credentials",
-        //        templatePath2,
-        //        new Dictionary<string, string>
-        //        {
-        //            ["Name"] = application.CandidateName,
-        //            ["Username"] = user?.Email ?? application.Email,
-        //            ["Password"] = "Test@12345"
-        //        });
+            var jobRoleName = await _context.JobRoles
+                .AsNoTracking()
+                .Where(x => x.Id == trainer.JobRoleId)
+                .Select(x => x.JobRoleTitle)
+                .FirstOrDefaultAsync();
 
-        //    return Ok(new
-        //    {
-        //        Email = application.Email,
-        //        Email1 = result1,
-        //        Email2 = result2
-        //    });
-        //}
+            var stateName = trainer.StateId.HasValue
+                ? await _context.State
+                    .AsNoTracking()
+                    .Where(x => x.Id == trainer.StateId.Value)
+                    .Select(x => x.StateName)
+                    .FirstOrDefaultAsync()
+                : null;
 
-       
+            var districtName = trainer.DistrictId.HasValue
+                ? await _context.District
+                    .AsNoTracking()
+                    .Where(x => x.Id == trainer.DistrictId.Value)
+                    .Select(x => x.DistrictName)
+                    .FirstOrDefaultAsync()
+                : null;
+
+            var cityName = trainer.CityId.HasValue
+                ? await _context.City
+                    .AsNoTracking()
+                    .Where(x => x.Id == trainer.CityId.Value)
+                    .Select(x => x.CityName)
+                    .FirstOrDefaultAsync()
+                : null;
+
+
+            // ================================
+            // Child Tables
+            // ================================
+
+            var qualifications = await _context.TrainerRegistrationQualification
+                .AsNoTracking()
+                .Where(x => x.TrainerRegistrationId == trainer.Id)
+                .OrderBy(x => x.Id)
+                .ToListAsync();
+
+            var experiences = await _context.TrainerRegistrationExperience
+                .AsNoTracking()
+                .Where(x => x.TrainerRegistrationId == trainer.Id)
+                .OrderBy(x => x.Id)
+                .ToListAsync();
+
+            var documents = await _context.TrainerRegistrationDocument
+                .AsNoTracking()
+                .Where(x => x.TrainerRegistrationId == trainer.Id)
+                .OrderBy(x => x.Id)
+                .ToListAsync();
+
+
+            // ================================
+            // Existing ViewModel
+            // ================================
+
+            var model = new TrainerRegistrationViewModel
+            {
+                CandidateName = trainer.CandidateName,
+                DateOfBirth = trainer.DateOfBirth,
+                Gender = trainer.Gender,
+
+                JobRoleId = trainer.JobRoleId,
+                TPId = trainer.TPId,
+                SPOCName = trainer.SPOCName,
+                SIDHApplied = trainer.SIDHApplied,
+                Scheme = trainer.Scheme,
+
+                Address = trainer.Address,
+                StateId = trainer.StateId,
+                DistrictId = trainer.DistrictId,
+                CityId = trainer.CityId,
+                Pincode = trainer.Pincode,
+
+                Email = trainer.Email ?? "",
+                Mobile = trainer.Mobile ?? "",
+                MobileVerified = trainer.MobileVerified,
+
+                ReferenceName = trainer.ReferenceName,
+                ReferenceDesignation = trainer.ReferenceDesignation,
+                ReferenceOrganization = trainer.ReferenceOrganization,
+                ReferenceEmail = trainer.ReferenceEmail,
+                ReferenceMobile = trainer.ReferenceMobile
+            };
+
+
+            // ================================
+            // ViewBag Display Data
+            // ================================
+
+            ViewBag.RegistrationNo = trainer.RegistrationNo;
+            ViewBag.RegistrationMode = trainer.RegistrationMode;
+            ViewBag.Status = trainer.Status;
+            ViewBag.Remarks = trainer.Remarks;
+            ViewBag.EmailVerified = trainer.EmailVerified;
+            ViewBag.CreatedDate = trainer.CreatedDate;
+
+            ViewBag.JobRoleName = jobRoleName;
+            ViewBag.StateName = stateName;
+            ViewBag.DistrictName = districtName;
+            ViewBag.CityName = cityName;
+
+            ViewBag.Qualifications = qualifications;
+            ViewBag.Experiences = experiences;
+            ViewBag.Documents = documents;
+
+            return View(model);
+        }
+        [HttpGet]
+        public async Task<IActionResult> ApplicationStatus()
+        {
+            var email = User.Identity?.Name;
+
+            if (string.IsNullOrWhiteSpace(email))
+                return RedirectToAction("Login", "Account");
+
+            email = email.Trim().ToLower();
+
+            var trainer = await _context.TrainerRegistration
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.Email != null &&
+                    x.Email.Trim().ToLower() == email);
+
+            if (trainer == null)
+                return NotFound("Trainer application not found.");
+
+            var jobRoleName = await _context.JobRoles
+                .AsNoTracking()
+                .Where(x => x.Id == trainer.JobRoleId)
+                .Select(x => x.JobRoleTitle)
+                .FirstOrDefaultAsync();
+
+            // Latest screening record
+            var screening = await _context.ScreeningSchedule
+                .AsNoTracking()
+                .Include(x => x.Batch)
+                .Where(x => x.TrainerRegistrationId == trainer.Id)
+                .OrderByDescending(x => x.Id)
+                .FirstOrDefaultAsync();
+
+            // Common information
+            ViewBag.TrainerName = trainer.CandidateName;
+            ViewBag.RegistrationNo = trainer.RegistrationNo;
+            ViewBag.JobRole = jobRoleName;
+            ViewBag.RegistrationDate = trainer.CreatedDate;
+
+            // Original registration status
+            ViewBag.RegistrationStatus = trainer.Status;
+
+            // Trainer active/inactive
+            ViewBag.IsActive = trainer.IsActive;
+
+            // =========================================================
+            // SCREENING STATUS
+            // =========================================================
+            if (screening != null)
+            {
+                ViewBag.ScreeningStatus = screening.Status;
+
+                ViewBag.BatchCode = screening.Batch?.BatchCode;
+                ViewBag.BatchName = screening.Batch?.BatchName;
+                ViewBag.BatchStartDate = screening.Batch?.StartDate;
+                ViewBag.BatchEndDate = screening.Batch?.EndDate;
+
+                // Payment based on screening result
+                if (string.Equals(
+         screening.Status,
+         "Success",
+         StringComparison.OrdinalIgnoreCase))
+                {
+                    ViewBag.PaymentStatus =
+                        !trainer.PaymentVerified
+                            ? (string.IsNullOrWhiteSpace(trainer.PaymentStatus)
+                                ? "Pending"
+                                : trainer.PaymentStatus)
+                            : "Success";
+                }
+                else
+                {
+                    ViewBag.PaymentStatus = "Not Applicable";
+                }
+
+                return View(new ScreeningScheduleVM
+                {
+                    BatchId = screening.BatchId,
+                    TrainerRegistrationId = screening.TrainerRegistrationId,
+                    ScreeningDate = screening.ScreeningDate,
+                    StartTime = screening.StartTime,
+                    EndTime = screening.EndTime,
+                    ScreeningMode = screening.ScreeningMode,
+                    Location = screening.Location,
+                    MeetingLink = screening.MeetingLink,
+                    Remarks = screening.Remarks
+                });
+            }
+
+            // =========================================================
+            // SCREENING NOT SCHEDULED
+            // =========================================================
+
+            ViewBag.ScreeningStatus = "Awaiting Schedule";
+            ViewBag.PaymentStatus = "Not Applicable";
+
+            return View(new ScreeningScheduleVM
+            {
+                TrainerRegistrationId = trainer.Id
+            });
+        }
+        [HttpGet]
+        public async Task<IActionResult> Payment()
+        {
+            var email = User.Identity?.Name;
+
+            if (string.IsNullOrWhiteSpace(email))
+                return RedirectToAction("Login", "Account");
+
+            email = email.Trim().ToLower();
+
+            var trainer = await _context.TrainerRegistration
+                .FirstOrDefaultAsync(x =>
+                    x.Email != null &&
+                    x.Email.Trim().ToLower() == email);
+
+            if (trainer == null)
+                return NotFound("Trainer application not found.");
+
+            var screening = await _context.ScreeningSchedule
+                .Where(x => x.TrainerRegistrationId == trainer.Id)
+                .OrderByDescending(x => x.Id)
+                .FirstOrDefaultAsync();
+
+            // Payment only after screening success
+            if (screening == null ||
+                !string.Equals(
+                    screening.Status,
+                    "Success",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["error"] =
+                    "Payment is available only after successful screening.";
+
+                return RedirectToAction(nameof(ApplicationStatus));
+            }
+
+            // Already paid
+            if (trainer.PaymentStatus == "Success" &&
+                trainer.PaymentVerified)
+            {
+                return RedirectToAction(nameof(ApplicationStatus));
+            }
+
+            ViewBag.TrainerName = trainer.CandidateName;
+            ViewBag.RegistrationNo = trainer.RegistrationNo;
+            ViewBag.PaymentStatus = trainer.PaymentStatus ?? "Pending";
+
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CompletePayment()
+        {
+            var email = User.Identity?.Name;
+
+            if (string.IsNullOrWhiteSpace(email))
+                return RedirectToAction("Login", "Account");
+
+            email = email.Trim().ToLower();
+
+            var trainer = await _context.TrainerRegistration
+                .FirstOrDefaultAsync(x =>
+                    x.Email != null &&
+                    x.Email.Trim().ToLower() == email);
+
+            if (trainer == null)
+                return NotFound("Trainer application not found.");
+
+            var screening = await _context.ScreeningSchedule
+                .Where(x => x.TrainerRegistrationId == trainer.Id)
+                .OrderByDescending(x => x.Id)
+                .FirstOrDefaultAsync();
+
+            if (screening == null ||
+                !string.Equals(
+                    screening.Status,
+                    "Success",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["error"] =
+                    "Payment cannot be completed before screening success.";
+
+                return RedirectToAction(nameof(ApplicationStatus));
+            }
+
+            // Mock payment success
+            trainer.PaymentStatus = "Success";
+            trainer.PaymentDate = DateTime.Now;
+            trainer.PaymentVerified = false;
+            trainer.UpdatedDate = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            TempData["msg"] = "Payment completed successfully.";
+
+            return RedirectToAction(nameof(ApplicationStatus));
+        }
     }
 }
