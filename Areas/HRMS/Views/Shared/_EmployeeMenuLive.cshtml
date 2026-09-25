@@ -25,6 +25,38 @@
 	bool isReportingManager = employee != null &&
 		Context.Employee.Any(
 			x => x.ReportingManagerId == employee.EmployeeId);
+
+
+	// =====================================
+	// PENDING LEAVE REQUEST COUNT
+	// =====================================
+	int pendingLeaveCount = 0;
+
+	if (employee != null)
+	{
+		var employeeId = employee.EmployeeId;
+
+		if (isHR)
+		{
+			pendingLeaveCount = Context.LeaveRequest
+				.Count(x => x.Status == "Pending");
+		}
+		else if (isReportingManager)
+		{
+			pendingLeaveCount = Context.LeaveRequest
+				.Count(x =>
+					x.Status == "Pending" &&
+					Context.Employee.Any(emp =>
+						emp.EmployeeId == x.EmployeeId &&
+						emp.ReportingManagerId == employeeId
+					));
+		}
+	}
+
+
+
+
+
 	var isFinanceEmployee = currentUser != null
 	&& employee != null
 	&& employee.DepartmentId == 25 && employee.DesignationId != 50;
@@ -49,6 +81,10 @@
 	var isFinanceHead = currentUser != null
 		&& employee != null
 		&& employee.DesignationId == 50;
+
+
+	//for statndard process
+	bool isStandardEmployee = roles.Contains("StandardsTeam");
 	//for reimbursement system
 	// =====================================
 	// REIMBURSEMENT SIDE MENU
@@ -490,7 +526,96 @@
 			</ul>
 
 		</li>
-		
+		@* @if (isStandardEmployee && !isReportingManager)
+{ *@
+		<li class="nk-menu-item has-sub">
+
+			<a href="#"
+			   class="nk-menu-link nk-menu-toggle">
+
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-briefcase"></em>
+				</span>
+
+				<span class="nk-menu-text">
+
+					Manage Job Roles
+				</span>
+
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="JobRoles"
+					   asp-action="Index1"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+
+							Job Role List
+						</span>
+
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="JobRoles"
+					   asp-action="Approved"
+					   class="nk-menu-link">
+
+
+						<span class="nk-menu-text">
+
+							Approved
+						</span>
+
+					</a>
+				</li>
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="JobRoles"
+					   asp-action="Rejected"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+
+							Rejected
+						</span>
+					</a>
+				</li>
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="JobRoles"
+					   asp-action="ArchivePending"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Pending Archive
+						</span>
+
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="JobRoles"
+					   asp-action="Archived"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+
+							Archived
+						</span>
+
+					</a>
+				</li>
+			</ul>
+
+		</li>
+		@* } *@
 	}
 
 	@if (User.IsInRole("Letter"))
@@ -923,16 +1048,26 @@
 				<span class="nk-menu-heading-text">TEAM MANAGEMENT</span>
 			</div>
 		</li>
-
+		
 		<li class="nk-menu-item">
 			<a href="/HRMS/LeaveRequest/ManageLeaves"
 			   class="nk-menu-link">
+
 				<span class="nk-menu-icon">
 					<em class="icon ni ni-calendar-booking"></em>
 				</span>
+
 				<span class="nk-menu-text">
 					Manage Leave Requests
 				</span>
+
+				@if (pendingLeaveCount > 0)
+				{
+					<span class="badge bg-outline-warning ml-auto">
+						@pendingLeaveCount
+					</span>
+				}
+
 			</a>
 		</li>
 		<!-- Attendance Approvals -->
@@ -1130,6 +1265,93 @@
 			</li>
 		}
 		<!-- ===================================================== -->
+
+
+		@*----------------- for manage job roles -----------------------------*@
+
+		@if (isReportingManager)
+		{
+			<li class="nk-menu-item has-sub">
+				<a href="#" class="nk-menu-link nk-menu-toggle">
+					<span class="nk-menu-icon">
+						<em class="icon ni ni-briefcase"></em>
+					</span>
+
+					<span class="nk-menu-text">
+
+						Manage Job Roles
+					</span>
+				</a>
+
+				<ul class="nk-menu-sub">
+
+					<li class="nk-menu-item">
+						<a href="/HRMS/JobRoles/Approval?status=Pending"
+						   class="nk-menu-link">
+							<span class="nk-menu-text">
+
+								Pending Job Approvals
+							</span>
+						</a>
+					</li>
+
+					<li class="nk-menu-item">
+						<a asp-area="HRMS"
+						   asp-controller="JobRoles"
+						   asp-action="Approval"
+						   asp-route-status="Approved"
+						   class="nk-menu-link">
+
+							<span class="nk-menu-text">
+
+								Approved
+							</span>
+						</a>
+					</li>
+
+					<li class="nk-menu-item">
+						<a asp-area="HRMS"
+						   asp-controller="JobRoles"
+						   asp-action="Approval"
+						   asp-route-status="Rejected"
+						   class="nk-menu-link">
+
+							<span class="nk-menu-text">
+
+								Rejected
+							</span>
+						</a>
+					</li>
+					<li class="nk-menu-item">
+						<a asp-area="HRMS"
+						   asp-controller="JobRoles"
+						   asp-action="Approval"
+						   asp-route-status="ArchivePending"
+						   class="nk-menu-link">
+
+							<span class="nk-menu-text">
+								Pending Archive
+							</span>
+
+						</a>
+					</li>
+					<li class="nk-menu-item">
+						<a asp-area="HRMS"
+						   asp-controller="JobRoles"
+						   asp-action="Approval"
+						   asp-route-status="Archived"
+						   class="nk-menu-link">
+
+							<span class="nk-menu-text">
+								Archived
+							</span>
+
+						</a>
+					</li>
+				</ul>
+			</li>
+
+		}
 	}
 
 	<!-- COMMON RESOURCES - EVERY EMPLOYEE -->

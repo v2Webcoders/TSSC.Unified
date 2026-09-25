@@ -10,6 +10,7 @@ using QUIZAPP.Models;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using TSSC.Unified.Services;
 using Microsoft.AspNetCore.Http.Features;
+using TSSC.Unified.Services.Leave;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,15 +46,25 @@ builder.Services.AddSingleton<IFileProvider>(
 //    options.Password.RequireDigit = false;
 //}).AddDefaultTokenProviders().AddEntityFrameworkStores<AppdbContext>();
 
+//builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+//{
+//    options.Password.RequiredLength = 6;
+//    options.Password.RequiredUniqueChars = 0;
+
+//    options.Password.RequireLowercase = false;
+//    options.Password.RequireUppercase = false;
+//    options.Password.RequireNonAlphanumeric = false;
+//    options.Password.RequireDigit = false;
+//})
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
-    options.Password.RequiredLength = 6;
+    options.Password.RequiredLength = 8;
     options.Password.RequiredUniqueChars = 0;
 
-    options.Password.RequireLowercase = false;
-    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireDigit = false;
+    options.Password.RequireDigit = true;
 })
 .AddEntityFrameworkStores<AppdbContext>()
 .AddDefaultTokenProviders();
@@ -67,6 +78,7 @@ builder.Services.AddScoped<
     AttendanceSyncService>();
 builder.Services.AddHostedService<BiometricAttendanceScheduler>();
 builder.Services.AddScoped<ITodayAttendanceLiveService, TodayAttendanceLiveService>();
+builder.Services.AddScoped<ILeaveService, LeaveService>();
 var app = builder.Build();
 
 

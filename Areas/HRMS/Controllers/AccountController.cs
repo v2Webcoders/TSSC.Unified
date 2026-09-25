@@ -28,6 +28,49 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             return View();
         }
 
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> ChangePassword(ChangePasswordVM model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(model);
+        //    }
+
+        //    var user = await _userManager.GetUserAsync(User);
+
+        //    if (user == null)
+        //    {
+        //        return Challenge();
+        //    }
+
+        //    var result = await _userManager.ChangePasswordAsync(
+        //        user,
+        //        model.CurrentPassword,
+        //        model.NewPassword
+        //    );
+
+        //    if (result.Succeeded)
+        //    {
+        //        await _signInManager.RefreshSignInAsync(user);
+
+        //        TempData["Success"] =
+        //            "Your password has been changed successfully.";
+
+        //        return RedirectToAction(nameof(ChangePassword));
+        //    }
+
+        //    foreach (var error in result.Errors)
+        //    {
+        //        ModelState.AddModelError(
+        //            string.Empty,
+        //            error.Description
+        //        );
+        //    }
+
+        //    return View(model);
+        //}
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordVM model)
@@ -52,20 +95,31 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             if (result.Succeeded)
             {
+                // Store clear password
+                user.Password = model.NewPassword;
+
+                // Make sure to update the user
+                var updateResult = await _userManager.UpdateAsync(user);
+
+                if (!updateResult.Succeeded)
+                {
+                    foreach (var error in updateResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return View(model);
+                }
+
                 await _signInManager.RefreshSignInAsync(user);
 
-                TempData["Success"] =
-                    "Your password has been changed successfully.";
+                TempData["Success"] = "Your password has been changed successfully.";
 
                 return RedirectToAction(nameof(ChangePassword));
             }
 
             foreach (var error in result.Errors)
             {
-                ModelState.AddModelError(
-                    string.Empty,
-                    error.Description
-                );
+                ModelState.AddModelError(string.Empty, error.Description);
             }
 
             return View(model);

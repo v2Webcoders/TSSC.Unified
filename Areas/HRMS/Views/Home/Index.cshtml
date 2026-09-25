@@ -31,6 +31,7 @@
             <!-- Dashboard Header -->
             <div class="d-flex flex-wrap justify-content-between align-items-start gap-4 mb-5">
 
+                <!-- Left: Employee Info -->
                 <div>
 
                     <h1 class="fs-4 text-primary fw-bold mb-1">
@@ -43,64 +44,46 @@
 
                             <!-- Date -->
                             <span class="d-flex align-items-center">
-
                                 <em class="icon ni ni-calendar-alt me-1"></em>
-
                                 @DateTime.Today.ToString("dddd, dd MMMM yyyy")
-
                             </span>
 
                             <span class="text-light">•</span>
-
 
                             <!-- Status -->
                             @if (Model.TodayInTime.HasValue)
                             {
                                 <span class="d-flex align-items-center text-success">
-
                                     <em class="icon ni ni-check-circle me-1"></em>
-
                                     Present
-
                                 </span>
                             }
                             else
                             {
                                 <span class="d-flex align-items-center text-warning">
-
                                     <em class="icon ni ni-clock me-1"></em>
-
                                     Not marked
-
                                 </span>
                             }
 
-
                             <span class="text-light">•</span>
-
 
                             <!-- In -->
                             <span>
-
                                 In:
                                 @(Model.TodayInTime.HasValue
                                     ? Model.TodayInTime.Value.ToString("hh:mm tt")
                                     : "--")
-
                             </span>
-
 
                             <span class="text-light">•</span>
 
-
                             <!-- Out -->
                             <span>
-
                                 Out:
                                 @(Model.TodayOutTime.HasValue
                                     ? Model.TodayOutTime.Value.ToString("hh:mm tt")
                                     : "--")
-
                             </span>
 
                         </div>
@@ -110,16 +93,30 @@
                 </div>
 
 
-                <!-- Manage Employees -->
-                <a asp-controller="Employee"
-                   asp-action="EmployeeList"
-                   class="btn btn-primary">
+                <!-- Right: Actions -->
+                <div class="d-flex align-items-center gap-2">
 
-                    <em class="icon ni ni-users me-1"></em>
+                    <!-- Calendar -->
+                    <button type="button"
+                            class="btn btn-outline-success btn-icon"
+                            data-bs-toggle="modal"
+                            data-bs-target="#calendarModal"
+                            title="Calendar">
+                        <em class="icon ni ni-calendar-alt"></em>
+                    </button>
 
-                    Manage Employees
+                    <!-- Manage Employees -->
+                    <a asp-controller="Employee"
+                       asp-action="EmployeeList"
+                       class="btn btn-primary">
 
-                </a>
+                        <em class="icon ni ni-users me-1"></em>
+
+                        Manage Employees
+
+                    </a>
+
+                </div>
 
             </div>
 
@@ -570,13 +567,47 @@
                     </div>
 
                 </div>
+                <!-- CALENDAR MODAL -->
+                <div class="modal fade"
+                     id="calendarModal"
+                     tabindex="-1"
+                     aria-labelledby="calendarModalLabel"
+                     aria-hidden="true">
 
+                    <div class="modal-dialog  modal-dialog-centered">
+
+                        <div class="modal-content border-0 shadow">
+
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="calendarModalLabel">
+                                    <em class="icon ni ni-calendar-alt me-1"></em>
+                                    Calendar
+                                </h5>
+
+                                <button type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="modal"
+                                        aria-label="Close">
+                                </button>
+                            </div>
+
+                            <div class="modal-body p-0">
+
+                                @Html.Partial("_DashboardCalendar")
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
             </div>
 
         </main>
 
     </div>
 </div>
+
 <script>
     // Highlight active sidebar link
     document.addEventListener('DOMContentLoaded', () => {

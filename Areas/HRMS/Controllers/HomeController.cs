@@ -40,7 +40,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             _todayAttendanceLiveService = todayAttendanceLiveService;
         }
 
-        
+
 
         public async Task<IActionResult> Index()
         {
@@ -240,26 +240,6 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 }
                 var today = DateTime.Today;
 
-                //var attendance =
-                //    await GetTodayAttendance(
-                //        employee.EmployeeCode);
-
-
-                //var model = new HRDashboardVM
-                //{
-                //    EmployeeName =
-                //        employee.FirstName,
-
-                //    EmployeeCode =
-                //        employee.EmployeeCode,
-
-                //    TodayInTime =
-                //        attendance.InTime,
-
-                //    TodayOutTime =
-                //        attendance.OutTime,
-                //    DOB = employee.DOB
-                //};
                 var attendance = await _todayAttendanceLiveService.GetTodayAttendanceAsync(employee.EmployeeCode);
 
                 var model = new HRDashboardVM
@@ -270,6 +250,25 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                     TodayOutTime = attendance.OutTime,
                     DOB = employee.DOB
                 };
+
+                model.Birthdays = await _db.Employee
+                .Where(x =>
+                    x.IsActive &&
+                    x.DOB.HasValue &&
+                    x.DOB.Value.Month == today.Month &&
+                    x.DOB.Value.Day == today.Day)
+                .Select(x => new EmployeeBirthdayVM
+                {
+                    EmployeeName =
+                        x.FirstName + " " + x.LastName,
+
+                    DOB = x.DOB!.Value,
+
+                    PhotoPath = x.PhotoPath,
+
+                    IsToday = true
+                })
+                .ToListAsync();
 
                 // =================================================
                 // CURRENT MONTH
@@ -305,7 +304,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 var holidays = await _db.Holiday
                 .Where(x => x.HolidayDate >= firstDayOfMonth &&
                             x.HolidayDate <= today &&
-                            x.Status=="Published")
+                            x.Status == "Published")
                 .Select(x => x.HolidayDate.Date)
                 .ToListAsync();
 
@@ -405,7 +404,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        
+
         private async Task<(DateTime? InTime, DateTime? OutTime)> GetTodayAttendance(
         string employeeCode)
         {
@@ -599,7 +598,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             }
         }
 
-        
+
 
         public IActionResult GenerateCertificate()
         {

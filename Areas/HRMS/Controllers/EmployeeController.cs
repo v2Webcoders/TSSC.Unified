@@ -332,32 +332,6 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                     //    // Employee is already created, so don't necessarily rollback employee creation
                     //}
 
-
-                    // Initialize Leave Balance from active Leave Policies
-                    var leavePolicies = await _context.LeavePolicy
-                        .Where(x => x.IsActive
-                            && x.EffectiveFrom <= DateTime.Today
-                            && (x.EffectiveTo == null ||
-                                x.EffectiveTo >= DateTime.Today))
-                        .ToListAsync();
-
-                    foreach (var policy in leavePolicies)
-                    {
-                        var leaveBalance = new EmployeeLeaveBalance
-                        {
-                            EmployeeId = employee.EmployeeId,
-                            LeaveTypeId = policy.LeaveTypeId,
-                            OpeningBalance = policy.NoOfDays,
-                            UsedLeaves = 0,
-                            Adjustment = 0,
-                            LastUpdated = DateTime.Now
-                        };
-
-                        _context.EmployeeLeaveBalance.Add(leaveBalance);
-                    }
-
-                    await _context.SaveChangesAsync();
-
                     await transaction.CommitAsync();
 
                     TempData["msg"] = "Employee created successfully.";
@@ -506,6 +480,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
      {
          EmployeeId = e.EmployeeId,
          EmployeeCode = e.EmployeeCode,
+         BiometricCode = e.BiometricCode,
          FirstName = e.FirstName,
          LastName = e.LastName,
          MobileNo = e.MobileNo,
@@ -545,6 +520,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
                                 // Basic Information
                                 EmployeeCode = e.EmployeeCode,
+                                BiometricCode = e.BiometricCode,
                                 FirstName = e.FirstName,
                                 LastName = e.LastName,
                                 Gender = e.Gender,
@@ -1566,6 +1542,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
                 EmployeeId = employee.EmployeeId,
                 EmployeeCode = employee.EmployeeCode,
+                BiometricCode = employee.BiometricCode,
                 FirstName = employee.FirstName,
                 LastName = employee.LastName,
                 Gender = employee.Gender,
@@ -1922,6 +1899,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             emp.SubBranchId = model.SubBranchId;
             emp.NoticePeriod = model.NoticePeriod;
             emp.EmployeeCode = model.EmployeeCode;
+            emp.BiometricCode = model.BiometricCode;
             emp.FirstName = model.FirstName;
             emp.LastName = model.LastName;
             emp.Gender = model.Gender;
@@ -2202,6 +2180,50 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             {
                 return StatusCode(500, $"ERROR: {ex.Message}");
             }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> SearchEmployees(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return Json(new List<object>());
+
+            var searchTerm = query.Trim().ToLower();
+
+            var results = await (
+                from e in _context.Employee
+                join d in _context.Department on e.DepartmentId equals d.DepartmentId into deptGroup
+                from d in deptGroup.DefaultIfEmpty()
+                join des in _context.Designation on e.DesignationId equals des.DesignationId into desigGroup
+                from des in desigGroup.DefaultIfEmpty()
+                where e.IsActive && e.ProfileStatus == "Active" && (
+                    e.FirstName.ToLower().Contains(searchTerm) ||
+                    e.LastName.ToLower().Contains(searchTerm) ||
+                    e.EmployeeCode.ToLower().Contains(searchTerm) ||
+                    e.OfficialEmail.ToLower().Contains(searchTerm) ||
+                    (e.FirstName.ToLower() + " " + e.LastName.ToLower()).Contains(searchTerm)
+                )
+                select new
+                {
+                    employeeId = e.EmployeeId,
+                    employeeCode = e.EmployeeCode,
+                    firstName = e.FirstName,
+                    lastName = e.LastName,
+                    mobileNo = e.MobileNo,
+                    officialEmail = e.OfficialEmail,
+                    departmentName = d != null ? d.DepartmentName : "N/A",
+                    designationName = des != null ? des.DesignationName : "N/A",
+                    isActive = e.IsActive,
+                    username = e.ApplicationUser.UserName,
+                    profileStatus = e.ProfileStatus
+                }
+            )
+            .OrderBy(x => x.firstName)
+            .ThenBy(x => x.lastName)
+            .Take(15)
+            .ToListAsync();
+
+            return Json(results);
         }
     }
 }

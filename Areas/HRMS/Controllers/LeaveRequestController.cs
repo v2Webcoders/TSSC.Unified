@@ -340,6 +340,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             var leaveRequests = await _context.LeaveRequest
                 .Include(x => x.LeaveType)
+                .Include(x=>x.Employee)
                 .Where(x =>  x.ApproverId == employee.EmployeeId)
                 .OrderByDescending(x => x.CreatedDate)
                 .ToListAsync();
@@ -348,8 +349,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             return View(leaveRequests);
         }
 
-        [HttpPost]
-        
+
         public async Task<IActionResult> Approve(int id)
         {
             var applicationUserId =
@@ -374,76 +374,50 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             if (leave.Status == "Approved")
             {
                 TempData["Error"] = "This leave request is already approved.";
-                return RedirectToAction(nameof(MyLeaves));
+                return RedirectToAction(nameof(ManageLeaves));
             }
 
-            // Get employee leave balance
-            var balance = await _context.EmployeeLeaveBalance
-                .FirstOrDefaultAsync(x =>
-                    x.EmployeeId == leave.EmployeeId &&
-                    x.LeaveTypeId == leave.LeaveTypeId);
+            //// Get employee leave balance
+            //var balance = await _context.EmployeeLeaveBalance
+            //    .FirstOrDefaultAsync(x =>
+            //        x.EmployeeId == leave.EmployeeId &&
+            //        x.LeaveTypeId == leave.LeaveTypeId);
 
-            if (balance == null)
-            {
-                TempData["Error"] =
-                    "Leave balance record not found for this employee.";
+            //if (balance == null)
+            //{
+            //    TempData["Error"] =
+            //        "Leave balance record not found for this employee.";
 
-                return RedirectToAction(nameof(MyLeaves));
-            }
+            //    return RedirectToAction(nameof(ManageLeaves));
+            //}
 
-            // Check available balance
-            if (balance.CurrentBalance < leave.TotalDays)
-            {
-                TempData["Error"] =
-                    $"Insufficient leave balance. Available balance: {balance.CurrentBalance} days.";
+            //// Check available balance
+            //if (balance.CurrentBalance < leave.TotalDays)
+            //{
+            //    TempData["Error"] =
+            //        $"Insufficient leave balance. Available balance: {balance.CurrentBalance} days.";
 
-                return RedirectToAction(nameof(MyLeaves));
-            }
+            //    return RedirectToAction(nameof(ManageLeaves));
+            //}
 
-            // Deduct leave
-            balance.UsedLeaves += leave.TotalDays;
-            balance.LastUpdated = DateTime.Now;
+            //// Deduct leave
+            //balance.UsedLeaves += leave.TotalDays;
+            //balance.LastUpdated = DateTime.Now;
 
-            // Approve leave
-            leave.Status = "Approved";
-            leave.ApprovedBy = employee.EmployeeId;
-            leave.ApprovedDate = DateTime.Now;
+            //// Approve leave
+            //leave.Status = "Approved";
+            //leave.ApprovedBy = employee.EmployeeId;
+            //leave.ApprovedDate = DateTime.Now;
 
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
 
             TempData["Success"] =
-                "Leave request approved and leave balance updated successfully.";
+                "Leave request approved successfully.";
 
-            return RedirectToAction(nameof(MyLeaves));
+            return RedirectToAction(nameof(ManageLeaves));
         }
 
-        //public async Task<IActionResult> Reject(int id)
-        //{
-        //    var applicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        //    var employee = await _context.Employee
-        //        .FirstOrDefaultAsync(x => x.ApplicationUserId == applicationUserId);
-
-        //    var leave = await _context.LeaveRequest
-        //        .FirstOrDefaultAsync(x => x.LeaveRequestId == id
-        //                              && x.ApproverId == employee.EmployeeId);
-
-        //    if (leave == null)
-        //        return NotFound();
-
-        //    leave.Status = "Rejected";
-        //    leave.ApprovedBy = employee.EmployeeId;
-        //    leave.ApprovedDate = DateTime.Now;
-
-        //    await _context.SaveChangesAsync();
-
-        //    TempData["Success"] = "Leave request rejected successfully.";
-
-        //    return RedirectToAction(nameof(MyLeaves));
-        //}
-
-        [HttpPost]
-       
+        
         public async Task<IActionResult> Reject(int id)
         {
             var applicationUserId =
@@ -468,45 +442,46 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             if (leave.Status == "Rejected")
             {
                 TempData["Error"] = "This leave request is already rejected.";
-                return RedirectToAction(nameof(MyLeaves));
+                return RedirectToAction(nameof(ManageLeaves));
             }
 
-            // If an already-approved leave is being changed to rejected,
-            // restore the previously deducted balance.
-            if (leave.Status == "Approved")
-            {
-                var balance = await _context.EmployeeLeaveBalance
-                    .FirstOrDefaultAsync(x =>
-                        x.EmployeeId == leave.EmployeeId &&
-                        x.LeaveTypeId == leave.LeaveTypeId);
+            //// If an already-approved leave is being changed to rejected,
+            //// restore the previously deducted balance.
+            //if (leave.Status == "Approved")
+            //{
+            //    var balance = await _context.EmployeeLeaveBalance
+            //        .FirstOrDefaultAsync(x =>
+            //            x.EmployeeId == leave.EmployeeId &&
+            //            x.LeaveTypeId == leave.LeaveTypeId);
 
-                if (balance == null)
-                {
-                    TempData["Error"] =
-                        "Leave balance record not found.";
+            //    if (balance == null)
+            //    {
+            //        TempData["Error"] =
+            //            "Leave balance record not found.";
 
-                    return RedirectToAction(nameof(MyLeaves));
-                }
+            //        return RedirectToAction(nameof(ManageLeaves));
+            //    }
 
-                balance.UsedLeaves -= leave.TotalDays;
+            //    balance.UsedLeaves -= leave.TotalDays;
 
-                if (balance.UsedLeaves < 0)
-                    balance.UsedLeaves = 0;
+            //    if (balance.UsedLeaves < 0)
+            //        balance.UsedLeaves = 0;
 
-                balance.LastUpdated = DateTime.Now;
-            }
+            //    balance.LastUpdated = DateTime.Now;
+            //}
 
-            leave.Status = "Rejected";
-            leave.ApprovedBy = employee.EmployeeId;
-            leave.ApprovedDate = DateTime.Now;
+            //leave.Status = "Rejected";
+            //leave.ApprovedBy = employee.EmployeeId;
+            //leave.ApprovedDate = DateTime.Now;
 
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
 
             TempData["Success"] =
                 "Leave request rejected successfully.";
 
-            return RedirectToAction(nameof(MyLeaves));
+            return RedirectToAction(nameof(ManageLeaves));
         }
+
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
@@ -533,7 +508,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             if (leaveRequest.Status != "Pending")
             {
                 TempData["Error"] = "Only pending leave requests can be deleted.";
-                return RedirectToAction(nameof(MyLeaves));
+                return RedirectToAction(nameof(ManageLeaves));
             }
 
             // Delete attachment if exists
@@ -556,7 +531,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             TempData["Success"] = "Leave request deleted successfully.";
 
-            return RedirectToAction(nameof(MyLeaves));
+            return RedirectToAction(nameof(ManageLeaves));
         }
     }
 }

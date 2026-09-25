@@ -71,7 +71,10 @@
 
 								<div class="col-lg-12">
 									<div class="row gy-3">
-
+										<div class="col-md-3">
+											<label class="form-label">Biometric Code <span class="text-danger">*</span></label>
+											<input asp-for="BiometricCode" class="form-control" />
+										</div>
 										<div class="col-md-3">
 											<label class="form-label">Employee Code <span class="text-danger">*</span></label>
 											<input asp-for="EmployeeCode" class="form-control" />
@@ -259,7 +262,9 @@
 											   type="password"
 											   class="form-control"
 											   autocomplete="new-password" />
-
+										<small class="form-text text-muted">
+											Password must be at least 8 characters with uppercase, lowercase, and numbers.
+										</small>
 										<span asp-validation-for="Password" class="text-danger"></span>
 									</div>
 								}
