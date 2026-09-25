@@ -308,7 +308,7 @@
                                             <em class="icon ni ni-eye"></em>
 
                                         </a>
-                                        <!-- APPROVE -->
+                                        @* <!-- APPROVE -->
                                         @if (item.Status != "Approved" && item.Status != "Rejected")
                                         {
                                             <form asp-area="HRMS"
@@ -357,6 +357,52 @@
                                             </form>
                                         }
 
+ *@
+                                        @if (item.Status != "Approved" && item.Status != "Rejected")
+                                        {
+                                            <form method="post"
+                                                  asp-area="HRMS"
+                                                  asp-controller="Trainer"
+                                                  style="display:inline;">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@item.Id" />
+
+                                                <!-- REMARK -->
+                                                <input type="text"
+                                                       name="remarks"
+                                                       class="form-control form-control-sm"
+                                                       placeholder="Remark"
+                                                       autocomplete="off"
+                                                       style="display:inline-block; width:180px; margin-right:5px; vertical-align:middle;" />
+
+                                                <!-- APPROVE -->
+                                                <button type="submit"
+                                                        formaction="@Url.Action("ApproveRegistration", "Trainer", new { area = "HRMS" })"
+                                                        class="btn btn-sm btn-outline-success"
+                                                        title="Approve"
+                                                        onclick="return confirm('Are you sure you want to approve this trainer?');">
+
+                                                    <em class="icon ni ni-check"></em>
+
+                                                </button>
+
+                                                <!-- REJECT -->
+                                                <button type="submit"
+                                                        formaction="@Url.Action("RejectRegistration", "Trainer", new { area = "HRMS" })"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        title="Reject"
+                                                        onclick="return confirm('Are you sure you want to reject this trainer?');">
+
+                                                    <em class="icon ni ni-cross"></em>
+
+                                                </button>
+
+                                            </form>
+                                        }
                                     </div>
 
                                 </td>

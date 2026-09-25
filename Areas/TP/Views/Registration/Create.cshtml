@@ -1,0 +1,221 @@
+﻿@using TSSC.Unified.ViewModel
+@model TPRegistrationVM
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+	Layout = "~/Views/Shared/_RegistrationLayout.cshtml";
+	ViewData["Title"] = "TP Registration";
+}
+
+<div class="reg-hero">
+	<h1 id="formTitle">Training Partner Registration</h1>
+	<p>Fill in your organisation, contact and financial details across the sections below.</p>
+</div>
+
+<div class="form-shell">
+	@* <div class="form-progress">
+        <div class="seg done"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+    </div> *@
+
+	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+	<form asp-action="Create" method="post" enctype="multipart/form-data" id="tpForm">
+		<div asp-validation-summary="All" class="text-danger"></div>
+		<p class="alert alert-primary">
+			Note: Fields marked <span class="req">*</span> are mandatory.
+		</p>
+		<div class="accordion open" data-step="1">
+			
+			<div class="acc-head" onclick="toggleAcc(this)">
+				<div class="left"><div class="step-num">1</div><div class="title">Basic Details</div></div>
+			</div>
+
+			<div class="acc-body">
+				<div class="form-grid">
+					<div class="field">
+						<label asp-for="OrganizationName">Organization Name <span class="req">*</span></label>
+						<input asp-for="OrganizationName" type="text" />
+						<span asp-validation-for="OrganizationName" class="text-danger"></span>
+					</div>
+
+					<div class="field">
+						<label asp-for="OrganizationType">Type of Organization <span class="req">*</span></label>
+						<select asp-for="OrganizationType">
+							<option value="">Select</option>
+							<option>Proprietorship</option>
+							<option>Partnership</option>
+							<option>Private Limited</option>
+							<option>LLP</option>
+							<option>Society</option>
+							<option>Trust</option>
+							<option>Other</option>
+						</select>
+						<span asp-validation-for="OrganizationType" class="text-danger"></span>
+					</div>
+
+					<div class="field">
+						<label asp-for="RegistrationNumber">Registration Number <span class="req">*</span></label>
+						<input asp-for="RegistrationNumber" type="text" />
+						<span asp-validation-for="RegistrationNumber" class="text-danger"></span>
+					</div>
+
+					<div class="field">
+						<label asp-for="DateOfIncorporation">Date of Incorporation <span class="req">*</span></label>
+						<input asp-for="DateOfIncorporation" type="text" placeholder="DD/MM/YYYY" />
+						<span asp-validation-for="DateOfIncorporation" class="text-danger"></span>
+					</div>
+
+					<div class="field">
+						<label asp-for="PANNumber">PAN Number <span class="req">*</span></label>
+						<input asp-for="PANNumber" type="text" maxlength="10" placeholder="ABCDE1234F" />
+						<span asp-validation-for="PANNumber" class="text-danger"></span>
+					</div>
+
+					<div class="field">
+						<label asp-for="GSTNumber">GST Number (optional)</label>
+						<input asp-for="GSTNumber" type="text" maxlength="15" />
+						<span asp-validation-for="GSTNumber" class="text-danger"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="accordion open" data-step="2">
+			<div class="acc-head" onclick="toggleAcc(this)">
+				<div class="left"><div class="step-num">2</div><div class="title">Organization Profile</div></div>
+			</div>
+
+			<div class="acc-body">
+				<div class="form-grid">
+					<div class="field">
+						<label asp-for="SectorExperience">Sector Experience <span class="req">*</span></label>
+						<select asp-for="SectorExperience">
+							<option value="">Select</option>
+							<option>Telecom</option>
+							<option>Multi-sector</option>
+						</select>
+						<span asp-validation-for="SectorExperience" class="text-danger"></span>
+					</div>
+
+					<div class="field">
+						<label asp-for="YearsOfExperience">Years of Experience <span class="req">*</span></label>
+						<input asp-for="YearsOfExperience" type="text" inputmode="numeric" />
+						<span asp-validation-for="YearsOfExperience" class="text-danger"></span>
+					</div>
+
+					<div class="field full">
+						<label asp-for="PreviousProjects">Previous Projects / Work Details</label>
+						<textarea asp-for="PreviousProjects"></textarea>
+					</div>
+
+					<div class="field">
+						<label asp-for="TrainingCentersCount">Number of Training Centers (if existing)</label>
+						<input asp-for="TrainingCentersCount" type="text" inputmode="numeric" />
+					</div>
+
+					<div class="field">
+						<label asp-for="TrainersAvailableCount">Number of Trainers Available <span class="req">*</span></label>
+						<input asp-for="TrainersAvailableCount" type="text" inputmode="numeric" />
+						<span asp-validation-for="TrainersAvailableCount" class="text-danger"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="accordion open" data-step="3">
+			<div class="acc-head" onclick="toggleAcc(this)">
+				<div class="left"><div class="step-num">3</div><div class="title">Contact Details</div></div>
+			</div>
+
+			<div class="acc-body">
+				<div class="form-grid">
+					<div class="field full">
+						<label asp-for="RegisteredOfficeAddress">Registered Office Address <span class="req">*</span></label>
+						<textarea asp-for="RegisteredOfficeAddress"></textarea>
+						<span asp-validation-for="RegisteredOfficeAddress" class="text-danger"></span>
+					</div>
+
+					<div class="field"><label asp-for="State">State <span class="req">*</span></label><input asp-for="State" type="text" /></div>
+					<div class="field"><label asp-for="District">District <span class="req">*</span></label><input asp-for="District" type="text" /></div>
+					<div class="field"><label asp-for="City">City <span class="req">*</span></label><input asp-for="City" type="text" /></div>
+					<div class="field"><label asp-for="PinCode">Pin Code <span class="req">*</span></label><input asp-for="PinCode" type="text" maxlength="6" inputmode="numeric" /></div>
+					<div class="field"><label asp-for="Email">Official Email ID <span class="req">*</span></label><input asp-for="Email" type="text" /></div>
+					<div class="field"><label asp-for="MobileNumber">Mobile Number <span class="req">*</span></label><input asp-for="MobileNumber" type="text" maxlength="10" inputmode="numeric" /></div>
+					<div class="field full"><label asp-for="AlternateContactPerson">Alternate Contact Person</label><input asp-for="AlternateContactPerson" type="text" /></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="accordion open" data-step="4">
+			<div class="acc-head" onclick="toggleAcc(this)">
+				<div class="left"><div class="step-num">4</div><div class="title">Financial Details</div></div>
+			</div>
+
+			<div class="acc-body">
+				<div class="form-grid">
+					<div class="field full">
+						<label asp-for="AnnualTurnoverLast3Years">Annual Turnover (Last 3 Years) <span class="req">*</span></label>
+						<textarea asp-for="AnnualTurnoverLast3Years" placeholder="FY 2023-24: ₹... | FY 2024-25: ₹... | FY 2025-26: ₹..."></textarea>
+					</div>
+
+					<div class="field"><label asp-for="BankAccountNumber">Bank Account Number <span class="req">*</span></label><input asp-for="BankAccountNumber" type="text" /></div>
+					<div class="field"><label asp-for="IFSCCode">IFSC Code <span class="req">*</span></label><input asp-for="IFSCCode" type="text" /></div>
+					<div class="field"><label asp-for="BankName">Bank Name <span class="req">*</span></label><input asp-for="BankName" type="text" /></div>
+					<div class="field"><label asp-for="FinancialDocuments">Financial Documents (PDF) <span class="req">*</span></label><input asp-for="FinancialDocuments" type="file" accept=".pdf" /></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="accordion open" data-step="5">
+			<div class="acc-head" onclick="toggleAcc(this)">
+				<div class="left"><div class="step-num">5</div><div class="title">Documents Upload</div></div>
+			</div>
+
+			<div class="acc-body">
+				<div class="form-grid">
+					<div class="field"><label asp-for="RegistrationCertificate">Registration Certificate (PDF) <span class="req">*</span></label><input asp-for="RegistrationCertificate" type="file" accept=".pdf" /></div>
+					<div class="field"><label asp-for="PANCardCopy">PAN Card Copy (PDF) <span class="req">*</span></label><input asp-for="PANCardCopy" type="file" accept=".pdf" /></div>
+					<div class="field"><label asp-for="GSTCertificate">GST Certificate (optional)</label><input asp-for="GSTCertificate" type="file" accept=".pdf" /></div>
+					<div class="field"><label asp-for="AddressProof">Address Proof (PDF) <span class="req">*</span></label><input asp-for="AddressProof" type="file" accept=".pdf" /></div>
+					<div class="field"><label asp-for="CancelledCheque">Cancelled Cheque <span class="req">*</span></label><input asp-for="CancelledCheque" type="file" accept=".pdf,.jpg,.jpeg,.png" /></div>
+					<div class="field"><label asp-for="UndertakingDocument">Undertaking (Scanned PDF) <span class="req">*</span></label><input asp-for="UndertakingDocument" type="file" accept=".pdf" /></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="accordion open" data-step="6">
+			<div class="acc-head" onclick="toggleAcc(this)">
+				<div class="left"><div class="step-num">6</div><div class="title">Authorized Person Details</div></div>
+			</div>
+
+			<div class="acc-body">
+				<div class="form-grid">
+					<div class="field"><label asp-for="AuthorizedSignatoryName">Name of Authorized Signatory <span class="req">*</span></label><input asp-for="AuthorizedSignatoryName" type="text" /></div>
+					<div class="field"><label asp-for="Designation">Designation <span class="req">*</span></label><input asp-for="Designation" type="text" /></div>
+					<div class="field"><label asp-for="AuthorizedPersonEmail">Email ID <span class="req">*</span></label><input asp-for="AuthorizedPersonEmail" type="text" /></div>
+					<div class="field"><label asp-for="AuthorizedPersonMobile">Mobile Number <span class="req">*</span></label><input asp-for="AuthorizedPersonMobile" type="text" maxlength="10" inputmode="numeric" /></div>
+					<div class="field full"><label asp-for="AuthorizedPersonIdProof">ID Proof (Aadhaar / PAN) <span class="req">*</span></label><input asp-for="AuthorizedPersonIdProof" type="file" accept=".pdf,.jpg,.jpeg,.png" /></div>
+				</div>
+			</div>
+		</div>
+
+		<div style="margin-top:24px;">
+			<label class="check-row">
+				<input asp-for="DeclarationAccepted" type="checkbox" />
+				I accept the Terms &amp; Conditions and declare that the information provided above is true and authentic to the best of my knowledge.
+			</label>
+			<span asp-validation-for="DeclarationAccepted" class="text-danger"></span>
+		</div>
+
+		<div class="form-actions" style="justify-content: flex-end;">
+			<button type="submit"
+					class="btn-primary"
+					style="width: auto; flex: 0 0 auto; padding: 13px 28px;">
+				Submit Registration
+			</button>
+		</div>
+	</form>
+</div>
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}
+
+

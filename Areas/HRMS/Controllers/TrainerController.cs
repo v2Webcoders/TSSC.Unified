@@ -159,6 +159,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             return Json(trainers);
         }
+        [HttpGet]
         public async Task<IActionResult> CreateBatch()
         {
             var model = new BatchCreateVM();
@@ -174,6 +175,16 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 })
                 .ToListAsync();
 
+            // Training Partner Dropdown
+            model.TPList = await _context.TPRegistrations
+         .AsNoTracking()
+         .OrderBy(x => x.OrganizationName)
+         .Select(x => new SelectListItem
+         {
+             Value = x.Id.ToString(),
+             Text = x.OrganizationName
+         })
+         .ToListAsync();
             return View(model);
         }
         [HttpPost]
@@ -193,8 +204,16 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     })
                     .ToListAsync();
 
-                // Keep your existing TP binding here
-                // model.TPList = ...
+                // TPList = ...
+                model.TPList = await _context.TPRegistrations
+           .AsNoTracking()
+           .OrderBy(x => x.OrganizationName)
+           .Select(x => new SelectListItem
+           {
+               Value = x.Id.ToString(),
+               Text = x.OrganizationName
+           })
+           .ToListAsync();
             }
 
             if (!ModelState.IsValid)
@@ -1027,6 +1046,246 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             return RedirectToAction(
                 nameof(PaymentApproval),
                 new { tab = "Approved" });
+        }
+        [HttpGet]
+        public async Task<IActionResult> AssignAgencyToBatch()
+        {
+            var batches = await _context.BatchMaster
+                .AsNoTracking()
+                .Include(x => x.JobRole)
+                .Include(x => x.AssessmentAgency)
+                .Where(x =>
+                    _context.BatchMasterTrainers.Any(bt =>
+                        bt.BatchId == x.Id &&
+                        bt.TrainerRegistration != null &&
+                        bt.TrainerRegistration.FinanceApproved &&
+                        bt.TrainerRegistration.PaymentVerified &&
+                        bt.TrainerRegistration.IsActive
+                    ))
+                .OrderByDescending(x => x.Id)
+                .ToListAsync();
+
+            var agencies = await _context.AssessmentAgency
+                .AsNoTracking()
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.AgencyName)
+                .ToListAsync();
+
+            ViewBag.Agencies = agencies;
+
+            return View(batches);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignAgencyToBatch(int batchId,int assessmentAgencyId)
+        {
+            var batch = await _context.BatchMaster
+                .FirstOrDefaultAsync(x => x.Id == batchId);
+
+            if (batch == null)
+            {
+                TempData["error"] = "Batch not found.";
+                return RedirectToAction(nameof(AssignAgencyToBatch), new { batchId });
+            }
+
+            var agency = await _context.AssessmentAgency
+                .FirstOrDefaultAsync(x =>
+                    x.Id == assessmentAgencyId &&
+                    x.IsActive);
+
+            if (agency == null)
+            {
+                TempData["error"] = "Please select a valid active agency.";
+
+                return RedirectToAction(
+                    nameof(AssignAgencyToBatch),
+                    new { batchId });
+            }
+
+            // Existing batch row update
+            batch.AssessmentAgencyId = agency.Id;
+            batch.AssignedBy = _userManager.GetUserId(User);
+            batch.AssignedDate = DateTime.Now;
+
+            // Send request to Vertical Head
+            batch.AgencyApprovalStatus = "Pending";
+
+            batch.UpdatedDate = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            TempData["msg"] =
+                "Assessment Agency request sent to Vertical Head for approval.";
+
+            return RedirectToAction(nameof(AssignAgencyToBatch), new { batchId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AgencyApprovalByManager()
+        {
+            var batches = await _context.BatchMaster
+                .AsNoTracking()
+                .Include(x => x.JobRole)
+                .Include(x => x.AssessmentAgency)
+                .Where(x =>
+                    x.AssessmentAgencyId != null &&
+                    x.AgencyApprovalStatus == "Pending")
+                .OrderByDescending(x => x.AssignedDate)
+                .ToListAsync();
+
+            return View(batches);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AgencyApprovalByManager(int id)
+        {
+            var batch = await _context.BatchMaster
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (batch == null)
+            {
+                TempData["error"] = "Batch not found.";
+                return RedirectToAction(nameof(AgencyApprovalByManager));
+            }
+
+            if (batch.AssessmentAgencyId == null)
+            {
+                TempData["error"] = "Assessment Agency is not assigned.";
+                return RedirectToAction(nameof(AgencyApprovalByManager));
+            }
+
+            if (!string.Equals(
+                    batch.AgencyApprovalStatus,
+                    "Pending",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["error"] = "This agency request has already been processed.";
+                return RedirectToAction(nameof(AgencyApprovalByManager));
+            }
+
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+            {
+                TempData["error"] = "Logged-in user not found.";
+                return RedirectToAction(nameof(AgencyApprovalByManager));
+            }
+
+            var employee = await _context.Employee
+                .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
+
+            if (employee == null)
+            {
+                TempData["error"] = "Employee record not found.";
+                return RedirectToAction(nameof(AgencyApprovalByManager));
+            }
+            batch.AgencyApprovalStatus = "Approved";
+            batch.VerticalHeadApprovedBy = employee.EmployeeId.ToString();
+            batch.VerticalHeadApprovedDate = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+            // GET TRAINER / TOA FOR THIS BATCH
+            // =====================================================
+
+            var trainers = await _context.BatchMasterTrainers
+                .AsNoTracking()
+                .Include(x => x.TrainerRegistration)
+                .Where(x =>
+                    x.BatchId == batch.Id &&
+                    x.TrainerRegistration != null &&
+                    x.TrainerRegistration.IsActive)
+                .Select(x => x.TrainerRegistration!)
+                .ToListAsync();
+
+            // =====================================================
+            // SEND EMAIL TO TOA / TRAINER
+            // =====================================================
+
+            foreach (var trainer in trainers)
+            {
+                if (string.IsNullOrWhiteSpace(trainer.Email))
+                    continue;
+
+                try
+                {
+                    string templatePath = Path.Combine(
+                        _environment.WebRootPath,
+                        "EmailTemplates",
+                        "TrainerBatchReadyEmail.html"
+                    );
+                    string baseUrl = $"{Request.Scheme}://{Request.Host}";
+                    var replacements = new Dictionary<string, string>
+                {
+                { "BaseUrl", baseUrl },
+
+                { "Name",trainer.CandidateName ?? string.Empty },
+
+                { "BatchName",batch.BatchName ?? string.Empty },
+
+                { "BatchCode",batch.BatchCode ?? string.Empty },
+
+                { "StartDate",batch.StartDate?.ToString("dd-MMM-yyyy") ?? "N/A" },
+
+                { "PortalUrl",$"{baseUrl}/Trainer/Home/Index" },
+
+                { "SupportEmail", "it@tsscindia.com" }
+                };
+
+                    string result = await _emailService.SendEmailAsync(
+                        trainer.Email,
+                        "Training Batch Ready - TSSC",
+                        templatePath,
+                        replacements
+                    );
+
+                    if (result == "True")
+                    {
+                        batch.EmailSent = true;
+                        batch.UpdatedDate = DateTime.Now;
+
+                        await _context.SaveChangesAsync();
+
+                        TempData["msg"] =
+                            "Assessment Agency approved and email sent successfully.";
+                    }
+                    else
+                    {
+                        batch.EmailSent = false;
+                        await _context.SaveChangesAsync();
+
+                        TempData["error"] =
+                            "Assessment Agency approved, but email could not be sent.";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(
+                        ex,
+                        "Unable to send batch ready email to {Email}",
+                        trainer.Email
+                    );
+                }
+            }
+
+
+            TempData["msg"] = "Assessment Agency approved successfully.";
+
+            return RedirectToAction(nameof(ApprovedAgency));
+        }
+        [HttpGet]
+        public async Task<IActionResult> ApprovedAgency()
+        {
+            var batches = await _context.BatchMaster
+                .AsNoTracking()
+                .Include(x => x.JobRole)
+                .Include(x => x.AssessmentAgency)
+                .Where(x =>
+                    x.AssessmentAgencyId != null &&
+                    x.AgencyApprovalStatus == "Approved")
+                .OrderByDescending(x => x.VerticalHeadApprovedDate)
+                .ToListAsync();
+
+            return View(batches);
         }
     }
 }

@@ -1,0 +1,249 @@
+﻿@using TSSC.Unified.Models
+@model IEnumerable<TPRegistration>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "TP Registrations"; 
+    var pageTitle = "Pending TP Registrations";
+    var pageDescription = "Training Partner registrations awaiting your approval.";
+
+    if (ViewBag.CurrentTab == "approved")
+    {
+        pageTitle = "Approved TP Registrations";
+        pageDescription = "Training Partner registrations approved by you.";
+    }
+    else if (ViewBag.CurrentTab == "rejected")
+    {
+        pageTitle = "Rejected TP Registrations";
+        pageDescription = "Training Partner registrations rejected by you.";
+    }
+}
+
+<div class="nk-block-head">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+
+            <h3 class="nk-block-title page-title">
+                @pageTitle
+            </h3>
+
+            <div class="nk-block-des text-soft">
+                <p>
+                    @pageDescription
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-icon">
+        <em class="icon ni ni-check-circle"></em>
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-icon">
+        <em class="icon ni ni-alert-circle"></em>
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="card card-bordered">
+    <div class="card-inner">
+        <div class="table-responsive">
+            <div class="table-responsive">
+
+                <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Organization</th>
+                            <th>Registration No.</th>
+                            <th>Applicant / Signatory</th>
+                            <th>Contact Details</th>
+                            <th>Submitted On</th>
+
+                            <th>Regional Head</th>
+                            <th>Vertical Head</th>
+                            <th>Finance</th>
+                            <th>CEO</th>
+
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @{
+                            var count = 1;
+                        }
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>@count</td>
+
+                                <td>
+                                    <strong>@item.OrganizationName</strong>
+                                    <br />
+                                    <small class="text-soft">
+                                        @item.OrganizationType
+                                    </small>
+                                </td>
+
+                                <td>
+                                    @item.RegistrationNumber
+                                </td>
+
+                                <td>
+                                    @item.AuthorizedSignatoryName
+                                    <br />
+                                    <small class="text-soft">
+                                        @item.Designation
+                                    </small>
+                                </td>
+
+                                <td>
+                                    @item.Email
+                                    <br />
+                                    <small class="text-soft">
+                                        @item.MobileNumber
+                                    </small>
+                                </td>
+
+                                <td>
+                                    @item.CreatedOn.ToString("dd MMM yyyy")
+                                </td>
+
+
+                                <!-- Regional Head Status -->
+                                <td>
+                                    @if (item.Regional_Head_Status == "Approved")
+                                    {
+                                        <span class="badge bg-success">
+                                            Approved
+                                        </span>
+                                    }
+                                    else if (item.Regional_Head_Status == "Rejected")
+                                    {
+                                        <span class="badge bg-danger">
+                                            Rejected
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">
+                                            Pending
+                                        </span>
+                                    }
+                                </td>
+
+
+                                <!-- Vertical Head Status -->
+                                <td>
+                                    @if (item.Vertical_Head_Status == "Approved")
+                                    {
+                                        <span class="badge bg-success">
+                                            Approved
+                                        </span>
+                                    }
+                                    else if (item.Vertical_Head_Status == "Rejected")
+                                    {
+                                        <span class="badge bg-danger">
+                                            Rejected
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">
+                                            Pending
+                                        </span>
+                                    }
+                                </td>
+
+
+                                <!-- Finance Status -->
+                                <td>
+                                    @if (item.Finance_Status == "Approved")
+                                    {
+                                        <span class="badge bg-success">
+                                            Approved
+                                        </span>
+                                    }
+                                    else if (item.Finance_Status == "Rejected")
+                                    {
+                                        <span class="badge bg-danger">
+                                            Rejected
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">
+                                            Pending
+                                        </span>
+                                    }
+                                </td>
+
+
+                                <!-- CEO Status -->
+                                <td>
+                                    @if (item.CEO_Status == "Approved")
+                                    {
+                                        <span class="badge bg-success">
+                                            Approved
+                                        </span>
+                                    }
+                                    else if (item.CEO_Status == "Rejected")
+                                    {
+                                        <span class="badge bg-danger">
+                                            Rejected
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">
+                                            Pending
+                                        </span>
+                                    }
+                                </td>
+
+
+                                <!-- Action -->
+                                <td class="text-end">
+
+                                    <a asp-area="HRMS"
+                                       asp-controller="TPRegistration"
+                                       asp-action="Details"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-primary">
+
+                                        <em class="icon ni ni-eye"></em>
+                                        View
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                            count++;
+                        }
+
+                    </tbody>
+
+                </table>
+        </div>
+    </div>
+</div>
+</div>

@@ -11,7 +11,7 @@ using QUIZAPP;
 namespace TSSC.Unified.Areas.HRMS.Controllers
 {
     [Area("HRMS")]
-    [Authorize(Roles = "HR,Employee")]
+    [Authorize]
     public class TaskController : Controller
     {
         private readonly AppdbContext _context;

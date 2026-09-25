@@ -8,6 +8,8 @@ using QUIZAPP.Services;
 using QUIZAPP;
 using QUIZAPP.Models;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using TSSC.Unified.Services;
+using Microsoft.AspNetCore.Http.Features;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,7 +22,10 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 104857600; // 100 MB
+});
 builder.Services.AddControllersWithViews();
 builder.Services.AddMvc();
 var connString = builder.Configuration.GetConnectionString("DefaultConnectionString");
@@ -28,23 +33,40 @@ builder.Services.AddDbContext<AppdbContext>(options => options.UseSqlServer(conn
 builder.Services.AddSingleton<IFileProvider>(
                   new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"))
                   );
-//builder.Services.AddIdentityApiEndpoints<AppUser>();
+
+
+//builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+//{
+//    options.Password.RequiredLength = 3;
+//    options.Password.RequiredUniqueChars = 0;
+//    options.Password.RequireLowercase = false;
+//    options.Password.RequireUppercase = false;
+//    options.Password.RequireNonAlphanumeric = false;
+//    options.Password.RequireDigit = false;
+//}).AddDefaultTokenProviders().AddEntityFrameworkStores<AppdbContext>();
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
-    options.Password.RequiredLength = 3;
+    options.Password.RequiredLength = 6;
     options.Password.RequiredUniqueChars = 0;
+
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireDigit = false;
-}).AddDefaultTokenProviders().AddEntityFrameworkStores<AppdbContext>();
+})
+.AddEntityFrameworkStores<AppdbContext>()
+.AddDefaultTokenProviders();
 
 // Register repository
 //builder.Services.AddScoped<ILookupRepository, Repository>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<UtilityService>();
-
+builder.Services.AddScoped<
+    IAttendanceSyncService,
+    AttendanceSyncService>();
+builder.Services.AddHostedService<BiometricAttendanceScheduler>();
+builder.Services.AddScoped<ITodayAttendanceLiveService, TodayAttendanceLiveService>();
 var app = builder.Build();
 
 
@@ -53,6 +75,7 @@ var app = builder.Build();
 //    var services = scope.ServiceProvider;
 //    var userManager = services.GetRequiredService<UserManager<AppUser>>();
 //    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
 
 //    // Seed Roles
 //    string[] roles = new[]
@@ -77,13 +100,14 @@ var app = builder.Build();
 //"Agency"
 //};
 
-//    foreach (var role in roles)
-//    {
-//        if (!await roleManager.RoleExistsAsync(role))
-//        {
-//            await roleManager.CreateAsync(new IdentityRole(role));
-//        }
-//    }
+
+////    foreach (var role in roles)
+////    {
+////        if (!await roleManager.RoleExistsAsync(role))
+////        {
+////            await roleManager.CreateAsync(new IdentityRole(role));
+////        }
+////    }
 
     //    //// Delete user if needed
     //    var existing = await userManager.FindByNameAsync("hrmanager@tssc.local");
@@ -104,7 +128,9 @@ var app = builder.Build();
     //            Email = adminEmail
     //        };
 
+
     //        var result = await userManager.CreateAsync(newAdmin, "Localhr@123"); // password must meet Identity rules
+
 
     //        if (result.Succeeded)
     //        {

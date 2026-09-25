@@ -1,0 +1,183 @@
+﻿@using TSSC.Unified.Models
+@model IEnumerable<ODRequest>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Apply OD";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+
+    <div class="nk-block-head-content">
+
+        <h3 class="nk-block-title page-title">
+            My OD Requests
+        </h3>
+
+    </div>
+
+</div>
+
+
+<div class="nk-block nk-block-lg">
+
+    <div class="card card-preview">
+
+        <div class="card-inner">
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <em class="icon ni ni-alert-circle me-1"></em>
+                    @TempData["Error"]
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Close">
+                    </button>
+                </div>
+            }
+            <div class="table-responsive">
+
+                <table class="datatable-init-export table table-tranx table_custom table-bordered">
+                    <thead>
+                        <tr>
+                            <th>S.No.</th>
+
+                            <th>OD Date</th>
+
+                            <th>OD Type</th>
+
+                            <th>Time</th>
+
+                            <th>Location</th>
+
+                            <th>Purpose</th>
+
+                            <th>Approver</th>
+
+                            <th>Status</th>
+
+                            <th>Attachment</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @serial
+                                </td>
+
+
+                                <td>
+                                    @(item.ODDate?.ToString("dd-MMM-yyyy"))
+                                </td>
+
+
+                                <td>
+                                    @item.ODType
+                                </td>
+
+
+                                <td>
+
+                                    @if (item.ODType == "Partial Day"
+                                   && item.RequestedFromTime.HasValue
+                                   && item.RequestedToTime.HasValue)
+                                    {
+                                        <span>
+                                            @item.RequestedFromTime.Value.ToString("hh:mm tt")
+                                            -
+                                            @item.RequestedToTime.Value.ToString("hh:mm tt")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            Full Office Hours
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <td>
+                                    @(item.Location ?? "-")
+                                </td>
+
+
+                                <td>
+                                    @item.Purpose
+                                </td>
+
+
+                                <td>
+                                    @(item.Approver?.FirstName ?? "-")
+                                </td>
+
+
+                                <td>
+
+                                    @if (item.Status == "Approved")
+                                    {
+                                        <span class="badge badge-dot bg-success">
+                                            Approved
+                                        </span>
+                                    }
+                                    else if (item.Status == "Rejected")
+                                    {
+                                        <span class="badge badge-dot bg-danger">
+                                            Rejected
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-dot bg-warning">
+                                            Pending
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+
+                                    @if (!string.IsNullOrEmpty(item.Attachment))
+                                    {
+                                        <a href="~/uploads/od/@item.Attachment"
+                                           target="_blank"
+                                           class="btn btn-sm btn-outline-primary">
+
+                                            <em class="icon ni ni-file-text"></em>
+
+                                            View
+
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            -
+                                        </span>
+                                    }
+
+                                </td>
+
+                            </tr>
+
+                            serial++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

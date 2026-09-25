@@ -27,22 +27,23 @@
 <div class="nk-block nk-block-lg">
 	<div class="card card-preview">
 
-		@if (!ViewData.ModelState.IsValid)
-		{
-			@Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
-		}
-
-		@if (TempData["msg"] != null)
-		{
-			<div class="example-alert w-100">
-				<div class="alert alert-success alert-icon">
-					<em class="icon ni ni-check-circle"></em>
-					<strong>@TempData["msg"]</strong>
-				</div>
-			</div>
-		}
+		
 
 		<div class="card-inner">
+			@if (!ViewData.ModelState.IsValid)
+			{
+				@Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+			}
+
+			@if (TempData["msg"] != null)
+			{
+				<div class="example-alert w-100">
+					<div class="alert alert-success alert-icon">
+						<em class="icon ni ni-check-circle"></em>
+						<strong>@TempData["msg"]</strong>
+					</div>
+				</div>
+			}
 			<div class="preview-block">
 				<div class="row gy-4">
 					<div class="col-md-12">
@@ -56,8 +57,8 @@
 							  method="post" enctype="multipart/form-data">
 
 							<input type="hidden" asp-for="EmployeeId" />
-
-							<div class="row gy-3">
+							<input type="hidden" asp-for="EmploymentStatus" value="Pending"/>
+							<div class="row gy-3 G-4">
 								<!-- ============= Basic Information ============= -->
 								<div class="col-12 mb-4">
 									<div style="border-left:4px solid #D9622F; padding:5px 0 5px 12px;">
@@ -68,26 +69,26 @@
 									</div>
 								</div>
 
-								<div class="col-lg-9">
+								<div class="col-lg-12">
 									<div class="row gy-3">
 
-										<div class="col-md-4">
+										<div class="col-md-3">
 											<label class="form-label">Employee Code <span class="text-danger">*</span></label>
 											<input asp-for="EmployeeCode" class="form-control" />
 										</div>
 
-										<div class="col-md-4">
+										<div class="col-md-3">
 											<label class="form-label">First Name <span class="text-danger">*</span></label>
 											<input asp-for="FirstName" class="form-control" />
 
 										</div>
 
-										<div class="col-md-4">
+										<div class="col-md-3">
 											<label class="form-label">Last Name</label>
 											<input asp-for="LastName" class="form-control" />
 										</div>
 
-										<div class="col-md-4">
+										@* <div class="col-md-3">
 											<label class="form-label">Gender<span class="text-danger">*</span></label>
 											<select asp-for="Gender" class="form-select">
 												<option value="">Select Gender</option>
@@ -96,29 +97,7 @@
 												<option>Other</option>
 											</select>
 										</div>
-
-										<div class="col-md-4">
-											<label class="form-label">Date of Birth <span class="text-danger">*</span></label>
-											<input asp-for="DOB" type="date" class="form-control" />
-										</div>
-
-										<div class="col-md-4">
-											<label class="form-label">Blood Group</label>
-											<select asp-for="BloodGroup" class="form-select">
-												<option value="">Select</option>
-												<option>A+</option>
-												<option>A-</option>
-												<option>B+</option>
-												<option>B-</option>
-												<option>AB+</option>
-												<option>AB-</option>
-												<option>O+</option>
-												<option>O-</option>
-												<option>NA</option>
-											</select>
-										</div>
-
-										<div class="col-md-4">
+										<div class="col-md-3">
 											<label class="form-label">Marital Status<span class="text-danger">*</span></label>
 											<select asp-for="MaritalStatus" class="form-select">
 												<option value="">Select</option>
@@ -127,38 +106,9 @@
 												<option>Divorced</option>
 												<option>Widowed</option>
 											</select>
-										</div>
-
+										</div> *@
 									</div>
 								</div>
-
-								<!-- Employee Photo -->
-								<div class="col-lg-3">
-
-									<label class="form-label">Employee Photo</label>
-
-									<div class="card card-bordered text-center p-3">
-
-										<img id="photoPreview"
-											 src="@(string.IsNullOrEmpty(Model.PhotoPath) ? Url.Content("~/images/no-user.png") : Url.Content(Model.PhotoPath))"
-											 class="rounded-circle mx-auto mb-3"
-											 style="width:140px;height:140px;object-fit:cover;border:3px solid #dee2e6;" />
-
-										<input asp-for="Photo"
-											   type="file"
-											   class="form-control"
-											   accept="image/*"
-											   onchange="previewPhoto(this)" />
-
-										<small class="text-muted mt-2 d-block">
-											JPG, JPEG, PNG (Max 2 MB)
-										</small>
-
-									</div>
-
-								</div>
-
-
 
 								<!-- ============= Official Information ============= -->
 								<div id="sec-official" class="col-12 mb-4 mt-5">
@@ -170,7 +120,7 @@
 									</div>
 								</div>
 
-								<div class="col-md-3">
+								@* <div class="col-md-3">
 									<label class="form-label">Branch <span class="text-danger"></span></label>
 									<select asp-for="BranchId" asp-items="ViewBag.Branches" class="form-select">
 										<option value="">Select Branch</option>
@@ -178,11 +128,11 @@
 								</div>
 
 								<div class="col-md-3">
-									<label class="form-label">Sub Branch</label>
+									<label class="form-label">Sub Branch <span class="text-danger"></span></label>
 									<select asp-for="SubBranchId" asp-items="ViewBag.SubBranches" class="form-select">
 										<option value="">Select Sub Branch</option>
 									</select>
-								</div>
+								</div> *@
 
 								<div class="col-md-3">
 									<label class="form-label">Department <span class="text-danger">*</span></label>
@@ -215,41 +165,45 @@
 									<select asp-for="EmployeeType" class="form-select">
 										<option value="">Select Employee Type</option>
 										<option>Permanent</option>
-										<option>Probation</option>
 										<option>Contract</option>
-										<option>Temporary</option>
 										<option>Internship</option>
-										<option>Consultant</option>
-										<option>Part-Time</option>
 									</select>
 								</div>
-
 								<div class="col-md-3">
 									<label class="form-label">Employment Status <span class="text-danger">*</span></label>
 									<select asp-for="EmploymentStatus" class="form-select">
-										<option value="">Select Status</option>
-										<option>Active</option>
-										<option>On Probation</option>
-										<option>On Leave</option>
-										<option>Notice Period</option>
-										<option>Resigned</option>
-										<option>Relieved</option>
-										<option>Terminated</option>
+										<option value="Active" selected>Active</option>
+										<option value="On Leave">On Leave</option>
+										<option value="Relieved">Relieved</option>
 									</select>
 								</div>
 
+								
 								<div class="col-md-3">
 									<label class="form-label">Notice Period</label>
 									<select asp-for="NoticePeriod" class="form-select">
 										<option value="">Select</option>
-										<option value="0">Immediate</option>
 										<option value="15">15 Days</option>
 										<option value="30">30 Days</option>
 										<option value="60">60 Days</option>
 										<option value="90">90 Days</option>
 									</select>
 								</div>
+								<div class="col-md-3">
+									<label class="form-label">UAN Number<span class="text-danger"></span></label>
+									<input asp-for="UANNo" class="form-control" />
+								</div>
 
+								<div class="col-md-3">
+									<label class="form-label">PF Number<span class="text-danger"></span></label>
+									<input asp-for="PFNo" class="form-control" />
+								</div>
+
+								<div class="col-md-3">
+									<label class="form-label">ESIC Number<span class="text-danger"></span></label>
+									<input asp-for="ESICNo" class="form-control" />
+								</div>
+								<div class="col-md-3"> <label class="form-label"> Resignation Date </label> <input asp-for="ResignationDate" type="date" class="form-control" /> <span asp-validation-for="ResignationDate" class="text-danger"></span> </div> <div class="col-md-3"> <label class="form-label"> Relieving Date </label> <input asp-for="RelievingDate" type="date" class="form-control" /> <span asp-validation-for="RelievingDate" class="text-danger"></span> </div>
 								<!-- ============= Contact Information ============= -->
 								<div id="sec-contact" class="col-12 mb-4 mt-5">
 									<div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
@@ -258,7 +212,7 @@
 										</h5>
 									</div>
 								</div>
-								<div class="col-md-6">
+								<div class="col-md-3">
 									<label class="form-label">Official Email<span class="text-danger">*</span></label>
 									@* <input asp-for="OfficialEmail" class="form-control" onkeyup="setUsername()"
 										   onchange="setUsername()" /> *@
@@ -274,136 +228,11 @@
 										<input asp-for="OfficialEmail" class="form-control" />
 									}
 								</div>
-
-								<div class="col-md-6">
-									<label class="form-label">Personal Email</label>
-									<input asp-for="PersonalEmail" class="form-control" />
-								</div>
-
-								<div class="col-md-6">
-									<label class="form-label">Mobile Number<span class="text-danger">*</span></label>
-									<input asp-for="MobileNo" class="form-control" />
-								</div>
-
-								<div class="col-md-6">
+								
+								@* <div class="col-md-6">
 									<label class="form-label">Alternate Mobile</label>
 									<input asp-for="AlternateMobile" class="form-control" />
-								</div>
-
-								<!-- ============= Address ============= -->
-								<div id="sec-address" class="col-12 mb-4 mt-5">
-									<div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
-										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
-											<em class="ni ni-map-pin"></em> Address
-										</h5>
-									</div>
-								</div>
-
-								<div class="col-md-6">
-									<label class="form-label">Current Address</label>
-									<textarea asp-for="CurrentAddress"
-											  class="form-control"
-											  rows="3"></textarea>
-								</div>
-
-								<div class="col-md-6">
-									<label class="form-label">Permanent Address</label>
-									<textarea asp-for="PermanentAddress"
-											  class="form-control"
-											  rows="3"></textarea>
-								</div>
-
-								<!-- ============= Identity Details ============= -->
-								<div id="sec-identity" class="col-12 mb-4 mt-5">
-									<div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
-										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
-											<em class="ni ni-shield-check"></em> Identity Details
-										</h5>
-									</div>
-								</div>
-
-								<div class="col-md-4">
-									<label class="form-label">Aadhaar Number</label>
-									<input asp-for="AadhaarNo" class="form-control" />
-								</div>
-
-								<div class="col-md-4">
-									<label class="form-label">PAN Number</label>
-									<input asp-for="PANNo" class="form-control" />
-								</div>
-
-								<div class="col-md-4">
-									<label class="form-label">Passport Number</label>
-									<input asp-for="PassportNo" class="form-control" />
-								</div>
-
-								<div class="col-md-6">
-									<label class="form-label">UAN Number</label>
-									<input asp-for="UANNo" class="form-control" />
-								</div>
-
-								<div class="col-md-3">
-									<label class="form-label">PF Number</label>
-									<input asp-for="PFNo" class="form-control" />
-								</div>
-
-								<div class="col-md-3">
-									<label class="form-label">ESIC Number</label>
-									<input asp-for="ESICNo" class="form-control" />
-								</div>
-
-								<!-- ============= Bank Details ============= -->
-								<div id="sec-bank" class="col-12 mb-4 mt-5">
-									<div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
-										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
-											<em class="icon ni ni-money"></em> Bank Details
-										</h5>
-									</div>
-								</div>
-
-								<div class="col-md-4">
-									<label class="form-label">Bank Name</label>
-									<input asp-for="BankName" class="form-control" />
-								</div>
-
-								<div class="col-md-4">
-									<label class="form-label">Account Number</label>
-									<input asp-for="AccountNo" class="form-control" />
-								</div>
-
-								<div class="col-md-4">
-									<label class="form-label">IFSC Code</label>
-									<input asp-for="IFSCCode" class="form-control" />
-								</div>
-
-								<!-- ============= Salary Details ============= -->
-								<div id="sec-salary" class="col-12 mb-4 mt-5">
-									<div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
-										<h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
-											<em class="ni ni-wallet"></em> Salary Details
-										</h5>
-									</div>
-								</div>
-
-								<div class="col-md-3">
-									<label class="form-label">CTC</label>
-									<input asp-for="CTC" class="form-control" />
-								</div>
-
-								<div class="col-md-3">
-									<label class="form-label">Basic Salary</label>
-									<input asp-for="BasicSalary" class="form-control" />
-								</div>
-
-								<div class="col-md-3">
-									<label class="form-label">HRA</label>
-									<input asp-for="HRA" class="form-control" />
-								</div>
-
-								<div class="col-md-3">
-									<label class="form-label">Special Allowance</label>
-									<input asp-for="SpecialAllowance" class="form-control" />
-								</div>
+								</div> *@
 
 								<!-- ============= Login Information ============= -->
 								<div id="sec-login" class="col-12 mb-4 mt-5">
@@ -415,10 +244,10 @@
 								</div>
 								<div class="col-md-4">
 									<label class="form-label">Username</label>
-									<input asp-for="Username" class="form-control bg-light" />
+									<input asp-for="Username" class="form-control bg-gray " />
 								</div>
 
-
+								
 								@if (Model.EmployeeId == 0)
 								{
 									<div class="col-md-4">

@@ -23,7 +23,7 @@
 				<em class="icon ni ni-users"></em> Employee List
 			</a>
 
-			<a asp-action="Create"
+			<a asp-action="Edit"
 			   asp-route-id="@Model.EmployeeId"
 			   class="btn btn-warning d-none d-md-inline-flex ms-2">
 				<em class="icon ni ni-edit"></em>
@@ -101,8 +101,6 @@
                 <li class="nav-item"><a class="nav-link" href="#sec-contact">Contact</a></li>
                 <li class="nav-item"><a class="nav-link" href="#sec-address">Address</a></li>
                 <li class="nav-item"><a class="nav-link" href="#sec-identity">Identity</a></li>
-                <li class="nav-item"><a class="nav-link" href="#sec-bank">Bank</a></li>
-                <li class="nav-item"><a class="nav-link" href="#sec-salary">Salary</a></li>
                 <li class="nav-item"><a class="nav-link" href="#sec-login">Login</a></li>
             </ul>
         </div>
@@ -176,20 +174,11 @@
                     <p class="fw-medium mb-0">@Val(Model.ReportingManagerName)</p>
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label text-muted mb-1">Branch</label>
-                    <p class="fw-medium mb-0">@Val(Model.BranchName)</p>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label text-muted mb-1">Sub Branch</label>
-                    <p class="fw-medium mb-0">@Val(Model.SubBranchName)</p>
-                </div>
-
+               
                 <div class="col-md-4">
                     <label class="form-label text-muted mb-1">Joining Date</label>
                     <p class="fw-medium mb-0">
-                        @(Model.JoiningDate.HasValue ? Model.JoiningDate.Value.ToString("dd-MMM-yyyy") : "—")
+                        @Model.JoiningDate?.ToString("dd-MMM-yyyy")
                     </p>
                 </div>
 
@@ -301,61 +290,7 @@
                 </div>
             </div>
 
-            <div class="my-5"></div>
-
-            <!-- ============= Bank Details ============= -->
-            <div id="sec-bank" class="col-12 mb-4 mt-5">
-                <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
-                    <h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
-                        <em class="icon ni ni-money"></em> Bank Details
-                    </h5>
-                </div>
-            </div>
-
-            <div class="row gy-4">
-                <div class="col-md-4">
-                    <label class="form-label text-muted mb-1">Bank Name</label>
-                    <p class="fw-medium mb-0">@Val(Model.BankName)</p>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label text-muted mb-1">Account No.</label>
-                    <p class="fw-medium mb-0">@Val(Model.AccountNo)</p>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label text-muted mb-1">IFSC Code</label>
-                    <p class="fw-medium mb-0">@Val(Model.IFSCCode)</p>
-                </div>
-            </div>
-
-            <div class="my-5"></div>
-
-            <!-- ============= Salary Details ============= -->
-            <div id="sec-salary" class="col-12 mb-4 mt-5">
-                <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
-                    <h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
-                        <em class="ni ni-wallet"></em> Salary Details
-                    </h5>
-                </div>
-            </div>
-
-            <div class="row gy-4">
-                <div class="col-md-3">
-                    <label class="form-label text-muted mb-1">CTC</label>
-                    <p class="fw-medium mb-0">@Val(Model.CTC?.ToString("N0"))</p>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label text-muted mb-1">Basic Salary</label>
-                    <p class="fw-medium mb-0">@Val(Model.BasicSalary?.ToString("N0"))</p>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label text-muted mb-1">HRA</label>
-                    <p class="fw-medium mb-0">@Val(Model.HRA?.ToString("N0"))</p>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label text-muted mb-1">Special Allowance</label>
-                    <p class="fw-medium mb-0">@Val(Model.SpecialAllowance?.ToString("N0"))</p>
-                </div>
-            </div>
+            
 
             <div class="my-5"></div>
 

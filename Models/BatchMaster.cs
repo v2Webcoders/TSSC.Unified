@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TSSC.Unified.Models
@@ -20,11 +21,12 @@ namespace TSSC.Unified.Models
         public int JobRoleId { get; set; }
 
         [ForeignKey(nameof(JobRoleId))]
-        public virtual JobRole? JobRole { get; set; }
+        public  JobRole? JobRole { get; set; }
 
-        [ForeignKey(nameof(TPId))]
         public int? TPId { get; set; }
 
+        [ForeignKey(nameof(TPId))]
+        public TPRegistration? TPRegistration { get; set; }
         // Batch dates
         public DateTime? StartDate { get; set; }
 
@@ -47,5 +49,20 @@ namespace TSSC.Unified.Models
         public string? CreatedBy { get; set; }
 
         public string? UpdatedBy { get; set; }
+        public int? AssessmentAgencyId { get; set; }
+
+        [ForeignKey(nameof(AssessmentAgencyId))]
+        public virtual AssessmentAgency? AssessmentAgency { get; set; }
+
+        public string? AssignedBy { get; set; }
+
+        public DateTime? AssignedDate { get; set; }
+        [StringLength(50)]
+        public string AgencyApprovalStatus { get; set; } = "Pending";
+
+        public string? VerticalHeadApprovedBy { get; set; }
+
+        public DateTime? VerticalHeadApprovedDate { get; set; }
+        public bool EmailSent { get; set; } = false;
     }
 }

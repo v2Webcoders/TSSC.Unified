@@ -1,0 +1,205 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Bulk Image Upload";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+
+
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+
+            <h2 class="nk-block-title page-title">
+                Candidate Photo Upload
+            </h2>
+
+            <div class="nk-block-des text-soft">
+            </div>
+
+        </div>
+
+        <div class="nk-block-head-content">
+
+            <a href="/Admin/Image/Index"
+               class="btn btn-primary d-none d-md-inline-flex">
+
+                <em class="icon ni ni-list"></em>&nbsp;
+                Photo Library
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+<div class="card card-bordered">
+
+  
+    <div class="card-inner">
+
+        <div class="preview-block">
+
+            <div class="row gy-4">
+
+                <div class="col-sm-12">
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="example-alert w-100 mb-3">
+
+                            <div class="alert alert-danger alert-icon">
+
+                                <em class="icon ni ni-cross-circle"></em>
+
+                                <strong>
+                                    @TempData["Error"]
+                                </strong>
+
+                            </div>
+
+                        </div>
+                    }
+
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="example-alert w-100 mb-3">
+
+                            <div class="alert alert-success alert-icon">
+
+                                <em class="icon ni ni-check-circle"></em>
+
+                                <strong>
+                                    @TempData["Success"]
+                                </strong>
+
+                            </div>
+
+                        </div>
+                    }
+
+
+                    <form asp-area="Admin"
+                          asp-controller="Image"
+                          asp-action="Upload"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        @Html.AntiForgeryToken()
+
+
+                        <div class="row gy-3">
+
+                            <!-- ================= Upload Section ================= -->
+
+                            <div class="col-12 mt-3 mb-2">
+
+                                <div style="border-left:4px solid #D9622F;padding:5px 0 5px 12px;">
+
+                                    <h5 class="mb-0 d-flex align-items-center gap-2"
+                                        style="color:#1B2A4A;">
+
+                                        <em class="ni ni-img"></em>
+
+                                        Photo Upload
+
+                                    </h5>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ================= Image Upload ================= -->
+
+                            <div class="col-md-12">
+
+                                <label class="form-label">
+                                    Select Images
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="file"
+                                       name="Images"
+                                       class="form-control"
+                                       accept=".jpg,.jpeg,.png,.webp"
+                                       multiple
+                                       required />
+
+                                <div class="form-note">
+                                    You can select multiple images at once.
+                                    Allowed formats: JPG, JPEG, PNG and WEBP.
+                                </div>
+
+                            </div>
+
+
+                            <!-- ================= Image Information ================= -->
+
+                            <div class="col-md-12">
+
+                                <div class="alert alert-info">
+
+                                    <strong>
+                                        Image Upload Information
+                                    </strong>
+
+                                    <p class="mb-1">
+                                        Select multiple images using Ctrl or Shift.
+                                    </p>
+
+                                    <p class="mb-0">
+                                        Each image will be saved with a unique file name
+                                        in the upload folder.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ================= Buttons ================= -->
+
+                            <div class="col-12 mt-4">
+
+                                <button type="submit"
+                                        class="btn btn-primary">
+
+                                    <em class="icon ni ni-upload"></em>
+
+                                    <span>
+                                        Upload Photos
+                                    </span>
+
+                                </button>
+
+
+                                <a href="/Admin/Image/Index"
+                                   class="btn btn-outline-secondary ms-2">
+
+                                    Cancel
+
+                                </a>
+
+                            </div>
+
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+

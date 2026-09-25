@@ -35,8 +35,31 @@ namespace TSSC.Unified.Models
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-        // Navigation Property
+        // =====================================================
+        // CHECK-IN LOCATION
+        // =====================================================
+
+        public double? CheckInLatitude { get; set; }
+
+        public double? CheckInLongitude { get; set; }
+
+        public double? CheckInAccuracy { get; set; }
+
+
+        // =====================================================
+        // CHECK-OUT LOCATION
+        // =====================================================
+
+        public double? CheckOutLatitude { get; set; }
+
+        public double? CheckOutLongitude { get; set; }
+
+        public double? CheckOutAccuracy { get; set; }
+        public string? CheckInLocation { get; set; }
+
+        public string? CheckOutLocation { get; set; }
+
         [ForeignKey(nameof(EmployeeId))]
-        public virtual Employee Employee { get; set; }
+        public virtual Employee? Employee { get; set; }
     }
 }

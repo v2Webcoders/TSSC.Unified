@@ -20,7 +20,7 @@ namespace TSSC.Unified.Models
 
         public int? SubSectorId { get; set; }
         [ForeignKey("SubSectorId")]
-        public virtual SubSector SubSector { get; set; }
+        public virtual SubSector? SubSector { get; set; }
 
         [StringLength(50)]
         public string QPVersion { get; set; }
@@ -54,6 +54,7 @@ namespace TSSC.Unified.Models
 
         public bool IsActive { get; set; } = true;
 
+        public bool ReOpen { get; set; } = false;
         // Navigation Property
         public virtual ICollection<JobRoleDocument> Documents { get; set; }
             = new List<JobRoleDocument>();

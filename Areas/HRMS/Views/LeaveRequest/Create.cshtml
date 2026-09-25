@@ -58,7 +58,7 @@
 
 					<input class="form-control"
 						   value="@Model.EmployeeName"
-						   readonly disabled/>
+						   readonly disabled />
 
 				</div>
 
@@ -179,8 +179,8 @@
 
 					<input asp-for="TotalDays"
 						   id="TotalDays"
-						   class="form-control"/>
-							<span asp-validation-for="TotalDays" class="text-danger"></span>
+						   class="form-control" />
+					<span asp-validation-for="TotalDays" class="text-danger"></span>
 
 				</div>
 
@@ -244,18 +244,18 @@
 
 					@if (!string.IsNullOrEmpty(Model.Attachment))
 					{
-							<div class="mt-2">
+						<div class="mt-2">
 
-								<a href="~/uploads/leaves/@Model.Attachment"
-								   target="_blank"
-								   class="btn btn-sm btn-outline-info">
+							<a href="~/uploads/leaves/@Model.Attachment"
+							   target="_blank"
+							   class="btn btn-sm btn-outline-info">
 
-									<em class="icon ni ni-file-docs"></em>
-									View Attachment
+								<em class="icon ni ni-file-docs"></em>
+								View Attachment
 
-								</a>
+							</a>
 
-							</div>
+						</div>
 					}
 
 				</div>
@@ -266,17 +266,17 @@
 				@if (Model.LeaveRequestId > 0)
 				{
 
-						<div class="col-md-6">
+					<div class="col-md-6">
 
-							<label class="form-label">
-								Status
-							</label>
+						<label class="form-label">
+							Status
+						</label>
 
-							<input asp-for="Status"
-								   class="form-control"
-								   readonly />
+						<input asp-for="Status"
+							   class="form-control"
+							   readonly />
 
-						</div>
+					</div>
 
 				}
 
@@ -295,8 +295,8 @@
 					<em class="icon ni ni-send"></em>
 
 					@(Model.LeaveRequestId == 0
-							? "Submit Leave Request"
-							: "Update Request")
+												? "Submit Leave Request"
+												: "Update Request")
 
 				</button>
 
@@ -320,55 +320,7 @@
 
 
 @section Scripts {
-
-@* <script>
-
-	        function calculateDays()
-	        {
-	            let fromDate = new Date($("#FromDate").val());
-	            let toDate = new Date($("#ToDate").val());
-
-
-	            if(fromDate && toDate && toDate >= fromDate)
-	            {
-	                let days =
-	                    Math.floor((toDate - fromDate) /
-	                    (1000 * 60 * 60 * 24)) + 1;
-
-
-	                $("#TotalDays").val(days);
-	            }
-	            else
-	            {
-	                $("#TotalDays").val("");
-	            }
-	        }
-
-
-	        $("#FromDate,#ToDate").change(function(){
-
-	            calculateDays();
-
-	        });
-
-
-
-	        $("#AttachmentFile").change(function(){
-
-	            if(this.files.length > 0)
-	            {
-	                if(this.files[0].size > 5242880)
-	                {
-	                    alert("File size should be less than 5 MB");
-	                    this.value="";
-	                }
-	            }
-
-	        });
-
-
-	    </script> *@
-			<script>
+	<script>
 			function calculateDays() {
 
 				let from = $("#FromDate").val();
@@ -407,5 +359,5 @@
 					this.value = "";
 				}
 			});
-		</script>
+	</script>
 }

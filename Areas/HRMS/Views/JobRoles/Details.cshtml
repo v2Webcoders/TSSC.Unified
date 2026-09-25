@@ -1,10 +1,19 @@
-﻿@using TSSC.Unified.Models
+﻿@using Microsoft.AspNetCore.Identity
+@using QUIZAPP
+@using QUIZAPP.Models
+@using TSSC.Unified.Models
 @model JobRole
+@inject AppdbContext Context
+@inject UserManager<AppUser> UserManager
+@inject SignInManager<AppUser> SignInManager
 
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
     Layout = "_Layout";
+    var currentUser = await UserManager.GetUserAsync(User); 
+    var employee = currentUser != null ? Context.Employee.FirstOrDefault(x => x.ApplicationUserId == currentUser.Id) : null; 
+    bool isReportingManager = employee != null && Context.Employee.Any(x => x.ReportingManagerId == employee.EmployeeId);
 }
 
 <div class="nk-block-head nk-block-head-sm">
@@ -16,7 +25,7 @@
             </h3>
         </div>
 
-        <div class="nk-block-head-content">
+        @* <div class="nk-block-head-content">
             <a asp-area="HRMS"
                asp-controller="JobRoles"
                asp-action="Index"
@@ -26,7 +35,7 @@
                 <span>Job Role List</span>
 
             </a>
-        </div>
+        </div> *@
 
     </div>
 </div>
@@ -175,6 +184,13 @@
                                     Rejected
                                 </span>
                             }
+                            else if (Model.Status == "Archived")
+                            {
+                                <span class="text-danger">
+                                    <span class="dot bg-danger"></span>
+                                    Archived
+                                </span>
+                            }
                             else
                             {
                                 <span class="text-warning">
@@ -300,26 +316,382 @@
             }
 
 
+            @* for remark and approve, reject *@
+
+
+            <!-- MANAGER APPROVE / REJECT ACTION -->
+            @if (isReportingManager &&
+                        ViewData["ReturnTo"]?.ToString() == "Approval" &&
+                        Model.Status == "Pending" &&
+                        Model.IsActive)
+            {
+                <div class="nk-block-head mt-4">
+                    <h5 class="title">
+                        <span style="border-left: 5px solid #D9622F; padding-left: 12px;">
+                            <em class="icon ni ni-check-circle me-1"></em>
+                            Manager Action
+                        </span>
+                    </h5>
+                </div>
+
+                <div class="row gy-3">
+
+                    <div class="col-md-12">
+                        <div class="form-group">
+
+                            <label class="form-label">
+                                Remarks
+                            </label>
+
+                            <textarea id="managerRemarks"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Enter remarks..."></textarea>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="row mt-3">
+                    <div class="col-md-12 text-end">
+
+                        <!-- REJECT -->
+                        <form asp-area="HRMS"
+                              asp-controller="JobRoles"
+                              asp-action="Reject"
+                              method="post"
+                              style="display:inline;">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@Model.Id" />
+
+                            <input type="hidden"
+                                   name="remarks"
+                                   id="rejectRemarks" />
+
+                            <button type="submit"
+                                    class="btn btn-danger me-2"
+                                    onclick="document.getElementById('rejectRemarks').value = document.getElementById('managerRemarks').value;">
+
+                                <em class="icon ni ni-cross-circle"></em>
+                                Reject
+
+                            </button>
+
+                        </form>
+
+
+                        <!-- APPROVE -->
+                        <form asp-area="HRMS"
+                              asp-controller="JobRoles"
+                              asp-action="Approve"
+                              method="post"
+                              style="display:inline;">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@Model.Id" />
+
+                            <input type="hidden"
+                                   name="remarks"
+                                   id="approveRemarks" />
+
+                            <button type="submit"
+                                    class="btn btn-success"
+                                    onclick="document.getElementById('approveRemarks').value = document.getElementById('managerRemarks').value;">
+
+                                <em class="icon ni ni-check-circle"></em>
+                                Approve
+
+                            </button>
+
+                        </form>
+
+                    </div>
+                </div>
+            }
+            <!-- REMARK -->
+
+            <div class="nk-block-head mt-4">
+                <h5 class="title">
+                    <span style="border-left: 5px solid #D9622F; padding-left: 12px;">
+                        <em class="icon ni ni-edit me-1"></em>
+                        Remark
+                    </span>
+                </h5>
+            </div>
+
+            <div class="row gy-3">
+
+                <div class="col-md-12">
+
+                    <div class="form-control bg-light"
+                         style="min-height: 80px; white-space: pre-wrap;">
+
+                        @if (!string.IsNullOrWhiteSpace(Model.Remark))
+                        {
+                            @Model.Remark
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                No remark available.
+                            </span>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+            <!-- EMPLOYEE ACTIONS -->
+            <!-- REOPEN -->
+            @if (ViewData["ReturnTo"]?.ToString() == "Rejected" &&
+                        Model.Status == "Rejected" &&
+                        Model.IsActive)
+            {
+                <div class="nk-block-head mt-4">
+                    <h5 class="title">
+                        <span style="border-left: 5px solid #D9622F; padding-left: 12px;">
+                            <em class="icon ni ni-reload me-1"></em>
+                            Job Role Action
+                        </span>
+                    </h5>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-12 text-end">
+
+                        <form asp-area="HRMS"
+                              asp-controller="JobRoles"
+                              asp-action="Reopen"
+                              method="post"
+                              style="display:inline;">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@Model.Id" />
+
+                            <button type="submit"
+                                    class="btn btn-warning">
+
+                                <em class="icon ni ni-reload"></em>
+                                Reopen
+
+                            </button>
+
+                        </form>
+
+                    </div>
+                </div>
+            }
+
+
+            <!-- ARCHIVE -->
+            @if (ViewData["ReturnTo"]?.ToString() == "Approved" &&
+                        Model.Status == "Approved" &&
+                        Model.IsActive)
+            {
+                <div class="nk-block-head mt-4">
+                    <h5 class="title">
+                        <span style="border-left: 5px solid #D9622F; padding-left: 12px;">
+                            <em class="icon ni ni-archive me-1"></em>
+                            Job Role Action
+                        </span>
+                    </h5>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-12 text-end">
+
+                        <form asp-area="HRMS"
+                              asp-controller="JobRoles"
+                              asp-action="Archive"
+                              method="post"
+                              style="display:inline;">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@Model.Id" />
+
+                            <button type="submit"
+                                    class="btn btn-danger">
+
+                                <em class="icon ni ni-archive"></em>
+                                Archive
+
+                            </button>
+
+                        </form>
+
+                    </div>
+                </div>
+            }
+
+
+            <!-- RESTORE -->
+            @if (ViewData["ReturnTo"]?.ToString() == "Archived" &&
+                        Model.Status == "Archived" &&
+                        !Model.IsActive)
+            {
+                <div class="nk-block-head mt-4">
+                    <h5 class="title">
+                        <span style="border-left: 5px solid #D9622F; padding-left: 12px;">
+                            <em class="icon ni ni-reload me-1"></em>
+                            Job Role Action
+                        </span>
+                    </h5>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-12 text-end">
+
+                        <form asp-area="HRMS"
+                              asp-controller="JobRoles"
+                              asp-action="Restore"
+                              method="post"
+                              style="display:inline;">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@Model.Id" />
+
+                            <button type="submit"
+                                    class="btn btn-success">
+
+                                <em class="icon ni ni-reload"></em>
+                                Restore
+
+                            </button>
+
+                        </form>
+
+                    </div>
+                </div>
+            }
             <!-- BACK BUTTON -->
 
-            <div class="row mt-4">
+            @* <div class="row mt-4">
 
                 <div class="col-md-12 text-end">
+                    @if (Model.Status == "Pending" && Model.IsActive)
+                    {
+                        <a href="/HRMS/JobRoles/Approval?status=Pending"
+                           class="btn btn-light">
 
-                    <a asp-area="HRMS"
-                       asp-controller="JobRoles"
-                       asp-action="Index"
+                            <em class="icon ni ni-arrow-left"></em>
+                            Back to List
+
+                        </a>
+                    }
+                    @if (Model.Status == "Approved" && Model.IsActive)
+                            {
+                    <a href="/HRMS/JobRoles/Approval?status=Approved"
                        class="btn btn-light">
 
                         <em class="icon ni ni-arrow-left"></em>
                         Back to List
 
                     </a>
+                            }
+                    @if (Model.Status == "Rejected" && Model.IsActive)
+                    {
+                        <a href="/HRMS/JobRoles/Approval?status=Rejected"
+                           class="btn btn-light">
 
+                            <em class="icon ni ni-arrow-left"></em>
+                            Back to List
+
+                        </a>
+                    }
+                    @if (!Model.IsActive)
+                    {
+                        <a asp-area="HRMS"
+                           asp-controller="JobRoles"
+                           asp-action="Approval"
+                           asp-route-status="Archived"
+                           class="btn btn-light">
+
+                            <em class="icon ni ni-arrow-left"></em>
+                            Back to List
+
+                        </a>
+                    }
                 </div>
 
+            </div> *@
+            <div class="row mt-4">
+                <div class="col-md-12 text-end">
+
+                    @if (ViewData["ReturnTo"]?.ToString() == "Index1")
+                    {
+                        <a asp-area="HRMS"
+                           asp-controller="JobRoles"
+                           asp-action="Index1"
+                           class="btn btn-light">
+
+                            <em class="icon ni ni-arrow-left"></em>
+                            Back to List
+
+                        </a>
+                    }
+                    else if (ViewData["ReturnTo"]?.ToString() == "Approved")
+                    {
+                        <a asp-area="HRMS"
+                           asp-controller="JobRoles"
+                           asp-action="Approved"
+                           class="btn btn-light">
+
+                            <em class="icon ni ni-arrow-left"></em>
+                            Back to List
+
+                        </a>
+                    }
+                    else if (ViewData["ReturnTo"]?.ToString() == "Rejected")
+                    {
+                        <a asp-area="HRMS"
+                           asp-controller="JobRoles"
+                           asp-action="Rejected"
+                           class="btn btn-light">
+
+                            <em class="icon ni ni-arrow-left"></em>
+                            Back to List
+
+                        </a>
+                    }
+                    else if (ViewData["ReturnTo"]?.ToString() == "Approval")
+                    {
+                        <a asp-area="HRMS"
+                           asp-controller="JobRoles"
+                           asp-action="Approval"
+                           asp-route-status="@ViewData["ReturnStatus"]"
+                           class="btn btn-light">
+
+                            <em class="icon ni ni-arrow-left"></em>
+                            Back to List
+
+                        </a>
+                    }
+
+                </div>
             </div>
 
+          
+
+            
         </div>
 
     </div>

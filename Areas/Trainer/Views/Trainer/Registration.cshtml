@@ -190,15 +190,17 @@
 
                     <div class="field">
 
-                        <label asp-for="TPId">
-                            TP / AB Name
-                            <span class="req">*</span>
+                        <label class="form-label">
+                            TP / Training Provider
                         </label>
 
-                        <select asp-for="TPId">
+
+                        <select asp-for="TPId"
+                                asp-items="Model.TPList"
+                                class="form-select">
 
                             <option value="">
-                                Select TP / AB
+                                Select TP
                             </option>
 
                         </select>

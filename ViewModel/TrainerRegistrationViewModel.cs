@@ -38,7 +38,7 @@ namespace TSSC.Unified.ViewModel
 
         //[Required(ErrorMessage = "Please select TP / AB.")]
         public int? TPId { get; set; }
-
+        public List<SelectListItem> TPList { get; set; }= new List<SelectListItem>();
         public string? SPOCName { get; set; }
 
         public string? SIDHApplied { get; set; }

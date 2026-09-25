@@ -1,0 +1,390 @@
+﻿@using TSSC.Unified.Models
+@using TSSC.Unified.ViewModel
+@model EmployeeVM
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_Layout";
+}
+
+<style>
+    /* =========================================================
+       READ ONLY / HR CONTROLLED FIELDS
+       ========================================================= */
+
+    .readonly-field {
+        position: relative;
+    }
+
+        .readonly-field .form-control {
+            background-color: #f1f3f6;
+            border-color: #dfe3e8;
+            color: #667085;
+            cursor: not-allowed;
+            padding-left: 38px;
+        }
+
+
+        /* Lock icon */
+
+        .readonly-field > em {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            color: #98a2b3;
+            font-size: 15px;
+            pointer-events: none;
+        }
+
+
+        /* Slightly different hover */
+
+        .readonly-field .form-control:hover {
+            background-color: #eef0f3;
+        }
+
+
+        /* Prevent focus appearance */
+
+        .readonly-field .form-control:focus {
+            background-color: #f1f3f6;
+            border-color: #dfe3e8;
+            box-shadow: none;
+        }
+</style>
+<form asp-action="UpdateProfile"
+      asp-controller="Employee"
+      method="post">
+
+    @Html.AntiForgeryToken()
+<div class="nk-block nk-block-lg">
+
+    <div class="card card-preview">
+
+        <div class="card-inner">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+
+                        <div class="d-flex align-items-center">
+
+                            <em class="icon ni ni-check-circle me-2"></em>
+
+                            <span>
+                                @TempData["Success"]
+                            </span>
+
+                        </div>
+
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert"
+                                aria-label="Close">
+                        </button>
+
+                    </div>
+                }
+            <div class="preview-block">
+
+                <div class="row gy-4">
+
+                        <div class="col-12 mb-4">
+                            <div style="border-left:4px solid #D9622F; padding:5px 0 5px 12px;">
+                                <h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+                                    <em class="ni ni-user-alt"></em>
+                                    Personal Information
+                                </h5>
+                            </div>
+                        </div>
+
+
+                    <!-- Employee Code - READ ONLY -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            Employee Code
+                        </label>
+
+                        <div class="readonly-field">
+
+                            <em class="ni ni-lock-alt"></em>
+
+                            <input asp-for="EmployeeCode"
+                                   class="form-control"
+                                   readonly />
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- First Name -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="FirstName"
+                               class="form-label profile-label">
+                            First Name
+                        </label>
+
+                        <input asp-for="FirstName"
+                               class="form-control" />
+
+                        <span asp-validation-for="FirstName"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Last Name -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="LastName"
+                               class="form-label profile-label">
+                            Last Name
+                        </label>
+
+                        <input asp-for="LastName"
+                               class="form-control" />
+
+                        <span asp-validation-for="LastName"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Email - READ ONLY -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="OfficialEmail"
+                               class="form-label profile-label">
+                            Official Email
+                        </label>
+
+                        <div class="readonly-field">
+
+                            <em class="ni ni-lock-alt"></em>
+
+                            <input asp-for="OfficialEmail"
+                                   class="form-control"
+                                   readonly />
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Mobile -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="MobileNo"
+                               class="form-label profile-label">
+                            Mobile Number
+                        </label>
+
+                        <input asp-for="MobileNo"
+                               class="form-control" />
+
+                        <span asp-validation-for="MobileNo"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Gender -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="Gender"
+                               class="form-label profile-label">
+                            Gender
+                        </label>
+
+                        <select asp-for="Gender"
+                                class="form-select">
+
+                            <option value="">
+                                Select Gender
+                            </option>
+
+                            <option value="Male">
+                                Male
+                            </option>
+
+                            <option value="Female">
+                                Female
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- EMPLOYMENT INFORMATION -->
+
+                        <div class="col-12 mb-4 pt-4">
+                            <div style="border-left:4px solid #D9622F; padding:5px 0 5px 12px;">
+                                <h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+                                    <em class="ni ni-user-alt"></em>
+                                    Employment Information
+                                </h5>
+                            </div>
+                        </div>
+
+
+                    <!-- Department -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            Department
+                        </label>
+
+                        <div class="readonly-field">
+
+                            <em class="ni ni-lock-alt"></em>
+
+                            <input value="@Model.DepartmentName"
+                                   class="form-control"
+                                   readonly />
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Designation -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            Designation
+                        </label>
+
+                        <div class="readonly-field">
+
+                            <em class="ni ni-lock-alt"></em>
+
+                            <input value="@Model.DesignationName"
+                                   class="form-control"
+                                   readonly />
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Joining Date -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label profile-label">
+                            Date of Joining
+                        </label>
+
+                        <div class="readonly-field">
+
+                            <em class="ni ni-lock-alt"></em>
+
+                            <input value="@Model.JoiningDate?.ToString("dd MMM yyyy")"
+                                   class="form-control"
+                                   readonly />
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CONTACT INFORMATION -->
+
+                        <div class="col-12 mb-4 pt-4">
+                            <div style="border-left:4px solid #D9622F; padding:5px 0 5px 12px;">
+                                <h5 class="mb-0 d-flex align-items-center gap-2" style="color:#1B2A4A;">
+                                    <em class="ni ni-user-alt"></em>
+                                    Contact Information
+                                </h5>
+                            </div>
+                        </div>
+
+
+                    <!-- Current Address -->
+
+                    <div class="col-md-8">
+
+                        <label asp-for="CurrentAddress"
+                               class="form-label profile-label">
+                            Current Address
+                        </label>
+
+                        <textarea asp-for="CurrentAddress"
+                                  class="form-control"
+                                  rows="3"></textarea>
+
+                    </div>
+
+
+                    <!-- Alternate Mobile -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="AlternateMobile"
+                               class="form-label profile-label">
+                            Alternate Mobile
+                        </label>
+
+                        <input asp-for="AlternateMobile"
+                               class="form-control" />
+
+                    </div>
+
+
+                    <!-- ACTIONS -->
+
+                    <div class="col-12">
+
+                        <div>
+
+                            <a asp-action="MyProfile"
+                               class="btn btn-light">
+
+                                <em class="icon ni ni-arrow-left me-1"></em>
+
+                                Cancel
+
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                <em class="icon ni ni-check me-1"></em>
+
+                                Save Changes
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+</form>

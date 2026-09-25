@@ -22,7 +22,7 @@ namespace TSSC.Unified.ViewModel
         [Display(Name = "Last Name")]
         public string? LastName { get; set; }
 
-        public string Gender { get; set; }
+        public string? Gender { get; set; }
 
         [Display(Name = "Date of Birth")]
         [DataType(DataType.Date)]
@@ -49,15 +49,19 @@ namespace TSSC.Unified.ViewModel
         [Display(Name = "Reporting Manager")]
         public int? ReportingManagerId { get; set; }
 
+        [Required]
         [Display(Name = "Joining Date")]
         [DataType(DataType.Date)]
         public DateTime? JoiningDate { get; set; }
 
+        [Required]
         [Display(Name = "Employee Type")]
-        public string? EmployeeType { get; set; }
+        public string EmployeeType { get; set; }
 
+
+        [Required]
         [Display(Name = "Employment Status")]
-        public string? EmploymentStatus { get; set; }
+        public string EmploymentStatus { get; set; }
 
 
         // ================= Contact Information =================
@@ -73,7 +77,7 @@ namespace TSSC.Unified.ViewModel
         
         [Phone]
         [Display(Name = "Mobile Number")]
-        public string MobileNo { get; set; }
+        public string? MobileNo { get; set; }
 
         [Phone]
         [Display(Name = "Alternate Mobile")]
@@ -140,7 +144,6 @@ namespace TSSC.Unified.ViewModel
         [Display(Name = "Username")]
         public string Username { get; set; }
 
-        
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string? Password { get; set; }
@@ -176,10 +179,19 @@ namespace TSSC.Unified.ViewModel
         [Display(Name = "Sub Branch")]
         public int? SubBranchId { get; set; }
 
+        [Required]
         [Display(Name = "Notice Period (Days)")]
         public int? NoticePeriod { get; set; }
         public string? BranchName { get; set; }
 
         public string? SubBranchName { get; set; }
+        
+        [Required]
+        public string ProfileStatus { get; set; } = "Pending";
+        [Display(Name = "Resignation Date")]
+        public DateTime? ResignationDate { get; set; }
+
+        [Display(Name = "Relieving Date")]
+        public DateTime? RelievingDate { get; set; }
     }
 }

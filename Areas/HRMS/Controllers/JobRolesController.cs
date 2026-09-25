@@ -34,7 +34,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             _environment = environment;
         }
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index1()
         {
             var currentUser = await _userManager.GetUserAsync(User);
 
@@ -59,6 +59,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             return View(jobRoles);
         }
+
         private async Task LoadSubSectors()
         {
             ViewBag.SubSectors = await _context.SubSectors
@@ -82,26 +83,52 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 await LoadSubSectors();
                 return View(model);
             }
-
             var currentUser = await _userManager.GetUserAsync(User);
 
             if (currentUser == null)
+            {
                 return RedirectToAction("Login", "Account");
-
+            }
             var employee = await _context.Employee
-                .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
+                .FirstOrDefaultAsync(x =>
+                    x.ApplicationUserId == currentUser.Id);
 
             if (employee == null)
             {
-                ModelState.AddModelError("", "Employee record not found.");
+                ModelState.AddModelError(
+                    "",
+                    "Employee record not found.");
 
                 await LoadSubSectors();
                 return View(model);
             }
 
             int employeeId = employee.EmployeeId;
+            if (!model.SubSectorId.HasValue)
+            {
+                ModelState.AddModelError(
+                    nameof(model.SubSectorId),
+                    "Please select a Sub Sector.");
 
-            var exists = await _context.JobRoles
+                await LoadSubSectors();
+                return View(model);
+            }
+
+            bool subSectorExists = await _context.SubSectors
+                .AnyAsync(x =>
+                    x.Id == model.SubSectorId.Value &&
+                    x.Status == "Active");
+
+            if (!subSectorExists)
+            {
+                ModelState.AddModelError(
+                    nameof(model.SubSectorId),
+                    "Selected Sub Sector is invalid.");
+
+                await LoadSubSectors();
+                return View(model);
+            }
+            bool exists = await _context.JobRoles
                 .AnyAsync(x => x.QPCode == model.QPCode);
 
             if (exists)
@@ -113,7 +140,75 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 await LoadSubSectors();
                 return View(model);
             }
+            if (model.Documents != null &&
+                model.Documents.Count > 0)
+            {
+                foreach (var document in model.Documents)
+                {
+                    if (document == null)
+                        continue;
 
+                    bool noFile =
+                        document.File == null ||
+                        document.File.Length == 0;
+                    if (noFile)
+                        continue;
+                    if (string.IsNullOrWhiteSpace(document.DocumentType))
+                    {
+                        ModelState.AddModelError(
+                            "Documents",
+                            "Please select Document Type for uploaded document.");
+
+                        continue;
+                    }
+                    if (string.IsNullOrWhiteSpace(document.Language))
+                    {
+                        ModelState.AddModelError(
+                            "Documents",
+                            $"Please select Language for {document.DocumentType}.");
+
+                        continue;
+                    }
+                    string extension =
+                        Path.GetExtension(document.File.FileName);
+
+                    if (!string.Equals(
+                            extension,
+                            ".pdf",
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        ModelState.AddModelError(
+                            "Documents",
+                            $"{document.File.FileName} must be a PDF file.");
+
+                        continue;
+                    }
+                    if (!string.Equals(
+                            document.File.ContentType,
+                            "application/pdf",
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        ModelState.AddModelError(
+                            "Documents",
+                            $"{document.File.FileName} is not a valid PDF file.");
+
+                        continue;
+                    }
+                    if (document.File.Length > 5 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError(
+                            "Documents",
+                            $"{document.File.FileName} must not exceed 5 MB.");
+
+                        continue;
+                    }
+                }
+            }
+            if (!ModelState.IsValid)
+            {
+                await LoadSubSectors();
+                return View(model);
+            }
             using var transaction =
                 await _context.Database.BeginTransactionAsync();
 
@@ -124,11 +219,14 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     QPCode = model.QPCode,
                     JobRoleTitle = model.JobRoleTitle,
                     Description = model.Description,
+
                     SubSectorId = model.SubSectorId,
+
                     QPVersion = model.QPVersion,
                     NSQFLevel = model.NSQFLevel,
                     EducationQualification = model.EducationQualification,
                     QPHours = model.QPHours,
+
                     ValidFrom = model.ValidFrom,
                     ValidTo = model.ValidTo,
 
@@ -140,94 +238,48 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 };
 
                 _context.JobRoles.Add(jobRole);
-
                 await _context.SaveChangesAsync();
-
-                if (model.Documents != null)
+                if (model.Documents != null &&
+                    model.Documents.Count > 0)
                 {
                     foreach (var document in model.Documents)
                     {
-                        if (document == null ||
-                            string.IsNullOrWhiteSpace(document.DocumentType) ||
-                            string.IsNullOrWhiteSpace(document.Language) ||
-                            document.File == null ||
+                        if (document == null)
+                            continue;
+                        if (document.File == null ||
                             document.File.Length == 0)
                         {
                             continue;
                         }
-
-                        // Allow PDF only
-                        var extension = Path.GetExtension(document.File.FileName);
-
-                        if (!string.Equals(extension, ".pdf", StringComparison.OrdinalIgnoreCase))
-                        {
-                            ModelState.AddModelError(
-                                "Documents",
-                                $"Only PDF files are allowed for {document.DocumentType}."
-                            );
-
-                            continue;
-                        }
-
-                        // Validate MIME type
-                        if (!string.Equals(
-                                document.File.ContentType,
-                                "application/pdf",
-                                StringComparison.OrdinalIgnoreCase))
-                        {
-                            ModelState.AddModelError(
-                                "Documents",
-                                $"Only PDF files are allowed for {document.DocumentType}."
-                            );
-
-                            continue;
-                        }
-
-                        // Optional: Maximum file size = 5 MB
-                        if (document.File.Length > 5 * 1024 * 1024)
-                        {
-                            ModelState.AddModelError(
-                                "Documents",
-                                $"{document.DocumentType} PDF must not exceed 5 MB."
-                            );
-
-                            continue;
-                        }
-
-                        var filePath = await SaveFile(
+                        string filePath = await SaveFile(
                             document.File,
                             jobRole.Id,
                             document.DocumentType,
                             document.Language);
+                        var jobRoleDocument = new JobRoleDocument
+                        {
+                            JobRoleId = jobRole.Id,
 
-                        _context.JobRoleDocuments.Add(
-                            new JobRoleDocument
-                            {
-                                JobRoleId = jobRole.Id,
-                                DocumentType = document.DocumentType,
-                                Language = document.Language,
-                                FileName = document.File.FileName,
-                                FilePath = filePath,
-                                CreatedBy = employeeId,
-                                CreatedDate = DateTime.Now
-                            });
+                            DocumentType = document.DocumentType,
+                            Language = document.Language,
+
+                            FileName = document.File.FileName,
+                            FilePath = filePath,
+
+                            CreatedBy = employeeId,
+                            CreatedDate = DateTime.Now
+                        };
+
+                        _context.JobRoleDocuments.Add(jobRoleDocument);
                     }
-
-                    // Important: don't save if validation failed
-                    if (!ModelState.IsValid)
-                    {
-                        return View(model);
-                    }
-
                     await _context.SaveChangesAsync();
                 }
-
                 await transaction.CommitAsync();
 
                 TempData["msg"] =
                     "Job Role added successfully.";
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index1));
             }
             catch (Exception ex)
             {
@@ -275,7 +327,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             return $"/uploads/jobroles/{jobRoleId}/{fileName}";
         }
         [HttpGet]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, bool isReopen = false)
         {
             var currentUser = await _userManager.GetUserAsync(User);
 
@@ -297,18 +349,25 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             if (jobRole == null)
                 return NotFound();
-
-            // Only Pending Job Roles can be edited
-            if (!string.Equals(
+            bool isPending = string.Equals(
+                jobRole.Status,
+                "Pending",
+                StringComparison.OrdinalIgnoreCase);
+            bool isRejectedReopen =
+                isReopen &&
+                string.Equals(
                     jobRole.Status,
-                    "Pending",
-                    StringComparison.OrdinalIgnoreCase))
+                    "Rejected",
+                    StringComparison.OrdinalIgnoreCase);
+
+            if (!isPending && !isRejectedReopen)
             {
                 TempData["msg"] =
                     "This Job Role cannot be edited after manager status update.";
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index1));
             }
+
 
             var model = new JobRoleViewModel
             {
@@ -322,18 +381,28 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 EducationQualification = jobRole.EducationQualification,
                 QPHours = jobRole.QPHours,
                 ValidFrom = jobRole.ValidFrom,
-                ValidTo = jobRole.ValidTo
+                ValidTo = jobRole.ValidTo,
+                Documents = jobRole.Documents?
+                .Select(d => new JobRoleDocumentViewModel
+                {
+                    DocumentType = d.DocumentType,
+                    Language = d.Language,
+                    FileName = d.FileName,
+                    FilePath = d.FilePath
+                })
+                .ToList()
+                ?? new List<JobRoleDocumentViewModel>()
             };
+            ViewBag.IsReopen = isRejectedReopen;
 
-            // Load Sub Sectors
+
             await LoadSubSectors();
 
-            // Use Add.cshtml for Edit
             return View("Add", model);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(JobRoleViewModel model)
+        public async Task<IActionResult> Edit(JobRoleViewModel model, bool isReopen)
         {
             var currentUser = await _userManager.GetUserAsync(User);
 
@@ -354,19 +423,25 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             if (jobRole == null)
                 return NotFound();
-
-            // Only Pending Job Roles can be edited
-            if (!string.Equals(
+            bool isPending = string.Equals(
+                jobRole.Status,
+                "Pending",
+                StringComparison.OrdinalIgnoreCase);
+            bool isRejectedReopen =
+                isReopen &&
+                string.Equals(
                     jobRole.Status,
-                    "Pending",
-                    StringComparison.OrdinalIgnoreCase))
+                    "Rejected",
+                    StringComparison.OrdinalIgnoreCase);
+
+            
+            if (!isPending && !isRejectedReopen)
             {
                 TempData["msg"] =
                     "This Job Role cannot be edited after manager status update.";
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index1));
             }
-
             if (!ModelState.IsValid)
             {
                 var errors = ModelState
@@ -382,11 +457,10 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                 await LoadSubSectors();
 
+                ViewBag.IsReopen = isRejectedReopen;
+
                 return View("Add", model);
             }
-
-            // Check duplicate QP Code
-            // Exclude the current Job Role
             var exists = await _context.JobRoles
                 .AnyAsync(x =>
                     x.QPCode == model.QPCode &&
@@ -400,10 +474,10 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                 await LoadSubSectors();
 
+                ViewBag.IsReopen = isRejectedReopen;
+
                 return View("Add", model);
             }
-
-            // Update fields
             jobRole.QPCode = model.QPCode;
             jobRole.JobRoleTitle = model.JobRoleTitle;
             jobRole.Description = model.Description;
@@ -414,15 +488,104 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             jobRole.QPHours = model.QPHours;
             jobRole.ValidFrom = model.ValidFrom;
             jobRole.ValidTo = model.ValidTo;
+            // ================= DOCUMENT UPDATE =================
+
+            if (model.Documents != null && model.Documents.Any())
+            {
+                foreach (var document in model.Documents)
+                {
+                    if (document.File != null && document.File.Length > 0)
+                    {
+                        var existingDocument = await _context.JobRoleDocuments
+                            .FirstOrDefaultAsync(x =>
+                                x.JobRoleId == jobRole.Id &&
+                                x.DocumentType == document.DocumentType &&
+                                x.Language == document.Language);
+
+                        var uploadsFolder = Path.Combine(
+                            _environment.WebRootPath,
+                            "uploads",
+                            "jobroles",
+                            jobRole.Id.ToString());
+
+                        if (!Directory.Exists(uploadsFolder))
+                        {
+                            Directory.CreateDirectory(uploadsFolder);
+                        }
+
+                        var fileName = Guid.NewGuid().ToString() +
+                                       Path.GetExtension(document.File.FileName);
+
+                        var filePath = Path.Combine(
+                            uploadsFolder,
+                            fileName);
+
+                        using (var stream = new FileStream(
+                            filePath,
+                            FileMode.Create))
+                        {
+                            await document.File.CopyToAsync(stream);
+                        }
+
+                        var relativePath =
+                            $"/uploads/jobroles/{jobRole.Id}/{fileName}";
+
+                        if (existingDocument != null)
+                        {
+                            existingDocument.FileName =
+                                document.File.FileName;
+
+                            existingDocument.FilePath =
+                                relativePath;
+
+                            existingDocument.DocumentType =
+                                document.DocumentType;
+
+                            existingDocument.Language =
+                                document.Language;
+                        }
+                        else
+                        {
+                            var newDocument = new JobRoleDocument
+                            {
+                                JobRoleId = jobRole.Id,
+                                DocumentType = document.DocumentType,
+                                Language = document.Language,
+                                FileName = document.File.FileName,
+                                FilePath = relativePath,
+                                CreatedBy = employee.EmployeeId,
+                                CreatedDate = DateTime.Now
+                            };
+
+                            _context.JobRoleDocuments.Add(newDocument);
+                        }
+                    }
+                }
+            }
+            if (isRejectedReopen)
+            {
+                jobRole.Status = "Pending";
+                jobRole.ReOpen = true;
+            }
 
             jobRole.ModifiedBy = employee.EmployeeId;
             jobRole.ModifiedDate = DateTime.Now;
 
+
             await _context.SaveChangesAsync();
+            if (isRejectedReopen)
+            {
+                TempData["msg"] =
+                    "Job Role updated and sent for approval.";
+            }
+            else
+            {
+                TempData["msg"] =
+                    "Job Role updated successfully.";
+            }
 
-            TempData["msg"] = "Job Role updated successfully.";
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index1));
         }
         [HttpGet]
         public async Task<IActionResult> Approved()
@@ -449,7 +612,39 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 .ToListAsync();
 
             ViewBag.Status = "Approved";
-            ViewBag.IsEmployee = false;
+            ViewBag.IsEmployee = true;
+            ViewBag.ReturnTo = "Approved";
+
+            return View("Approval", jobRoles);
+        }
+        [HttpGet]
+        public async Task<IActionResult> Rejected()
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return RedirectToAction("Login", "Account");
+
+            var employee = await _context.Employee
+                .FirstOrDefaultAsync(x =>
+                    x.ApplicationUserId == currentUser.Id &&
+                    x.IsActive);
+
+            if (employee == null)
+                return Unauthorized();
+
+            var jobRoles = await _context.JobRoles
+                .Include(x => x.Documents)
+                .Where(x =>
+                    x.CreatedBy == employee.EmployeeId &&
+                    x.Status == "Rejected" &&
+                    x.IsActive)
+                .OrderByDescending(x => x.Id)
+                .ToListAsync();
+
+            ViewBag.Status = "Rejected";
+            ViewBag.IsEmployee = true;
+            ViewBag.ReturnTo = "Rejected";
 
             return View("Approval", jobRoles);
         }
@@ -461,27 +656,36 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             if (currentUser == null)
                 return RedirectToAction("Login", "Account");
 
-            // Logged-in manager
-            var manager = await _context.Employee
-                .AsNoTracking()
+            var employee = await _context.Employee
                 .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
 
-            if (manager == null)
+            if (employee == null)
                 return Unauthorized();
 
             IQueryable<JobRole> query = _context.JobRoles
                 .Include(x => x.Documents)
                 .Include(x => x.SubSector);
-
-            if (status.Equals("Archived", StringComparison.OrdinalIgnoreCase))
+            if (status.Equals("ArchivePending", StringComparison.OrdinalIgnoreCase))
             {
                 query = query.Where(x =>
                     x.CreatedBy.HasValue &&
-                    !_context.Employee.Any(e =>
+                    _context.Employee.Any(e =>
                         e.EmployeeId == x.CreatedBy.Value &&
-                        e.ReportingManagerId == manager.EmployeeId &&
-                        e.IsActive
-                    ) == false &&
+                        e.ReportingManagerId == employee.EmployeeId
+                    ) &&
+                    x.Status == "Archive Pending" &&
+                    x.IsActive
+                );
+            }
+            else if (status.Equals("Archived", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.Where(x =>
+                    x.CreatedBy.HasValue &&
+                    _context.Employee.Any(e =>
+                        e.EmployeeId == x.CreatedBy.Value &&
+                        e.ReportingManagerId == employee.EmployeeId
+                    ) &&
+                    x.Status == "Archived" &&
                     !x.IsActive
                 );
             }
@@ -491,8 +695,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     x.CreatedBy.HasValue &&
                     _context.Employee.Any(e =>
                         e.EmployeeId == x.CreatedBy.Value &&
-                        e.ReportingManagerId == manager.EmployeeId &&
-                        e.IsActive
+                        e.ReportingManagerId == employee.EmployeeId
                     ) &&
                     x.Status == status &&
                     x.IsActive
@@ -505,6 +708,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             ViewBag.Status = status;
             ViewBag.IsEmployee = false;
+            ViewBag.ReturnTo = "Approval";
 
             return View(jobRoles);
         }
@@ -512,6 +716,14 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Approve(int id, string remark)
         {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var employee = await _context.Employee
+               .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
             var jobRole = await _context.JobRoles
                 .FirstOrDefaultAsync(x =>
                     x.Id == id &&
@@ -535,7 +747,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             jobRole.Status = "Approved";
             jobRole.Remark = remark;
             jobRole.ModifiedDate = DateTime.Now;
-
+            jobRole.ModifiedBy = employee.EmployeeId;
             await _context.SaveChangesAsync();
 
             TempData["msg"] =
@@ -548,6 +760,14 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject(int id,string remark)
         {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var employee = await _context.Employee
+               .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
             var jobRole = await _context.JobRoles
                 .FirstOrDefaultAsync(x =>
                     x.Id == id &&
@@ -571,6 +791,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             jobRole.Status = "Rejected";
             jobRole.Remark = remark;
             jobRole.ModifiedDate = DateTime.Now;
+            jobRole.ModifiedBy = employee.EmployeeId;
 
             await _context.SaveChangesAsync();
 
@@ -579,8 +800,84 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             return RedirectToAction(nameof(Approval));
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveArchive(int id, string? remark)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return RedirectToAction("Login", "Account");
+
+            var manager = await _context.Employee
+                .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
+
+            if (manager == null)
+                return Unauthorized();
+
+            var jobRole = await _context.JobRoles
+                .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.Status == "Archive Pending" &&
+                    x.IsActive);
+
+            if (jobRole == null)
+                return NotFound();
+            jobRole.Status = "Archived";
+            jobRole.IsActive = false;
+            jobRole.Remark = remark;
+            jobRole.ModifiedBy = manager.EmployeeId;
+            jobRole.ModifiedDate = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            TempData["msg"] = "Archive request approved successfully.";
+
+            return RedirectToAction(nameof(Approval), new { status = "ArchivePending" });
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectArchive(int id, string? remark)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return RedirectToAction("Login", "Account");
+
+            var manager = await _context.Employee
+                .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
+
+            if (manager == null)
+                return Unauthorized();
+
+            var jobRole = await _context.JobRoles
+                .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.Status == "Archive Pending" &&
+                    x.IsActive);
+
+            if (jobRole == null)
+                return NotFound();
+
+           
+            jobRole.Status = "Approved";
+            jobRole.IsActive = true;
+
+            jobRole.Remark = remark;
+            jobRole.ModifiedBy = manager.EmployeeId;
+            jobRole.ModifiedDate = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            TempData["msg"] = "Archive request rejected.";
+
+            return RedirectToAction(nameof(Approval), new
+            {
+                status = "Approved"
+            });
+        }
         [HttpGet]
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id, string? returnTo = null, string? status = null)
         {
             var jobRole = await _context.JobRoles
                 .Include(x => x.Documents)
@@ -590,26 +887,165 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             if (jobRole == null)
                 return NotFound();
 
+            ViewData["ReturnTo"] = returnTo;
+            ViewData["ReturnStatus"] = status;
+
             return View(jobRole);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Archived()
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return RedirectToAction("Login", "Account");
+
+            var employee = await _context.Employee
+                .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
+
+            if (employee == null)
+                return Unauthorized();
+
+            var jobRoles = await _context.JobRoles
+                .Include(x => x.Documents)
+                .Include(x => x.SubSector)
+                .Where(x =>
+                    x.CreatedBy == employee.EmployeeId &&
+                    x.Status == "Archived" &&
+                    !x.IsActive)
+                .OrderByDescending(x => x.Id)
+                .ToListAsync();
+
+            ViewBag.Status = "Archived";
+            ViewBag.IsEmployee = true;
+            ViewBag.ReturnTo = "Archived";
+
+            return View("Approval", jobRoles);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Archive(int id)
         {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var employee = await _context.Employee
+               .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
             var jobRole = await _context.JobRoles
                 .FirstOrDefaultAsync(x => x.Id == id && x.Status == "Approved");
 
             if (jobRole == null)
                 return NotFound();
+            jobRole.Status = "Archive Pending";
+            jobRole.IsActive = true;
 
-            jobRole.IsActive = false;
             jobRole.ModifiedDate = DateTime.Now;
+            jobRole.ModifiedBy = employee.EmployeeId;
 
             await _context.SaveChangesAsync();
 
             TempData["msg"] = "Job Role archived successfully.";
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Approved));
+        }
+        [HttpGet]
+        public async Task<IActionResult> ArchivePending()
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return RedirectToAction("Login", "Account");
+
+            var employee = await _context.Employee
+                .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
+
+            if (employee == null)
+                return Unauthorized();
+
+            var jobRoles = await _context.JobRoles
+                .Include(x => x.Documents)
+                .Include(x => x.SubSector)
+                .Where(x =>
+                    x.CreatedBy == employee.EmployeeId &&
+                    x.Status == "Archive Pending" &&
+                    x.IsActive)
+                .OrderByDescending(x => x.Id)
+                .ToListAsync();
+
+            ViewBag.Status = "Archive Pending";
+            ViewBag.IsEmployee = true;
+            ViewBag.ReturnTo = "ArchivePending";
+
+            return View("Approval", jobRoles);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Restore(int id)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var employee = await _context.Employee
+               .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
+            var jobRole = await _context.JobRoles
+                .FirstOrDefaultAsync(x => x.Id == id && !x.IsActive);
+
+            if (jobRole == null)
+                return NotFound();
+
+            jobRole.IsActive = true;
+            jobRole.Status = "Approved";
+            jobRole.ModifiedDate = DateTime.Now;
+            jobRole.ModifiedBy = employee.EmployeeId;
+            await _context.SaveChangesAsync();
+
+            TempData["msg"] = "Job Role restored successfully.";
+
+            return RedirectToAction(nameof(Archived), new { status = "Archived" });
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reopen(int id)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var employee = await _context.Employee
+                .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
+
+            if (employee == null)
+            {
+                return Unauthorized();
+            }
+
+            var jobRole = await _context.JobRoles
+                .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.Status == "Rejected" &&
+                    x.IsActive &&
+                    x.CreatedBy == employee.EmployeeId);
+
+            if (jobRole == null)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Edit), new
+            {
+                id = id,
+                isReopen = true
+            });
         }
     }
 }

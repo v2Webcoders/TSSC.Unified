@@ -5,10 +5,11 @@
 @inject AppdbContext Context
 @inject UserManager<AppUser> UserManager
 @inject SignInManager<AppUser> SignInManager
+@inject IConfiguration Configuration
 
 @{
 	var currentUser = await UserManager.GetUserAsync(User);
-	var name = currentUser?.Name ?? currentUser?.UserName ?? "User";
+	//var name = currentUser?.Name ?? currentUser?.UserName ?? "User";
 	var email = currentUser?.Email ?? "No email";
 	var mobile = currentUser?.MobileNo ?? "NA";
 	//var role = currentUser?.UserRole ?? "HR Manager";
@@ -20,7 +21,7 @@
 	var employee = currentUser != null
 		? Context.Employee.FirstOrDefault(x => x.ApplicationUserId == currentUser.Id)
 		: null;
-
+	var name = employee.FirstName + " " + employee.LastName;
 	bool isReportingManager = employee != null &&
 		Context.Employee.Any(x => x.ReportingManagerId == employee.EmployeeId);
 
@@ -78,16 +79,14 @@
 				<div class="nk-sidebar-element nk-sidebar-body">
 					<div class="nk-sidebar-content">
 						<div class="nk-sidebar-menu" data-simplebar>
-
-							@* @if (User.IsInRole(""))
+							@if (Configuration["AppSettings:Mode"] == "Production")
 							{
-								<partial name="_HRMenu" />
+								<partial name="_EmployeeMenuLive" />
 							}
-							else 
+							else
 							{
 								<partial name="_EmployeeMenu" />
-							} *@
-							<partial name="_EmployeeMenu" />
+							}
 						</div><!-- .nk-sidebar-menu -->
 					</div><!-- .nk-sidebar-content -->
 				</div>
@@ -272,14 +271,19 @@
 													</div>
 												</div>
 											</div>
-											@* <div class="dropdown-inner">
+											<div class="dropdown-inner">
                                                 <ul class="link-list">
-                                                    <li><a href="javascript:void(0);"><em class="icon ni ni-user-alt"></em><span>View Profile</span></a></li>
-                                                    <li><a href="javascript:void(0);"><em class="icon ni ni-setting-alt"></em><span>Account Setting</span></a></li>
-                                                    <li><a href="javascript:void(0);"><em class="icon ni ni-activity-alt"></em><span>Login Activity</span></a></li>
+													<li>
+														<a href="/HRMS/Account/ChangePassword">
+															<em class="icon ni ni-lock-alt"></em>
+															<span>Change Password</span>
+														</a>
+													</li>
+                                                   @*  <li><a href="javascript:void(0);"><em class="icon ni ni-setting-alt"></em><span>Account Setting</span></a></li>
+                                                    <li><a href="javascript:void(0);"><em class="icon ni ni-activity-alt"></em><span>Login Activity</span></a></li> *@
 
                                                 </ul>
-                                            </div> *@
+                                            </div>
 											<div class="dropdown-inner">
 												<ul class="link-list">
 													<li><a href="/Account/LogOut"><em class="icon ni ni-signout"></em><span>Sign out</span></a></li>

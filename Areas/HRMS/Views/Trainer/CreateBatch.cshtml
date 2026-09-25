@@ -63,7 +63,7 @@
                 <!-- TP -->
                 <div class="col-md-6">
                     <label class="form-label">
-                        Training Partner (TP)
+                        Training Partner
                     </label>
 
                     <select asp-for="TPId"
@@ -71,10 +71,13 @@
                             class="form-select">
 
                         <option value="">
-                            Select TP
+                            Select Training Partner
                         </option>
 
                     </select>
+
+                    <span asp-validation-for="TPId"
+                          class="text-danger"></span>
                 </div>
 
 

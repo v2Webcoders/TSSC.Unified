@@ -1,0 +1,257 @@
+﻿@using TSSC.Unified.Models
+@model AttendanceRegularization
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+	Layout = "_Layout";
+	ViewData["Title"] = "";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+	<div class="nk-block-between">
+		<div class="nk-block-head-content">
+			<h3 class="nk-block-title page-title">Attendance Regularization</h3>
+			<div class="nk-block-des text-soft">
+				<p>Request correction for missing or incorrect attendance.</p>
+			</div>
+		</div><!-- .nk-block-head-content -->
+		<div class="nk-block-head-content">
+			<a asp-action="MyRegularizations"
+			   asp-controller="Attendance"
+			   class="btn btn-primary d-none d-md-inline-flex">
+				<em class="icon ni ni-edit-alt"></em>&nbsp;
+				My Regularizations
+			</a>
+		</div><!-- .nk-block-head-content -->
+	</div><!-- .nk-block-between -->
+</div>
+<div class="nk-block nk-block-lg">
+	<div class="card card-preview">
+		
+		<div class="card-inner">
+			<div class="preview-block">
+				<div class="row gy-4">
+					<form asp-action="Regularization"
+						  asp-controller="Attendance"
+						  asp-area="HRMS"
+						  method="post"
+						  enctype="multipart/form-data">
+
+						@Html.AntiForgeryToken()
+
+						<div asp-validation-summary="ModelOnly"
+							 class="alert alert-danger">
+						</div>
+
+
+						<!-- ================================= -->
+						<!-- DATE -->
+						<!-- ================================= -->
+
+						<div class="row g-4">
+
+							<div class="col-md-6">
+
+								<label class="form-label">
+									Attendance Date
+								</label>
+
+								<input asp-for="AttendanceDate"
+									   type="date"
+									   class="form-control"
+									    />
+
+							</div>
+
+
+							<!-- ================================= -->
+							<!-- EXISTING IN -->
+							<!-- ================================= -->
+							@{
+								var existingIn = Model.ExistingInTime?
+								.ToString("yyyy-MM-ddTHH:mm");
+
+								var existingOut = Model.ExistingOutTime?
+								.ToString("yyyy-MM-ddTHH:mm");
+							}
+
+							<div class="row g-3">
+
+								<!-- EXISTING IN -->
+								<div class="col-md-6">
+
+									<label asp-for="ExistingInTime"
+										   class="form-label">
+										Existing In Time
+									</label>
+
+									<input asp-for="ExistingInTime"
+										   type="datetime-local"
+										   class="form-control"
+										   readonly />
+
+								</div>
+
+
+								<!-- EXISTING OUT -->
+								<div class="col-md-6">
+
+									<label asp-for="ExistingOutTime"
+										   class="form-label">
+										Existing Out Time
+									</label>
+
+									<input asp-for="ExistingOutTime"
+										   type="datetime-local"
+										   class="form-control"
+										   readonly />
+
+								</div>
+
+
+								<!-- REQUESTED IN -->
+								<div class="col-md-6">
+
+									<label asp-for="RequestedInTime"
+										   class="form-label">
+										Requested In Time
+									</label>
+
+									<input asp-for="RequestedInTime"
+										   type="datetime-local"
+										   class="form-control" />
+
+									<span asp-validation-for="RequestedInTime"
+										  class="text-danger">
+									</span>
+
+								</div>
+
+
+								<!-- REQUESTED OUT -->
+								<div class="col-md-6">
+
+									<label asp-for="RequestedOutTime"
+										   class="form-label">
+										Requested Out Time
+									</label>
+
+									<input asp-for="RequestedOutTime"
+										   type="datetime-local"
+										   class="form-control" />
+
+									<span asp-validation-for="RequestedOutTime"
+										  class="text-danger">
+									</span>
+
+								</div>
+
+							</div>
+
+
+							<!-- ================================= -->
+							<!-- REASON -->
+							<!-- ================================= -->
+
+							<div class="col-12">
+
+								<label asp-for="Reason"
+									   class="form-label">
+
+									Reason
+									<span class="text-danger">*</span>
+
+								</label>
+
+								<textarea asp-for="Reason"
+										  class="form-control"
+										  rows="4"
+										  placeholder="Explain why attendance needs to be regularized..."
+										  required></textarea>
+
+								<span asp-validation-for="Reason"
+									  class="text-danger">
+								</span>
+
+							</div>
+
+
+							<!-- ================================= -->
+							<!-- ATTACHMENT -->
+							<!-- ================================= -->
+
+							<div class="col-md-6">
+
+								<label class="form-label">
+									Supporting Document
+								</label>
+
+								<input type="file"
+									   name="AttachmentFile"
+									   class="form-control"
+									   accept=".pdf,.jpg,.jpeg,.png" />
+
+								<div class="form-note">
+									PDF, JPG, JPEG or PNG
+								</div>
+
+							</div>
+
+						</div>
+
+
+						<!-- ================================= -->
+						<!-- INFORMATION -->
+						<!-- ================================= -->
+
+						<div class="alert alert-info mt-4">
+
+							<div class="d-flex gap-2">
+
+								<em class="icon ni ni-info"></em>
+								<div>
+									Your request will be sent to
+									your reporting manager for approval.
+
+									Attendance will be updated only
+									after approval.
+
+								</div>
+
+							</div>
+
+						</div>
+
+
+						<!-- ================================= -->
+						<!-- BUTTONS -->
+						<!-- ================================= -->
+
+						<div class="col-12 mt-4">
+							<a asp-action="MyAttendance"
+							   class="btn btn-light">
+
+								Cancel
+
+							</a>
+
+							<button type="submit"
+									class="btn btn-primary">
+
+								<em class="icon ni ni-send me-1"></em>
+
+								Submit Request
+
+							</button>
+
+						</div>
+
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+

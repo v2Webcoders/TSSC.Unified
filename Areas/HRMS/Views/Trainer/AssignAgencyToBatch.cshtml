@@ -1,0 +1,169 @@
+﻿@model IEnumerable<TSSC.Unified.Models.BatchMaster>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+
+    var agencies =
+        ViewBag.Agencies as List<TSSC.Unified.Models.AssessmentAgency>
+        ?? new List<TSSC.Unified.Models.AssessmentAgency>();
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Assign Assessment Agency
+            </h3>
+        </div>
+
+    </div>
+</div>
+
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <div class="table-responsive">
+
+            <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+                <thead>
+                    <tr>
+                        <th>S.No.</th>
+                        <th>Batch Code</th>
+                        <th>Batch Name</th>
+                        <th>Job Role</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Assessment Agency</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @serial
+                                </td>
+
+                                <td>
+                                    @(item.BatchCode ?? "-")
+                                </td>
+
+                                <td>
+                                    @item.BatchName
+                                </td>
+
+                                <td>
+                                    @(item.JobRole?.JobRoleTitle ?? "-")
+                                </td>
+
+                                <td>
+                                    @(item.StartDate?.ToString("dd-MMM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @(item.EndDate?.ToString("dd-MMM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+
+                                    <select name="assessmentAgencyId"
+                                            class="form-select"
+                                            form="assignForm_@item.Id"
+                                            required>
+
+                                        <option value="">
+                                            Select Agency
+                                        </option>
+
+                                        @foreach (var agency in agencies)
+                                        {
+                                            if (item.AssessmentAgencyId == agency.Id)
+                                            {
+                                                <option value="@agency.Id" selected>
+                                                    @agency.AgencyName
+                                                </option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@agency.Id">
+                                                    @agency.AgencyName
+                                                </option>
+                                            }
+                                        }
+
+                            </select>
+
+                        </td>
+
+                        <td>
+
+                            <form id="assignForm_@item.Id"
+                                  method="post"
+                                          action="/HRMS/Trainer/AssignAgencyToBatch">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="batchId"
+                                       value="@item.Id" />
+
+                                        @if (!item.AssessmentAgencyId.HasValue)
+                                        {
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-primary"
+                                                    onclick="return confirm('Send this Assessment Agency assignment to Vertical Head for approval?');">
+
+                                                <em class="icon ni ni-send"></em>
+                                                Send to Vertical Head
+
+                                            </button>
+                                        }
+                                        else if (item.AgencyApprovalStatus == "Pending")
+                                        {
+                                            <span class="badge badge-dim bg-warning">
+                                                Pending Vertical Head Approval
+                                            </span>
+                                        }
+                                        else if (item.AgencyApprovalStatus == "Approved")
+                                        {
+                                            <span class="badge badge-dim bg-success">
+                                                Approved
+                                            </span>
+                                        }
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                                        serial++;
+                        }
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center text-muted py-4">
+                No batches are available for Assessment Agency assignment.
+            </div>
+        }
+
+    </div>
+</div>

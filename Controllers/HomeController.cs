@@ -8,5 +8,12 @@ namespace TSSC.Unified.Controllers
         //{
         //    return RedirectToAction("Index", "Home", new { area = "Admin" });
         //}
+        [HttpGet("certificate-verify")]
+        public IActionResult CertificateVerify(string? certificateId)
+        {
+            return Content(
+                $"Certificate verification is coming soon.\n\nCertificate ID: {certificateId}"
+            );
+        }
     }
 }

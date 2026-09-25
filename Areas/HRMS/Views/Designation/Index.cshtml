@@ -1,0 +1,188 @@
+﻿@using TSSC.Unified.Models
+@model IEnumerable<Designation>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Designations";
+}
+
+<div class="nk-block-head">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Designations
+            </h3>
+        </div>
+
+        <div class="nk-block-head-content">
+
+            <a asp-action="Create"
+               asp-controller="Designation"
+               asp-area="HRMS"
+               class="btn btn-primary">
+
+                <em class="icon ni ni-plus"></em>
+                <span>Add Designation</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-icon">
+        <em class="icon ni ni-check-circle"></em>
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+
+<div class="card card-bordered">
+
+    <div class="card-inner">
+
+        <div class="table-responsive">
+
+            <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer dtr-inline collapsed">
+
+                <thead>
+                    <tr>
+
+                        <th>
+                            #
+                        </th>
+
+                        <th>
+                            Designation Name
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th class="text-end">
+                            Action
+                        </th>
+
+                    </tr>
+                </thead>
+
+
+                <tbody>
+
+                    @{
+                        var count = 1;
+                    }
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                @count
+                            </td>
+
+                            <td>
+                                <strong>
+                                    @item.DesignationName
+                                </strong>
+                            </td>
+
+                            <td>
+
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge bg-success">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">
+                                        Inactive
+                                    </span>
+                                }
+
+                            </td>
+
+
+                            <td class="text-end">
+
+                                <!-- Edit -->
+                                <a asp-action="Create"
+                                   asp-controller="Designation"
+                                   asp-area="HRMS"
+                                   asp-route-id="@item.DesignationId"
+                                   class="btn btn-sm btn-primary">
+
+                                    <em class="icon ni ni-edit"></em>
+                                    Edit
+
+                                </a>
+
+
+                                <!-- Deactivate / Activate -->
+                                @if (item.IsActive)
+                                {
+                                    <form asp-action="Delete"
+                                          asp-controller="Designation"
+                                          asp-area="HRMS"
+                                          asp-route-id="@item.DesignationId"
+                                          method="post"
+                                          class="d-inline">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-danger"
+                                                onclick="return confirm('Are you sure you want to deactivate this designation?');">
+
+                                            <em class="icon ni ni-cross-circle"></em>
+                                            Deactivate
+
+                                        </button>
+
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="Activate"
+                                          asp-controller="Designation"
+                                          asp-area="HRMS"
+                                          asp-route-id="@item.DesignationId"
+                                          method="post"
+                                          class="d-inline">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-success">
+
+                                            <em class="icon ni ni-check-circle"></em>
+                                            Activate
+
+                                        </button>
+
+                                    </form>
+                                }
+
+                            </td>
+
+                        </tr>
+
+                        count++;
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

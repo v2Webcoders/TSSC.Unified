@@ -196,7 +196,16 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
                     Text = x.JobRoleTitle
                 })
                 .ToList();
-
+            //TP
+            model.TPList =  _context.TPRegistrations
+    .AsNoTracking()
+    .OrderBy(x => x.OrganizationName)
+    .Select(x => new SelectListItem
+    {
+        Value = x.Id.ToString(),
+        Text = x.OrganizationName
+    })
+    .ToList();
             // State
             model.StateList = _context.State
                 .Select(x => new SelectListItem
@@ -1073,17 +1082,38 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
                 ViewBag.BatchEndDate = screening.Batch?.EndDate;
 
                 // Payment based on screening result
+                //       if (string.Equals(
+                //screening.Status,
+                //"Success",
+                //StringComparison.OrdinalIgnoreCase))
+                //       {
+                //           ViewBag.PaymentStatus =
+                //               !trainer.PaymentVerified
+                //                   ? (string.IsNullOrWhiteSpace(trainer.PaymentStatus)
+                //                       ? "Pending"
+                //                       : trainer.PaymentStatus)
+                //                   : "Success";
+                //       }
+                //       else
+                //       {
+                //           ViewBag.PaymentStatus = "Not Applicable";
+                //       }
                 if (string.Equals(
-         screening.Status,
-         "Success",
-         StringComparison.OrdinalIgnoreCase))
+               screening.Status,
+               "Success",
+               StringComparison.OrdinalIgnoreCase))
                 {
-                    ViewBag.PaymentStatus =
-                        !trainer.PaymentVerified
-                            ? (string.IsNullOrWhiteSpace(trainer.PaymentStatus)
+                    if (trainer.PaymentVerified && trainer.FinanceApproved)
+                    {
+                        ViewBag.PaymentStatus = "Success";
+                    }
+                    else
+                    {
+                        ViewBag.PaymentStatus =
+                            string.IsNullOrWhiteSpace(trainer.PaymentStatus)
                                 ? "Pending"
-                                : trainer.PaymentStatus)
-                            : "Success";
+                                : trainer.PaymentStatus;
+                    }
                 }
                 else
                 {

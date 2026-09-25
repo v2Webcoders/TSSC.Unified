@@ -1,0 +1,146 @@
+﻿@using TSSC.Unified.Models
+@using TSSC.Unified.ViewModel
+@model DesignationVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+
+    bool isEdit = Model.DesignationId > 0;
+
+    ViewData["Title"] = isEdit
+        ? "Edit Designation"
+        : "Add Designation";
+}
+
+<div class="nk-block-head">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+
+            <h3 class="nk-block-title page-title">
+                @(isEdit ? "Edit Designation" : "Add Designation")
+            </h3>
+
+        </div>
+
+        <div class="nk-block-head-content">
+
+            <a asp-action="Index"
+               asp-controller="Designation"
+               asp-area="HRMS"
+               class="btn btn-primary">
+
+                <em class="icon ni ni-list"></em>
+
+                <span>Designations</span>
+
+            </a>
+
+        </div>
+
+    </div>
+</div>
+
+
+<div class="card card-bordered">
+
+    <div class="card-inner">
+
+        <form asp-action="Create"
+              asp-controller="Designation"
+              asp-area="HRMS"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input asp-for="DesignationId"
+                   type="hidden" />
+
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-danger"></div>
+
+
+            <div class="row g-4">
+
+                <!-- Designation Name -->
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Designation Name
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="DesignationName"
+                           class="form-control"
+                           placeholder="Enter designation name" />
+
+                    <span asp-validation-for="DesignationName"
+                          class="text-danger"></span>
+
+                </div>
+
+
+                <!-- Status -->
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Status
+                    </label>
+
+                    <select asp-for="IsActive"
+                            class="form-select">
+
+                        <option value="true">
+                            Active
+                        </option>
+
+                        <option value="false">
+                            Inactive
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="IsActive"
+                          class="text-danger"></span>
+
+                </div>
+
+
+                <!-- Submit -->
+                <div class="col-md-12">
+
+                    <div class="form-group">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            <em class="icon ni ni-save"></em>
+
+                            @(isEdit
+                                ? " Update Designation"
+                                : " Save Designation")
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync(
+            "_ValidationScriptsPartial");
+    }
+}
+

@@ -145,20 +145,39 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             await _context.SaveChangesAsync();
 
             TempData["msg"] =
-                "Employee Hierarchy PDF uploaded successfully.";
+                "Organization Chart uploaded successfully.";
 
             return RedirectToAction("EmployeeHierarchy");
         }
+        //[HttpGet]
+        //public async Task<IActionResult> HierarchyView()
+        //{
+        //    var hierarchy = await _context.EmployeeHierarchy
+        //        .FirstOrDefaultAsync(x => x.IsActive);
+
+        //    if (hierarchy == null || string.IsNullOrEmpty(hierarchy.HierarchyDocument))
+        //    {
+        //        TempData["msg"] = "Employee Hierarchy PDF not found.";
+        //        return RedirectToAction("HierarchyView");
+        //    }
+
+        //    return Redirect(hierarchy.HierarchyDocument);
+        //}
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> HierarchyView()
         {
-            var hierarchy = await _context.EmployeeHierarchy
-                .FirstOrDefaultAsync(x => x.IsActive);
+            var hierarchy =
+                await _context.EmployeeHierarchy
+                    .Where(x => x.IsActive)
+                    .FirstOrDefaultAsync();
 
-            if (hierarchy == null || string.IsNullOrEmpty(hierarchy.HierarchyDocument))
+            if (hierarchy == null ||
+                string.IsNullOrWhiteSpace(hierarchy.HierarchyDocument))
             {
-                TempData["msg"] = "Employee Hierarchy PDF not found.";
-                return RedirectToAction("EmployeeHierarchy");
+                
+
+                return NotFound("Organization Chart PDF not found.");
             }
 
             return Redirect(hierarchy.HierarchyDocument);

@@ -1,0 +1,420 @@
+﻿@model TSSC.Unified.ViewModel.EditProfileVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Complete My Profile</h3>
+            <div class="nk-block-des text-soft">
+                <p>Please complete your profile details and submit them for HR verification.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="nk-block nk-block-lg">
+    <div class="card card-preview">
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+        }
+
+        @if (TempData["msg"] != null)
+        {
+            <div class="example-alert w-100">
+                <div class="alert alert-success alert-icon">
+                    <em class="icon ni ni-check-circle"></em>
+                    <strong>@TempData["msg"]</strong>
+                </div>
+            </div>
+        }
+
+        <div class="card-inner">
+
+            <form asp-action="EditProfile"
+                  asp-controller="Employee"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <input type="hidden" asp-for="EmployeeId" />
+
+                <div class="row gy-4">
+
+                    <!-- ================= Basic Information ================= -->
+
+                    <div class="col-12 mb-3">
+                        <div style="border-left:4px solid #D9622F; padding:5px 0 5px 12px;">
+                            <h5 class="mb-0 d-flex align-items-center gap-2"
+                                style="color:#1B2A4A;">
+                                <em class="ni ni-user-alt"></em>
+                                Personal Information
+                            </h5>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-9">
+                        <div class="row gy-3">
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    First Name <span class="text-danger">*</span>
+                                </label>
+
+                                <input asp-for="FirstName"
+                                       class="form-control" readonly />
+
+                                <span asp-validation-for="FirstName"
+                                      class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Last Name<span class="text-danger">*</span>
+                                </label>
+
+                                <input asp-for="LastName"
+                                       class="form-control" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Gender <span class="text-danger">*</span>
+                                </label>
+
+                                <select asp-for="Gender"
+                                        class="form-select">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Date of Birth <span class="text-danger">*</span>
+                                </label>
+
+                                <input asp-for="DOB"
+                                       type="date"
+                                       class="form-control" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Blood Group
+                                </label>
+
+                                <select asp-for="BloodGroup"
+                                        class="form-select">
+                                    <option value="">Select</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                    <option value="NA">NA</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Marital Status <span class="text-danger">*</span>
+                                </label>
+
+                                <select asp-for="MaritalStatus"
+                                        class="form-select">
+                                    <option value="">Select</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Divorced">Divorced</option>
+                                    <option value="Widowed">Widowed</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- ================= Photo ================= -->
+
+                    <div class="col-lg-3">
+
+                        <label class="form-label">
+                            Employee Photo
+                        </label>
+
+                        <div class="card card-bordered text-center p-3">
+
+                            <img id="photoPreview"
+                                 src="@(string.IsNullOrEmpty(Model.PhotoPath)
+                                      ? Url.Content("~/images/no-user.png")
+                                      : Url.Content(Model.PhotoPath))"
+                                 class="rounded-circle mx-auto mb-3"
+                                 style="width:140px;
+                                        height:140px;
+                                        object-fit:cover;
+                                        border:3px solid #dee2e6;" />
+
+                            <input asp-for="Photo"
+                                   type="file"
+                                   class="form-control"
+                                   accept="image/*"
+                                   onchange="previewPhoto(this)" />
+
+                            <small class="text-muted mt-2 d-block">
+                                JPG, JPEG, PNG (Max 2 MB)
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ================= Contact ================= -->
+
+                    <div class="col-12 mb-3 mt-5">
+                        <div style="border-left:4px solid #D9622F;
+                                    padding:5px 0 5px 12px;">
+
+                            <h5 class="mb-0 d-flex align-items-center gap-2"
+                                style="color:#1B2A4A;">
+                                <em class="ni ni-call"></em>
+                                Contact Information
+                            </h5>
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Personal Email<span class="text-danger"></span>
+                        </label>
+
+                        <input asp-for="PersonalEmail"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Mobile Number <span class="text-danger">*</span>
+                        </label>
+
+                        <input asp-for="MobileNo"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Alternate Mobile
+                        </label>
+
+                        <input asp-for="AlternateMobile"
+                               class="form-control" />
+
+                    </div>
+
+                    <!-- ================= Address ================= -->
+
+                    <div class="col-12 mb-3 mt-5">
+
+                        <div style="border-left:4px solid #D9622F;
+                                    padding:5px 0 5px 12px;">
+
+                            <h5 class="mb-0 d-flex align-items-center gap-2"
+                                style="color:#1B2A4A;">
+
+                                <em class="ni ni-map-pin"></em>
+                                Address
+
+                            </h5>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Current Address<span class="text-danger">*</span>
+                        </label>
+
+                        <textarea asp-for="CurrentAddress"
+                                  class="form-control"
+                                  rows="4"></textarea>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Permanent Address
+                        </label>
+
+                        <textarea asp-for="PermanentAddress"
+                                  class="form-control"
+                                  rows="4"></textarea>
+
+                    </div>
+
+                    <!-- ================= Identity ================= -->
+
+                    <div class="col-12 mb-3 mt-5">
+
+                        <div style="border-left:4px solid #D9622F;
+                                    padding:5px 0 5px 12px;">
+
+                            <h5 class="mb-0 d-flex align-items-center gap-2"
+                                style="color:#1B2A4A;">
+
+                                <em class="ni ni-shield-check"></em>
+                                Identity Details
+
+                            </h5>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Aadhaar Number<span class="text-danger"></span>
+                        </label>
+
+                        <input asp-for="AadhaarNo"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            PAN Number<span class="text-danger"></span>
+                        </label>
+
+                        <input asp-for="PANNo"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Passport Number
+                        </label>
+
+                        <input asp-for="PassportNo"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            UAN Number
+                        </label>
+
+                        <input asp-for="UANNo"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            PF Number
+                        </label>
+
+                        <input asp-for="PFNo"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            ESIC Number
+                        </label>
+
+                        <input asp-for="ESICNo"
+                               class="form-control" />
+
+                    </div>
+
+                    <!-- ================= Bank ================= -->
+
+                    <!-- ================= Submit ================= -->
+
+                    <div class="col-12 mt-5">
+
+                        <div class="alert alert-info alert-icon">
+
+                            <em class="icon ni ni-info"></em>
+
+                            <strong>Before submitting:</strong>
+                            Please verify that all information entered above
+                            is correct. Your profile will be reviewed by HR.
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-12 mt-2">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            <em class="icon ni ni-check-circle"></em>
+
+                            <span>Submit Profile</span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        function previewPhoto(input) {
+
+            if (input.files && input.files[0]) {
+
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+
+                    document.getElementById("photoPreview").src =
+                        e.target.result;
+
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+    </script>
+}

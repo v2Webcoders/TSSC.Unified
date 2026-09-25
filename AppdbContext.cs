@@ -43,9 +43,16 @@ namespace QUIZAPP
 
         public DbSet<LeaveAdjustment> LeaveAdjustment { get; set; }
         public DbSet<LeavePolicy> LeavePolicy { get; set; }
+
+        public DbSet<EmployeeAttendance> EmployeeAttendance { get; set; }
+        public DbSet<AttendanceRegularization> AttendanceRegularization { get; set; }
+        public DbSet<ODRequest> ODRequest { get; set; }
+        public DbSet<Holiday> Holiday { get; set; }
+
         public DbSet<Reimbursement> Reimbursement { get; set; }
         public DbSet<Reimbursements> Reimbursements { get; set; }
         public DbSet<EmployeeHierarchy> EmployeeHierarchy { get; set; }
+
 
         //for certificate generation--------------------------------------------------------------
         public DbSet<Certificate> Certificate { get; set; }
@@ -59,9 +66,18 @@ namespace QUIZAPP
         //for add trainer module--------------------------------------------------------------
         public DbSet<TrainerRegistration> TrainerRegistration { get; set; }
 
+
         public DbSet<TrainerRegistrationQualification> TrainerRegistrationQualification { get; set; }
 
+
+        //public DbSet<Certificate> Certificates { get; set; }
+        //----------------------------------------------------------------------------------------
+        public DbSet<TPRegistration> TPRegistrations { get; set; }
+        public DbSet<TPRegistrationDocument> TPRegistrationDocuments { get; set; }
+
+        
         public DbSet<TrainerRegistrationExperience> TrainerRegistrationExperience { get; set; }
+
 
         public DbSet<TrainerRegistrationDocument> TrainerRegistrationDocument { get; set; }
 
@@ -69,5 +85,9 @@ namespace QUIZAPP
         public DbSet<BatchMasterTrainer> BatchMasterTrainers { get; set; }
         public DbSet<ScreeningSchedule> ScreeningSchedule { get; set; }
         public DbSet<AssessmentAgency> AssessmentAgency { get; set; }
+
+       
+        public DbSet<CertificateGenerationAssessmentDetail> CertificateGenerationAssessmentDetail{ get; set; }
+
     }
 }

@@ -45,7 +45,7 @@ namespace QUIZAPP.Services
             {
                 Port = int.Parse(smtpConfig["Port"]),
                 Credentials = new NetworkCredential(smtpConfig["UserName"], smtpConfig["Password"]),
-                EnableSsl = bool.Parse(smtpConfig["EnableSsl"])
+                //EnableSsl = bool.Parse(smtpConfig["EnableSsl"])
             };
 
             var mailMessage = new MailMessage
@@ -58,6 +58,7 @@ namespace QUIZAPP.Services
 
             mailMessage.To.Add(toEmail);
             mailMessage.CC.Add("laxmi.soni@v2web.in");
+
             try
             {
                 await smtpClient.SendMailAsync(mailMessage);

@@ -37,9 +37,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 .ToListAsync();
 
             ViewBag.LeaveTypes = await _context.LeaveType
-                .Where(x => x.IsActive)
+                .Where(x => x.LeaveTypeName== "Comp Off")
                 .ToListAsync();
-
             return View();
         }
 
