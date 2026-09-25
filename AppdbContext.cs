@@ -86,7 +86,6 @@ namespace QUIZAPP
         public DbSet<ScreeningSchedule> ScreeningSchedule { get; set; }
         public DbSet<AssessmentAgency> AssessmentAgency { get; set; }
 
-       
         public DbSet<CertificateGenerationAssessmentDetail> CertificateGenerationAssessmentDetail{ get; set; }
 
     }
