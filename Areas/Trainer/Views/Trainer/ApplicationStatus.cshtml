@@ -1,0 +1,606 @@
+﻿@model TSSC.Unified.ViewModel.ScreeningScheduleVM
+
+@{
+    Layout = "_Layout";
+
+    string trainerName = ViewBag.TrainerName?.ToString() ?? "-";
+    string registrationNo = ViewBag.RegistrationNo?.ToString() ?? "-";
+    string registrationStatus = ViewBag.RegistrationStatus?.ToString() ?? "Pending";
+
+    string screeningStatus =
+        ViewBag.ScreeningStatus?.ToString() ?? "Awaiting Schedule";
+
+    string paymentStatus =
+        ViewBag.PaymentStatus?.ToString() ?? "Pending";
+
+    string jobRole =
+        ViewBag.JobRole?.ToString() ?? "-";
+
+    string batchCode =
+        ViewBag.BatchCode?.ToString() ?? "-";
+
+    string batchName =
+        ViewBag.BatchName?.ToString() ?? "-";
+
+    bool screeningScheduled =
+        !string.IsNullOrWhiteSpace(Model.ScreeningDate?.ToString())
+        && screeningStatus == "Scheduled";
+
+    bool screeningCompleted =
+        screeningStatus == "Completed" ||
+        screeningStatus == "Success";
+
+    bool paymentCompleted =
+        paymentStatus == "Success";
+}
+
+<!-- ========================================================= -->
+<!-- PAGE HEADER -->
+<!-- ========================================================= -->
+
+<div class="nk-block-head nk-block-head-sm">
+
+    <div class="nk-block-between align-items-center">
+
+        <div class="nk-block-head-content">
+
+            <h3 class="nk-block-title page-title">
+                My Application Status
+            </h3>
+
+            <div class="nk-block-des">
+                <p>
+                    Track your application, screening, batch and payment status.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- APPLICATION JOURNEY -->
+<!-- ========================================================= -->
+
+<div class="card card-bordered mb-4">
+
+    <div class="card-inner">
+
+        <h5 class="title mb-4">
+            Application Status
+        </h5>
+
+        <div class="row g-3">
+
+            <!-- REGISTERED -->
+            <div class="col-md-3">
+
+                <div class="border rounded p-3 text-center h-100">
+
+                    <div class="fs-4 text-success mb-2">
+                        ✓
+                    </div>
+
+                    <div class="fw-semibold">
+                        Registered
+                    </div>
+
+                    <small class="text-soft">
+                        Completed
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- SCREENING -->
+            <div class="col-md-3">
+
+                <div class="border rounded p-3 text-center h-100">
+
+                    <div class="fs-4
+                        @(screeningCompleted
+                            ? "text-success"
+                            : screeningScheduled
+                                ? "text-primary"
+                                : "text-warning") mb-2">
+
+                        @(screeningCompleted ? "✓" : "2")
+
+                    </div>
+
+                    <div class="fw-semibold">
+                        Screening
+                    </div>
+
+                    <small class="text-soft">
+                        @screeningStatus
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- PAYMENT -->
+            <div class="col-md-3">
+
+                <div class="border rounded p-3 text-center h-100">
+
+                    <div class="fs-4
+                        @(paymentCompleted
+                            ? "text-success"
+                            : screeningCompleted
+                                ? "text-warning"
+                                : "text-secondary") mb-2">
+
+                        @(paymentCompleted ? "✓" : "3")
+
+                    </div>
+
+                    <div class="fw-semibold">
+                        Payment
+                    </div>
+
+                    <small class="text-soft">
+                        @paymentStatus
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- CERTIFIED -->
+            <div class="col-md-3">
+
+                <div class="border rounded p-3 text-center h-100">
+
+                    <div class="fs-4 text-secondary mb-2">
+                        4
+                    </div>
+
+                    <div class="fw-semibold">
+                        Certified
+                    </div>
+
+                    <small class="text-soft">
+                        Pending
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- APPLICATION SUMMARY -->
+<!-- ========================================================= -->
+
+<div class="card card-bordered mb-4">
+
+    <div class="card-inner">
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+
+                <label class="form-label">
+                    Trainer Name
+                </label>
+
+                <div class="form-control">
+                    @trainerName
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <label class="form-label">
+                    Registration No.
+                </label>
+
+                <div class="form-control">
+                    @registrationNo
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <label class="form-label">
+                    Application Status
+                </label>
+
+                <div>
+
+                    @if (registrationStatus.Equals(
+                        "Approved",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        <span class="badge badge-dim bg-success">
+                            Approved
+                        </span>
+                    }
+                    else if (registrationStatus.Equals(
+                        "Rejected",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        <span class="badge badge-dim bg-danger">
+                            Rejected
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-dim bg-warning">
+                            @registrationStatus
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- TRAINING / SCREENING TABLE -->
+<!-- ========================================================= -->
+
+<div class="card card-bordered">
+
+    <div class="card-inner">
+
+        <h5 class="title mb-4">
+            My Application Details
+        </h5>
+
+        <div class="table-responsive">
+
+            <table class="table table-bordered align-middle">
+
+                <thead class="tb-odr-head">
+
+                    <tr>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Job Role
+                        </th>
+
+                        <th>
+                            Screening
+                        </th>
+
+                        <th>
+                            Payment
+                        </th>
+
+                        <th>
+                            Batch ID
+                        </th>
+
+                        <th>
+                            Training Mode
+                        </th>
+
+                        <th>
+                            Batch Start Date
+                        </th>
+
+                        <th>
+                            Batch End Date
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <!-- DATE -->
+
+                        <td>
+
+                            @(ViewBag.RegistrationDate != null
+                                ? Convert.ToDateTime(
+                                    ViewBag.RegistrationDate
+                                  ).ToString("dd-MM-yyyy")
+                                : "-")
+
+                        </td>
+
+
+                        <!-- JOB ROLE -->
+
+                        <td>
+
+                            @jobRole
+
+                        </td>
+
+
+                        <!-- SCREENING -->
+
+                        <td>
+                            @{
+                                screeningStatus = ViewBag.ScreeningStatus?.ToString() ?? "Awaiting Schedule";
+
+                                var badgeClass = screeningStatus switch
+                                {
+                                    "Rejected" => "bg-danger",
+                                    "Success" => "bg-success",
+                                    "Scheduled" => "bg-warning",
+                                    "On Hold" => "bg-warning",
+                                    "Cancelled" => "bg-secondary",
+                                    _ => "bg-warning"
+                                };
+                            }
+
+                            <span class="badge badge-dim @badgeClass">
+                                @screeningStatus
+                            </span>
+
+                            @if (Model.ScreeningDate.HasValue)
+                            {
+                                <div class="mt-1">
+                                    @Model.ScreeningDate.Value.ToString("dd-MM-yyyy")
+                                </div>
+                            }
+
+                            @if (Model.StartTime.HasValue && Model.EndTime.HasValue)
+                            {
+                                <div>
+                                    @Model.StartTime.Value.ToString(@"hh\:mm")
+                                    -
+                                    @Model.EndTime.Value.ToString(@"hh\:mm")
+                                </div>
+                            }
+                        </td>
+
+
+                        <!-- PAYMENT -->
+
+                        <td>
+                            @{
+                                 paymentStatus =
+                                ViewBag.PaymentStatus?.ToString() ?? "Not Applicable";
+
+                                 screeningStatus =
+                                ViewBag.ScreeningStatus?.ToString() ?? "Awaiting Schedule";
+                            }
+
+                            @if (screeningStatus.Equals("Success",
+                                                        StringComparison.OrdinalIgnoreCase)
+                                                        && paymentStatus.Equals("Pending",
+                                                        StringComparison.OrdinalIgnoreCase))
+                            {
+                                <a href="@Url.Content("~/Trainer/Trainer/Payment")"
+                                   class="btn btn-sm btn-primary">
+                                    Pay Now
+                                </a>
+                            }
+                            else if (paymentStatus.Equals(
+                            "Success",
+                            StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge badge-dim bg-success">
+                                    Success
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-dim bg-secondary">
+                                    @paymentStatus
+                                </span>
+                            }
+                        </td>
+
+
+                        <!-- BATCH -->
+
+                        <td>
+
+                            @if (Model.BatchId.HasValue)
+                            {
+                                <strong>
+                                    @batchCode
+                                </strong>
+
+                                @if (!string.IsNullOrWhiteSpace(batchName))
+                                {
+                                    <div class="small text-soft">
+                                        @batchName
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-soft">
+                                    Not Assigned
+                                </span>
+                            }
+
+                        </td>
+
+
+                        <!-- TRAINING MODE -->
+
+                        <td>
+
+                            @(Model.ScreeningMode ?? "-")
+
+                        </td>
+
+
+                        <!-- BATCH START -->
+
+                        <td>
+
+                            @(ViewBag.BatchStartDate != null
+                                ? Convert.ToDateTime(
+                                    ViewBag.BatchStartDate
+                                  ).ToString("dd-MM-yyyy")
+                                : "-")
+
+                        </td>
+
+
+                        <!-- BATCH END -->
+
+                        <td>
+
+                            @(ViewBag.BatchEndDate != null
+                                ? Convert.ToDateTime(
+                                    ViewBag.BatchEndDate
+                                  ).ToString("dd-MM-yyyy")
+                                : "-")
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- SCREENING LOCATION / MEETING -->
+<!-- ========================================================= -->
+
+@if (screeningScheduled)
+{
+    <div class="card card-bordered mt-4">
+
+        <div class="card-inner">
+
+            <h5 class="title mb-4">
+                Screening Details
+            </h5>
+
+            <div class="row g-4">
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Screening Date
+                    </label>
+
+                    <div class="form-control">
+                        @(Model.ScreeningDate?.ToString("dd-MMM-yyyy") ?? "-")
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Screening Time
+                    </label>
+
+                    <div class="form-control">
+
+                        @(Model.StartTime?.ToString(@"hh\:mm") ?? "-")
+
+                        @if (Model.EndTime.HasValue)
+                        {
+                            <span>
+                                -
+                                @Model.EndTime.Value.ToString(@"hh\:mm")
+                            </span>
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Screening Mode
+                    </label>
+
+                    <div class="form-control">
+                        @(Model.ScreeningMode ?? "-")
+                    </div>
+
+                </div>
+
+
+                @if (Model.ScreeningMode == "Online")
+                {
+                    <div class="col-md-12">
+
+                        <label class="form-label">
+                            Meeting Link
+                        </label>
+
+                        <div>
+
+                            <a href="@Model.MeetingLink"
+                               target="_blank"
+                               class="btn btn-primary">
+
+                                <em class="icon ni ni-video"></em>
+
+                                Join Screening
+
+                            </a>
+
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="col-md-12">
+
+                        <label class="form-label">
+                            Screening Location
+                        </label>
+
+                        <div class="form-control">
+                            @(Model.Location ?? "-")
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+}

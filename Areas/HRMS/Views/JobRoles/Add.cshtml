@@ -88,7 +88,9 @@
                 @Html.AntiForgeryToken()
 
                 <input type="hidden" asp-for="Id" />
-
+                <input type="hidden"
+                       name="isReopen"
+                       value="@(ViewBag.IsReopen == true ? "true" : "false")" />
 
                 <div class="row gy-3">
 
@@ -172,16 +174,6 @@
                             Sub Sector
 
                         </label>
-
-                       @*  <select asp-for="SubSectorId"
-                                class="form-select">
-
-                            <option value="">
-                                Select Sub Sector
-                            </option>
-
-
-                        </select> *@
                         <select asp-for="SubSectorId" class="form-select">
                             <option value="">Select Sub Sector</option>
 
@@ -360,7 +352,7 @@
                     <!-- JOB ROLE DOCUMENTS -->
                     <!-- ========================================= -->
 
-                    <div class="col-12 mt-3 mb-3">
+                    @* <div class="col-12 mt-3 mb-3">
 
                         <div style="border-left:4px solid #D9622F;
                                     padding:5px 0 5px 12px;">
@@ -480,8 +472,273 @@
 
                         </div>
 
+                    </div> *@
+                    <div class="col-12 mt-3 mb-3">
+
+                        <div style="border-left:4px solid #D9622F;
+                padding:5px 0 5px 12px;">
+
+                            <h5 class="mb-0 d-flex align-items-center gap-2"
+                                style="color:#1B2A4A;">
+
+                                <em class="ni ni-file-text"></em>
+
+                                Job Role Documents
+
+                            </h5>
+
+                        </div>
+
                     </div>
 
+
+                    <div class="col-12">
+
+                        <div id="documentContainer">
+
+                            @if (Model.Documents != null && Model.Documents.Any())
+                            {
+                                for (int i = 0; i < Model.Documents.Count; i++)
+                                {
+                                    <div class="document-row">
+
+                                        <div class="row gy-3 align-items-end">
+
+                                            <div class="col-md-3">
+
+                                                <label class="form-label">
+                                                    Document Type
+                                                </label>
+
+                                                <select name="Documents[@i].DocumentType"
+                                                        class="form-select document-type">
+
+                                                    <option value="">
+                                                        Select Document Type
+                                                    </option>
+
+                                                    <option value="QP"
+                                                            selected="@(Model.Documents[i].DocumentType == "QP")">
+                                                        QP
+                                                    </option>
+
+                                                    <option value="MockTest"
+                                                            selected="@(Model.Documents[i].DocumentType == "MockTest")">
+                                                        Mock Test
+                                                    </option>
+
+                                                    <option value="MC"
+                                                            selected="@(Model.Documents[i].DocumentType == "MC")">
+                                                        MC
+                                                    </option>
+
+                                                    <option value="FG"
+                                                            selected="@(Model.Documents[i].DocumentType == "FG")">
+                                                        FG
+                                                    </option>
+
+                                                    <option value="PH"
+                                                            selected="@(Model.Documents[i].DocumentType == "PH")">
+                                                        PH
+                                                    </option>
+
+                                                    <option value="ToolList"
+                                                            selected="@(Model.Documents[i].DocumentType == "ToolList")">
+                                                        Tool List
+                                                    </option>
+
+                                                </select>
+
+                                            </div>
+
+
+                                            <div class="col-md-3">
+
+                                                <label class="form-label">
+                                                    Language
+                                                </label>
+
+                                                <select name="Documents[@i].Language"
+                                                        class="form-select language-select">
+
+                                                    <option value="">
+                                                        Select Language
+                                                    </option>
+
+                                                    <option value="English"
+                                                            selected="@(Model.Documents[i].Language == "English")">
+                                                        English
+                                                    </option>
+
+                                                    <option value="Hindi"
+                                                            selected="@(Model.Documents[i].Language == "Hindi")">
+                                                        Hindi
+                                                    </option>
+
+                                                    <option value="Marathi"
+                                                            selected="@(Model.Documents[i].Language == "Marathi")">
+                                                        Marathi
+                                                    </option>
+
+                                                    <option value="RL"
+                                                            selected="@(Model.Documents[i].Language == "RL")">
+                                                        RL
+                                                    </option>
+
+                                                </select>
+
+                                            </div>
+
+
+                                            <div class="col-md-4">
+
+                                                <label class="form-label">
+                                                    Upload File
+                                                </label>
+
+                                                @if (!string.IsNullOrEmpty(Model.Documents[i].FileName))
+                                                {
+                                                    <div class="mb-2">
+
+                                                        <a href="@Model.Documents[i].FilePath"
+                                                           target="_blank"
+                                                           class="text-primary">
+
+                                                            <em class="icon ni ni-file-pdf"></em>
+
+                                                            @Model.Documents[i].FileName
+
+                                                        </a>
+
+                                                    </div>
+                                                }
+
+                                                <input type="file"
+                                                       name="Documents[@i].File"
+                                                       class="form-control"
+                                                       accept=".pdf,application/pdf" />
+
+                                            </div>
+
+
+                                            <div class="col-md-2">
+
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-primary btn-icon add-document"
+                                                        title="Add Document">
+
+                                                    <em class="icon ni ni-plus"></em>
+
+                                                </button>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <!-- First Document Row -->
+
+                                <div class="document-row">
+
+                                    <div class="row gy-3 align-items-end">
+
+                                        <div class="col-md-3">
+
+                                            <label class="form-label">
+                                                Document Type
+                                            </label>
+
+                                            <select name="Documents[0].DocumentType"
+                                                    class="form-select document-type">
+
+                                                <option value="">
+                                                    Select Document Type
+                                                </option>
+
+                                                <option value="QP">QP</option>
+                                                <option value="MockTest">Mock Test</option>
+                                                <option value="MC">MC</option>
+                                                <option value="FG">FG</option>
+                                                <option value="PH">PH</option>
+                                                <option value="ToolList">Tool List</option>
+
+                                            </select>
+
+                                        </div>
+
+
+                                        <div class="col-md-3">
+
+                                            <label class="form-label">
+                                                Language
+                                            </label>
+
+                                            <select name="Documents[0].Language"
+                                                    class="form-select language-select">
+
+                                                <option value="">
+                                                    Select Language
+                                                </option>
+
+                                                <option value="English">
+                                                    English
+                                                </option>
+
+                                                <option value="Hindi">
+                                                    Hindi
+                                                </option>
+
+                                                <option value="Marathi">
+                                                    Marathi
+                                                </option>
+
+                                                <option value="RL">
+                                                    RL
+                                                </option>
+
+                                            </select>
+
+                                        </div>
+
+
+                                        <div class="col-md-4">
+
+                                            <label class="form-label">
+                                                Upload File
+                                            </label>
+
+                                            <input type="file"
+                                                   name="Documents[0].File"
+                                                   class="form-control"
+                                                   accept=".pdf,application/pdf" />
+
+                                        </div>
+
+
+                                        <div class="col-md-2">
+
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary btn-icon add-document"
+                                                    title="Add Document">
+
+                                                <em class="icon ni ni-plus"></em>
+
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
 
                     <!-- ========================================= -->
                     <!-- BUTTONS -->
@@ -502,7 +759,7 @@
                         </button>
 
 
-                        <a asp-action="Index"
+                        <a asp-action="Index1"
                            asp-controller="JobRoles"
                            asp-area="HRMS"
                            class="btn btn-outline-secondary ms-2">
@@ -525,34 +782,39 @@
 </div>
 
 
+
+
+
 @section Scripts {
 
     <partial name="_ValidationScriptsPartial" />
 
-
     <script>
 
-        let documentIndex = 1;
+        // let documentIndex = 1;
+        let documentIndex = @(Model.Documents?.Count ?? 0);
 
-        const maxLanguages = 4;
+        const maxDocuments = 4;
 
 
-        // Add document row
+        // =========================================================
+        // ADD DOCUMENT
+        // =========================================================
 
         $(document).on("click", ".add-document", function () {
 
             const rowCount = $(".document-row").length;
 
-            if (rowCount >= maxLanguages) {
+            if (rowCount >= maxDocuments) {
                 return;
             }
-
 
             const html = `
                 <div class="document-row mt-3">
 
                     <div class="row gy-3 align-items-end">
 
+                        <!-- DOCUMENT TYPE -->
                         <div class="col-md-3">
 
                             <label class="form-label">
@@ -566,18 +828,36 @@
                                     Select Document Type
                                 </option>
 
-                                <option value="QP">QP</option>
-                                <option value="MockTest">Mock Test</option>
-                                <option value="MC">MC</option>
-                                <option value="FG">FG</option>
-                                <option value="PH">PH</option>
-                                <option value="ToolList">Tool List</option>
+                                <option value="QP">
+                                    QP
+                                </option>
+
+                                <option value="MockTest">
+                                    Mock Test
+                                </option>
+
+                                <option value="MC">
+                                    MC
+                                </option>
+
+                                <option value="FG">
+                                    FG
+                                </option>
+
+                                <option value="PH">
+                                    PH
+                                </option>
+
+                                <option value="ToolList">
+                                    Tool List
+                                </option>
 
                             </select>
 
                         </div>
 
 
+                        <!-- LANGUAGE -->
                         <div class="col-md-3">
 
                             <label class="form-label">
@@ -612,6 +892,7 @@
                         </div>
 
 
+                        <!-- FILE -->
                         <div class="col-md-4">
 
                             <label class="form-label">
@@ -620,11 +901,13 @@
 
                             <input type="file"
                                    name="Documents[${documentIndex}].File"
-                                   class="form-control" />
+                                   class="form-control"
+                                   accept=".pdf,application/pdf" />
 
                         </div>
 
 
+                        <!-- BUTTONS -->
                         <div class="col-md-2">
 
                             <button type="button"
@@ -634,6 +917,7 @@
                                 <em class="icon ni ni-plus"></em>
 
                             </button>
+
 
                             <button type="button"
                                     class="btn btn-sm btn-outline-danger btn-icon remove-document ms-1"
@@ -655,14 +939,14 @@
 
             documentIndex++;
 
-            updateLanguageOptions();
-
             updateAddButtons();
 
         });
 
 
-        // Remove document row
+        // =========================================================
+        // REMOVE DOCUMENT
+        // =========================================================
 
         $(document).on("click", ".remove-document", function () {
 
@@ -670,77 +954,20 @@
                 .closest(".document-row")
                 .remove();
 
-            updateLanguageOptions();
-
             updateAddButtons();
 
         });
 
 
-        // Prevent duplicate languages
-
-        $(document).on("change", ".language-select", function () {
-
-            updateLanguageOptions();
-
-        });
-
-
-        function updateLanguageOptions() {
-
-            const selectedLanguages = [];
-
-
-            $(".language-select").each(function () {
-
-                const value = $(this).val();
-
-                if (value) {
-                    selectedLanguages.push(value);
-                }
-
-            });
-
-
-            $(".language-select").each(function () {
-
-                const currentValue = $(this).val();
-
-
-                $(this).find("option").each(function () {
-
-                    const optionValue = $(this).val();
-
-
-                    if (
-                        optionValue &&
-                        optionValue !== currentValue &&
-                        selectedLanguages.includes(optionValue)
-                    ) {
-
-                        $(this).prop("disabled", true);
-
-                    }
-                    else {
-
-                        $(this).prop("disabled", false);
-
-                    }
-
-                });
-
-            });
-
-        }
-
-
-        // Maximum 4 rows
+        // =========================================================
+        // UPDATE ADD BUTTON
+        // =========================================================
 
         function updateAddButtons() {
 
             const rowCount = $(".document-row").length;
 
-            if (rowCount >= maxLanguages) {
+            if (rowCount >= maxDocuments) {
 
                 $(".add-document").hide();
 
@@ -753,6 +980,17 @@
 
         }
 
-    </script>
 
+        // =========================================================
+        // INITIALIZE
+        // =========================================================
+
+        $(document).ready(function () {
+
+            updateAddButtons();
+
+        });
+
+    </script>
 }
+

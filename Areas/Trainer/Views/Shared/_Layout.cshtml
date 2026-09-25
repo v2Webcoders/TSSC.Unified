@@ -5,36 +5,28 @@
 @inject AppdbContext Context
 @inject UserManager<AppUser> UserManager
 @inject SignInManager<AppUser> SignInManager
-
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
 	var currentUser = await UserManager.GetUserAsync(User);
-	var name = currentUser?.Name ?? currentUser?.UserName ?? "User";
+
 	var email = currentUser?.Email ?? "No email";
 	var mobile = currentUser?.MobileNo ?? "NA";
-	//var role = currentUser?.UserRole ?? "HR Manager";
 
 	var roles = currentUser != null
 		? await UserManager.GetRolesAsync(currentUser)
 		: new List<string>();
+
 	var role = roles.FirstOrDefault() ?? "";
-	var employee = currentUser != null
-		? Context.Employee.FirstOrDefault(x => x.ApplicationUserId == currentUser.Id)
+
+	// Trainer Login
+	var trainerRegistration = currentUser != null
+		? Context.TrainerRegistration
+			.FirstOrDefault(x => x.Email == currentUser.Email)
 		: null;
 
-	bool isReportingManager = employee != null &&
-		Context.Employee.Any(x => x.ReportingManagerId == employee.EmployeeId);
-
-	// Uncomment if required later
-	// var employeeList = Context.Employee
-	//     .Where(x => x.ReportingManagerId == employee.EmployeeId && x.IsActive)
-	//     .Select(x => new SelectListItem
-	//     {
-	//         Value = x.EmployeeId.ToString(),
-	//         Text = x.FirstName + " " + x.LastName
-	//     })
-	//     .ToList();
-
-	// ViewBag.EmployeeList = employeeList;
+	var name = trainerRegistration?.CandidateName
+			   ?? currentUser?.UserName
+			   ?? "Trainer";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -47,7 +39,7 @@
 	<!-- Fav Icon  -->
 	<!--<link rel="shortcut icon" href="./images/favicon.png">-->
 	<!-- Page Title  -->
-	<title>HRMS Panel | TSSC Unified Portal</title>
+	<title>Training Partner Area</title>
 	<!-- StyleSheets  -->
 	<link rel="stylesheet" href="/assets/css/dashlite.css?ver=3.4.0">
 	<link id="skin-default" rel="stylesheet" href="/assets/css/theme.css?ver=3.4.0">
@@ -74,155 +66,84 @@
 					</div>
 				</div>
 
-				<!-- .nk-sidebar-element -->
-				<div class="nk-sidebar-element nk-sidebar-body">
-					<div class="nk-sidebar-content">
-						<div class="nk-sidebar-menu" data-simplebar>
-
-							@* @if (User.IsInRole(""))
-							{
-								<partial name="_HRMenu" />
-							}
-							else 
-							{
-								<partial name="_EmployeeMenu" />
-							} *@
-							<partial name="_EmployeeMenu" />
-						</div><!-- .nk-sidebar-menu -->
-					</div><!-- .nk-sidebar-content -->
-				</div>
+				
 
 				<!-- .nk-sidebar-element -->
+				@if (User.IsInRole("Trainer"))
+				{
+					<div class="nk-sidebar-element nk-sidebar-body">
+						<div class="nk-sidebar-content">
 
+							<div class="nk-sidebar-menu" data-simplebar>
 
-				@* @if (User.IsInRole("Employee"))
-                {
-                    <!-- .nk-sidebar-element -->
-                    <div class="nk-sidebar-element nk-sidebar-body">
-                        <div class="nk-sidebar-content">
-                            <div class="nk-sidebar-menu" data-simplebar>
-                                <ul class="nk-menu">
+								<ul class="nk-menu">
 
-                                    <li class="nk-menu-heading">
-                                        <h6 class="overline-title">Employee Manager Panel</h6>
-                                    </li>
+									
+									<!-- Dashboard -->
+									<li class="nk-menu-item">
 
-                                    <!-- Dashboard -->
-                                    <li class="nk-menu-item">
-                                        <a href="/HRMS/Home/" class="nk-menu-link">
-                                            <span class="nk-menu-icon">
-                                                <em class="icon ni ni-monitor"></em>
-                                            </span>
-                                            <span class="nk-menu-text">Dashboard</span>
-                                        </a>
-                                    </li>
+										<a asp-area="Trainer"
+										   asp-controller="Home"
+										   asp-action="Index"
+										   class="nk-menu-link">
 
-                                    <li class="nk-menu-item has-sub">
-                                        <a href="#" class="nk-menu-link nk-menu-toggle">
-                                            <span class="nk-menu-icon">
-                                                <em class="icon ni ni-users"></em>
-                                            </span>
-                                            <span class="nk-menu-text">Letter(Send / Receive)</span>
-                                        </a>
+											<span class="nk-menu-icon">
+												<em class="icon ni ni-monitor"></em>
+											</span>
 
-                                        <ul class="nk-menu-sub">
-                                            <li class="nk-menu-item">
-                                                <a href="/HRMS/Letter/LetterReceive" class="nk-menu-link">
-                                                    <span class="nk-menu-text">Receive Letter</span>
-                                                </a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/HRMS/Letter/LetterReceiveList" class="nk-menu-link">
-                                                    <span class="nk-menu-text">Received Letter List</span>
-                                                </a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/HRMS/Letter/LetterSend" class="nk-menu-link">
-                                                    <span class="nk-menu-text">Send Letter</span>
-                                                </a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/HRMS/Letter/LetterSendList" class="nk-menu-link">
-                                                    <span class="nk-menu-text">Send Letter List</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </li>
+											<span class="nk-menu-text">
+												Dashboard
+											</span>
 
-                                    <!-- Employee Management -->
+										</a>
 
-                                    @if (isReportingManager)
-                                    {
-                                        <li class="nk-menu-item has-sub">
-                                            <a href="#" class="nk-menu-link nk-menu-toggle">
-                                            <span class="nk-menu-icon">
-                                                <em class="icon ni ni-users"></em>
-                                            </span>
-                                            <span class="nk-menu-text">Task & Activities (Assign & Apporval)</span>
-                                        </a>
+									</li>
 
-                                        <ul class="nk-menu-sub">
-                                            <li class="nk-menu-item">
-                                                <a href="/HRMS/Task/Create" class="nk-menu-link">
-                                                    <span class="nk-menu-text">Assign Task</span>
-                                                </a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/HRMS/Task/TaskList" class="nk-menu-link">
-                                                    <span class="nk-menu-text">Task List</span>
-                                                </a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/HRMS/Task/CompletedTask" class="nk-menu-link">
-                                                    <span class="nk-menu-text">Completed Tasks</span>
-                                                </a>
-                                            </li>
-                                                <li class="nk-menu-item">
-                                                    <a href="/HRMS/Task/ClosedTask" class="nk-menu-link">
-                                                        <span class="nk-menu-text">Closed Tasks</span>
-                                                    </a>
-                                                </li>
-                                        </ul>
-                                    </li>
-                                    }
-                                   else
-                                    {
-                                        <li class="nk-menu-item has-sub">
-                                            <a href="#" class="nk-menu-link nk-menu-toggle">
-                                                <span class="nk-menu-icon">
-                                                    <em class="icon ni ni-users"></em>
-                                                </span>
-                                                <span class="nk-menu-text">Task & Activities</span>
-                                            </a>
+									<!-- My Application -->
+									<li class="nk-menu-item">
 
-                                            <ul class="nk-menu-sub">
-                                                <li class="nk-menu-item">
-                                                    <a href="/HRMS/Task/MyTasks" class="nk-menu-link">
-                                                        <span class="nk-menu-text">My Task</span>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                    }
+										<a asp-area="Trainer"
+										   asp-controller="Trainer"
+										   asp-action="MyApplication"
+										   class="nk-menu-link">
 
+											<span class="nk-menu-icon">
+												<em class="icon ni ni-building"></em>
+											</span>
 
-                                    <!-- My Profile -->
-                                    <li class="nk-menu-item">
-                                        <a href="/HRMS/Profile/MyProfile" class="nk-menu-link">
-                                            <span class="nk-menu-icon">
-                                                <em class="icon ni ni-user-circle"></em>
-                                            </span>
-                                            <span class="nk-menu-text">My Profile</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div><!-- .nk-sidebar-menu -->
-                        </div><!-- .nk-sidebar-content -->
-                    </div>
+											<span class="nk-menu-text">
+												My Application
+											</span>
 
-                    <!-- .nk-sidebar-element -->
-                }
- *@
+										</a>
+
+									</li>
+									<li class="nk-menu-item">
+
+										<a asp-area="Trainer"
+										   asp-controller="Trainer"
+										   asp-action="ApplicationStatus"
+										   class="nk-menu-link">
+
+											<span class="nk-menu-icon">
+												<em class="icon ni ni-list-round"></em>
+											</span>
+
+											<span class="nk-menu-text">
+												My Application Status
+											</span>
+
+										</a>
+
+									</li>
+
+								</ul>
+
+							</div>
+
+						</div>
+					</div>
+				}
 			</div>
 			<!-- sidebar  -->
 			<div class="nk-wrap">

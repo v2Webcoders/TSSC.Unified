@@ -52,9 +52,10 @@ namespace TSSC.Unified.Models
 
             [MaxLength(200)]
             public string Email { get; set; }
-        public bool EmailVerified { get; set; }
+            public bool EmailVerified { get; set; }
+            public bool IsActive { get; set; }
 
-        [MaxLength(20)]
+            [MaxLength(20)]
             public string? Mobile { get; set; }
 
             public bool MobileVerified { get; set; }
@@ -105,9 +106,17 @@ namespace TSSC.Unified.Models
 
             public int? UpdatedBy { get; set; }
 
+            [StringLength(50)]
+            public string? PaymentStatus { get; set; }
 
-            // Child Records
-            public ICollection<TrainerRegistrationQualification>
+            public DateTime? PaymentDate { get; set; }
+
+            public bool PaymentVerified { get; set; }
+            public bool FinanceApproved { get; set; }
+
+            public DateTime? FinanceApprovedDate { get; set; }
+        // Child Records
+        public ICollection<TrainerRegistrationQualification>
                 Qualifications
             { get; set; }
                 = new List<TrainerRegistrationQualification>();

@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Training Batch Notification</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f6fa;
+            font-family: 'Roboto', Arial, sans-serif;
+            color: #8094ae;
+        }
+
+        .wrapper {
+            width: 100%;
+            background-color: #f5f6fa;
+            padding: 30px 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding-bottom: 25px;
+        }
+
+            .header img {
+                height: 60px;
+            }
+
+        .header-title {
+            font-size: 14px;
+            color: #6576ff;
+            padding-top: 12px;
+        }
+
+        .content {
+            background-color: #ffffff;
+            padding: 30px 30px 20px;
+        }
+
+            .content p {
+                margin: 0 0 15px;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+
+        .details {
+            width: 100%;
+            margin: 20px 0;
+        }
+
+            .details td {
+                padding: 10px 0;
+                font-size: 14px;
+            }
+
+        .label {
+            width: 40%;
+            color: #8094ae;
+            font-weight: 600;
+        }
+
+        .value {
+            color: #364a63;
+        }
+
+        .button-wrapper {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #6576ff;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px 20px 0;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="wrapper">
+
+        <div class="container">
+
+            <!-- Header -->
+            <div class="header">
+
+                <a href="{{BaseUrl}}">
+                    <img src="{{BaseUrl}}/assets/images/logo.png"
+                         alt="TSSC Logo">
+                </a>
+
+                <div class="header-title">
+                    Telecom Sector Skill Council
+                </div>
+
+            </div>
+
+
+            <!-- Content -->
+            <div class="content">
+
+                <p>
+                    Dear <strong>{{Name}}</strong>,
+                </p>
+
+                <p>
+                    Your training batch is now ready.
+                </p>
+
+                <p>
+                    Your training is scheduled to start from
+                    <strong>{{StartDate}}</strong>.
+                </p>
+
+
+                <!-- Batch Details -->
+                <table class="details"
+                       border="0"
+                       cellpadding="0"
+                       cellspacing="0">
+
+                    <tr>
+                        <td class="label">
+                            Batch Name
+                        </td>
+
+                        <td class="value">
+                            {{BatchName}}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            Batch Code
+                        </td>
+
+                        <td class="value">
+                            {{BatchCode}}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            Training Start Date
+                        </td>
+
+                        <td class="value">
+                            {{StartDate}}
+                        </td>
+                    </tr>
+
+                </table>
+
+
+                <p>
+                    You are requested to attend the training in online mode.
+                </p>
+
+                <p>
+                    Please login to the portal to view your assigned batch
+                    and access the online training session details.
+                </p>
+
+
+                <div class="button-wrapper">
+
+                    <a href="{{PortalUrl}}"
+                       class="button">
+                        Login to Portal
+                    </a>
+
+                </div>
+
+
+                <p style="margin-bottom:20px;">
+                    For any assistance, please reach us at
+                    <strong>{{SupportEmail}}</strong>.
+                </p>
+
+
+                <p>
+                    Regards,<br>
+                    <strong>TSSC</strong>
+                </p>
+
+            </div>
+
+
+            <!-- Footer -->
+            <div class="footer">
+
+                Copyright © 2026 TSSC INDIA.
+                All rights reserved.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

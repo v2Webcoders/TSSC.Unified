@@ -1,0 +1,407 @@
+﻿@using TSSC.Unified.Models
+@model IEnumerable<JobRole>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Job Roles";
+    int serial = 1;
+}
+
+<!-- =========================
+     PAGE HEADER
+========================= -->
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <!-- JOB ROLE LIST -->
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Job Role List
+            </h3>
+        </div>
+
+        <!-- ADD JOB ROLE -->
+        <div class="nk-block-head-content">
+            <div class="toggle-wrap nk-block-tools-toggle">
+
+                <a asp-area="HRMS"
+                   asp-controller="JobRoles"
+                   asp-action="Add"
+                   class="btn btn-primary">
+
+                    <em class="icon ni ni-plus"></em>
+                    <span>Add Job Role</span>
+
+                </a>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- =========================
+     CONTENT
+========================= -->
+<div class="nk-content-inner">
+    <div class="nk-content-body">
+
+
+        <!-- SUCCESS MESSAGE -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-icon">
+
+                <em class="icon ni ni-check-circle"></em>
+
+                @TempData["SuccessMessage"]
+
+            </div>
+        }
+
+        <!-- =========================
+             TABLE CARD
+        ========================= -->
+        <div class="card card-bordered">
+
+            <div class="card-inner">
+
+                <table id="jobRoleTable"
+                       class="datatable-init-export table table-tranx table_custom table-bordered">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>S.No.</th>
+
+                            <th>QP Code</th>
+
+                            <th>Job Role Title</th>
+
+                            <th>QP Version</th>
+
+                            <th>NSQF Level</th>
+
+                            <th>QP Hours</th>
+
+                            <th>Valid From</th>
+
+                            <th>Valid To</th>
+                            <th>Remark</th>
+
+                            <th>Status</th>
+
+                            <th width="120">
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+
+                            var filterStatus = "";
+
+                            if (item.Status == "Approved" ||
+                            item.Status == "Active")
+                            {
+                                filterStatus = "approved";
+                            }
+                            else if (item.Status == "Pending" ||
+                            item.Status == "Submitted" ||
+                            item.Status == "Under Verification")
+                            {
+                                filterStatus = "pending";
+                            }
+                            else if (item.Status == "Rejected")
+                            {
+                                filterStatus = "rejected";
+                            }
+
+
+                        <tr data-status="@filterStatus">
+
+                            <!-- S.NO -->
+                            <td class="serial-number">
+                                @serial
+                            </td>
+
+
+                            <!-- QP CODE -->
+                            <td>
+                                @item.QPCode
+                            </td>
+
+
+                            <!-- JOB ROLE TITLE -->
+                            <td>
+                                @item.JobRoleTitle
+                            </td>
+
+
+                            <!-- QP VERSION -->
+                            <td>
+                                @(string.IsNullOrEmpty(item.QPVersion)
+                                                                ? "-"
+                                                                : item.QPVersion)
+                                                                             </td>
+
+
+                            <!-- NSQF LEVEL -->
+                            <td>
+                                @(string.IsNullOrEmpty(item.NSQFLevel)
+                                                                ? "-"
+                                                                : item.NSQFLevel)
+                                                                             </td>
+
+
+                            <!-- QP HOURS -->
+                            <td>
+                                @(item.QPHours.HasValue
+                                                                ? item.QPHours.Value.ToString("0.##")
+                                                                : "-")
+                                                                  </td>
+
+
+                            <!-- VALID FROM -->
+                            <td>
+                                @(item.ValidFrom.HasValue? item.ValidFrom.Value.ToString("dd-MMM-yyyy"): "-")
+                            </td>
+
+
+                            <!-- VALID TO -->
+                            <td>
+                                @(item.ValidTo.HasValue? item.ValidTo.Value.ToString("dd-MMM-yyyy"): "-")
+                            </td>
+
+                                <td>
+                                    @item.Remark
+                                </td>
+                                <!-- STATUS -->
+                                <td>
+
+                                @if (item.Status == "Approved" ||
+                                                                item.Status == "Active")
+                                    {
+                                        <span class="badge badge-dot bg-success">
+                                            @item.Status
+                                        </span>
+                                    }
+                                    else if (item.Status == "Submitted" ||
+                                    item.Status == "Under Verification" ||
+                                    item.Status == "Pending")
+                                    {
+                                        <span class="badge badge-dot bg-warning">
+                                            @item.Status
+                                        </span>
+                                    }
+                                    else if (item.Status == "Rejected")
+                                    {
+                                        <span class="badge badge-dot bg-danger">
+                                            @item.Status
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-dot bg-secondary">
+                                            @item.Status
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ACTION -->
+                                <td>
+
+                                    <div class="btn-group" role="group">
+
+                                        <!-- VIEW -->
+                                        <a asp-area="HRMS"
+                                           asp-controller="JobRoles"
+                                           asp-action="Details"
+                                           asp-route-id="@item.Id"
+                                           asp-route-returnTo="Index1"
+                                           class="btn btn-sm btn-outline-info"
+                                           title="View">
+
+                                            <em class="icon ni ni-eye"></em>
+
+                                        </a>
+
+
+                                        <!-- EDIT -->
+                                        @if (item.Status == "Pending")
+                                        {
+                                            <a asp-area="HRMS"
+                                               asp-controller="JobRoles"
+                                               asp-action="Edit"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-sm btn-outline-primary"
+                                               title="Edit">
+
+                                                <em class="icon ni ni-edit"></em>
+
+                                            </a>
+                                        }
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                            serial++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- =========================
+     FILTER SCRIPT
+========================= -->
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const filterButtons =
+            document.querySelectorAll(".status-filter");
+
+        const tableRows =
+            document.querySelectorAll("#jobRoleTable tbody tr");
+
+
+        filterButtons.forEach(function (button) {
+
+            button.addEventListener("click", function () {
+
+                const selectedStatus =
+                    this.getAttribute("data-status");
+
+
+                // Reset buttons
+                filterButtons.forEach(function (btn) {
+
+                    btn.classList.remove("active");
+
+                    if (btn.dataset.status === "all") {
+
+                        btn.className =
+                            "btn btn-outline-primary status-filter";
+
+                    }
+                    else if (btn.dataset.status === "pending") {
+
+                        btn.className =
+                            "btn btn-outline-warning status-filter";
+
+                    }
+                    else if (btn.dataset.status === "approved") {
+
+                        btn.className =
+                            "btn btn-outline-success status-filter";
+
+                    }
+                    else if (btn.dataset.status === "rejected") {
+
+                        btn.className =
+                            "btn btn-outline-danger status-filter";
+
+                    }
+
+                });
+
+
+                // Selected button
+                this.classList.add("active");
+
+
+                if (selectedStatus === "all") {
+
+                    this.classList.remove("btn-outline-primary");
+                    this.classList.add("btn-primary");
+
+                }
+                else if (selectedStatus === "pending") {
+
+                    this.classList.remove("btn-outline-warning");
+                    this.classList.add("btn-warning");
+
+                }
+                else if (selectedStatus === "approved") {
+
+                    this.classList.remove("btn-outline-success");
+                    this.classList.add("btn-success");
+
+                }
+                else if (selectedStatus === "rejected") {
+
+                    this.classList.remove("btn-outline-danger");
+                    this.classList.add("btn-danger");
+
+                }
+
+
+                // Filter table
+                let visibleSerial = 1;
+
+
+                tableRows.forEach(function (row) {
+
+                    const rowStatus =
+                        row.getAttribute("data-status");
+
+
+                    if (
+                        selectedStatus === "all" ||
+                        rowStatus === selectedStatus
+                    ) {
+
+                        row.style.display = "";
+
+
+                        const serialCell =
+                            row.querySelector(".serial-number");
+
+
+                        if (serialCell) {
+
+                            serialCell.textContent =
+                                visibleSerial++;
+
+                        }
+
+                    }
+                    else {
+
+                        row.style.display = "none";
+
+                    }
+
+                });
+
+            });
+
+        });
+
+    });
+
+</script>

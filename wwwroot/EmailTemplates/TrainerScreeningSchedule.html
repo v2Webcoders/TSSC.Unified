@@ -1,0 +1,364 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Trainer Screening Schedule</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #333333;
+        }
+
+        .wrapper {
+            width: 100%;
+            padding: 30px 15px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        }
+
+        .header {
+            background-color: #0d6efd;
+            color: #ffffff;
+            text-align: center;
+            padding: 28px 25px;
+        }
+
+            .header h1 {
+                margin: 0;
+                font-size: 24px;
+                font-weight: 600;
+            }
+
+            .header p {
+                margin: 8px 0 0;
+                font-size: 14px;
+            }
+
+        .content {
+            padding: 30px;
+        }
+
+            .content p {
+                font-size: 15px;
+                line-height: 1.7;
+                margin: 0 0 15px;
+            }
+
+        .greeting {
+            font-size: 17px !important;
+            font-weight: 600;
+        }
+
+        .section-title {
+            margin-top: 25px;
+            margin-bottom: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            color: #222222;
+        }
+
+        .details {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #e1e5e9;
+        }
+
+            .details td {
+                padding: 12px 14px;
+                border-bottom: 1px solid #e1e5e9;
+                font-size: 14px;
+                vertical-align: top;
+            }
+
+            .details tr:last-child td {
+                border-bottom: none;
+            }
+
+            .details .label {
+                width: 38%;
+                background-color: #f8f9fa;
+                font-weight: 600;
+                color: #444444;
+            }
+
+        .online-box {
+            margin-top: 20px;
+            padding: 18px;
+            background-color: #eef6ff;
+            border-left: 4px solid #0d6efd;
+            border-radius: 5px;
+        }
+
+        .offline-box {
+            margin-top: 20px;
+            padding: 18px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #6c757d;
+            border-radius: 5px;
+        }
+
+            .online-box p,
+            .offline-box p {
+                margin: 5px 0;
+            }
+
+        .join-button {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 12px 24px;
+            background-color: #0d6efd;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .remarks {
+            margin-top: 20px;
+            padding: 16px;
+            background-color: #fff8e1;
+            border: 1px solid #ffe082;
+            border-radius: 5px;
+        }
+
+        .remarks-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            padding: 22px 30px;
+            text-align: center;
+        }
+
+            .footer p {
+                margin: 5px 0;
+                color: #777777;
+                font-size: 12px;
+                line-height: 1.6;
+            }
+
+        @media only screen and (max-width: 600px) {
+
+            .wrapper {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 22px 18px;
+            }
+
+            .content {
+                padding: 20px 18px;
+            }
+
+            .footer {
+                padding: 20px 18px;
+            }
+
+            .header h1 {
+                font-size: 21px;
+            }
+
+            .details td {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            .details .label {
+                width: 42%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="wrapper">
+
+        <div class="container">
+
+            <!-- HEADER -->
+            <div class="header">
+                <h1>Trainer Screening Scheduled</h1>
+                <p>Your screening schedule has been successfully confirmed</p>
+            </div>
+
+
+            <!-- CONTENT -->
+            <div class="content">
+
+                <p class="greeting">
+                    Dear {{TrainerName}},
+                </p>
+
+                <p>
+                    We are pleased to inform you that your
+                    <strong>Trainer Screening</strong> has been successfully scheduled.
+                </p>
+
+                <p>
+                    Please find your screening details below.
+                </p>
+
+
+                <!-- SCREENING DETAILS -->
+                <div class="section-title">
+                    Screening Details
+                </div>
+
+                <table class="details">
+
+                    <tr>
+                        <td class="label">Trainer Name</td>
+                        <td>{{TrainerName}}</td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">Registration No.</td>
+                        <td>{{RegistrationNo}}</td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">Batch Name</td>
+                        <td>{{BatchName}}</td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">Screening Date</td>
+                        <td>{{ScreeningDate}}</td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">Start Time</td>
+                        <td>{{StartTime}}</td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">End Time</td>
+                        <td>{{EndTime}}</td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">Screening Mode</td>
+                        <td>{{ScreeningMode}}</td>
+                    </tr>
+
+                </table>
+
+
+                <!-- ONLINE SCREENING -->
+                <div class="online-box">
+
+                    <p>
+                        <strong>Online Screening</strong>
+                    </p>
+
+                    <p>
+                        Your screening will be conducted online.
+                        Please join using the button below.
+                    </p>
+
+                    <a href="{{MeetingLink}}"
+                       class="join-button"
+                       target="_blank">
+                        Join Screening
+                    </a>
+
+                </div>
+
+
+                <!-- OFFLINE SCREENING -->
+                <div class="offline-box">
+
+                    <p>
+                        <strong>Screening Location</strong>
+                    </p>
+
+                    <p>
+                        {{Location}}
+                    </p>
+
+                </div>
+
+
+                <!-- REMARKS -->
+                <div class="remarks">
+
+                    <div class="remarks-title">
+                        Remarks
+                    </div>
+
+                    <div>
+                        {{Remarks}}
+                    </div>
+
+                </div>
+
+
+                <!-- IMPORTANT MESSAGE -->
+                <p style="margin-top:25px;">
+
+                    Kindly ensure that you are available at the scheduled date and time.
+
+                    For online screening, please ensure that you have a stable
+                    internet connection and join the meeting a few minutes
+                    before the scheduled time.
+
+                </p>
+
+                <p>
+                    In case of any issue regarding your screening schedule,
+                    please contact the concerned team.
+                </p>
+
+
+                <!-- REGARDS -->
+                <p style="margin-top:25px;">
+
+                    Regards,<br>
+
+                    <strong>TSSC Team</strong>
+
+                </p>
+
+            </div>
+
+
+            <!-- FOOTER -->
+            <div class="footer">
+
+                <p>
+                    This is a system-generated email.
+                    Please do not reply to this email.
+                </p>
+
+                <p>
+                    © TSSC. All Rights Reserved.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

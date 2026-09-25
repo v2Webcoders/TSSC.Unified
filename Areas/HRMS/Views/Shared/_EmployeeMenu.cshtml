@@ -49,6 +49,9 @@
 	var isFinanceHead = currentUser != null
 		&& employee != null
 		&& employee.DesignationId == 50;
+
+	//for statndard process
+	bool isStandardEmployee = roles.Contains("StandardsTeam");
 	//for reimbursement system
 	// =====================================
 	// REIMBURSEMENT SIDE MENU
@@ -151,6 +154,7 @@
 		isCeoApprover;
 
 	}
+
 }
 
 <style>
@@ -490,33 +494,75 @@
 			</ul>
 
 		</li>
-		<li class="nk-menu-item has-sub">
+		@* @if (isStandardEmployee && !isReportingManager)
+		{ *@
+			<li class="nk-menu-item has-sub">
 
-			<a href="#"
-			   class="nk-menu-link nk-menu-toggle">
+				<a href="#"
+				class="nk-menu-link nk-menu-toggle">
 
-				<span class="nk-menu-icon">
-					<em class="icon ni ni-briefcase"></em>
-				</span>
+					<span class="nk-menu-icon">
+						<em class="icon ni ni-briefcase"></em>
+					</span>
 
-				<span class="nk-menu-text">
+					<span class="nk-menu-text">
 
-					Manage Job Roles
-				</span>
+						Manage Job Roles
+					</span>
 
-			</a>
+				</a>
 
-			<ul class="nk-menu-sub">
+				<ul class="nk-menu-sub">
 
+					<li class="nk-menu-item">
+						<a asp-area="HRMS"
+						asp-controller="JobRoles"
+						asp-action="Index1"
+						class="nk-menu-link">
+
+							<span class="nk-menu-text">
+
+								Job Role List
+							</span>
+
+						</a>
+					</li>
+
+					<li class="nk-menu-item">
+						<a asp-area="HRMS"
+						asp-controller="JobRoles"
+						asp-action="Approved"
+						class="nk-menu-link">
+
+
+
+							<span class="nk-menu-text">
+
+								Approved
+							</span>
+
+						</a>
+					</li>
 				<li class="nk-menu-item">
 					<a asp-area="HRMS"
 					   asp-controller="JobRoles"
-					   asp-action="Index"
+					   asp-action="Rejected"
 					   class="nk-menu-link">
 
 						<span class="nk-menu-text">
 
-							Add Job Roles
+							Rejected
+						</span>
+					</a>
+				</li>
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="JobRoles"
+					   asp-action="ArchivePending"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Pending Archive
 						</span>
 
 					</a>
@@ -525,22 +571,20 @@
 				<li class="nk-menu-item">
 					<a asp-area="HRMS"
 					   asp-controller="JobRoles"
-					   asp-action="Approved"
+					   asp-action="Archived"
 					   class="nk-menu-link">
-
-
 
 						<span class="nk-menu-text">
 
-							Approved Job Roles
+							Archived
 						</span>
 
 					</a>
 				</li>
+				</ul>
 
-			</ul>
-
-		</li>
+			</li>
+		@* } *@
 	}
 
 	@if (User.IsInRole("Letter"))
@@ -633,7 +677,193 @@
 	</li>
 
 
+	<!-- TOT/TOA - ONLY -->
 	<!-- ===================================================== -->
+	@if (User.IsInRole("TOTTOAADMIN"))
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					<em class="icon ni ni-user-check"></em>
+					TOT/TOA
+				</span>
+			</div>
+		</li>
+	
+		<!-- TOT/TOA -->
+
+		<li class="nk-menu-item has-sub">
+
+			<a href="#"
+			   class="nk-menu-link nk-menu-toggle">
+
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-mail"></em>
+				</span>
+
+				<span class="nk-menu-text">
+					Manage TOT/TOA
+				</span>
+
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/Trainer/RegistrationList"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Trainer Registrations
+						</span>
+
+					</a>
+				</li>
+				<li class="nk-menu-item">
+					<a href="/HRMS/Trainer/CreateBatch"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Create Batch
+						</span>
+
+					</a>
+				</li>
+				<li class="nk-menu-item">
+					<a href="/HRMS/Trainer/BatchList"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							 Batch List
+						</span>
+
+					</a>
+				</li>
+				<li class="nk-menu-item">
+					<a href="/HRMS/Trainer/AssignAgencyToBatch"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Assign Assesment Agency
+						</span>
+
+					</a>
+				</li>
+				
+			</ul>
+
+		</li>
+	}
+	
+	@if (isFinanceEmployee)
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					<em class="icon ni ni-user-check"></em>
+					TOT/TOA
+				</span>
+			</div>
+		</li>
+		<li class="nk-menu-item has-sub">
+
+			<a href="#"
+			   class="nk-menu-link nk-menu-toggle">
+
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-user-check"></em>
+				</span>
+
+				<span class="nk-menu-text">
+					Manage TOT/TOA
+				</span>
+
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/Trainer/PaymentApproval?tab=Pending"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Pending Approval
+						</span>
+
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/Trainer/PaymentApproval?tab=Approved"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Approved
+						</span>
+
+					</a>
+				</li>
+
+			</ul>
+
+		</li>
+	}
+
+	@if (isReportingManager)
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					<em class="icon ni ni-user-check"></em>
+					TOT/TOA
+				</span>
+			</div>
+		</li>
+		<li class="nk-menu-item has-sub">
+
+			<a href="#"
+			   class="nk-menu-link nk-menu-toggle">
+
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-user-check"></em>
+				</span>
+
+				<span class="nk-menu-text">
+					Manage TOT/TOA
+				</span>
+
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/Trainer/AgencyApprovalByManager"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Pending Approval
+						</span>
+
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/Trainer/ApprovedAgency"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Approved
+						</span>
+
+					</a>
+				</li>
+
+			</ul>
+
+		</li>
+	}
+
+
 	<!-- HR MANAGEMENT - HR ONLY -->
 	<!-- ===================================================== -->
 	@if (isHR)
@@ -1048,7 +1278,9 @@
 	}
 	<!-- MANAGER - REPORTING MANAGER ONLY -->
 	<!-- ===================================================== -->
-	@if ((isReportingManager || showReimbursementApproverMenu))
+
+	@if (isReportingManager || showReimbursementApproverMenu || isFinanceEmployee || isHR || isFinanceHead || isCEO) ;)
+
 	{
 		<li class="nk-menu-heading">
 			<div class="nk-menu-heading-content">
@@ -1217,48 +1449,128 @@
 			</li>
 		}
 		@* Reimbursements — Management (actual expense claims, 5-stage chain) *@
-		var reimbursementStages = new List<(bool Show, string Action, string ApprovedStatus, string RejectedStatus)>
-	{
-	(isReportingManager, "ManagerReimbursement", "Manager Approved", "Rejected"),
-	(isFinanceEmployee, "FinanceReimbursement", "Finance Approved", "Finance Rejected"),
-	(isHR, "HRReimbursement", "HR Approved", "HR Rejected"),
-	(isFinanceHead, "FinanceHeadReimbursement", "Finance Head Approved", "Finance Head Rejected"),
-	(isCEO, "CEOReimbursement", "CEO Approved", "CEO Rejected"),
-	};
-		var activeStage = reimbursementStages.FirstOrDefault(s => s.Show);
-
-		@if (activeStage.Action != null)
+	@{
+		var reimbursementStages =
+		new List<(bool Show, string Action, string StatusColumn,
+		string PendingStatus, string ApprovedStatus, string RejectedStatus)>
 		{
-			<li class="nk-menu-item has-sub">
-				<a href="#" class="nk-menu-link nk-menu-toggle">
-					<span class="nk-menu-icon"><em class="icon ni ni-wallet"></em></span>
-					<span class="nk-menu-text">Reimbursements</span>
-				</a>
-				<ul class="nk-menu-sub">
-					<li class="nk-menu-item">
-						<a asp-area="HRMS" asp-controller="Reimbursement" asp-action="@activeStage.Action" asp-route-status="Pending" class="nk-menu-link">
-							<span class="nk-menu-text">Reimbursement Request</span>
-						</a>
-					</li>
-					<li class="nk-menu-item">
-						<a asp-area="HRMS" asp-controller="Reimbursement" asp-action="@activeStage.Action" asp-route-status="@activeStage.ApprovedStatus" class="nk-menu-link">
-							<span class="nk-menu-text">Approved Reimbursement</span>
-						</a>
-					</li>
-					<li class="nk-menu-item">
-						<a asp-area="HRMS" asp-controller="Reimbursement" asp-action="@activeStage.Action" asp-route-status="@activeStage.RejectedStatus" class="nk-menu-link">
-							<span class="nk-menu-text">Reject Reimbursement</span>
-						</a>
-					</li>
-				</ul>
-			</li>
-		}
-		<!-- ===================================================== -->
+		(
+		isReportingManager,
+		"ManagerReimbursement",
+		"Status",
+		"Pending Manager Approval",
+		"Manager Approved",
+		"Rejected"
+		),
+
+		(
+		isFinanceEmployee,
+		"FinanceReimbursement",
+		"FinanceStatus",
+		"Pending",
+		"Finance Approved",
+		"Finance Rejected"
+		),
+
+		(
+		isHR,
+		"HRReimbursement",
+		"HRStatus",
+		"Pending",
+		"HR Approved",
+		"HR Rejected"
+		),
+
+		(
+		isFinanceHead,
+		"FinanceHeadReimbursement",
+		"FinanceHeadStatus",
+		"Pending",
+		"Finance Head Approved",
+		"Finance Head Rejected"
+		),
+
+		(
+		isCEO,
+		"CEOReimbursement",
+		"CEOStatus",
+		"Pending",
+		"CEO Approved",
+		"CEO Rejected"
+		)
+		};
+
+		var activeStage = reimbursementStages
+		.FirstOrDefault(s => s.Show);
+
+		var hasActiveStage = activeStage.Show;
+	}
+
+	@if (hasActiveStage)
+	{
+		<li class="nk-menu-item has-sub">
+
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-check-circle-cut"></em>
+				</span>
+
+				<span class="nk-menu-text">Reimbursements</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<!-- Pending Request -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="@activeStage.Action"
+					   asp-route-status="@activeStage.PendingStatus"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Reimbursement Request
+						</span>
+					</a>
+				</li>
+
+				<!-- Approved -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="@activeStage.Action"
+					   asp-route-status="@activeStage.ApprovedStatus"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Approved Reimbursement
+						</span>
+					</a>
+				</li>
+
+				<!-- Rejected -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="@activeStage.Action"
+					   asp-route-status="@activeStage.RejectedStatus"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Reject Reimbursement
+						</span>
+					</a>
+				</li>
+
+			</ul>
+		</li>
+	}
+
 
 
 		@*----------------- for manage job roles -----------------------------*@
 
-		@if (isReportingManager)
+	@if (isReportingManager)
 
 		{
 			<li class="nk-menu-item has-sub">
@@ -1276,12 +1588,8 @@
 				<ul class="nk-menu-sub">
 
 					<li class="nk-menu-item">
-						<a asp-area="HRMS"
-						   asp-controller="JobRoles"
-						   asp-action="Approval"
-						   asp-route-status="Pending"
-						   class="nk-menu-link">
-
+					<a href="/HRMS/JobRoles/Approval?status=Pending"
+					   class="nk-menu-link">
 							<span class="nk-menu-text">
 
 								Pending Job Approvals
@@ -1316,21 +1624,32 @@
 							</span>
 						</a>
 					</li>
-					<li class="nk-menu-item">
-						<a asp-area="HRMS"
-						   asp-controller="JobRoles"
-						   asp-action="Approval"
-						   asp-route-status="Archived"
-						   class="nk-menu-link">
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="JobRoles"
+					   asp-action="Approval"
+					   asp-route-status="ArchivePending"
+					   class="nk-menu-link">
 
-							<span class="nk-menu-text">
+						<span class="nk-menu-text">
+							Pending Archive
+						</span>
 
-								Archived
-							</span>
+					</a>
+				</li>
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="JobRoles"
+					   asp-action="Approval"
+					   asp-route-status="Archived"
+					   class="nk-menu-link">
 
-						</a>
-					</li>
+						<span class="nk-menu-text">
+							Archived
+						</span>
 
+					</a>
+				</li>
 				</ul>
 			</li>
 

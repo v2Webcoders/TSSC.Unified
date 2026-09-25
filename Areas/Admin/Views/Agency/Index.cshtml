@@ -1,0 +1,152 @@
+﻿@model IEnumerable<TSSC.Unified.Models.AssessmentAgency>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Assessment Agency
+            </h3>
+        </div>
+
+        <div class="nk-block-head-content">
+
+            <div class="toggle-wrap nk-block-tools-toggle">
+
+                <a href="#"
+                   class="btn btn-icon btn-trigger toggle-expand me-n1"
+                   data-target="pageMenu">
+
+                    <em class="icon ni ni-more-v"></em>
+
+                </a>
+
+                <div class="toggle-expand-content"
+                     data-content="pageMenu">
+
+                    <ul class="nk-block-tools g-3">
+
+                        <li class="nk-block-tools-opt">
+
+                            <a href="/Admin/Agency/AddAgency"
+                               class="btn btn-primary">
+
+                                <em class="icon ni ni-plus"></em>
+                                <span>Add Agency</span>
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="card card-bordered">
+
+    <div class="card-inner">
+
+        <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer dtr-inline collapsed">
+
+            <thead>
+
+                <tr>
+                    <th>S.No.</th>
+                    <th>Agency Name</th>
+                    <th>Status</th>
+                    <th>Created On</th>
+                    <th>Updated On</th>
+                    <th>Action</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>
+                            @serial
+                        </td>
+
+                        <td>
+                            @item.AgencyName
+                        </td>
+
+                        <td>
+
+                            @if (item.IsActive ==true)
+                            {
+                                <span class="badge badge-dot bg-success">
+                                    Active
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-dot bg-danger">
+                                    Inactive
+                                </span>
+                            }
+
+                        </td>
+
+                        <td>
+                            @item.CreatedDate.ToString("dd-MMM-yyyy")
+                        </td>
+
+                        <td>
+                            @(item.UpdatedDate?.ToString("dd-MMM-yyyy") ?? "-")
+                        </td>
+
+                        <td>
+
+                            <div class="btn-group"
+                                 role="group">
+
+                                <a href="#"
+                                   class="btn btn-sm btn-outline-warning"
+                                   title="Edit">
+
+                                    <em class="icon ni ni-edit"></em>
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    serial++;
+                }
+
+            </tbody>
+
+        </table>
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center text-muted py-4">
+                No Assessment Agency found.
+            </div>
+        }
+
+    </div>
+
+</div>
