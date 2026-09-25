@@ -494,8 +494,8 @@
 			</ul>
 
 		</li>
-		@if (isStandardEmployee && !isReportingManager)
-		{
+		@* @if (isStandardEmployee && !isReportingManager)
+		{ *@
 			<li class="nk-menu-item has-sub">
 
 				<a href="#"
@@ -584,7 +584,7 @@
 				</ul>
 
 			</li>
-		}
+		@* } *@
 	}
 
 	@if (User.IsInRole("Letter"))

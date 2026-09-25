@@ -873,7 +873,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             return RedirectToAction(nameof(Approval), new
             {
-                status = "Approved"
+                status = "ArchivePending"
             });
         }
         [HttpGet]
