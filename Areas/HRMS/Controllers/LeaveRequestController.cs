@@ -405,11 +405,11 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             //balance.LastUpdated = DateTime.Now;
 
             //// Approve leave
-            //leave.Status = "Approved";
-            //leave.ApprovedBy = employee.EmployeeId;
-            //leave.ApprovedDate = DateTime.Now;
+            leave.Status = "Approved";
+            leave.ApprovedBy = employee.EmployeeId;
+            leave.ApprovedDate = DateTime.Now;
 
-            //await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             TempData["Success"] =
                 "Leave request approved successfully.";
@@ -470,11 +470,11 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             //    balance.LastUpdated = DateTime.Now;
             //}
 
-            //leave.Status = "Rejected";
-            //leave.ApprovedBy = employee.EmployeeId;
-            //leave.ApprovedDate = DateTime.Now;
+            leave.Status = "Rejected";
+            leave.ApprovedBy = employee.EmployeeId;
+            leave.ApprovedDate = DateTime.Now;
 
-            //await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             TempData["Success"] =
                 "Leave request rejected successfully.";
