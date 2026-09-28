@@ -285,7 +285,7 @@
 
 			<li class="nk-menu-item">
 
-				<a href="/HRMS/Attendance/Regularization"
+				<a href="/HRMS/Attendance/MyAttendance?mode=regularization"
 				   class="nk-menu-link">
 
 					<span class="nk-menu-text">
@@ -526,96 +526,6 @@
 			</ul>
 
 		</li>
-		@if (isStandardEmployee && !isReportingManager)
-{
-		<li class="nk-menu-item has-sub">
-
-			<a href="#"
-			   class="nk-menu-link nk-menu-toggle">
-
-				<span class="nk-menu-icon">
-					<em class="icon ni ni-briefcase"></em>
-				</span>
-
-				<span class="nk-menu-text">
-
-					Manage Job Roles
-				</span>
-
-			</a>
-
-			<ul class="nk-menu-sub">
-
-				<li class="nk-menu-item">
-					<a asp-area="HRMS"
-					   asp-controller="JobRoles"
-					   asp-action="Index1"
-					   class="nk-menu-link">
-
-						<span class="nk-menu-text">
-
-							Job Role List
-						</span>
-
-					</a>
-				</li>
-
-				<li class="nk-menu-item">
-					<a asp-area="HRMS"
-					   asp-controller="JobRoles"
-					   asp-action="Approved"
-					   class="nk-menu-link">
-
-
-						<span class="nk-menu-text">
-
-							Approved
-						</span>
-
-					</a>
-				</li>
-				<li class="nk-menu-item">
-					<a asp-area="HRMS"
-					   asp-controller="JobRoles"
-					   asp-action="Rejected"
-					   class="nk-menu-link">
-
-						<span class="nk-menu-text">
-
-							Rejected
-						</span>
-					</a>
-				</li>
-				<li class="nk-menu-item">
-					<a asp-area="HRMS"
-					   asp-controller="JobRoles"
-					   asp-action="ArchivePending"
-					   class="nk-menu-link">
-
-						<span class="nk-menu-text">
-							Pending Archive
-						</span>
-
-					</a>
-				</li>
-
-				<li class="nk-menu-item">
-					<a asp-area="HRMS"
-					   asp-controller="JobRoles"
-					   asp-action="Archived"
-					   class="nk-menu-link">
-
-						<span class="nk-menu-text">
-
-							Archived
-						</span>
-
-					</a>
-				</li>
-			</ul>
-
-		</li>
-		}
 	}
 
 	@if (User.IsInRole("Letter"))
@@ -1376,94 +1286,6 @@
 			</li>
 		}
 
-		<!-- ===================================================== -->
-
-
-		@*----------------- for manage job roles -----------------------------*@
-
-		@if (isStandardEmployee && isReportingManager)
-		{
-			<li class="nk-menu-item has-sub">
-				<a href="#" class="nk-menu-link nk-menu-toggle">
-					<span class="nk-menu-icon">
-						<em class="icon ni ni-briefcase"></em>
-					</span>
-
-					<span class="nk-menu-text">
-
-						Manage Job Roles
-					</span>
-				</a>
-
-				<ul class="nk-menu-sub">
-
-					<li class="nk-menu-item">
-						<a href="/HRMS/JobRoles/Approval?status=Pending"
-						   class="nk-menu-link">
-							<span class="nk-menu-text">
-
-								Pending Job Approvals
-							</span>
-						</a>
-					</li>
-
-					<li class="nk-menu-item">
-						<a asp-area="HRMS"
-						   asp-controller="JobRoles"
-						   asp-action="Approval"
-						   asp-route-status="Approved"
-						   class="nk-menu-link">
-
-							<span class="nk-menu-text">
-
-								Approved
-							</span>
-						</a>
-					</li>
-
-					<li class="nk-menu-item">
-						<a asp-area="HRMS"
-						   asp-controller="JobRoles"
-						   asp-action="Approval"
-						   asp-route-status="Rejected"
-						   class="nk-menu-link">
-
-							<span class="nk-menu-text">
-
-								Rejected
-							</span>
-						</a>
-					</li>
-					<li class="nk-menu-item">
-						<a asp-area="HRMS"
-						   asp-controller="JobRoles"
-						   asp-action="Approval"
-						   asp-route-status="ArchivePending"
-						   class="nk-menu-link">
-
-							<span class="nk-menu-text">
-								Pending Archive
-							</span>
-
-						</a>
-					</li>
-					<li class="nk-menu-item">
-						<a asp-area="HRMS"
-						   asp-controller="JobRoles"
-						   asp-action="Approval"
-						   asp-route-status="Archived"
-						   class="nk-menu-link">
-
-							<span class="nk-menu-text">
-								Archived
-							</span>
-
-						</a>
-					</li>
-				</ul>
-			</li>
-
-		}
 	}
 
 	<!-- COMMON RESOURCES - EVERY EMPLOYEE -->

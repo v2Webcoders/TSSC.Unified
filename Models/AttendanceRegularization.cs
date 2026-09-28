@@ -47,9 +47,12 @@ namespace TSSC.Unified.Models
 
         // Navigation
         [ForeignKey(nameof(EmployeeId))]
-        public virtual Employee Employee { get; set; }
+        public virtual Employee? Employee { get; set; }
 
         [ForeignKey(nameof(ApproverId))]
         public virtual Employee? Approver { get; set; }
+
+        [Required(ErrorMessage = "Please select regularization type.")]
+        public string? RegularizationType { get; set; }
     }
 }

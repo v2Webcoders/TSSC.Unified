@@ -236,7 +236,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
         public async Task<IActionResult> MyAttendance(
         int? year,
-        int? month)
+        int? month, string? mode)
         {
             var currentUser =
                 await _userManager.GetUserAsync(User);
@@ -319,6 +319,13 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             ViewBag.MonthName =
                 startDate.ToString("MMMM yyyy");
+
+            // Page title based on query string
+            ViewBag.PageTitle =
+                string.Equals(mode, "regularization",
+                    StringComparison.OrdinalIgnoreCase)
+                    ? "Attendance Regularization"
+                    : "View Attendance";
 
             // Present (including Late)
             ViewBag.PresentCount =
@@ -549,6 +556,287 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
         // EMPLOYEE - SUBMIT REGULARIZATION
         // =========================================================
 
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Regularization(
+        //AttendanceRegularization model,
+        //IFormFile? AttachmentFile)
+        //{
+        //    // =====================================================
+        //    // CURRENT USER
+        //    // =====================================================
+
+        //    var currentUser =
+        //        await _userManager.GetUserAsync(User);
+
+        //    if (currentUser == null)
+        //        return Unauthorized();
+
+        //    // =====================================================
+        //    // FIND EMPLOYEE
+        //    // =====================================================
+
+        //    var employee =
+        //        await _context.Employee
+        //            .FirstOrDefaultAsync(x =>
+        //                x.ApplicationUserId ==
+        //                currentUser.Id);
+
+        //    if (employee == null)
+        //    {
+        //        TempData["Error"] =
+        //            "Employee record not found.";
+
+        //        return RedirectToAction(
+        //            nameof(MyAttendance));
+        //    }
+
+        //    // =====================================================
+        //    // DATE
+        //    // =====================================================
+
+        //    model.AttendanceDate =
+        //        model.AttendanceDate.Date;
+
+
+        //    // =====================================================
+        //    // FIND EXISTING ATTENDANCE
+        //    // =====================================================
+
+        //    var attendance =
+        //        await _context.EmployeeAttendance
+        //            .FirstOrDefaultAsync(x =>
+        //                x.EmployeeId ==
+        //                    employee.EmployeeId
+        //                &&
+        //                x.AttendanceDate ==
+        //                    model.AttendanceDate);
+
+
+        //    // =====================================================
+        //    // VALIDATE REQUESTED TIME
+        //    // =====================================================
+
+        //    if (!model.RequestedInTime.HasValue &&
+        //        !model.RequestedOutTime.HasValue)
+        //    {
+        //        ModelState.AddModelError(
+        //            "",
+        //            "Please provide at least one attendance time.");
+
+        //        return View(model);
+        //    }
+
+
+        //    // =====================================================
+        //    // VALIDATE IN / OUT TIME
+        //    // =====================================================
+
+        //    if (model.RequestedInTime.HasValue &&
+        //        model.RequestedOutTime.HasValue &&
+        //        model.RequestedOutTime <=
+        //        model.RequestedInTime)
+        //    {
+        //        ModelState.AddModelError(
+        //            "",
+        //            "Out time must be later than In time.");
+
+        //        return View(model);
+        //    }
+
+
+        //    // =====================================================
+        //    // PREVENT DUPLICATE PENDING REQUEST
+        //    // =====================================================
+
+        //    bool exists =
+        //        await _context.AttendanceRegularization
+        //            .AnyAsync(x =>
+        //                x.EmployeeId ==
+        //                    employee.EmployeeId
+        //                &&
+        //                x.AttendanceDate ==
+        //                    model.AttendanceDate
+        //                &&
+        //                x.Status == "Pending");
+
+        //    if (exists)
+        //    {
+        //        ModelState.AddModelError(
+        //            "",
+        //            "A pending regularization already exists for this date.");
+
+        //        return View(model);
+        //    }
+
+
+        //    // =====================================================
+        //    // FIND REPORTING MANAGER
+        //    // =====================================================
+
+        //    if (!employee.ReportingManagerId.HasValue)
+        //    {
+        //        ModelState.AddModelError(
+        //            "",
+        //            "No reporting manager is assigned to this employee.");
+
+        //        return View(model);
+        //    }
+
+
+        //    // =====================================================
+        //    // ATTACHMENT
+        //    // =====================================================
+
+        //    string? fileName = null;
+
+        //    if (AttachmentFile != null &&
+        //        AttachmentFile.Length > 0)
+        //    {
+        //        var extension =
+        //            Path.GetExtension(
+        //                AttachmentFile.FileName);
+
+        //        var allowedExtensions =
+        //            new[]
+        //            {
+        //        ".pdf",
+        //        ".jpg",
+        //        ".jpeg",
+        //        ".png"
+        //            };
+
+
+        //        if (!allowedExtensions
+        //            .Contains(
+        //                extension.ToLowerInvariant()))
+        //        {
+        //            ModelState.AddModelError(
+        //                "AttachmentFile",
+        //                "Only PDF, JPG, JPEG and PNG files are allowed.");
+
+        //            return View(model);
+        //        }
+
+
+        //        // -------------------------------------------------
+        //        // Upload folder
+        //        // -------------------------------------------------
+
+        //        var uploadPath =
+        //            Path.Combine(
+        //                Directory.GetCurrentDirectory(),
+        //                "wwwroot",
+        //                "uploads",
+        //                "attendance");
+
+
+        //        if (!Directory.Exists(uploadPath))
+        //            Directory.CreateDirectory(uploadPath);
+
+
+        //        // -------------------------------------------------
+        //        // Generate unique file name
+        //        // -------------------------------------------------
+
+        //        fileName =
+        //            Guid.NewGuid().ToString()
+        //            + extension;
+
+
+        //        var filePath =
+        //            Path.Combine(
+        //                uploadPath,
+        //                fileName);
+
+
+        //        await using var stream =
+        //            new FileStream(
+        //                filePath,
+        //                FileMode.Create);
+
+        //        await AttachmentFile.CopyToAsync(stream);
+        //    }
+
+
+        //    // =====================================================
+        //    // CREATE REGULARIZATION REQUEST
+        //    // =====================================================
+
+        //    var request =
+        //        new AttendanceRegularization
+        //        {
+        //            EmployeeId =
+        //                employee.EmployeeId,
+
+        //            AttendanceDate =
+        //                model.AttendanceDate,
+
+        //            // -------------------------------------------------
+        //            // If biometric attendance exists, save its values.
+        //            // If not, these remain NULL.
+        //            // -------------------------------------------------
+
+        //            ExistingInTime =
+        //                attendance?.InTime,
+
+        //            ExistingOutTime =
+        //                attendance?.OutTime,
+
+        //            // -------------------------------------------------
+        //            // Employee requested values
+        //            // -------------------------------------------------
+
+        //            RequestedInTime =
+        //                model.RequestedInTime,
+
+        //            RequestedOutTime =
+        //                model.RequestedOutTime,
+
+        //            Reason =
+        //                model.Reason,
+
+        //            Attachment =
+        //                fileName,
+
+        //            Status =
+        //                "Pending",
+
+        //            ApproverId =
+        //                employee.ReportingManagerId,
+
+        //            CreatedDate =
+        //                DateTime.Now
+        //        };
+
+
+        //    // =====================================================
+        //    // SAVE REQUEST
+        //    // =====================================================
+
+        //    _context.AttendanceRegularization
+        //        .Add(request);
+
+        //    await _context.SaveChangesAsync();
+
+
+        //    // =====================================================
+        //    // SUCCESS
+        //    // =====================================================
+
+        //    TempData["Success"] =
+        //        "Attendance regularization request submitted successfully.";
+
+        //    return RedirectToAction(
+        //        nameof(MyRegularizations));
+        //}
+
+
+        // =========================================================
+        // EMPLOYEE - MY REGULARIZATION REQUESTS
+        // =========================================================
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Regularization(
@@ -565,6 +853,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             if (currentUser == null)
                 return Unauthorized();
 
+
             // =====================================================
             // FIND EMPLOYEE
             // =====================================================
@@ -572,17 +861,16 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             var employee =
                 await _context.Employee
                     .FirstOrDefaultAsync(x =>
-                        x.ApplicationUserId ==
-                        currentUser.Id);
+                        x.ApplicationUserId == currentUser.Id);
 
             if (employee == null)
             {
                 TempData["Error"] =
                     "Employee record not found.";
 
-                return RedirectToAction(
-                    nameof(MyAttendance));
+                return RedirectToAction(nameof(MyAttendance));
             }
+
 
             // =====================================================
             // DATE
@@ -599,25 +887,75 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             var attendance =
                 await _context.EmployeeAttendance
                     .FirstOrDefaultAsync(x =>
-                        x.EmployeeId ==
-                            employee.EmployeeId
-                        &&
-                        x.AttendanceDate ==
-                            model.AttendanceDate);
+                        x.EmployeeId == employee.EmployeeId &&
+                        x.AttendanceDate == model.AttendanceDate);
 
 
             // =====================================================
-            // VALIDATE REQUESTED TIME
+            // VALIDATE REGULARIZATION TYPE
             // =====================================================
 
-            if (!model.RequestedInTime.HasValue &&
-                !model.RequestedOutTime.HasValue)
+            var validTypes = new[]
+            {
+        "Both",
+        "In",
+        "Out"
+    };
+
+            if (string.IsNullOrWhiteSpace(model.RegularizationType) ||
+                !validTypes.Contains(model.RegularizationType))
             {
                 ModelState.AddModelError(
-                    "",
-                    "Please provide at least one attendance time.");
+                    "RegularizationType",
+                    "Please select a valid regularization type.");
 
                 return View(model);
+            }
+
+
+            // =====================================================
+            // VALIDATE REQUESTED TIME BASED ON TYPE
+            // =====================================================
+
+            if (model.RegularizationType == "Both")
+            {
+                if (!model.RequestedInTime.HasValue)
+                {
+                    ModelState.AddModelError(
+                        "RequestedInTime",
+                        "Requested In Time is required.");
+                }
+
+                if (!model.RequestedOutTime.HasValue)
+                {
+                    ModelState.AddModelError(
+                        "RequestedOutTime",
+                        "Requested Out Time is required.");
+                }
+            }
+            else if (model.RegularizationType == "In")
+            {
+                if (!model.RequestedInTime.HasValue)
+                {
+                    ModelState.AddModelError(
+                        "RequestedInTime",
+                        "Requested In Time is required.");
+                }
+
+                // Don't save an Out value for In-only request
+                model.RequestedOutTime = null;
+            }
+            else if (model.RegularizationType == "Out")
+            {
+                if (!model.RequestedOutTime.HasValue)
+                {
+                    ModelState.AddModelError(
+                        "RequestedOutTime",
+                        "Requested Out Time is required.");
+                }
+
+                // Don't save an In value for Out-only request
+                model.RequestedInTime = null;
             }
 
 
@@ -627,12 +965,26 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             if (model.RequestedInTime.HasValue &&
                 model.RequestedOutTime.HasValue &&
-                model.RequestedOutTime <=
-                model.RequestedInTime)
+                model.RequestedOutTime <= model.RequestedInTime)
             {
                 ModelState.AddModelError(
                     "",
                     "Out time must be later than In time.");
+            }
+
+
+            // =====================================================
+            // STOP IF VALIDATION FAILED
+            // =====================================================
+
+            if (!ModelState.IsValid)
+            {
+                // Restore existing values for display
+                model.ExistingInTime =
+                    attendance?.InTime;
+
+                model.ExistingOutTime =
+                    attendance?.OutTime;
 
                 return View(model);
             }
@@ -645,12 +997,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             bool exists =
                 await _context.AttendanceRegularization
                     .AnyAsync(x =>
-                        x.EmployeeId ==
-                            employee.EmployeeId
-                        &&
-                        x.AttendanceDate ==
-                            model.AttendanceDate
-                        &&
+                        x.EmployeeId == employee.EmployeeId &&
+                        x.AttendanceDate == model.AttendanceDate &&
                         x.Status == "Pending");
 
             if (exists)
@@ -658,6 +1006,9 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 ModelState.AddModelError(
                     "",
                     "A pending regularization already exists for this date.");
+
+                model.ExistingInTime = attendance?.InTime;
+                model.ExistingOutTime = attendance?.OutTime;
 
                 return View(model);
             }
@@ -672,6 +1023,9 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 ModelState.AddModelError(
                     "",
                     "No reporting manager is assigned to this employee.");
+
+                model.ExistingInTime = attendance?.InTime;
+                model.ExistingOutTime = attendance?.OutTime;
 
                 return View(model);
             }
@@ -699,14 +1053,15 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 ".png"
                     };
 
-
                 if (!allowedExtensions
-                    .Contains(
-                        extension.ToLowerInvariant()))
+                    .Contains(extension.ToLowerInvariant()))
                 {
                     ModelState.AddModelError(
                         "AttachmentFile",
                         "Only PDF, JPG, JPEG and PNG files are allowed.");
+
+                    model.ExistingInTime = attendance?.InTime;
+                    model.ExistingOutTime = attendance?.OutTime;
 
                     return View(model);
                 }
@@ -733,8 +1088,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 // -------------------------------------------------
 
                 fileName =
-                    Guid.NewGuid().ToString()
-                    + extension;
+                    Guid.NewGuid().ToString() +
+                    extension;
 
 
                 var filePath =
@@ -766,8 +1121,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                         model.AttendanceDate,
 
                     // -------------------------------------------------
-                    // If biometric attendance exists, save its values.
-                    // If not, these remain NULL.
+                    // Existing attendance from DATABASE
                     // -------------------------------------------------
 
                     ExistingInTime =
@@ -775,6 +1129,13 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                     ExistingOutTime =
                         attendance?.OutTime,
+
+                    // -------------------------------------------------
+                    // Regularization type
+                    // -------------------------------------------------
+
+                    RegularizationType =
+                        model.RegularizationType,
 
                     // -------------------------------------------------
                     // Employee requested values
@@ -823,11 +1184,6 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             return RedirectToAction(
                 nameof(MyRegularizations));
         }
-
-
-        // =========================================================
-        // EMPLOYEE - MY REGULARIZATION REQUESTS
-        // =========================================================
 
         [Authorize]
         [HttpGet]
@@ -986,8 +1342,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     .FirstOrDefaultAsync(x =>
                         x.ApplicationUserId == currentUser.Id);
 
-            if (manager == null)
-                return Unauthorized();
+            //if (manager == null)
+            //    return Unauthorized();
 
 
             // =========================================
@@ -997,9 +1353,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             var request =
                 await _context.AttendanceRegularization
                     .FirstOrDefaultAsync(x =>
-                        x.RegularizationId == id
-                        &&
-                        x.ApproverId == manager.EmployeeId);
+                        x.RegularizationId == id);
 
             if (request == null)
             {
@@ -1007,7 +1361,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     "Regularization request not found or you are not authorized to approve it.";
 
                 return RedirectToAction(
-                    nameof(RegularizationRequests));
+                    nameof(AllRegularizations));
             }
 
 
@@ -1021,7 +1375,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     "This regularization request has already been processed.";
 
                 return RedirectToAction(
-                    nameof(RegularizationRequests));
+                    nameof(AllRegularizations));
             }
 
 
@@ -1127,7 +1481,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
 
             return RedirectToAction(
-                nameof(RegularizationRequests));
+                nameof(AllRegularizations));
         }
 
 
@@ -1135,7 +1489,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
         // MANAGER - REJECT
         // =========================================================
 
-        [Authorize]
+        
         [HttpGet]
         public async Task<IActionResult> RejectRegularization(int id)
         {
@@ -1146,21 +1500,20 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 return Unauthorized();
 
 
-            var manager =
-                await _context.Employee
-                    .FirstOrDefaultAsync(x =>
-                        x.ApplicationUserId == currentUser.Id);
+            //var manager =
+            //    await _context.Employee
+            //        .FirstOrDefaultAsync(x =>
+            //            x.ApplicationUserId == currentUser.Id);
 
-            if (manager == null)
-                return Unauthorized();
+            //if (manager == null)
+            //    return Unauthorized();
 
 
             var request =
                 await _context.AttendanceRegularization
                     .FirstOrDefaultAsync(x =>
                         x.RegularizationId == id
-                        &&
-                        x.ApproverId == manager.EmployeeId);
+                        );
 
             if (request == null)
             {
@@ -1168,18 +1521,18 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     "Regularization request not found.";
 
                 return RedirectToAction(
-                    nameof(RegularizationRequests));
+                    nameof(AllRegularizations));
             }
 
 
-            if (request.Status != "Pending")
-            {
-                TempData["Error"] =
-                    "This request has already been processed.";
+            //if (request.Status != "Pending")
+            //{
+            //    TempData["Error"] =
+            //        "This request has already been processed.";
 
-                return RedirectToAction(
-                    nameof(RegularizationRequests));
-            }
+            //    return RedirectToAction(
+            //        nameof(AllRegularizations));
+            //}
 
 
             request.Status =
@@ -1198,9 +1551,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             TempData["Success"] =
                 "Attendance regularization rejected successfully.";
 
-
             return RedirectToAction(
-                nameof(RegularizationRequests));
+                nameof(AllRegularizations));
         }
 
         [Authorize(Roles = "HR")]
@@ -2772,6 +3124,275 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     "Index",
                     "Home");
             }
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> ManagerApproveRegularization(int id)
+        {
+            var currentUser =
+                await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return Unauthorized();
+
+
+            // =========================================
+            // FIND REPORTING MANAGER
+            // =========================================
+
+            var manager =
+                await _context.Employee
+                    .FirstOrDefaultAsync(x =>
+                        x.ApplicationUserId == currentUser.Id);
+
+            if (manager == null)
+            {
+                TempData["Error"] =
+                    "Manager employee record not found.";
+
+                return RedirectToAction(
+                    nameof(RegularizationRequests));
+            }
+
+
+            // =========================================
+            // FIND REQUEST
+            // =========================================
+
+            var request =
+                await _context.AttendanceRegularization
+                    .Include(x => x.Employee)
+                    .FirstOrDefaultAsync(x =>
+                        x.RegularizationId == id
+                        &&
+                        x.ApproverId == manager.EmployeeId);
+
+            if (request == null)
+            {
+                TempData["Error"] =
+                    "Regularization request not found or you are not authorized to approve it.";
+
+                return RedirectToAction(
+                    nameof(RegularizationRequests));
+            }
+
+
+            // =========================================
+            // ONLY PENDING REQUEST CAN BE APPROVED
+            // =========================================
+
+            //if (request.Status != "Pending")
+            //{
+            //    TempData["Error"] =
+            //        "This regularization request has already been processed.";
+
+            //    return RedirectToAction(
+            //        nameof(RegularizationRequests));
+            //}
+
+
+            // =========================================
+            // FIND ATTENDANCE
+            // =========================================
+
+            var attendance =
+                await _context.EmployeeAttendance
+                    .FirstOrDefaultAsync(x =>
+                        x.EmployeeId == request.EmployeeId
+                        &&
+                        x.AttendanceDate == request.AttendanceDate);
+
+
+            // =========================================
+            // IF NO ATTENDANCE EXISTS
+            // CREATE ONE
+            // =========================================
+
+            if (attendance == null)
+            {
+                attendance = new EmployeeAttendance
+                {
+                    EmployeeId =
+                        request.EmployeeId,
+
+                    EmployeeCode =
+                        request.Employee?.EmployeeCode ?? "",
+
+                    AttendanceDate =
+                        request.AttendanceDate,
+
+                    InTime =
+                        request.RequestedInTime,
+
+                    OutTime =
+                        request.RequestedOutTime,
+
+                    AttendanceStatus =
+                        "Present",
+
+                    Remarks =
+                        "Attendance created through approved regularization request.",
+
+                    AttendanceSource =
+                        "Regularization",
+
+                    CreatedDate =
+                        DateTime.Now
+                };
+
+                _context.EmployeeAttendance.Add(attendance);
+            }
+            else
+            {
+                // =========================================
+                // UPDATE EXISTING ATTENDANCE
+                // =========================================
+
+                if (request.RequestedInTime.HasValue)
+                {
+                    attendance.InTime =
+                        request.RequestedInTime;
+                }
+
+                if (request.RequestedOutTime.HasValue)
+                {
+                    attendance.OutTime =
+                        request.RequestedOutTime;
+                }
+
+                attendance.AttendanceStatus =
+                    "Present";
+
+                attendance.AttendanceSource =
+                    "Regularization";
+
+                attendance.Remarks =
+                    "Attendance updated through approved regularization request.";
+            }
+
+
+            // =========================================
+            // APPROVE REQUEST
+            // =========================================
+
+            request.Status =
+                "Approved";
+
+            request.ApprovedDate =
+                DateTime.Now;
+
+            request.ApprovalRemarks =
+                "Attendance regularization approved.";
+
+
+            // =========================================
+            // SAVE
+            // =========================================
+
+            await _context.SaveChangesAsync();
+
+
+            TempData["Success"] =
+                "Attendance regularization approved successfully.";
+
+
+            return RedirectToAction(
+                nameof(RegularizationRequests));
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> ManagerRejectRegularization(int id)
+        {
+            var currentUser =
+                await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return Unauthorized();
+
+
+            // =========================================
+            // FIND REPORTING MANAGER
+            // =========================================
+
+            var manager =
+                await _context.Employee
+                    .FirstOrDefaultAsync(x =>
+                        x.ApplicationUserId == currentUser.Id);
+
+            if (manager == null)
+            {
+                TempData["Error"] =
+                    "Manager employee record not found.";
+
+                return RedirectToAction(
+                    nameof(RegularizationRequests));
+            }
+
+
+            // =========================================
+            // FIND REQUEST
+            // =========================================
+
+            var request =
+                await _context.AttendanceRegularization
+                    .FirstOrDefaultAsync(x =>
+                        x.RegularizationId == id
+                        &&
+                        x.ApproverId == manager.EmployeeId);
+
+            if (request == null)
+            {
+                TempData["Error"] =
+                    "Regularization request not found or you are not authorized to reject it.";
+
+                return RedirectToAction(
+                    nameof(RegularizationRequests));
+            }
+
+
+            // =========================================
+            // ONLY PENDING REQUEST CAN BE REJECTED
+            // =========================================
+
+            //if (request.Status != "Pending")
+            //{
+            //    TempData["Error"] =
+            //        "This regularization request has already been processed.";
+
+            //    return RedirectToAction(
+            //        nameof(RegularizationRequests));
+            //}
+
+
+            // =========================================
+            // REJECT REQUEST
+            // =========================================
+
+            request.Status =
+                "Rejected";
+
+            request.ApprovedDate =
+                DateTime.Now;
+
+            request.ApprovalRemarks =
+                "Attendance regularization rejected.";
+
+
+            // =========================================
+            // SAVE
+            // =========================================
+
+            await _context.SaveChangesAsync();
+
+
+            TempData["Success"] =
+                "Attendance regularization rejected successfully.";
+
+
+            return RedirectToAction(
+                nameof(RegularizationRequests));
         }
     }
 }

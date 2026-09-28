@@ -240,7 +240,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 }
                 var today = DateTime.Today;
 
-                var attendance = await _todayAttendanceLiveService.GetTodayAttendanceAsync(employee.EmployeeCode);
+                var attendance = await _todayAttendanceLiveService.GetTodayAttendanceAsync(employee.BiometricCode);
 
                 var model = new HRDashboardVM
                 {
