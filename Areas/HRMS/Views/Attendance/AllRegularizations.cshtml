@@ -138,7 +138,26 @@
 <!-- ========================================= -->
 
 <div class="nk-block nk-block-lg">
-
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"></button>
+        </div>
+    }
     <div class="card card-preview">
 
         <div class="card-inner">
@@ -215,10 +234,10 @@
                                 <!-- EMPLOYEE -->
                                 <!-- ================================= -->
 
-                                <td>
+                                <td style="min-width:120px;">
 
                                     <strong>
-                                        @item.Employee?.FirstName
+                                        @(item.Employee?.FirstName) @(item.Employee?.LastName)
                                     </strong>
 
                                     <br />
@@ -368,8 +387,8 @@
 
                                         <small class="text-muted">
 
-                                            @item.ApprovedDate?
-                                                .ToString("dd-MMM-yyyy hh:mm")
+                                            @(item.ApprovedDate?
+                                                .ToString("dd-MMM-yyyy hh:mm"))
 
                                         </small>
                                     }
@@ -398,9 +417,7 @@
 
                                         <small class="text-muted">
 
-                                            Applied:
-                                            @item.CreatedDate
-                                                .ToString("dd-MMM-yyyy hh:mm")
+                                            Applied: @(item.CreatedDate.ToString("dd-MMM-yyyy hh:mm"))
 
                                         </small>
                                     }

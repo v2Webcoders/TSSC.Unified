@@ -32,226 +32,380 @@
 		<div class="card-inner">
 			<div class="preview-block">
 				<div class="row gy-4">
-					<form asp-action="Regularization"
-						  asp-controller="Attendance"
-						  asp-area="HRMS"
-						  method="post"
-						  enctype="multipart/form-data">
+                    <form asp-action="Regularization"
+                          asp-controller="Attendance"
+                          asp-area="HRMS"
+                          method="post"
+                          enctype="multipart/form-data">
 
-						@Html.AntiForgeryToken()
+                        @Html.AntiForgeryToken()
 
-						<div asp-validation-summary="ModelOnly"
-							 class="alert alert-danger">
-						</div>
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div asp-validation-summary="All"
+                                 class="alert alert-danger">
+                            </div>
+                        }
+                        <div class="row g-4">
 
+                            <!-- ================================ -->
+                            <!-- ATTENDANCE DATE -->
+                            <!-- ================================ -->
 
-						<!-- ================================= -->
-						<!-- DATE -->
-						<!-- ================================= -->
+                           @*  <div class="col-md-6">
 
-						<div class="row g-4">
+                                <label asp-for="AttendanceDate"
+                                       class="form-label">
+                                    Attendance Date
+                                </label>
 
-							<div class="col-md-6">
+                                <input asp-for="AttendanceDate"
+                                       type="date"
+                                       class="form-control" />
 
-								<label class="form-label">
-									Attendance Date
-								</label>
+                                <span asp-validation-for="AttendanceDate"
+                                      class="text-danger">
+                                </span>
 
-								<input asp-for="AttendanceDate"
-									   type="date"
-									   class="form-control"
-									    />
+                            </div> *@
+                            <div class="col-md-6">
 
-							</div>
+                                <label class="form-label">
+                                    Attendance Date
+                                </label>
 
+                                <div class="form-control bg-light">
+                                    <span id="displayDate">
+                                        @(Model.AttendanceDate != default(DateTime)
+                                            ? Model.AttendanceDate.ToString("dd MMM yyyy")
+                                            : "—")
+                                    </span>
+                                </div>
 
-							<!-- ================================= -->
-							<!-- EXISTING IN -->
-							<!-- ================================= -->
-							@{
-								var existingIn = Model.ExistingInTime?
-								.ToString("yyyy-MM-ddTHH:mm");
+                                <!-- Hidden input to submit the value -->
+                                <input asp-for="AttendanceDate"
+                                       type="hidden" />
 
-								var existingOut = Model.ExistingOutTime?
-								.ToString("yyyy-MM-ddTHH:mm");
-							}
+                                <span asp-validation-for="AttendanceDate"
+                                      class="text-danger">
+                                </span>
 
-							<div class="row g-3">
+                            </div>
 
-								<!-- EXISTING IN -->
-								<div class="col-md-6">
+                            <!-- ================================ -->
+                            <!-- EXISTING ATTENDANCE -->
+                            <!-- ================================ -->
 
-									<label asp-for="ExistingInTime"
-										   class="form-label">
-										Existing In Time
-									</label>
+                            <div class="col-12">
 
-									<input asp-for="ExistingInTime"
-										   type="datetime-local"
-										   class="form-control"
-										   readonly />
+                                <div class="card card-bordered">
 
-								</div>
+                                    <div class="card-inner">
 
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
 
-								<!-- EXISTING OUT -->
-								<div class="col-md-6">
+                                            <h6 class="title mb-0">
+                                                Existing Attendance
+                                            </h6>
 
-									<label asp-for="ExistingOutTime"
-										   class="form-label">
-										Existing Out Time
-									</label>
+                                            <span class="badge @(Model.ExistingInTime.HasValue && Model.ExistingOutTime.HasValue ? "bg-success" : "bg-warning")">
+                                                @(Model.ExistingInTime.HasValue && Model.ExistingOutTime.HasValue ? "Complete" : "Incomplete")
+                                            </span>
 
-									<input asp-for="ExistingOutTime"
-										   type="datetime-local"
-										   class="form-control"
-										   readonly />
+                                        </div>
 
-								</div>
+                                        <div class="row g-3">
 
+                                            <!-- EXISTING IN -->
 
-								<!-- REQUESTED IN -->
-								<div class="col-md-6">
+                                            <div class="col-md-6">
 
-									<label asp-for="RequestedInTime"
-										   class="form-label">
-										Requested In Time
-									</label>
+                                                <label class="form-label text-soft">
+                                                    Existing In Time
+                                                </label>
 
-									<input asp-for="RequestedInTime"
-										   type="datetime-local"
-										   class="form-control" />
+                                                <div class="form-control bg-light @(!Model.ExistingInTime.HasValue ? "border-warning" : "")">
+                                                    <strong>
+                                                        @(Model.ExistingInTime.HasValue
+                                                            ? Model.ExistingInTime.Value.ToString("dd MMM yyyy, hh:mm tt")
+                                                            : "No In Time")
+                                                    </strong>
+                                                </div>
 
-									<span asp-validation-for="RequestedInTime"
-										  class="text-danger">
-									</span>
+                                            </div>
 
-								</div>
 
+                                            <!-- EXISTING OUT -->
 
-								<!-- REQUESTED OUT -->
-								<div class="col-md-6">
+                                            <div class="col-md-6">
 
-									<label asp-for="RequestedOutTime"
-										   class="form-label">
-										Requested Out Time
-									</label>
+                                                <label class="form-label text-soft">
+                                                    Existing Out Time
+                                                </label>
 
-									<input asp-for="RequestedOutTime"
-										   type="datetime-local"
-										   class="form-control" />
+                                                <div class="form-control bg-light @(!Model.ExistingOutTime.HasValue ? "border-warning" : "")">
+                                                    <strong>
+                                                        @(Model.ExistingOutTime.HasValue
+                                                            ? Model.ExistingOutTime.Value.ToString("dd MMM yyyy, hh:mm tt")
+                                                            : "No Out Time")
+                                                    </strong>
+                                                </div>
 
-									<span asp-validation-for="RequestedOutTime"
-										  class="text-danger">
-									</span>
+                                            </div>
 
-								</div>
+                                        </div>
 
-							</div>
+                                    </div>
 
+                                </div>
 
-							<!-- ================================= -->
-							<!-- REASON -->
-							<!-- ================================= -->
+                            </div>
 
-							<div class="col-12">
 
-								<label asp-for="Reason"
-									   class="form-label">
+                            <!-- ================================ -->
+                            <!-- REGULARIZATION TYPE -->
+                            <!-- ================================ -->
 
-									Reason
-									<span class="text-danger">*</span>
+                            <div class="col-md-6">
 
-								</label>
+                                <label class="form-label">
+                                    Regularization Type
+                                    <span class="text-danger">*</span>
+                                </label>
 
-								<textarea asp-for="Reason"
-										  class="form-control"
-										  rows="4"
-										  placeholder="Explain why attendance needs to be regularized..."
-										  required></textarea>
+                                <select asp-for="RegularizationType"
+                                        id="regularizationType"
+                                        class="form-select">
+                                    <option value="">Select Regularization Type</option>
+                                    <option value="Both">In Time & Out Time</option>
+                                    <option value="In">In Time</option>
+                                    <option value="Out">Out Time</option>
+                                </select>
 
-								<span asp-validation-for="Reason"
-									  class="text-danger">
-								</span>
+                                <span asp-validation-for="RegularizationType"
+                                      class="text-danger"></span>
 
-							</div>
+                            </div>
 
 
-							<!-- ================================= -->
-							<!-- ATTACHMENT -->
-							<!-- ================================= -->
+                            <!-- ================================ -->
+                            <!-- REQUESTED IN -->
+                            <!-- ================================ -->
 
-							<div class="col-md-6">
+                            <div class="col-md-6 regularization-field"
+                                 id="requestedInContainer"
+                                 style="display:none;">
 
-								<label class="form-label">
-									Supporting Document
-								</label>
+                                <label asp-for="RequestedInTime"
+                                       class="form-label">
 
-								<input type="file"
-									   name="AttachmentFile"
-									   class="form-control"
-									   accept=".pdf,.jpg,.jpeg,.png" />
+                                    Requested In Time
+                                    <span class="text-danger">*</span>
 
-								<div class="form-note">
-									PDF, JPG, JPEG or PNG
-								</div>
+                                </label>
 
-							</div>
+                                <input asp-for="RequestedInTime"
+                                       type="datetime-local"
+                                       class="form-control" />
 
-						</div>
+                                <span asp-validation-for="RequestedInTime"
+                                      class="text-danger">
+                                </span>
 
+                            </div>
 
-						<!-- ================================= -->
-						<!-- INFORMATION -->
-						<!-- ================================= -->
 
-						<div class="alert alert-info mt-4">
+                            <!-- ================================ -->
+                            <!-- REQUESTED OUT -->
+                            <!-- ================================ -->
 
-							<div class="d-flex gap-2">
+                            <div class="col-md-6 regularization-field"
+                                 id="requestedOutContainer"
+                                 style="display:none;">
 
-								<em class="icon ni ni-info"></em>
-								<div>
-									Your request will be sent to
-									your reporting manager for approval.
+                                <label asp-for="RequestedOutTime"
+                                       class="form-label">
 
-									Attendance will be updated only
-									after approval.
+                                    Requested Out Time
+                                    <span class="text-danger">*</span>
 
-								</div>
+                                </label>
 
-							</div>
+                                <input asp-for="RequestedOutTime"
+                                       type="datetime-local"
+                                       class="form-control" />
 
-						</div>
+                                <span asp-validation-for="RequestedOutTime"
+                                      class="text-danger">
+                                </span>
 
+                            </div>
 
-						<!-- ================================= -->
-						<!-- BUTTONS -->
-						<!-- ================================= -->
 
-						<div class="col-12 mt-4">
-							<a asp-action="MyAttendance"
-							   class="btn btn-light">
+                            <!-- ================================ -->
+                            <!-- REASON -->
+                            <!-- ================================ -->
 
-								Cancel
+                            <div class="col-12">
 
-							</a>
+                                <label asp-for="Reason"
+                                       class="form-label">
 
-							<button type="submit"
-									class="btn btn-primary">
+                                    Reason
+                                    <span class="text-danger">*</span>
 
-								<em class="icon ni ni-send me-1"></em>
+                                </label>
 
-								Submit Request
+                                <textarea asp-for="Reason"
+                                          class="form-control"
+                                          rows="4"
+                                          placeholder="Explain why attendance needs to be regularized..."
+                                          required></textarea>
 
-							</button>
+                                <span asp-validation-for="Reason"
+                                      class="text-danger">
+                                </span>
 
-						</div>
+                            </div>
 
-					</form>
+
+                            <!-- ================================ -->
+                            <!-- ATTACHMENT -->
+                            <!-- ================================ -->
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Supporting Document
+                                </label>
+
+                                <input type="file"
+                                       name="AttachmentFile"
+                                       class="form-control"
+                                       accept=".pdf,.jpg,.jpeg,.png" />
+
+                                <div class="form-note">
+                                    PDF, JPG, JPEG or PNG
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================================ -->
+                        <!-- INFORMATION -->
+                        <!-- ================================ -->
+
+                        <div class="alert alert-info mt-4">
+
+                            <div class="d-flex gap-2">
+
+                                <em class="icon ni ni-info"></em>
+
+                                <div>
+                                    Your request will be sent to your reporting manager
+                                    for approval. Attendance will be updated only after approval.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================================ -->
+                        <!-- BUTTONS -->
+                        <!-- ================================ -->
+
+                        <div class="col-12 mt-4">
+
+                            <a asp-action="MyAttendance"
+                               asp-route-mode="regularization"
+                               class="btn btn-light">
+
+                                Cancel
+
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                <em class="icon ni ni-send me-1"></em>
+
+                                Submit Request
+
+                            </button>
+
+                        </div>
+
+                    </form>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
 
+        const type = document.getElementById("regularizationType");
+
+        const inContainer =
+            document.getElementById("requestedInContainer");
+
+        const outContainer =
+            document.getElementById("requestedOutContainer");
+
+        const inInput =
+            document.getElementById("RequestedInTime");
+
+        const outInput =
+            document.getElementById("RequestedOutTime");
+
+
+        function updateFields() {
+
+            // Hide both initially
+            inContainer.style.display = "none";
+            outContainer.style.display = "none";
+
+            inInput.required = false;
+            outInput.required = false;
+
+
+            // In + Out
+            if (type.value === "Both") {
+
+                inContainer.style.display = "block";
+                outContainer.style.display = "block";
+
+                inInput.required = true;
+                outInput.required = true;
+            }
+
+
+            // In only
+            else if (type.value === "In") {
+
+                inContainer.style.display = "block";
+
+                inInput.required = true;
+            }
+
+
+            // Out only
+            else if (type.value === "Out") {
+
+                outContainer.style.display = "block";
+
+                outInput.required = true;
+            }
+        }
+
+
+        type.addEventListener("change", updateFields);
+
+        updateFields();
+
+    });
+</script>
 

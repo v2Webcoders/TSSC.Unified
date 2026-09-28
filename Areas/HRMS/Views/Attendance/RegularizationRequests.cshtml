@@ -76,7 +76,26 @@
 <!-- ========================================= -->
 
 <div class="nk-block nk-block-lg">
-
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"></button>
+        </div>
+    }
     <div class="card card-preview">
 
         <div class="card-inner">
@@ -174,8 +193,8 @@
 
                                 <td>
 
-                                    @item.AttendanceDate
-                                        .ToString("dd-MMM-yyyy")
+                                    @(item.AttendanceDate
+                                        .ToString("dd-MMM-yyyy"))
 
                                 </td>
 
@@ -306,8 +325,8 @@
 
                                         <small class="text-muted">
 
-                                            @item.ApprovedDate?
-                                                .ToString("dd-MMM-yyyy hh:mm")
+                                            @(item.ApprovedDate?
+                                                .ToString("dd-MMM-yyyy hh:mm"))
 
                                         </small>
                                     }
@@ -321,8 +340,8 @@
 
                                         <small class="text-muted">
 
-                                            @item.ApprovedDate?
-                                                .ToString("dd-MMM-yyyy hh:mm")
+                                            @(item.ApprovedDate?
+                                                .ToString("dd-MMM-yyyy hh:mm"))
 
                                         </small>
                                     }
@@ -337,8 +356,8 @@
                                         <small class="text-muted">
 
                                             Applied:
-                                            @item.CreatedDate
-                                                .ToString("dd-MMM-yyyy hh:mm")
+                                            @(item.CreatedDate
+                                                .ToString("dd-MMM-yyyy hh:mm"))
 
                                         </small>
                                     }
@@ -358,7 +377,7 @@
                                         {
                                             <!-- APPROVE -->
 
-                                            <a asp-action="ApproveRegularization"
+                                            <a asp-action="ManagerApproveRegularization"
                                                asp-route-id="@item.RegularizationId"
                                                class="btn btn-sm btn-outline-success"
                                                title="Approve"
@@ -369,7 +388,7 @@
 
                                             <!-- REJECT -->
 
-                                            <a asp-action="RejectRegularization"
+                                            <a asp-action="ManagerRejectRegularization"
                                                asp-route-id="@item.RegularizationId"
                                                class="btn btn-sm btn-outline-danger"
                                                title="Reject"
@@ -381,7 +400,7 @@
                                         {
                                             <!-- ALLOW MANAGER TO REJECT APPROVED REQUEST -->
 
-                                            <a asp-action="RejectRegularization"
+                                            <a asp-action="ManagerRejectRegularization"
                                                asp-route-id="@item.RegularizationId"
                                                class="btn btn-sm btn-outline-danger"
                                                title="Reject"
@@ -393,7 +412,7 @@
                                         {
                                             <!-- ALLOW MANAGER TO APPROVE REJECTED REQUEST -->
 
-                                            <a asp-action="ApproveRegularization"
+                                            <a asp-action="ManagerApproveRegularization"
                                                asp-route-id="@item.RegularizationId"
                                                class="btn btn-sm btn-outline-success"
                                                title="Approve"

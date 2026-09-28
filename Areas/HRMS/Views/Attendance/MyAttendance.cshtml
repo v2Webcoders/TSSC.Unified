@@ -42,442 +42,23 @@
     <link rel="stylesheet" href="~/assets/css/calendar.css" />
 }
 
-@* 
-<style>
-    /* =========================================
-           ATTENDANCE CALENDAR
-        ========================================= */
-    .wfm-label {
-        margin-top: 3px;
-        font-size: 10px;
-        font-weight: 700;
-        color: #D9622F;
-        text-align: center;
-        letter-spacing: 0.3px;
-    }
 
-    .attendance-calendar-header {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 25px;
-        padding: 18px 20px;
-        border-bottom: 1px solid #e5e9f2;
-    }
-
-    .calendar-month-title {
-        font-size: 20px;
-        font-weight: 700;
-        color: #243b64;
-    }
-
-    .calendar-nav {
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        color: #1d6fd1;
-        background: #f1f6fc;
-        text-decoration: none;
-        transition: all .2s ease;
-    }
-
-        .calendar-nav:hover {
-            background: #1d6fd1;
-            color: #fff;
-        }
-
-
-    /* =========================================
-           WEEK DAYS
-        ========================================= */
-
-    .calendar-weekdays {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        background: #f5f8fc;
-        border-top: 1px solid #e5e9f2;
-        border-bottom: 1px solid #e5e9f2;
-    }
-
-        .calendar-weekdays div {
-            padding: 13px 10px;
-            text-align: center;
-            font-size: 13px;
-            font-weight: 700;
-            color: #65748b;
-        }
-
-
-    /* =========================================
-           CALENDAR GRID
-        ========================================= */
-
-    .attendance-calendar {
-        display: grid;
-        grid-template-columns: repeat(7, minmax(100px, 1fr));
-        background: #eaf2f7;
-    }
-
-    .calendar-day {
-        position: relative;
-        min-height: 105px;
-        padding: 10px;
-        background: #fff;
-        border-right: 1px solid #e2e8f0;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-        .calendar-day.empty {
-            background: #f8fafc;
-        }
-
-    .day-number {
-        text-align: right;
-        font-size: 16px;
-        font-weight: 600;
-        color: #26364f;
-        margin-bottom: 15px;
-    }
-
-
-    /* =========================================
-           ATTENDANCE
-        ========================================= */
-
-    .attendance-status {
-        border-radius: 4px;
-        padding: 7px 8px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-        .attendance-status.present {
-            background: #E3FBF3;
-            color: #0B6B4F;
-            border-left: 3px solid #1EE0AC;
-        }
-
-
-    .attendance-time {
-        display: flex;
-        justify-content: space-between;
-        gap: 5px;
-        white-space: nowrap;
-    }
-
-    .working-hours {
-        margin-top: 4px;
-        font-size: 11px;
-        color: #66852e;
-    }
-
-
-    /* =========================================
-           ABSENT
-        ========================================= */
-
-    .attendance-status.absent {
-        background: #ffe8e8;
-        color: #d64040;
-        border-left: 3px solid #e55353;
-    }
-
-
-    /* =========================================
-           WEEKEND
-        ========================================= */
-
-    .attendance-status.weekend {
-        background: #eef1f5;
-        color: #7c8797;
-    }
-
-    /* Leave status */
-    .attendance-status.leave {
-        margin-top: 6px;
-        padding: 7px 8px;
-        border-radius: 6px;
-        background: #fff4e8;
-        border: 1px solid #f3d3b5;
-        text-align: center;
-        line-height: 1.3;
-    }
-
-        /* Leave title */
-        .attendance-status.leave .leave-label {
-            font-size: 12px;
-            color: #c85a1a;
-            font-weight: 600;
-        }
-
-        /* Leave date range */
-        .attendance-status.leave .leave-date {
-            margin-top: 3px;
-            font-size: 10px;
-            color: #7a5a45;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        /* Half day leave */
-        .attendance-status.leave .leave-label strong {
-            font-weight: 600;
-        }
-    /* =========================================
-           EMPLOYEE INFO + ATTENDANCE KPIs
-        ========================================= */
-
-    .attendance-employee-info {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        padding: 12px 15px;
-        background: #fff;
-        border: 1px solid #e5e9f2;
-        border-radius: 6px;
-    }
-
-        .attendance-employee-info strong {
-            color: #243b64;
-            margin-left: 8px;
-        }
-
-    .employee-details {
-        min-width: 180px;
-    }
-
-    .employee-code {
-        color: #8091a5;
-        font-size: 12px;
-        margin-left: 3px;
-    }
-
-    /* =========================================
-           KPI CONTAINER
-        ========================================= */
-
-    .attendance-kpis {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 8px;
-    }
-
-    /* =========================================
-           KPI CARD
-        ========================================= */
-
-    .attendance-kpi {
-        min-width: 70px;
-        padding: 7px 10px;
-        border-radius: 5px;
-        text-align: center;
-        background: #f8f9fa;
-        border: 1px solid #e5e9f2;
-    }
-
-        .attendance-kpi .kpi-value {
-            display: block;
-            font-size: 17px;
-            font-weight: 700;
-            line-height: 1.1;
-        }
-
-        .attendance-kpi .kpi-label {
-            display: block;
-            margin-top: 2px;
-            font-size: 10px;
-            color: #8091a5;
-        }
-
-        /* =========================================
-           KPI COLORS
-        ========================================= */
-
-        .attendance-kpi.present .kpi-value {
-            color: #198754;
-        }
-
-        .attendance-kpi.late .kpi-value {
-            color: #d97706;
-        }
-
-        .attendance-kpi.halfday .kpi-value {
-            color: #dc3545;
-        }
-
-        .attendance-kpi.leave .kpi-value {
-            color: #D9622F;
-        }
-
-        .attendance-kpi.absent .kpi-value {
-            color: #6c757d;
-        }
-
-    /* =========================================
-           MOBILE
-        ========================================= */
-
-    @@media (max-width: 768px) {
-        .attendance-employee-info {
-            align-items: flex-start;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .attendance-kpis {
-            width: 100%;
-            justify-content: flex-start;
-            flex-wrap: wrap;
-        }
-
-        .attendance-kpi {
-            flex: 1;
-            min-width: 60px;
-        }
-    }
-
-
-    /* =========================================
-           LEGEND
-        ========================================= */
-
-    .attendance-legend {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 25px;
-        color: #65748b;
-        font-size: 13px;
-    }
-
-        .attendance-legend span {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-        }
-
-    .legend-dot {
-        width: 9px;
-        height: 9px;
-        border-radius: 50%;
-        display: inline-block;
-    }
-
-    .present-dot {
-        background: #20c997;
-    }
-
-    .absent-dot {
-        background: #e55353;
-    }
-
-    .weekend-dot {
-        background: #adb5bd;
-    }
-
-    .leave-dot {
-        background: #4676e8;
-    }
-
-    .holiday-dot {
-        background: #f0a06a;
-    }
-
-    .attendance-status.holiday {
-        color: #9a6700;
-        background: #fff8e1;
-        border: 1px solid #f4c542;
-        border-radius: 6px;
-        padding: 8px;
-    }
-
-    .holiday-label {
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .holiday-name {
-        font-size: 12px;
-        margin-top: 3px;
-    }
-
-    .attendance-source-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
-        font-size: 11px;
-        font-weight: 700;
-        cursor: help;
-        background: #ffffff;
-        color: #495057;
-        border: 1px solid #d5dae0;
-    }
-
-    .attendance-time {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .time-separator {
-        color: #8A93A8;
-        flex-shrink: 0;
-    }
-            .attendance-info-box {
-    margin-bottom: 0.75rem;
-}
-
-.attendance-info-box .d-flex {
-    padding: 0.5rem 0.75rem;
-    border-left: 3px solid #0D6EFD;
-    background-color: rgba(13, 110, 253, 0.03);
-    border-radius: 0.25rem;
-}
-
-.attendance-info-box .icon {
-    font-size: 0.9rem;
-    color: #0D6EFD;
-    margin-top: 2px;
-    flex-shrink: 0;
-}
-
-.attendance-info-box span {
-    font-size: 0.85rem;
-    line-height: 1.4;
-    color: #6C757D;
-}
-
-.attendance-info-box strong {
-    color: #212529;
-    font-weight: 600;
-}
-
-           
-
-
-</style> *@
 
 <div class="nk-block-head">
     <div class="nk-block-between">
         <div class="nk-block-head-content">
-            <h3 class="nk-block-title page-title">
-                View Attendance
-            </h3>
+    <h3 class="nk-block-title page-title">
+        @ViewBag.PageTitle
+    </h3>
 
-            <div class="nk-block-des text-soft">
-                <p>
-                    View your monthly attendance
-                    and attendance status.
-                </p>
-            </div>
-        </div>
+    <div class="nk-block-des text-soft">
+        <p>
+            @(ViewBag.PageTitle == "Attendance Regularization"
+                ? "Review and regularize your attendance records."
+                : "View your monthly attendance and attendance status.")
+        </p>
+    </div>
+</div>
         <div class="nk-block-head-content">
             <div class="toggle-wrap nk-block-tools-toggle">
                 <a href="#" class="btn btn-icon btn-trigger toggle-expand me-n1" data-target="pageMenu">
@@ -1089,61 +670,60 @@
                 <h6 id="modalDate"
                     class="mb-4">
                 </h6>
+                <!-- Add this helper text -->
+    <small class="text-muted d-block mb-4">
+        <em class="icon ni ni-info me-1"></em>
+        Review your attendance record. Use "Regularize" if the timing needs adjustment.
+    </small>
 
+               <div class="row g-3">
 
-                <div class="row g-3">
+    <!-- In Time - Display Card -->
+    <div class="col-6">
+        <div class="d-flex flex-column">
+            <small class="text-soft mb-2">
+                <em class="icon ni ni-arrow-right me-1"></em>
+                In Time
+            </small>
+            <strong id="modalIn" class="fs-5 text-dark">
+                —
+            </strong>
+            <small id="inTimeNote" class="text-muted mt-1"></small>
+        </div>
+    </div>
 
-                    <div class="col-6">
+    <!-- Out Time - Display Card -->
+    <div class="col-6">
+        <div class="d-flex flex-column">
+            <small class="text-soft mb-2">
+                <em class="icon ni ni-arrow-left me-1"></em>
+                Out Time
+            </small>
+            <strong id="modalOut" class="fs-5 text-dark">
+                —
+            </strong>
+            <small id="outTimeNote" class="text-muted mt-1"></small>
+        </div>
+    </div>
 
-                        <div class="border rounded p-3">
+    <!-- Status - Prominent Display -->
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <small class="text-soft d-block mb-2">
+                    <em class="icon ni ni-check-circle me-1"></em>
+                    Status
+                </small>
+                <strong id="modalStatus" class="fs-5 text-dark">
+                    —
+                </strong>
+            </div>
+            <span id="statusBadge" class="badge"></span>
+        </div>
+        <small id="statusAction" class="text-muted d-block mt-2"></small>
+    </div>
 
-                            <span class="text-soft d-block">
-                                In Time
-                            </span>
-
-                            <strong id="modalIn">
-                                —
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-6">
-
-                        <div class="border rounded p-3">
-
-                            <span class="text-soft d-block">
-                                Out Time
-                            </span>
-
-                            <strong id="modalOut">
-                                —
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-12">
-
-                        <div class="border rounded p-3">
-
-                            <span class="text-soft d-block">
-                                Status
-                            </span>
-
-                            <strong id="modalStatus">
-                                —
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-                </div>
+</div>
 
             </div>
 
@@ -1174,7 +754,7 @@
 </div>
 
 
-<style>
+@* <style>
 
     /* =========================================================
            ATTENDANCE CALENDAR
@@ -1337,7 +917,7 @@
         font-size: 12px;
     }
 
-    }</style>
+    }</style> *@
 
 
 @* <script>
