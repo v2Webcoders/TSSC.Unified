@@ -31,7 +31,8 @@
 	// PENDING LEAVE REQUEST COUNT
 	// =====================================
 	int pendingLeaveCount = 0;
-
+	int pendingRegularizationCount = 0;
+	int pendingODCount = 0;
 	if (employee != null)
 	{
 		var employeeId = employee.EmployeeId;
@@ -40,6 +41,10 @@
 		{
 			pendingLeaveCount = Context.LeaveRequest
 				.Count(x => x.Status == "Pending");
+			pendingRegularizationCount = Context.AttendanceRegularization
+		.Count(x => x.Status == "Pending");
+			pendingODCount = Context.ODRequest
+						.Count(x => x.Status == "Pending");
 		}
 		else if (isReportingManager)
 		{
@@ -50,6 +55,21 @@
 						emp.EmployeeId == x.EmployeeId &&
 						emp.ReportingManagerId == employeeId
 					));
+			// Reporting Manager sees only their reportees' pending requests
+			pendingRegularizationCount = Context.AttendanceRegularization
+				.Count(x =>
+					x.Status == "Pending" &&
+					Context.Employee.Any(emp =>
+						emp.EmployeeId == x.EmployeeId &&
+						emp.ReportingManagerId == employeeId
+					));
+			pendingODCount = Context.ODRequest
+	.Count(x =>
+		x.Status == "Pending" &&
+		Context.Employee.Any(emp =>
+			emp.EmployeeId == x.EmployeeId &&
+			emp.ReportingManagerId == employeeId
+		));
 		}
 	}
 
@@ -207,6 +227,16 @@
 		border-bottom: 1px solid #1688B5;
 	}
 
+	.attendance-attention-dot {
+		position: absolute;
+		right: 34px;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 8px;
+		height: 8px;
+		background: #e85347;
+		border-radius: 50%;
+	}
 </style>
 <ul class="nk-menu">
 
@@ -765,7 +795,9 @@
 						<span class="nk-menu-text">
 							All Regularizations
 						</span>
-
+						<span class="badge bg-danger ms-auto">
+							@pendingRegularizationCount
+						</span>
 					</a>
 
 				</li>
@@ -970,14 +1002,9 @@
 				<span class="nk-menu-text">
 					Manage Leave Requests
 				</span>
-
-				@if (pendingLeaveCount > 0)
-				{
-					<span class="badge bg-outline-warning ml-auto">
-						@pendingLeaveCount
-					</span>
-				}
-
+				<span class="badge bg-danger ms-auto">
+					@pendingLeaveCount
+				</span>
 			</a>
 		</li>
 		<!-- Attendance Approvals -->
@@ -990,11 +1017,15 @@
 				<span class="nk-menu-icon">
 					<em class="icon ni ni-calendar-check-fill"></em>
 				</span>
-
+				
 				<span class="nk-menu-text">
-					Attendance Approvals
+					Attendance Approvals 
+					
 				</span>
-
+				@if (pendingRegularizationCount > 0 || pendingODCount > 0)
+				{
+					<span class="attendance-attention-dot"></span>
+				}
 			</a>
 
 			<ul class="nk-menu-sub">
@@ -1007,7 +1038,9 @@
 						<span class="nk-menu-text">
 							Regularization Requests
 						</span>
-
+						<span class="badge bg-danger ms-auto">
+							@pendingRegularizationCount
+						</span>
 					</a>
 
 				</li>
@@ -1021,7 +1054,9 @@
 						<span class="nk-menu-text">
 							OD Requests
 						</span>
-
+						<span class="badge bg-danger ms-auto">
+							@pendingODCount
+						</span>
 					</a>
 
 				</li>

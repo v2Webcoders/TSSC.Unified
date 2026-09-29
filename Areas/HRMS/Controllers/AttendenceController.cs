@@ -3394,6 +3394,298 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             return RedirectToAction(
                 nameof(RegularizationRequests));
         }
+
+        [HttpPost]
+        public async Task<IActionResult> BulkApproveRegularization(
+        List<int> selectedIds)
+        {
+            if (selectedIds == null || !selectedIds.Any())
+            {
+                TempData["Error"] =
+                    "Please select at least one regularization request.";
+
+                return RedirectToAction(nameof(AllRegularizations));
+            }
+
+            var currentUser =
+                await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return Unauthorized();
+
+            int approvedCount = 0;
+            int skippedCount = 0;
+
+
+            // =========================================
+            // PROCESS SELECTED REQUESTS
+            // =========================================
+
+            foreach (var id in selectedIds)
+            {
+                // =========================================
+                // FIND REQUEST
+                // =========================================
+
+                var request =
+                    await _context.AttendanceRegularization
+                        .Include(x => x.Employee)
+                        .FirstOrDefaultAsync(x =>
+                            x.RegularizationId == id);
+
+                if (request == null)
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+
+                // =========================================
+                // ONLY PENDING REQUEST CAN BE APPROVED
+                // =========================================
+
+                if (request.Status != "Pending")
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+
+                // =========================================
+                // FIND ATTENDANCE
+                // =========================================
+
+                var attendance =
+                    await _context.EmployeeAttendance
+                        .FirstOrDefaultAsync(x =>
+                            x.EmployeeId == request.EmployeeId
+                            &&
+                            x.AttendanceDate ==
+                                request.AttendanceDate);
+
+
+                // =========================================
+                // IF NO ATTENDANCE EXISTS
+                // CREATE ONE
+                // =========================================
+
+                if (attendance == null)
+                {
+                    attendance = new EmployeeAttendance
+                    {
+                        EmployeeId =
+                            request.EmployeeId,
+
+                        EmployeeCode =
+                            request.Employee?.EmployeeCode ?? "",
+
+                        AttendanceDate =
+                            request.AttendanceDate,
+
+                        InTime =
+                            request.RequestedInTime,
+
+                        OutTime =
+                            request.RequestedOutTime,
+
+                        AttendanceStatus =
+                            "Present",
+
+                        Remarks =
+                            "Attendance created through approved regularization request.",
+
+                        AttendanceSource =
+                            "Regularization",
+
+                        CreatedDate =
+                            DateTime.Now
+                    };
+
+                    _context.EmployeeAttendance.Add(attendance);
+                }
+                else
+                {
+                    // =========================================
+                    // UPDATE EXISTING ATTENDANCE
+                    // =========================================
+
+                    if (request.RequestedInTime.HasValue)
+                    {
+                        attendance.InTime =
+                            request.RequestedInTime;
+                    }
+
+                    if (request.RequestedOutTime.HasValue)
+                    {
+                        attendance.OutTime =
+                            request.RequestedOutTime;
+                    }
+
+                    attendance.AttendanceStatus =
+                        "Present";
+
+                    attendance.AttendanceSource =
+                        "Regularization";
+
+                    attendance.Remarks =
+                        "Attendance updated through approved regularization request.";
+                }
+
+
+                // =========================================
+                // APPROVE REQUEST
+                // =========================================
+
+                request.Status =
+                    "Approved";
+
+                request.ApprovedDate =
+                    DateTime.Now;
+
+                request.ApprovalRemarks =
+                    "Attendance regularization approved.";
+
+                approvedCount++;
+            }
+
+
+            // =========================================
+            // SAVE ALL CHANGES ONCE
+            // =========================================
+
+            await _context.SaveChangesAsync();
+
+
+            // =========================================
+            // RESULT MESSAGE
+            // =========================================
+
+            if (approvedCount > 0 && skippedCount == 0)
+            {
+                TempData["Success"] =
+                    $"{approvedCount} regularization request(s) approved successfully.";
+            }
+            else if (approvedCount > 0 && skippedCount > 0)
+            {
+                TempData["Success"] =
+                    $"{approvedCount} request(s) approved successfully. " +
+                    $"{skippedCount} request(s) skipped.";
+            }
+            else
+            {
+                TempData["Error"] =
+                    "No selected regularization requests could be approved.";
+            }
+
+
+            return RedirectToAction(nameof(AllRegularizations));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BulkRejectRegularization(
+        List<int> selectedIds)
+        {
+            if (selectedIds == null || !selectedIds.Any())
+            {
+                TempData["Error"] =
+                    "Please select at least one regularization request.";
+
+                return RedirectToAction(nameof(AllRegularizations));
+            }
+
+            var currentUser =
+                await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return Unauthorized();
+
+
+            int rejectedCount = 0;
+            int skippedCount = 0;
+
+
+            // =========================================
+            // PROCESS SELECTED REQUESTS
+            // =========================================
+
+            foreach (var id in selectedIds)
+            {
+                // =========================================
+                // FIND REQUEST
+                // =========================================
+
+                var request =
+                    await _context.AttendanceRegularization
+                        .FirstOrDefaultAsync(x =>
+                            x.RegularizationId == id);
+
+                if (request == null)
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+
+                // =========================================
+                // ONLY PENDING REQUEST CAN BE REJECTED
+                // =========================================
+
+                if (request.Status != "Pending")
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+
+                // =========================================
+                // REJECT REQUEST
+                // =========================================
+
+                request.Status =
+                    "Rejected";
+
+                request.ApprovedDate =
+                    DateTime.Now;
+
+                request.ApprovalRemarks =
+                    "Attendance regularization rejected.";
+
+                rejectedCount++;
+            }
+
+
+            // =========================================
+            // SAVE ALL CHANGES
+            // =========================================
+
+            await _context.SaveChangesAsync();
+
+
+            // =========================================
+            // RESULT MESSAGE
+            // =========================================
+
+            if (rejectedCount > 0 && skippedCount == 0)
+            {
+                TempData["Success"] =
+                    $"{rejectedCount} regularization request(s) rejected successfully.";
+            }
+            else if (rejectedCount > 0 && skippedCount > 0)
+            {
+                TempData["Success"] =
+                    $"{rejectedCount} request(s) rejected successfully. " +
+                    $"{skippedCount} request(s) skipped.";
+            }
+            else
+            {
+                TempData["Error"] =
+                    "No selected regularization requests could be rejected.";
+            }
+
+
+            return RedirectToAction(nameof(AllRegularizations));
+        }
     }
 }
 

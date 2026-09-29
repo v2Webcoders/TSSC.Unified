@@ -161,14 +161,46 @@
     <div class="card card-preview">
 
         <div class="card-inner">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <button type="button"
+                            class="btn btn-sm btn-success"
+                            id="bulkApproveBtn">
+                        <em class="icon ni ni-check-circle"></em>
+                        Approve Selected
+                    </button>
+                    <button type="button"
+                            class="btn btn-sm btn-danger"
+                            id="bulkRejectBtn">
+                        <em class="icon ni ni-cross-circle"></em>
+                        Reject Selected
+                    </button>
+                    <span class="ms-2 text-muted">
+                        <span id="selectedCount">0</span> selected
+                    </span>
+                </div>
+            </div>
 
+            <form asp-action="BulkApproveRegularization"
+                  method="post"
+                  id="bulkRegularizationForm">
+                <div id="selectedIdsContainer"></div>
+            </form>
+            <form asp-action="BulkRejectRegularization"
+                  method="post"
+                  id="bulkRejectForm">
+
+                <div id="selectedRejectIdsContainer"></div>
+
+            </form>
             <div class="table-responsive">
-
                 <table class="datatable-init-export table table-tranx table_custom table-bordered">
-
                     <thead>
-
                         <tr>
+                            <th width="40" data-orderable="false">
+                                <input type="checkbox"
+                                       id="selectAllRegularization" />
+                            </th>
 
                             <th width="60">
                                 S.No.
@@ -220,7 +252,14 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-
+                                <td>
+                                    @if (item.Status == "Pending")
+                                    {
+                                        <input type="checkbox"
+                                               class="regularization-checkbox"
+                                               value="@item.RegularizationId" />
+                                    }
+                                </td>
                                 <!-- ================================= -->
                                 <!-- SERIAL -->
                                 <!-- ================================= -->
@@ -500,5 +539,246 @@
     </div>
 
 </div>
+@section Scripts {
+    <script>
+
+        let selectedRegularizations = new Set();
+
+
+        // ==========================================
+        // INDIVIDUAL CHECKBOX
+        // ==========================================
+
+        $(document).on(
+            'change',
+            '.regularization-checkbox',
+            function () {
+
+                const id = $(this).val();
+
+                if ($(this).is(':checked')) {
+
+                    selectedRegularizations.add(id);
+
+                } else {
+
+                    selectedRegularizations.delete(id);
+                }
+
+                updateSelectedCount();
+                updateSelectAll();
+            }
+        );
+
+
+        // ==========================================
+        // SELECT ALL CURRENT PAGE
+        // ==========================================
+
+        $(document).on(
+            'change',
+            '#selectAllRegularization',
+            function () {
+
+                const checked = $(this).is(':checked');
+
+                $('.regularization-checkbox').each(function () {
+
+                    const id = $(this).val();
+
+                    $(this).prop('checked', checked);
+
+                    if (checked) {
+
+                        selectedRegularizations.add(id);
+
+                    } else {
+
+                        selectedRegularizations.delete(id);
+                    }
+
+                });
+
+                updateSelectedCount();
+            }
+        );
+
+
+        // ==========================================
+        // DATATABLE PAGE CHANGE
+        // ==========================================
+
+        $('.datatable-init-export').on(
+            'draw.dt',
+            function () {
+
+                $('.regularization-checkbox').each(function () {
+
+                    const id = $(this).val();
+
+                    $(this).prop(
+                        'checked',
+                        selectedRegularizations.has(id)
+                    );
+
+                });
+
+                updateSelectedCount();
+                updateSelectAll();
+            }
+        );
+
+
+        // ==========================================
+        // UPDATE COUNT
+        // ==========================================
+
+        function updateSelectedCount() {
+
+            $('#selectedCount').text(
+                selectedRegularizations.size
+            );
+        }
+
+
+        // ==========================================
+        // UPDATE SELECT ALL
+        // ==========================================
+
+        function updateSelectAll() {
+
+            const checkboxes =
+                $('.regularization-checkbox');
+
+            if (checkboxes.length === 0) {
+
+                $('#selectAllRegularization')
+                    .prop('checked', false)
+                    .prop('indeterminate', false);
+
+                return;
+            }
+
+            const checked =
+                checkboxes.filter(':checked').length;
+
+            $('#selectAllRegularization').prop(
+                'checked',
+                checked === checkboxes.length
+            );
+
+            $('#selectAllRegularization').prop(
+                'indeterminate',
+                checked > 0 &&
+                checked < checkboxes.length
+            );
+        }
+
+
+        // ==========================================
+        // BULK APPROVE BUTTON
+        // ==========================================
+
+        $('#bulkApproveBtn').on('click', function () {
+
+            console.log(
+                'Selected IDs:',
+                Array.from(selectedRegularizations)
+            );
+
+
+            // No selection
+            if (selectedRegularizations.size === 0) {
+
+                alert(
+                    'Please select at least one pending regularization request.'
+                );
+
+                return;
+            }
+
+
+            // Confirmation
+            if (!confirm(
+                'Are you sure you want to approve ' +
+                selectedRegularizations.size +
+                ' selected regularization request(s)?'
+            )) {
+
+                return;
+            }
+
+
+            // Clear previous hidden inputs
+            $('#selectedIdsContainer').empty();
+
+
+            // Create hidden input for every selected ID
+            selectedRegularizations.forEach(function (id) {
+
+                $('#selectedIdsContainer').append(
+                    $('<input>', {
+                        type: 'hidden',
+                        name: 'selectedIds',
+                        value: id
+                    })
+                );
+
+            });
+
+
+            // Submit
+            $('#bulkRegularizationForm').submit();
+
+        });
+
+
+         // ==========================================
+        // BULK REJECT BUTTON
+        // ==========================================
+
+                $('#bulkRejectBtn').on('click', function () {
+
+            if (selectedRegularizations.size === 0) {
+
+                alert(
+                    'Please select at least one pending regularization request.'
+                );
+
+                return;
+            }
+
+            if (!confirm(
+                'Are you sure you want to reject ' +
+                selectedRegularizations.size +
+                ' selected regularization request(s)?'
+            )) {
+                return;
+            }
+
+            // Clear previous hidden inputs
+            $('#selectedRejectIdsContainer').empty();
+
+
+            // Add selected IDs
+            selectedRegularizations.forEach(function (id) {
+
+                $('#selectedRejectIdsContainer').append(
+                    $('<input>', {
+                        type: 'hidden',
+                        name: 'selectedIds',
+                        value: id
+                    })
+                );
+
+            });
+
+
+            // Submit
+            $('#bulkRejectForm').submit();
+
+        });
+    </script>
+}
 
 
