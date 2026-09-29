@@ -52,7 +52,7 @@ namespace TSSC.Unified.Models
         [ForeignKey(nameof(ApproverId))]
         public virtual Employee? Approver { get; set; }
 
-        [Required(ErrorMessage = "Please select regularization type.")]
+        
         public string? RegularizationType { get; set; }
     }
 }

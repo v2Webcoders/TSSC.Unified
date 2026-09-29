@@ -396,7 +396,7 @@
                     if (currentDate.DayOfWeek == DayOfWeek.Sunday)
                     {
                         statusClass = "sunday";
-                        statusText = "Sunday";
+                        statusText = "Weekend";
                     }
                     else
                     {
@@ -605,10 +605,10 @@
                         {
                             if (statusClass == "sunday")
                             {
-                                <div class="attendance-status holiday">
+                                <div class="attendance-status weekend">
 
                                     <div class="holiday-label">
-                                        Sunday
+                                        Weekend
                                     </div>
 
                                 </div>
@@ -1011,10 +1011,14 @@
             // Modal information
             // -----------------------------
 
-            document.getElementById("modalDate").textContent =
-                date || "Attendance";
+            @* document.getElementById("modalDate").textContent =
+                date || "Attendance"; *@
+                const displayDate = date
+                ? date.split("-").reverse().join("-")
+                : "Attendance";
 
-            document.getElementById("modalIn").textContent =
+                document.getElementById("modalDate").textContent = displayDate;
+                document.getElementById("modalIn").textContent =
                 inTime || "—";
 
             document.getElementById("modalOut").textContent =

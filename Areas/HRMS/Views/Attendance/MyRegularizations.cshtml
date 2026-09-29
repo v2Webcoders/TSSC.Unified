@@ -386,7 +386,7 @@
                                         @if (item.Approver != null)
                                         {
                                             <strong>
-                                                @item.Approver.FirstName
+                                                @item.Approver.FirstName @item.Approver.LastName
                                             </strong>
 
                                             @if (!string.IsNullOrEmpty(

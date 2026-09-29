@@ -1525,14 +1525,14 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             }
 
 
-            //if (request.Status != "Pending")
-            //{
-            //    TempData["Error"] =
-            //        "This request has already been processed.";
+            if (request.Status != "Pending")
+            {
+                TempData["Error"] =
+                    "This request has already been processed.";
 
-            //    return RedirectToAction(
-            //        nameof(AllRegularizations));
-            //}
+                return RedirectToAction(
+                    nameof(AllRegularizations));
+            }
 
 
             request.Status =
@@ -3182,14 +3182,14 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             // ONLY PENDING REQUEST CAN BE APPROVED
             // =========================================
 
-            //if (request.Status != "Pending")
-            //{
-            //    TempData["Error"] =
-            //        "This regularization request has already been processed.";
+            if (request.Status != "Pending")
+            {
+                TempData["Error"] =
+                    "This regularization request has already been processed.";
 
-            //    return RedirectToAction(
-            //        nameof(RegularizationRequests));
-            //}
+                return RedirectToAction(
+                    nameof(RegularizationRequests));
+            }
 
 
             // =========================================
@@ -3356,14 +3356,14 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             // ONLY PENDING REQUEST CAN BE REJECTED
             // =========================================
 
-            //if (request.Status != "Pending")
-            //{
-            //    TempData["Error"] =
-            //        "This regularization request has already been processed.";
+            if (request.Status != "Pending")
+            {
+                TempData["Error"] =
+                    "This regularization request has already been processed.";
 
-            //    return RedirectToAction(
-            //        nameof(RegularizationRequests));
-            //}
+                return RedirectToAction(
+                    nameof(RegularizationRequests));
+            }
 
 
             // =========================================
