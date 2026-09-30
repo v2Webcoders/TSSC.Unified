@@ -223,12 +223,15 @@
 			<!-- Right sign-in form -->
 			<div class="col-lg-6 panel">
 				<div class="card">
-
-					<a class="d-lg-none brand-mark" href="index.html" style="color:var(--navy); margin-bottom:22px; display:flex;">
-						<span class="dot"></span> TSSC UNIFIED PORTAL
-					</a>
 					<div class="status-chip" id="formTitle"><span class="pulse"></span>  TSSC PORTAL</div>
 					<div class="card-title">Welcome back</div>
+					@if (TempData["PasswordResetSuccess"] != null)
+					{
+						<div class="alert alert-success mt-3">
+							<i class="fas fa-check-circle me-2"></i> 
+							@TempData["PasswordResetSuccess"]
+						</div>
+					}
 					<div class="card-note">Sign in with your registered username and password to continue.</div>
 
 
@@ -304,7 +307,7 @@
                                 Remember me
                             </label> *@
 
-							<a class="link-btn" href="javascript:void(0);">
+							<a class="link-btn" href="/Account/ForgotPassword">
 								Forgot password?
 							</a>
 						</div>
@@ -312,7 +315,7 @@
 						<button type="submit" id="btnSubmit" class="btn-primary">
 							Sign In
 						</button>
-
+						
 						@if (TempData["ErrorMessage"] != null)
 						{
 							<div class="alert alert-danger mt-3">

@@ -40,6 +40,17 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/assets/css/calendar.css" />
+    @* <style>
+        .icon-circle-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+</style> *@
 }
 
 
@@ -122,115 +133,114 @@
                                     <span class="ms-2">9:30–9:59 <span class="badge bg-success-subtle text-success ms-1">OK</span></span>
                                     <span class="ms-2">10:00–10:59 <span class="badge bg-warning-subtle text-warning ms-1">Late</span></span>
                                     <span class="ms-2">11:00+ <span class="badge bg-danger-subtle text-danger ms-1">Half</span></span>
-                                    <span class="ms-2">3 Late = <span class="badge bg-info-subtle text-info ms-1">-1 Leave</span></span>
+                                    <span class="ms-2">
+        First 3 Late
+        <span class="badge bg-success-subtle text-success ms-1">No Deduction</span>
+    </span>
+
+    <span class="ms-2">
+        4th Late onward
+        <span class="badge bg-info-subtle text-info ms-1">-0.5 Leave / Late</span>
+    </span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
 
+                   <div class="row g-3 mb-4 row-cols-2 row-cols-md-3 row-cols-xl-5">
+
+    <!-- Present -->
+    <div class="col">
+        <div class="card card-bordered h-100">
+            <div class="card-inner card-inner-sm">
+                <div class="d-flex justify-content-between align-items-center gap-2">
+                    <div class="min-w-0">
+                        <span class="text-soft fs-12px d-block text-truncate">Present</span>
+                        <span class="amount fs-20px fw-bold lh-sm">@ViewBag.PresentCount</span>
+                    </div>
                     <!-- Present -->
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="card card-bordered h-100">
-                            <div class="card-inner">
-                                <div class="d-flex justify-content-between align-items-center">
+<div class="icon-circle icon-circle-sm bg-success text-white">
+    <em class="icon ni ni-check"></em>
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                    <div>
-                                        <span class="text-soft">
-                                            Present
-                                        </span>
-
-                                        <h3 class="mt-1 mb-0">
-                                            @ViewBag.PresentCount
-                                        </h3>
-                                    </div>
-
-                                    <div class="icon-circle bg-success text-white">
-                                        <em class="icon ni ni-check"></em>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
+    <!-- Half Day -->
+    <div class="col">
+        <div class="card card-bordered h-100">
+            <div class="card-inner card-inner-sm">
+                <div class="d-flex justify-content-between align-items-center gap-2">
+                    <div class="min-w-0">
+                        <span class="text-soft fs-12px d-block text-truncate">Half Day</span>
+                        <span class="amount fs-20px fw-bold lh-sm">@ViewBag.HalfDayCount</span>
                     </div>
+                    <!-- Half Day -->
+<div class="icon-circle icon-circle-sm bg-primary text-white">
+    <em class="icon ni ni-clock"></em>
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-
-                    <!-- Absent -->
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="card card-bordered h-100">
-                            <div class="card-inner">
-                                <div class="d-flex justify-content-between align-items-center">
-
-                                    <div>
-                                        <span class="text-soft">
-                                            Absent
-                                        </span>
-
-                                        <h3 class="mt-1 mb-0">
-                                            @ViewBag.AbsentCount
-                                        </h3>
-                                    </div>
-
-                                    <div class="icon-circle bg-danger text-white">
-                                        <em class="icon ni ni-cross"></em>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
+    <!-- Absent -->
+    <div class="col">
+        <div class="card card-bordered h-100">
+            <div class="card-inner card-inner-sm">
+                <div class="d-flex justify-content-between align-items-center gap-2">
+                    <div class="min-w-0">
+                        <span class="text-soft fs-12px d-block text-truncate">Absent</span>
+                        <span class="amount fs-20px fw-bold lh-sm">@ViewBag.AbsentCount</span>
                     </div>
+                   <!-- Absent -->
+<div class="icon-circle icon-circle-sm bg-danger text-white">
+    <em class="icon ni ni-cross"></em>
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-
+    <!-- Late -->
+    <div class="col">
+        <div class="card card-bordered h-100">
+            <div class="card-inner card-inner-sm">
+                <div class="d-flex justify-content-between align-items-center gap-2">
+                    <div class="min-w-0">
+                        <span class="text-soft fs-12px d-block text-truncate">Late</span>
+                        <span class="amount fs-20px fw-bold lh-sm">@ViewBag.LateCount</span>
+                    </div>
                     <!-- Late -->
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="card card-bordered h-100">
-                            <div class="card-inner">
-                                <div class="d-flex justify-content-between align-items-center">
+<div class="icon-circle icon-circle-sm bg-warning text-white">
+    <em class="icon ni ni-alert"></em>
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                    <div>
-                                        <span class="text-soft">
-                                            Late
-                                        </span>
-
-                                        <h3 class="mt-1 mb-0">
-                                            @ViewBag.LateCount
-                                        </h3>
-                                    </div>
-
-                                    <div class="icon-circle bg-warning text-white">
-                                        <em class="icon ni ni-alert"></em>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
+    <!-- Leave Deducted -->
+    <div class="col">
+        <div class="card card-bordered h-100">
+            <div class="card-inner card-inner-sm">
+                <div class="d-flex justify-content-between align-items-center gap-2">
+                    <div class="min-w-0">
+                        <span class="text-soft fs-12px d-block text-truncate">Leave Deducted</span>
+                        <span class="amount fs-20px fw-bold lh-sm">@ViewBag.LateLeaveDeduction</span>
                     </div>
+                    <!-- Leave Deducted -->
+<div class="icon-circle icon-circle-sm bg-info text-white">
+    <em class="icon ni ni-calendar"></em>
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-
-                    <!-- Leave Deduction -->
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="card card-bordered h-100">
-                            <div class="card-inner">
-                                <div class="d-flex justify-content-between align-items-center">
-
-                                    <div>
-                                        <span class="text-soft">
-                                            Leave Deducted
-                                        </span>
-
-                                        <h3 class="mt-1 mb-0">
-                                            @ViewBag.LateLeaveDeduction
-                                        </h3>
-                                    </div>
-
-                                    <div class="icon-circle bg-info text-white">
-                                        <em class="icon ni ni-calendar"></em>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+</div>
 
                 </div>
 
@@ -348,6 +358,11 @@
                 {
                     statusClass = "future";
                     statusText = "";
+                }
+                else if (currentDate.DayOfWeek == DayOfWeek.Saturday)
+                {
+                    statusClass = "saturday";
+                    statusText = "Work From Home";
                 }
                 else if (record != null)
                 {
@@ -613,6 +628,7 @@
 
                                 </div>
                             }
+                            
                             else if (statusClass == "absent")
                             {
                                 <div class="attendance-status absent">

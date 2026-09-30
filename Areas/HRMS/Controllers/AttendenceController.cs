@@ -333,11 +333,27 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     x.AttendanceStatus == "Present" ||
                     x.AttendanceStatus == "Late");
 
+            //// Late -- 30-9-2026
+            //int lateCount = attendance.Count(x =>
+            //    x.AttendanceStatus == "Late");
+
+            //int lateLeaveDeduction = lateCount / 3;
+
+            //ViewBag.LateCount = lateCount;
+            //ViewBag.LateLeaveDeduction = lateLeaveDeduction;
+
             // Late
             int lateCount = attendance.Count(x =>
-                x.AttendanceStatus == "Late");
+            x.AttendanceStatus == "Late" ||
+            (x.InTime.HasValue &&
+             x.InTime.Value.TimeOfDay >= new TimeSpan(10, 0, 0) &&
+             x.InTime.Value.TimeOfDay < new TimeSpan(11, 0, 0)));
 
-            int lateLeaveDeduction = lateCount / 3;
+            // First 3 late marks have no deduction.
+            // From the 4th late mark onward, each late mark deducts 0.5 leave.
+            decimal lateLeaveDeduction = lateCount >= 4
+                ? (lateCount - 3) * 0.5m
+                : 0m;
 
             ViewBag.LateCount = lateCount;
             ViewBag.LateLeaveDeduction = lateLeaveDeduction;
@@ -375,29 +391,52 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             }
 
             // Count only weekdays (Mon-Fri) from 1st of month until countUntilDate
-            var weekdaysInRange = Enumerable.Range(0, (countUntilDate - startDate).Days + 1)
-                .Select(day => startDate.AddDays(day))
-                .Count(date => 
-                               date.DayOfWeek != DayOfWeek.Sunday);
+            var weekdaysInRange = Enumerable.Range(
+        0,
+        (countUntilDate - startDate).Days + 1)
+    .Select(day => startDate.AddDays(day))
+    .Count(date =>
+        date.DayOfWeek != DayOfWeek.Saturday &&
+        date.DayOfWeek != DayOfWeek.Sunday);
+
 
             // Days with attendance records
             int attendanceRecordDays = attendance.Count();
 
+
             // Days on approved leave
             int leaveDays = leaveList.Count();
 
-            // Absent = Weekdays in range - (Days with attendance) - (Days on leave)
-            int absentDays = weekdaysInRange - attendanceRecordDays - leaveDays;
 
-            ViewBag.AbsentCount = Math.Max(0, absentDays); // Prevent negative values
-                                                           // Holiday records for the month
+            // Holiday records for the month
             var holidayList = await _context.Holiday
                 .Where(x =>
                     x.HolidayDate >= startDate &&
                     x.HolidayDate < endDate)
                 .ToListAsync();
 
+
+            // Holidays that fall on weekdays within the selected range
+            int holidayDays = holidayList.Count(x =>
+                x.HolidayDate.DayOfWeek != DayOfWeek.Saturday &&
+                x.HolidayDate.DayOfWeek != DayOfWeek.Sunday);
+
+
+            // Absent = Weekdays - Attendance - Leave - Holidays
+            int absentDays =
+                weekdaysInRange
+                - attendanceRecordDays
+                - leaveDays
+                - holidayDays;
+
+
+            ViewBag.AbsentCount = Math.Max(0, absentDays);
+
             ViewBag.HolidayList = holidayList;
+
+           
+
+
 
             return View(attendance);
         }
@@ -1337,10 +1376,10 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             // FIND REPORTING MANAGER
             // =========================================
 
-            var manager =
-                await _context.Employee
-                    .FirstOrDefaultAsync(x =>
-                        x.ApplicationUserId == currentUser.Id);
+            //var manager =
+            //    await _context.Employee
+            //        .FirstOrDefaultAsync(x =>
+            //            x.ApplicationUserId == currentUser.Id);
 
             //if (manager == null)
             //    return Unauthorized();
@@ -1396,6 +1435,29 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             // CREATE ONE
             // =========================================
 
+            string baseAttendanceStatus;
+
+            if (!request.RequestedInTime.HasValue)
+            {
+                baseAttendanceStatus = "Absent";
+            }
+            else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(10, 0, 0))
+            {
+                // Before 10:00 AM
+                baseAttendanceStatus = "Present";
+            }
+            else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(11, 0, 0))
+            {
+                // 10:00 AM - 10:59 AM
+                baseAttendanceStatus = "Late";
+            }
+            else
+            {
+                // 11:00 AM onwards
+                baseAttendanceStatus = "Half Day";
+            }
+
+
             if (attendance == null)
             {
                 attendance = new EmployeeAttendance
@@ -1416,7 +1478,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                         request.RequestedOutTime,
 
                     AttendanceStatus =
-                        "Present",
+                       baseAttendanceStatus,
 
                     Remarks =
                         "Attendance created through approved regularization request.",
@@ -1449,7 +1511,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 }
 
                 attendance.AttendanceStatus =
-                    "Present";
+                    baseAttendanceStatus;
 
                 attendance.AttendanceSource =
                     "Regularization";
@@ -3208,7 +3270,27 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             // IF NO ATTENDANCE EXISTS
             // CREATE ONE
             // =========================================
+            string baseAttendanceStatus;
 
+            if (!request.RequestedInTime.HasValue)
+            {
+                baseAttendanceStatus = "Absent";
+            }
+            else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(10, 0, 0))
+            {
+                // Before 10:00 AM
+                baseAttendanceStatus = "Present";
+            }
+            else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(11, 0, 0))
+            {
+                // 10:00 AM - 10:59 AM
+                baseAttendanceStatus = "Late";
+            }
+            else
+            {
+                // 11:00 AM onwards
+                baseAttendanceStatus = "Half Day";
+            }
             if (attendance == null)
             {
                 attendance = new EmployeeAttendance
@@ -3229,7 +3311,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                         request.RequestedOutTime,
 
                     AttendanceStatus =
-                        "Present",
+                        baseAttendanceStatus,
 
                     Remarks =
                         "Attendance created through approved regularization request.",
@@ -3262,7 +3344,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 }
 
                 attendance.AttendanceStatus =
-                    "Present";
+                    baseAttendanceStatus;
 
                 attendance.AttendanceSource =
                     "Regularization";
@@ -3468,7 +3550,27 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 // IF NO ATTENDANCE EXISTS
                 // CREATE ONE
                 // =========================================
+                string baseAttendanceStatus;
 
+                if (!request.RequestedInTime.HasValue)
+                {
+                    baseAttendanceStatus = "Absent";
+                }
+                else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(10, 0, 0))
+                {
+                    // Before 10:00 AM
+                    baseAttendanceStatus = "Present";
+                }
+                else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(11, 0, 0))
+                {
+                    // 10:00 AM - 10:59 AM
+                    baseAttendanceStatus = "Late";
+                }
+                else
+                {
+                    // 11:00 AM onwards
+                    baseAttendanceStatus = "Half Day";
+                }
                 if (attendance == null)
                 {
                     attendance = new EmployeeAttendance
@@ -3489,7 +3591,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                             request.RequestedOutTime,
 
                         AttendanceStatus =
-                            "Present",
+                            baseAttendanceStatus,
 
                         Remarks =
                             "Attendance created through approved regularization request.",
@@ -3522,7 +3624,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     }
 
                     attendance.AttendanceStatus =
-                        "Present";
+                        baseAttendanceStatus;
 
                     attendance.AttendanceSource =
                         "Regularization";
