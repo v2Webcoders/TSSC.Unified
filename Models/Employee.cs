@@ -173,6 +173,8 @@ namespace TSSC.Unified.Models
 
         [Display(Name = "Relieving Date")]
         public DateTime? RelievingDate { get; set; }
+
+        public string BiometricCode { get; set; }
     }
     public class Department
     {

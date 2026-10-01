@@ -36,5 +36,15 @@
 
         public string? CheckOutLocation { get; set; }
         public string? AttendanceSource { get; set; }
+
+        // Leave Details
+        public DateTime? LeaveFromDate { get; set; }
+
+        public DateTime? LeaveToDate { get; set; }
+
+        public string? LeaveType { get; set; }
+        public bool? IsHoliday { get; set; }
+
+        public string? HolidayName { get; set; }
     }
 }

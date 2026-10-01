@@ -1,0 +1,302 @@
+﻿/* =========================================================
+       MODERN COMPACT ATTENDANCE CALENDAR
+    ========================================================= */
+.dashboard-calendar-widget {
+    background: #ffffff;
+    border: 1px solid #e8ebf0;
+    border-radius: 10px;
+    padding: 9px;
+    box-shadow: 0 4px 14px rgba(27, 42, 74, 0.06);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* =========================================================
+       HEADER
+    ========================================================= */
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 7px;
+}
+
+.calendar-title {
+    flex: 1;
+    margin: 0;
+    text-align: center;
+    font-size: 13px;
+    line-height: 25px;
+    font-weight: 700;
+    color: #1B2A4A;
+    letter-spacing: -0.1px;
+}
+
+/* Navigation buttons */
+
+.calendar-nav-btn {
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: #f7f8fa;
+    border: 1px solid #e8ebef;
+    border-radius: 6px;
+    color: #687386;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+    .calendar-nav-btn:hover {
+        background: #1B2A4A;
+        border-color: #1B2A4A;
+        color: #ffffff;
+        box-shadow: 0 3px 7px rgba(27, 42, 74, 0.16);
+    }
+
+    .calendar-nav-btn:active {
+        transform: scale(0.94);
+    }
+
+    .calendar-nav-btn em {
+        font-size: 10px;
+    }
+
+/* =========================================================
+       WEEKDAYS
+    ========================================================= */
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: 3px;
+}
+
+.weekday {
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 7.5px;
+    font-weight: 700;
+    color: #9aa3b1;
+    text-transform: uppercase;
+    letter-spacing: 0.25px;
+}
+
+.calendar-weekdays .weekday:first-child,
+.calendar-weekdays .weekday:last-child {
+    color: #D9622F;
+}
+
+/* =========================================================
+       CALENDAR DAYS
+    ========================================================= */
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: 7px;
+}
+
+.calendar-day {
+    position: relative;
+    width: 100%;
+    height: 27px;
+    min-height: 27px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f9fafb;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: #344054;
+    font-size: 9px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.16s ease;
+}
+
+    /* Hover */
+
+    .calendar-day:not(.other-month):not(.today):hover {
+        background: #fff5f1;
+        border-color: #f3cdbd;
+        color: #D9622F;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 5px rgba(217, 98, 47, 0.08);
+    }
+
+    /* =========================================================
+       OTHER MONTH
+    ========================================================= */
+
+    .calendar-day.other-month {
+        background: transparent;
+        color: #d7dbe1;
+        cursor: default;
+    }
+
+        .calendar-day.other-month:hover {
+            background: transparent;
+            border-color: transparent;
+            transform: none;
+            box-shadow: none;
+        }
+
+    /* =========================================================
+       WEEKENDS
+    ========================================================= */
+
+    .calendar-day.weekend {
+        background: #fffaf8;
+        color: #D9622F;
+    }
+
+    /* =========================================================
+       TODAY
+    ========================================================= */
+
+    .calendar-day.today {
+        background: #1B2A4A;
+        border-color: #1B2A4A;
+        color: #ffffff;
+        font-weight: 700;
+        box-shadow: 0 3px 7px rgba(27, 42, 74, 0.20);
+        z-index: 2;
+    }
+
+        /* Today hover */
+
+        .calendar-day.today:hover {
+            background: #24395f;
+            border-color: #24395f;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+    /* =========================================================
+       SELECTED DAY
+    ========================================================= */
+
+    .calendar-day.selected {
+        background: #fff1eb;
+        border-color: #D9622F;
+        color: #D9622F;
+        font-weight: 700;
+        box-shadow: inset 0 0 0 1px rgba(217, 98, 47, 0.05);
+    }
+
+    /* =========================================================
+       TODAY + SELECTED
+    ========================================================= */
+
+    .calendar-day.today.selected {
+        background: #D9622F;
+        border-color: #D9622F;
+        color: #ffffff;
+        box-shadow: 0 3px 8px rgba(217, 98, 47, 0.25);
+    }
+
+    /* =========================================================
+       EVENT INDICATOR
+    ========================================================= */
+
+    .calendar-day.has-event::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 3px;
+        width: 3px;
+        height: 3px;
+        margin-left: -1.5px;
+        background: #D9622F;
+        border-radius: 50%;
+    }
+
+    .calendar-day.today.has-event::after {
+        background: #ffffff;
+    }
+
+    /* Selected event */
+
+    .calendar-day.selected.has-event::after {
+        background: #D9622F;
+    }
+
+/* =========================================================
+       FOOTER
+    ========================================================= */
+
+.calendar-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 6px;
+    border-top: 1px solid #edf0f3;
+}
+
+/* Today button */
+
+.btn-today {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 21px;
+    padding: 2px 11px;
+    background: #fff4ef;
+    border: 1px solid #f1cbbd;
+    border-radius: 5px;
+    color: #D9622F;
+    font-size: 9px;
+    line-height: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.16s ease;
+}
+
+    .btn-today:hover {
+        background: #D9622F;
+        border-color: #D9622F;
+        color: #ffffff;
+        box-shadow: 0 3px 7px rgba(217, 98, 47, 0.18);
+    }
+
+/* =========================================================
+       MOBILE
+    ========================================================= */
+
+@media (max-width: 576px) {
+    .dashboard-calendar-widget {
+        padding: 7px;
+        border-radius: 8px;
+    }
+
+    .calendar-title {
+        font-size: 12px;
+    }
+
+    .calendar-nav-btn {
+        width: 23px;
+        height: 23px;
+    }
+
+    .weekday {
+        font-size: 7px;
+    }
+
+    .calendar-days {
+        gap: 1px;
+    }
+
+    .calendar-day {
+        height: 25px;
+        min-height: 25px;
+        border-radius: 5px;
+        font-size: 8.5px;
+    }
+}

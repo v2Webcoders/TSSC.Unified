@@ -558,7 +558,8 @@
       responsive: {
         details: true
       },
-      buttons: ['copy', 'excel', 'csv', 'pdf', 'colvis']
+        /*buttons: ['copy', 'excel', 'csv', 'pdf', 'colvis']*/
+       buttons: ['excel', 'pdf']
     });
     $.fn.DataTable.ext.pager.numbers_length = 7;
   };

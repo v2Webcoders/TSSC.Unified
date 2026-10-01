@@ -208,7 +208,8 @@
                                     currentDate.Date);
 
 
-                            <td class="calendar-day">
+                            <td class="calendar-day @(isHR && holiday == null ? "mark-holiday-cell" : "")"
+    data-date="@(isHR && holiday == null ? currentDate.ToString("yyyy-MM-dd") : "")">
 
                                 <div class="calendar-date">
 
@@ -278,7 +279,7 @@
                                 }
                                 else
                                 {
-                                    @if (isHR)
+                                    @* @if (isHR)
                                     {
                                         <button type="button"
                                 class="btn btn-sm btn-primary mark-holiday"
@@ -289,7 +290,7 @@
                             Mark Holiday
 
                         </button>
-                                    }
+                                    } *@
 
                                 }
 
@@ -655,7 +656,7 @@
             if (!editButton)
                 return;
 
-            alert("EDIT CLICKED");
+           // alert("EDIT CLICKED");
 
 
             // =========================================
@@ -726,6 +727,69 @@
             modal.show();
 
         });
+
+        document.addEventListener("click", function (event) {
+
+    const cell =
+        event.target.closest(".mark-holiday-cell");
+
+    if (!cell)
+        return;
+
+
+    // =========================================
+    // GET DATE
+    // =========================================
+
+    const date =
+        cell.dataset.date;
+
+
+    // =========================================
+    // FILL ADD HOLIDAY FORM
+    // =========================================
+
+    document.getElementById("HolidayDate").value =
+        date || "";
+
+    document.getElementById("HolidayName").value =
+        "";
+
+    document.getElementById("HolidayType").value =
+        "";
+
+    document.getElementById("Description").value =
+        "";
+
+
+    // =========================================
+    // GET MODAL
+    // =========================================
+
+    const modalElement =
+        document.getElementById("markHolidayModal");
+
+
+    if (!modalElement) {
+
+        alert("Add Holiday modal NOT FOUND");
+
+        return;
+    }
+
+
+    // =========================================
+    // OPEN MODAL
+    // =========================================
+
+    const modal =
+        bootstrap.Modal.getOrCreateInstance(
+            modalElement
+        );
+
+    modal.show();
+
+});
 
     </script>
 

@@ -184,6 +184,31 @@ namespace TSSC.Unified.Services
                 int punchCount =
                     Convert.ToInt32(reader["PunchCount"]);
 
+                // =================================================
+                // DETERMINE ATTENDANCE STATUS
+                // Based on FIRST BIOMETRIC PUNCH
+                // =================================================
+
+                string baseAttendanceStatus;
+
+                if (inTime.TimeOfDay < new TimeSpan(10, 0, 0))
+                {
+                    // Before 10:00 AM
+                    baseAttendanceStatus = "Present";
+                }
+                else if (inTime.TimeOfDay < new TimeSpan(11, 0, 0))
+                {
+                    // 10:00 AM - 10:59 AM
+                    baseAttendanceStatus = "Late";
+                }
+                else
+                {
+                    // 11:00 AM onwards
+                    baseAttendanceStatus = "Half Day";
+                }
+
+
+
 
                 // =================================================
                 // FIND EMPLOYEE
@@ -192,8 +217,8 @@ namespace TSSC.Unified.Services
                 var employee =
                     await _hrmsContext.Employee
                         .FirstOrDefaultAsync(x =>
-                            x.EmployeeCode != null &&
-                            x.EmployeeCode.Trim() == employeeCode);
+                            x.BiometricCode != null &&
+                            x.BiometricCode.Trim() == employeeCode);
 
                 if (employee == null)
                 {
@@ -228,6 +253,18 @@ namespace TSSC.Unified.Services
                 {
                     result.DuplicatePunches += punchCount - 2;
                 }
+
+                string attendanceStatus =
+                missingPunch
+               ? $"{baseAttendanceStatus} - Check Out Missing"
+               : baseAttendanceStatus;
+
+                string remarks =
+                missingPunch
+               ? $"Employee checked in at {inTime:hh:mm tt} " +
+                 "but has not checked out."
+               : $"Attendance synchronized from biometric device. " +
+                 $"Check-in: {inTime:hh:mm tt}";
 
 
                 // =================================================
@@ -266,16 +303,20 @@ namespace TSSC.Unified.Services
                                 ? null
                                 : outTime,
 
+                        //AttendanceStatus =
+                        //missingPunch
+                        //    ? "Present - Check Out Missing"
+                        //    : "Present",
+
+                        //                    Remarks =
+                        //missingPunch
+                        //    ? "Employee checked in but has not checked out."
+                        //    : "Attendance synchronized from biometric device.",
                         AttendanceStatus =
-                        missingPunch
-                            ? "Present - Check Out Missing"
-                            : "Present",
+                        attendanceStatus,
 
-                                            Remarks =
-                        missingPunch
-                            ? "Employee checked in but has not checked out."
-                            : "Attendance synchronized from biometric device.",
-
+                        Remarks =
+                        remarks,
                         AttendanceSource =
                             "Biometric",
 

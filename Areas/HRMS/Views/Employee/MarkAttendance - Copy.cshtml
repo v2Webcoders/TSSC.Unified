@@ -30,547 +30,6 @@
         align-items: center;
         justify-content: center;
     }
-
-
-
-    :root {
-        --bg: #F5F8FC;
-        --surface: #FFFFFF;
-        --ink: #17324D;
-        --ink-soft: #71839A;
-        --hairline: #E2E9F1;
-        --teal: #0B3A63;
-        --teal-soft: #EAF1F8;
-        --rose: #E85B55;
-        --rose-soft: #FDECEA;
-        --amber: #F58220;
-        --amber-soft: #FEF0E1;
-        --success: #16A765;
-        --success-soft: #E9F8F1;
-    }
-
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        margin: 0;
-        background: var(--bg);
-        font-family: 'Inter',sans-serif;
-        color: var(--ink);
-        -webkit-font-smoothing: antialiased;
-    }
-
-    .wrap {
-        /* max-width: 920px; */
-        max-width: 100%;
-        margin: 0 auto;
-        padding: 48px 24px 64px;
-    }
-
-    /* Header */
-    .head-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        gap: 16px;
-        margin-bottom: 32px;
-        flex-wrap: wrap;
-    }
-
-    h1 {
-        font-size: 28px;
-        font-weight: 700;
-        margin: 0 0 6px;
-        letter-spacing: -0.01em;
-    }
-
-    .sub {
-        color: var(--ink-soft);
-        font-size: 14.5px;
-        margin: 0;
-    }
-
-    .date-pill {
-        font-family: 'IBM Plex Mono',monospace;
-        font-size: 12px;
-        font-weight: 650;
-        color: var(--teal);
-        border: 1px solid #D5E4F1;
-        background: #EEF5FB;
-        padding: 8px 14px;
-        border-radius: 8px;
-        white-space: nowrap;
-    }
-    
-
-    /* Employee strip */
-    .employee-strip {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 16px;
-        padding: 20px 22px;
-        background: var(--surface);
-        border: 1px solid var(--hairline);
-        border-radius: 14px;
-        margin-bottom: 28px;
-        box-shadow: 0 4px 16px rgba(18,52,82,0.04);
-    }
-
-    .employee-left {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-
-    .avatar {
-        width: 46px;
-        height: 46px;
-        border-radius: 12px;
-        background: var(--teal);
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        font-weight: 700;
-        flex-shrink: 0;
-    }
-
-    .employee-strip .field-group {
-        display: flex;
-        gap: 32px;
-        flex-wrap: wrap;
-    }
-
-    .field-label {
-        font-size: 11.5px;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: var(--ink-soft);
-        margin-bottom: 4px;
-    }
-
-    .field-value {
-        font-size: 15px;
-        font-weight: 600;
-    }
-
-    /* .status-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 13px;
-        font-weight: 600;
-        padding: 5px 12px 5px 10px;
-        border-radius: 20px;
-        background: var(--success-soft);
-        color: var(--success);
-    }
-
-        .status-pill::before {
-            content: '';
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--success);
-        } */
-
-    .status-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 13px;
-        font-weight: 600;
-        padding: 5px 12px 5px 10px;
-        border-radius: 20px;
-    }
-
-        /* =========================================
-       COMPLETED
-    ========================================= */
-        .status-pill.completed {
-            background: var(--success-soft);
-            color: var(--success);
-        }
-
-            .status-pill.completed::before {
-                content: '';
-                width: 7px;
-                height: 7px;
-                border-radius: 50%;
-                background: var(--success);
-            }
-
-
-        /* =========================================
-       PRESENT
-    ========================================= */
-        .status-pill.present {
-            background: var(--success-soft);
-            color: var(--success);
-        }
-
-            .status-pill.present::before {
-                content: '';
-                width: 7px;
-                height: 7px;
-                border-radius: 50%;
-                background: var(--success);
-            }
-
-
-        /* =========================================
-       NOT MARKED
-    ========================================= */
-        .status-pill.not-marked {
-            background: var(--amber-soft);
-            color: var(--amber);
-        }
-
-            .status-pill.not-marked::before {
-                content: '';
-                width: 7px;
-                height: 7px;
-                border-radius: 50%;
-                background: var(--amber);
-            }
-    /* Day timeline */
-    .timeline-card {
-        background: var(--surface);
-        border: 1px solid var(--hairline);
-        border-radius: 14px;
-        padding: 28px 32px 32px;
-        margin-bottom: 24px;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 8px 24px rgba(18,52,82,0.05);
-    }
-
-        .timeline-card::after {
-            content: '';
-            position: absolute;
-            left: 24px;
-            right: 24px;
-            bottom: 0;
-            height: 4px;
-            border-radius: 4px 4px 0 0;
-            background: var(--amber);
-        }
-
-    .timeline-track {
-        position: relative;
-        height: 4px;
-        background: var(--hairline);
-        border-radius: 2px;
-        margin: 8px 40px 0;
-    }
-
-    .timeline-fill {
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 0%;
-        background: var(--teal);
-        border-radius: 2px;
-        transition: width .4s ease;
-    }
-
-    .timeline-node {
-        position: absolute;
-        top: 50%;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        background: var(--surface);
-        border: 3px solid var(--hairline);
-        transform: translate(-50%,-50%);
-        transition: border-color .3s ease, background .3s ease;
-    }
-
-        .timeline-node.in {
-            left: 0;
-        }
-
-        .timeline-node.out {
-            left: 100%;
-        }
-
-        .timeline-node.active {
-            border-color: var(--teal);
-            background: var(--teal);
-        }
-
-        .timeline-node.pending-out.active {
-            border-color: var(--rose);
-            background: var(--rose);
-        }
-
-    .timeline-labels {
-        display: flex;
-        justify-content: space-between;
-        margin: 14px 24px 0;
-        font-size: 12.5px;
-        color: var(--ink-soft);
-    }
-
-    .timeline-caption {
-        text-align: center;
-        font-family: 'IBM Plex Mono',monospace;
-        font-size: 13px;
-        color: var(--ink-soft);
-        margin-top: 18px;
-    }
-
-    /* Panels */
-    .panels {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-    }
-    @@media (max-width:640px) {
-        .panels
-
-    {
-        grid-template-columns: 1fr;
-    }
-
-    }
-
-    .panel {
-        background: var(--surface);
-        border: 1px solid var(--hairline);
-        border-radius: 14px;
-        padding: 26px 26px 24px;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 4px 16px rgba(18,52,82,0.04);
-        transition: transform .2s ease, box-shadow .2s ease;
-    }
-
-        .panel:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 28px rgba(18,52,82,0.08);
-        }
-
-        .panel::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-        }
-
-        .panel.in::before {
-            background: var(--teal);
-        }
-
-        .panel.out::before {
-            background: var(--rose);
-        }
-
-    .panel-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 18px;
-    }
-
-    .panel-title {
-        font-size: 16px;
-        font-weight: 700;
-        margin: 0;
-    }
-
-    .panel-desc {
-        font-size: 13px;
-        color: var(--ink-soft);
-        margin: 2px 0 0;
-    }
-
-    .panel-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 9px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        font-size: 16px;
-    }
-
-    .panel.in .panel-icon {
-        background: var(--teal-soft);
-        color: var(--teal);
-    }
-
-    .panel.out .panel-icon {
-        background: var(--rose-soft);
-        color: var(--rose);
-    }
-
-    .time-label {
-        font-size: 11.5px;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: var(--ink-soft);
-        margin-bottom: 6px;
-    }
-
-    .time-display {
-        font-family: 'IBM Plex Mono',monospace;
-        font-size: 26px;
-        font-weight: 600;
-        padding: 14px 16px;
-        background: var(--bg);
-        border-radius: 10px;
-        margin-bottom: 20px;
-    }
-
-        .time-display.empty {
-            color: var(--ink-soft);
-            font-family: 'Inter',sans-serif;
-            font-size: 15px;
-            font-weight: 500;
-        }
-
-    .action-btn {
-        width: 100%;
-        border: none;
-        border-radius: 10px;
-        padding: 13px 18px;
-        font-size: 14.5px;
-        font-weight: 600;
-        font-family: 'Inter',sans-serif;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        transition: opacity .15s ease, transform .1s ease;
-    }
-
-        .action-btn:active {
-            transform: scale(0.98);
-        }
-
-        .action-btn:disabled {
-            opacity: 0.45;
-            cursor: not-allowed;
-        }
-
-    .btn-in {
-        background: var(--teal);
-        color: #fff;
-        box-shadow: 0 5px 12px rgba(11,58,99,0.15);
-    }
-
-        .btn-in:not(:disabled):hover {
-            background: var(--amber);
-            box-shadow: 0 7px 16px rgba(245,130,32,0.2);
-            transform: translateY(-1px);
-        }
-
-    .btn-out {
-        background: var(--rose);
-        color: #fff;
-        box-shadow: 0 5px 12px rgba(232,91,85,0.12);
-    }
-
-        .btn-out:not(:disabled):hover {
-            background: #D94D47;
-            transform: translateY(-1px);
-        }
-
-    .status-note {
-        font-size: 12.5px;
-        color: var(--ink-soft);
-        margin-top: 12px;
-        min-height: 16px;
-    }
-
-    /* Modal */
-    .modal-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(20,24,38,0.45);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 50;
-        padding: 20px;
-    }
-
-        .modal-overlay.show {
-            display: flex;
-        }
-
-    .modal-box {
-        background: var(--surface);
-        border-radius: 14px;
-        max-width: 360px;
-        width: 100%;
-        padding: 30px 28px 26px;
-        text-align: center;
-    }
-
-    .modal-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        margin: 0 auto 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-    }
-
-    .modal-title {
-        font-size: 17px;
-        font-weight: 700;
-        margin: 0 0 6px;
-    }
-
-    .modal-msg {
-        font-size: 14px;
-        color: var(--ink-soft);
-        margin: 0 0 22px;
-    }
-
-    .modal-actions {
-        display: flex;
-        gap: 10px;
-    }
-
-        .modal-actions button {
-            flex: 1;
-            padding: 11px;
-            border-radius: 9px;
-            font-size: 14px;
-            font-weight: 600;
-            font-family: 'Inter',sans-serif;
-            border: none;
-            cursor: pointer;
-        }
-
-    .modal-cancel {
-        background: #EEF2F7;
-        color: #3F5870;
-    }
-
-    .modal-confirm {
-        background: var(--teal);
-        color: #fff;
-        transition: background .2s ease;
-    }
-
-        .modal-confirm:hover {
-            background: var(--amber);
-        }
 </style>
 <div class="nk-block-head nk-block-head-sm">
 
@@ -589,211 +48,346 @@
             </div>
 
         </div>
-        <div class="nk-block-head-content">
-            <div class="date-pill" id="todayDate">@Model.AttendanceDate.ToString("dd MMM yyyy")</div>
-        </div>
+        
     </div>
 
 </div>
-
+<div class="col-12 text-end">
+    <span class="badge bg-light-primary text-primary">
+        @Model.AttendanceDate.ToString("dd MMM yyyy")
+    </span>
+</div>
 <div class="nk-block nk-block-lg">
 
-    <div class="card card-bordered">
+    <div class="card card-preview">
         
         <div class="card-inner">
 
             <div class="preview-block">
                 
                 <div class="row gy-4">
-                    <div class="wrap">
 
-                        <div class="head-row">
-                            <div>
-                                @* <h1>Mark Attendance</h1>
-                                <p class="sub">Record your attendance for today.</p> *@
-                            </div>
-                           
-                        </div>
+                    <!-- =========================================
+                         HEADER
+                    ========================================== -->
 
-                        <div class="employee-strip">
-                            <div class="employee-left">
-                                <div class="avatar">
-                                    @{
-                                        var names = Model.EmployeeName?.Split(' ') ?? new string[] { };
-                                        var initials = string.Empty;
+                   
 
-                                        if (names.Length >= 2)
-                                        {
-                                            initials = (names[0][0].ToString() + names[1][0].ToString()).ToUpper();
-                                        }
-                                        else if (names.Length == 1 && names[0].Length > 0)
-                                        {
-                                            initials = names[0][0].ToString().ToUpper();
-                                        }
-                                    }
-                                    @initials
-                                </div>
-                                <div class="field-group">
-                                    <div>
-                                        <div class="field-label">Employee Code</div>
-                                        <div class="field-value">@Model.EmployeeCode</div>
+
+                    <!-- =========================================
+                         EMPLOYEE INFORMATION
+                    ========================================== -->
+
+                    <div class="col-12">
+
+                       @*  <div class="card border">
+
+                            <div class="card-inner">
+
+                                <div class="row gy-3">
+
+                                    <div class="col-md-4">
+
+                                        <label class="form-label text-soft">
+                                            Employee Code
+                                        </label>
+
+                                        <div class="form-control bg-light">
+                                            @Model.EmployeeCode
+                                        </div>
+
                                     </div>
-                                    <div>
-                                        <div class="field-label">Employee Name</div>
-                                        <div class="field-value">@Model.EmployeeName</div>
+
+
+                                    <div class="col-md-4">
+
+                                        <label class="form-label text-soft">
+                                            Employee Name
+                                        </label>
+
+                                        <div class="form-control bg-light">
+                                            @Model.EmployeeName
+                                        </div>
+
                                     </div>
-                                </div>
-                            </div>
-                            @if (Model.IsCheckedOut)
-                            {
-                                <span class="status-pill completed">
-                                    Completed
-                                </span>
-                            }
-                            else if (Model.IsCheckedIn)
-                            {
-                                <span class="status-pill present">
-                                    Present
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="status-pill not-marked">
-                                    Not Marked
-                                </span>
-                            }
-                        </div>
 
-                        <div class="timeline-card">
-                            <div class="timeline-track">
-                                <div class="timeline-fill" id="timelineFill"></div>
-                               @*  <div class="timeline-node in active" id="nodeIn"></div>
-                                <div class="timeline-node out pending-out" id="nodeOut"></div> *@
-                                <!-- Check In Node -->
-                                <div class="timeline-node in @(Model.IsCheckedIn ? "active" : "pending")"
-                                     id="nodeIn"></div>
 
-                                <!-- Check Out Node -->
-                                <div class="timeline-node out @(Model.IsCheckedOut ? "pending-out active" : "pending-out")"
-                                     id="nodeOut"></div>
-                            </div>
-                            <div class="timeline-labels">
-                               
-                                    @if (Model.IsCheckedIn)
-                                    {
-                                    <span>Checked In</span>
-                                    }
-                                    
-                                @if (Model.IsCheckedOut)
-                                {
-                                    <span>Checked Out</span>
-                                }
-                                
-                               
-                            </div>
-                            <div class="timeline-caption" id="timelineCaption">
-                                Working — since 
-                                @if (Model.InTime.HasValue)
-                                {
-                                    @Model.InTime.Value.ToString("hh:mm tt")
-                                }
-                            </div>
-                        </div>
+                                    <div class="col-md-4">
 
-                        <div class="panels">
+                                        <label class="form-label text-soft">
+                                            Attendance Status
+                                        </label>
 
-                            <!-- CHECK IN -->
-                            <div class="panel in">
-                                <div class="panel-head">
-                                    <div>
-                                        <p class="panel-title">Check In</p>
-                                        <p class="panel-desc">Start your work day</p>
+                                        <div class="form-control bg-light">
+
+                                            @if (Model.IsCheckedOut)
+                                            {
+                                                <span class="badge bg-success">
+                                                    Completed
+                                                </span>
+                                            }
+                                            else if (Model.IsCheckedIn)
+                                            {
+                                                <span class="badge bg-success">
+                                                    Present
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">
+                                                    Not Marked
+                                                </span>
+                                            }
+
+                                        </div>
+
                                     </div>
-                                    <div class="panel-icon">→</div>
+
                                 </div>
 
-                                <div class="time-label">Check In Time</div>
-                                @if (Model.InTime.HasValue)
-                                {
-                                    <div class="time-display" id="checkInTime">@Model.InTime.Value.ToString("hh:mm tt")</div>
-                                    
-                                }
-                                else
-                                {
-                                    <div class="time-display empty">
-                                        Not checked in
-                                    </div>
-                                }
-
-                                <button type="button"
-                                        id="btnCheckIn"
-                                        class="action-btn btn-in"
-                                @(Model.IsCheckedIn ? "disabled" : "")>
-
-                                    <em class="icon ni ni-check-circle"></em>
-
-                                    Check In
-
-                                </button>
-                                
-
-                                <small id="locationInStatus" class="status-note"></small>
                             </div>
 
-                            <!-- CHECK OUT -->
-                            <div class="panel out">
-                                <div class="panel-head">
-                                    <div>
-                                        <p class="panel-title">Check Out</p>
-                                        <p class="panel-desc">End your work day</p>
+                        </div> *@
+                        <div class="card border">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Employee Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3 mb-md-0">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label class="form-label text-soft small">Employee Code</label>
+                                                <div class="text-dark fw-semibold">@Model.EmployeeCode</div>
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label text-soft small">Employee Name</label>
+                                                <div class="text-dark fw-semibold">@Model.EmployeeName</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="panel-icon">⇥</div>
+                                    <div class="col-md-6 d-flex align-items-end">
+                                        <div class="w-100">
+                                            <label class="form-label text-soft small">Attendance Status</label>
+                                            <div>
+                                                @if (Model.IsCheckedOut)
+                                                {
+                                                    <span class="badge bg-success">Completed</span>
+                                                }
+                                                else if (Model.IsCheckedIn)
+                                                {
+                                                    <span class="badge bg-success">Present</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning">Not Marked</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-
-                                <div class="time-label">Check Out Time</div>
-                                @if (Model.OutTime.HasValue)
-                                {
-                                    <div class="time-display" id="checkOutTime">@Model.OutTime.Value.ToString("hh:mm tt")</div>
-                                    
-                                }
-                                else
-                                {
-                                    <div class="time-display empty" id="checkOutTime">Not checked out</div>
-                                }
-                                
-                                <button type="button"
-                                        id="btnCheckOut"
-                                        class="action-btn btn-out"
-                                @(!Model.IsCheckedIn || Model.IsCheckedOut ? "disabled" : "")>
-
-                                    <em class="icon ni ni-signout"></em>
-
-                                    Check Out
-
-                                </button>
-                                
-
-                                <small id="locationOutStatus" class="status-note"></small>
                             </div>
-
                         </div>
                     </div>
 
-                    <!-- Confirmation Modal -->
-                    <div class="modal-overlay" id="attendanceConfirmModal">
-                        <div class="modal-box">
-                            <div class="modal-icon" id="modalIconWrap">✓</div>
-                            <h5 class="modal-title" id="attendanceConfirmTitle">Confirm Check Out</h5>
-                            <p class="modal-msg" id="attendanceConfirmMessage">Are you sure you want to mark your attendance?</p>
-                            <div class="modal-actions">
-                                <button class="modal-cancel" id="btnCancelAttendance">Cancel</button>
-                                <button class="modal-confirm" id="btnConfirmAttendance">Confirm</button>
+
+                    <!-- =========================================
+                         CHECK IN
+                    ========================================== -->
+
+                    <div class="col-md-6">
+
+                        <div class="card border h-100">
+
+                            <div class="card-inner">
+
+                                <div class="d-flex align-items-center gap-2 mb-4">
+
+                                    <div class="icon-circle bg-light-success">
+
+                                        <em class="icon ni ni-login"></em>
+
+                                    </div>
+
+                                    <div>
+
+                                        <h5 class="mb-0">
+                                            Check In
+                                        </h5>
+
+                                        <small class="text-soft">
+                                            Start your work day
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="mb-4">
+
+                                    <label class="form-label">
+                                        Check In Time
+                                    </label>
+
+                                    <div class="form-control bg-light"
+                                         id="checkInTime">
+
+                                        @if (Model.InTime.HasValue)
+                                        {
+                                            @Model.InTime.Value.ToString("hh:mm tt")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-soft">
+                                                Not checked in
+                                            </span>
+                                        }
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="d-flex gap-2 flex-wrap">
+
+                                    @* <button type="button"
+                                            id="btnLocationIn"
+                                            class="btn btn-outline-primary">
+
+                                        <em class="icon ni ni-location me-1"></em>
+
+                                        Get Location
+
+                                    </button> *@
+
+
+                                    <button type="button"
+                                            id="btnCheckIn"
+                                            class="btn btn-primary"
+                                    @(Model.IsCheckedIn ? "disabled" : "")>
+
+                                         <em class="icon ni ni-check-circle"></em>
+
+                                         Check In
+
+                                    </button>
+                                   
+                                </div>
+
+
+                                <small id="locationInStatus"
+                                       class="text-soft d-block mt-3">
+                                </small>
+
                             </div>
+
                         </div>
+
                     </div>
+
+
+                    <!-- =========================================
+                         CHECK OUT
+                    ========================================== -->
+
+                    <div class="col-md-6">
+
+                        <div class="card border h-100">
+
+                            <div class="card-inner">
+
+                                <div class="d-flex align-items-center gap-2 mb-4">
+
+                                    <div class="icon-circle bg-light-danger">
+
+                                        <em class="icon ni ni-logout"></em>
+
+                                    </div>
+
+                                    <div>
+
+                                        <h5 class="mb-0">
+                                            Check Out
+                                        </h5>
+
+                                        <small class="text-soft">
+                                            End your work day
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="mb-4">
+
+                                    <label class="form-label">
+                                        Check Out Time
+                                    </label>
+
+                                    <div class="form-control bg-light"
+                                         id="checkOutTime">
+
+                                        @if (Model.OutTime.HasValue)
+                                        {
+                                            @Model.OutTime.Value.ToString("hh:mm tt")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-soft">
+                                                Not checked out
+                                            </span>
+                                        }
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="d-flex gap-2 flex-wrap">
+
+                                   @*  <button type="button"
+                                            id="btnLocationOut"
+                                            class="btn btn-outline-primary">
+
+                                        <em class="icon ni ni-location me-1"></em>
+
+                                        Get Location
+
+                                    </button> *@
+
+
+                                    <button type="button"
+                                            id="btnCheckOut"
+                                            class="btn btn-danger"
+                                    @(!Model.IsCheckedIn || Model.IsCheckedOut ? "disabled" : "")>
+
+                                        <em class="icon ni ni-signout"></em>
+
+                                        Check Out
+
+                                    </button>
+
+                                </div>
+
+
+                                <small id="locationOutStatus"
+                                       class="text-soft d-block mt-3">
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
     <!-- Attendance Confirmation Modal -->
     <div class="modal fade" id="attendanceConfirmModal" tabindex="-1"

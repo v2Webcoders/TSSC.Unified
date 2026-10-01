@@ -51,7 +51,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             ViewBag.IsHR = User.IsInRole("HR");
 
             IQueryable<LeaveRequest> query = _context.LeaveRequest
-                .Include(x => x.LeaveType);
+                .Include(x => x.LeaveType).Include(x => x.Employee); 
 
             // HR can see all leave requests
             if (!User.IsInRole("HR"))
