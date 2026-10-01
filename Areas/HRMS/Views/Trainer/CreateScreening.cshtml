@@ -7,12 +7,17 @@
 }
 
 <div class="nk-block-head nk-block-head-sm">
+
     <div class="nk-block-head-content">
+
         <h3 class="nk-block-title page-title">
             Schedule Screening
         </h3>
+
     </div>
+
 </div>
+
 
 <div class="card card-bordered">
 
@@ -23,31 +28,14 @@
               asp-area="HRMS"
               method="post">
 
-            <!-- IMPORTANT:
-                 Batch and Trainer IDs are submitted through hidden fields
-            -->
-            <input type="hidden" asp-for="BatchId" />
-            <input type="hidden" asp-for="TrainerRegistrationId" />
+            @Html.AntiForgeryToken()
+
+            <!-- Trainer ID -->
+            <input type="hidden"
+                   asp-for="TrainerRegistrationId" />
+
 
             <div class="row g-3">
-
-                <!-- Batch -->
-                <div class="col-md-6">
-
-                    <label class="form-label">
-                        Batch
-                    </label>
-
-                    <input type="text"
-                           class="form-control"
-                           value="@(Model.BatchList?.FirstOrDefault()?.Text ?? "")"
-                           readonly />
-
-                    <span asp-validation-for="BatchId"
-                          class="text-danger"></span>
-
-                </div>
-
 
                 <!-- Trainer -->
                 <div class="col-md-6">
@@ -161,6 +149,9 @@
                            class="form-control"
                            placeholder="Enter screening location" />
 
+                    <span asp-validation-for="Location"
+                          class="text-danger"></span>
+
                 </div>
 
 
@@ -176,6 +167,9 @@
                            class="form-control"
                            placeholder="Enter meeting link" />
 
+                    <span asp-validation-for="MeetingLink"
+                          class="text-danger"></span>
+
                 </div>
 
 
@@ -190,6 +184,9 @@
                               class="form-control"
                               rows="3"
                               placeholder="Enter remarks"></textarea>
+
+                    <span asp-validation-for="Remarks"
+                          class="text-danger"></span>
 
                 </div>
 
@@ -208,7 +205,8 @@
 
                     </button>
 
-                    <a asp-action="BatchList"
+
+                    <a asp-action="RegistrationList"
                        asp-controller="Trainer"
                        asp-area="HRMS"
                        class="btn btn-outline-secondary">
@@ -258,10 +256,13 @@
                     $('#locationDiv').show();
 
                 }
+
             }
 
             $('#ScreeningMode').on('change', function () {
+
                 toggleScreeningMode();
+
             });
 
             toggleScreeningMode();

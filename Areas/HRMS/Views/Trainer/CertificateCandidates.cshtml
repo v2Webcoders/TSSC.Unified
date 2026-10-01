@@ -1,0 +1,442 @@
+﻿@model IEnumerable<TSSC.Unified.Models.BatchMasterTrainer>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+
+    var batch =
+        ViewBag.Batch as TSSC.Unified.Models.BatchMaster;
+
+    int serial = 1;
+}
+
+<!-- ========================================================= -->
+<!-- PAGE HEADER -->
+<!-- ========================================================= -->
+
+<div class="nk-block-head nk-block-head-sm">
+
+    <div class="nk-block-between align-items-center">
+
+        <div class="nk-block-head-content">
+
+            <h3 class="nk-block-title page-title">
+                Certificate Upload
+            </h3>
+
+            <div class="nk-block-des">
+                <p>
+                    Trainers who have raised certificate requests.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="nk-block-tools">
+
+            <a href="/HRMS/Trainer/UploadCertificate"
+               class="btn btn-outline-primary">
+
+                <em class="icon ni ni-arrow-left"></em>
+                Back
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- BATCH DETAILS -->
+<!-- ========================================================= -->
+
+<div class="card card-bordered mb-4">
+
+    <div class="card-inner">
+
+        <div class="row g-4">
+
+            <!-- BATCH CODE -->
+            <div class="col-md-4">
+
+                <label class="form-label">
+                    Batch Code
+                </label>
+
+                <div class="form-control">
+                    @(batch?.BatchCode ?? "-")
+                </div>
+
+            </div>
+
+
+            <!-- BATCH NAME -->
+            <div class="col-md-4">
+
+                <label class="form-label">
+                    Batch Name
+                </label>
+
+                <div class="form-control">
+                    @(batch?.BatchName ?? "-")
+                </div>
+
+            </div>
+
+
+            <!-- JOB ROLE -->
+            <div class="col-md-4">
+
+                <label class="form-label">
+                    Job Role
+                </label>
+
+                <div class="form-control">
+                    @(batch?.JobRole?.JobRoleTitle ?? "-")
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- MESSAGES -->
+<!-- ========================================================= -->
+@if (TempData["msg"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+
+        <strong>Success!</strong>
+        @TempData["msg"]
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}
+
+
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+
+        <strong>Error!</strong>
+        @TempData["error"]
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}
+
+
+<!-- ========================================================= -->
+<!-- TRAINER LIST -->
+<!-- ========================================================= -->
+
+<div class="card card-bordered">
+
+    <div class="card-inner">
+
+        <h5 class="title mb-4">
+            Trainers
+        </h5>
+
+
+        <div class="table-responsive">
+
+            <table class="table table-bordered table-hover">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            S.No.
+                        </th>
+
+                        <th>
+                            Registration No.
+                        </th>
+
+                        <th>
+                            Trainer Name
+                        </th>
+
+                        <th>
+                            Email
+                        </th>
+
+                        <th>
+                            Result
+                        </th>
+
+                        <th>
+                            Certificate Request
+                        </th>
+
+                        <th>
+                            Certificate
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            var trainer =
+                            item.TrainerRegistration;
+
+
+                            <tr>
+
+                                <!-- S.NO -->
+                                <td>
+                                    @serial
+                                </td>
+
+
+                                <!-- REGISTRATION NO -->
+                                <td>
+                                    @(trainer?.RegistrationNo ?? "-")
+                                </td>
+
+
+                                <!-- TRAINER -->
+                                <td>
+                                    <strong>
+                                        @(trainer?.CandidateName ?? "-")
+                                    </strong>
+                                </td>
+
+
+                                <!-- EMAIL -->
+                                <td>
+                                    @(trainer?.Email ?? "-")
+                                </td>
+
+
+                                <!-- RESULT -->
+                                <td>
+
+                                    @if (item.ResultUploaded)
+                                    {
+                                        <span class="badge badge-dim bg-success">
+                                            Uploaded
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-dim bg-warning">
+                                            Pending
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- REQUEST -->
+                                <td>
+
+                                    @if (trainer?.RaiseReq == true)
+                                    {
+                                        <span class="badge badge-dim bg-success">
+                                            Raised
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-dim bg-secondary">
+                                            Not Raised
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- CERTIFICATE -->
+                                <td>
+
+                                    @if (trainer?.CertificateUploaded == true)
+                                    {
+                                        <span class="badge badge-dim bg-success">
+
+                                            <em class="icon ni ni-check-circle"></em>
+                                            Uploaded
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-dim bg-warning">
+                                            Pending
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ACTION -->
+                                <td>
+
+                                    @if (trainer?.CertificateUploaded == true)
+                                    {
+                                        <a href="/@trainer.CertificateFilePath"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="btn btn-sm btn-outline-primary">
+
+                                            <em class="icon ni ni-eye"></em>
+                                            View
+
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <form action="/HRMS/Trainer/UploadTrainerCertificate"
+                                              method="post"
+                                              enctype="multipart/form-data"
+                                              class="d-inline">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="trainerId"
+                                                   value="@trainer?.Id" />
+
+                                            <input type="file"
+                                                   id="certificate_@trainer?.Id"
+                                                   name="certificateFile"
+                                                   accept=".pdf"
+                                                   class="d-none"
+                                                   onchange="uploadCertificate(this);" />
+
+                                            <label for="certificate_@trainer?.Id"
+                                                   class="btn btn-sm btn-outline-success"
+                                                   title="Upload Certificate">
+
+                                                <em class="icon ni ni-upload"></em>
+                                                Upload Certificate
+
+                                            </label>
+
+                                        </form>
+                                    }
+
+                                </td>
+
+                            </tr>
+
+                            serial++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+
+                            <td colspan="8"
+                                class="text-center py-5">
+
+                                <div class="text-soft">
+
+                                    <em class="icon ni ni-info fs-2"></em>
+
+                                    <div class="mt-2">
+                                        No certificate requests found
+                                        for this batch.
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script>
+
+        function uploadCertificate(input) {
+
+            if (!input.files || input.files.length === 0) {
+                return;
+            }
+
+
+            var file = input.files[0];
+
+            var fileName =
+                file.name.toLowerCase();
+
+
+            // PDF ONLY
+            if (!fileName.endsWith(".pdf")) {
+
+                alert(
+                    "Only PDF certificate files are allowed."
+                );
+
+                input.value = "";
+                return;
+            }
+
+
+            // MAX 10 MB
+            var maxSize =
+                10 * 1024 * 1024;
+
+            if (file.size > maxSize) {
+
+                alert(
+                    "Certificate file size must not exceed 10 MB."
+                );
+
+                input.value = "";
+                return;
+            }
+
+
+            // AUTO SUBMIT
+            input.closest("form").submit();
+
+        }
+
+    </script>
+
+}

@@ -863,5 +863,276 @@
         </div>
 
     </div>
+    <!-- ====================================================== -->
+    <!-- SCREENING DETAILS -->
+    <!-- ====================================================== -->
+    @{
+        var screening =
+        ViewBag.Screening as TSSC.Unified.Models.ScreeningSchedule;
+    }
+
+    @if (screening != null)
+    {
+        <div class="col-12">
+
+            <div class="card card-bordered">
+
+                <div class="card-inner">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+
+                        <h5 class="title mb-0">
+                            Screening Details
+                        </h5>
+
+                        @if (string.Equals(
+                                            screening.Status,
+                                            "Success",
+                                            StringComparison.OrdinalIgnoreCase))
+                        {
+                            <span class="badge badge-dim bg-success">
+                                Success
+                            </span>
+                        }
+                        else if (string.Equals(
+                        screening.Status,
+                        "Rejected",
+                        StringComparison.OrdinalIgnoreCase))
+                        {
+                            <span class="badge badge-dim bg-danger">
+                                Rejected
+                            </span>
+                        }
+                        else if (string.Equals(
+                        screening.Status,
+                        "On Hold",
+                        StringComparison.OrdinalIgnoreCase))
+                        {
+                            <span class="badge badge-dim bg-warning">
+                                On Hold
+                            </span>
+                        }
+                        else if (string.Equals(
+                        screening.Status,
+                        "Scheduled",
+                        StringComparison.OrdinalIgnoreCase))
+                        {
+                            <span class="badge badge-dim bg-primary">
+                                Scheduled
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-dim bg-secondary">
+                                @(screening.Status ?? "-")
+                            </span>
+                        }
+
+                    </div>
+
+
+                    <div class="row gy-3">
+
+                        <!-- SCREENING DATE -->
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Screening Date
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@screening.ScreeningDate.ToString("dd-MMM-yyyy")"
+                                   readonly />
+
+                        </div>
+
+
+                        <!-- START TIME -->
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Start Time
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@screening.StartTime.ToString(@"hh\:mm")"
+                                   readonly />
+
+                        </div>
+
+
+                        <!-- END TIME -->
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                End Time
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(screening.EndTime.HasValue
+                                                                      ? screening.EndTime.Value.ToString(@"hh\:mm")
+                                                                  : "-")"
+                               readonly />
+
+                        </div>
+
+
+                        <!-- SCREENING MODE -->
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Screening Mode
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(screening.ScreeningMode ?? "-")"
+                                   readonly />
+
+                        </div>
+
+
+                        <!-- LOCATION -->
+                    @if (string.Equals(
+                                        screening.ScreeningMode,
+                                        "Offline",
+                                        StringComparison.OrdinalIgnoreCase))
+                        {
+                            <div class="col-md-8">
+
+                                <label class="form-label">
+                                    Screening Location
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       value="@(screening.Location ?? "-")"
+                                       readonly />
+
+                            </div>
+                        }
+
+
+                        <!-- MEETING LINK -->
+                        @if (string.Equals(
+                                            screening.ScreeningMode,
+                                            "Online",
+                                            StringComparison.OrdinalIgnoreCase))
+                        {
+                            <div class="col-md-8">
+
+                                <label class="form-label">
+                                    Meeting Link
+                                </label>
+
+                                @if (!string.IsNullOrWhiteSpace(
+                                                        screening.MeetingLink))
+                                {
+                                    <div>
+                                        <a href="@screening.MeetingLink"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="btn btn-outline-primary">
+
+                                            <em class="icon ni ni-video"></em>
+
+                                            Open Meeting Link
+
+                                        </a>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <input type="text"
+                                           class="form-control"
+                                           value="-"
+                                           readonly />
+                                }
+
+                            </div>
+                        }
+
+
+                        <!-- REMARKS -->
+                        <div class="col-md-12">
+
+                            <label class="form-label">
+                                Screening Remarks
+                            </label>
+
+                            <textarea class="form-control"
+                                  rows="3"
+                                  readonly>@(screening.Remarks ?? "-")</textarea>
+
+                        </div>
+
+
+                        <!-- CREATED DATE -->
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Scheduled On
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(screening.CreatedDate.ToString("dd-MMM-yyyy hh:mm tt"))"
+                                   readonly />
+
+                        </div>
+
+
+                        <!-- UPDATED DATE -->
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Last Updated
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(screening.UpdatedDate?.ToString("dd-MMM-yyyy hh:mm tt") ?? "-")"
+                                   readonly />
+
+                        </div>
+
+
+                        <!-- EMAIL STATUS -->
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Email Status
+                            </label>
+
+                            <div class="form-control">
+
+                                @if (screening.EmailSent)
+                                {
+                                    <span class="text-success">
+                                        Email Sent
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-warning">
+                                        Email Not Sent
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
 
 </div>

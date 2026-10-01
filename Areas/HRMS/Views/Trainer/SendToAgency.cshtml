@@ -1,0 +1,228 @@
+﻿@model IEnumerable<TSSC.Unified.Models.BatchMaster>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Send Batch to Assessment Agency
+            </h3>
+        </div>
+
+    </div>
+</div>
+
+
+@if (TempData["msg"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        <strong>Success!</strong>
+        @TempData["msg"]
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+    </div>
+}
+
+
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        <strong>Error!</strong>
+        @TempData["error"]
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+    </div>
+}
+
+
+<div class="card card-bordered">
+
+    <div class="card-inner">
+
+        <div class="table-responsive">
+
+            <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+                <thead>
+                    <tr>
+                        <th>S.No.</th>
+                        <th>Batch Code</th>
+                        <th>Batch Name</th>
+                        <th>Job Role</th>
+                        <th>Assessment Agency</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Approval Status</th>
+                        <th>Email Status</th>
+                        <th>Agency Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @serial
+                                </td>
+
+                                <td>
+                                    @(item.BatchCode ?? "-")
+                                </td>
+
+                                <td>
+                                    @(item.BatchName ?? "-")
+                                </td>
+
+                                <td>
+                                    @(item.JobRole?.JobRoleTitle ?? "-")
+                                </td>
+
+                                <td>
+                                    @(item.AssessmentAgency?.AgencyName ?? "-")
+                                </td>
+
+                                <td>
+                                    @(item.StartDate?.ToString("dd-MMM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @(item.EndDate?.ToString("dd-MMM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @if (string.Equals(
+                                                                item.AgencyApprovalStatus,
+                                                                "Approved",
+                                                                StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <span class="badge bg-success">
+                                            Approved
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            @(item.AgencyApprovalStatus ?? "-")
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (item.EmailSent)
+                                    {
+                                        <span class="badge bg-success">
+                                            Sent
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">
+                                            Pending
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (item.AgencySent)
+                                    {
+                                        <span class="badge bg-success">
+                                            Sent
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">
+                                            Pending
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+
+                                    @if (!item.AgencySent)
+                                    {
+                                        <form asp-area="HRMS"
+                                              asp-controller="Trainer"
+                                              asp-action="SendBatchToAgency"
+                                              asp-route-id="@item.Id"
+                                              method="post"
+                                              style="display:inline;">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-primary"
+                                                    title="Send to Assessment Agency"
+                                                    onclick="return confirm('Are you sure you want to send this batch to Assessment Agency?');">
+
+                                                <em class="icon ni ni-send"></em>
+                                                Send to Agency
+
+                                            </button>
+
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-success">
+                                            <em class="icon ni ni-check-circle"></em>
+                                            Sent
+                                        </span>
+                                    }
+
+                                </td>
+
+                            </tr>
+
+                            serial++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="11" class="text-center">
+
+                                <div class="py-4">
+
+                                    <em class="icon ni ni-file-text"
+                                        style="font-size:40px;">
+                                    </em>
+
+                                    <p class="mt-2 mb-0">
+                                        No batches are pending to be sent to Assessment Agency.
+                                    </p>
+
+                                </div>
+
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

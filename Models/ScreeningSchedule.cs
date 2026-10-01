@@ -9,8 +9,8 @@ namespace TSSC.Unified.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
-        public int BatchId { get; set; }
+        //[Required]
+        //public int? BatchId { get; set; }
 
         [Required]
         public int TrainerRegistrationId { get; set; }
@@ -46,8 +46,8 @@ namespace TSSC.Unified.Models
 
         // Navigation Properties
 
-        [ForeignKey(nameof(BatchId))]
-        public virtual BatchMaster? Batch { get; set; }
+        //[ForeignKey(nameof(BatchId))]
+        //public virtual BatchMaster? Batch { get; set; }
 
         [ForeignKey(nameof(TrainerRegistrationId))]
         public virtual TrainerRegistration? TrainerRegistration { get; set; }

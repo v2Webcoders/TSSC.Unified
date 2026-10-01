@@ -5,8 +5,8 @@ namespace TSSC.Unified.ViewModel
 {
     public class ScreeningScheduleVM
     {
-        [Required(ErrorMessage = "Please select Batch.")]
-        public int? BatchId { get; set; }
+        //[Required(ErrorMessage = "Please select Batch.")]
+       // public int? BatchId { get; set; }
 
         [Required(ErrorMessage = "Please select Trainer.")]
         public int? TrainerRegistrationId { get; set; }
@@ -28,7 +28,7 @@ namespace TSSC.Unified.ViewModel
 
         public string? Remarks { get; set; }
 
-        public List<SelectListItem> BatchList { get; set; } = new();
+       // public List<SelectListItem> BatchList { get; set; } = new();
 
         public List<SelectListItem> TrainerList { get; set; } = new();
     }

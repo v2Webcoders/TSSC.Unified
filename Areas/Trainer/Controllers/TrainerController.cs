@@ -1030,18 +1030,22 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
             var email = User.Identity?.Name;
 
             if (string.IsNullOrWhiteSpace(email))
+            {
                 return RedirectToAction("Login", "Account");
+            }
 
-            email = email.Trim().ToLower();
+            email = email.Trim();
 
             var trainer = await _context.TrainerRegistration
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x =>
                     x.Email != null &&
-                    x.Email.Trim().ToLower() == email);
+                    x.Email.Trim().ToLower() == email.ToLower());
 
             if (trainer == null)
+            {
                 return NotFound("Trainer application not found.");
+            }
 
             var jobRoleName = await _context.JobRoles
                 .AsNoTracking()
@@ -1049,70 +1053,93 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
                 .Select(x => x.JobRoleTitle)
                 .FirstOrDefaultAsync();
 
-            // Latest screening record
             var screening = await _context.ScreeningSchedule
+                .AsNoTracking()
+                .Where(x => x.TrainerRegistrationId == trainer.Id)
+                .OrderByDescending(x => x.Id)
+                .FirstOrDefaultAsync();
+
+            var batchMapping = await _context.BatchMasterTrainers
                 .AsNoTracking()
                 .Include(x => x.Batch)
                 .Where(x => x.TrainerRegistrationId == trainer.Id)
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefaultAsync();
 
-            // Common information
+            var batch = batchMapping?.Batch;
+
+            bool paymentSubmitted =
+                string.Equals(
+                    trainer.PaymentStatus?.Trim(),
+                    "Success",
+                    StringComparison.OrdinalIgnoreCase);
+
+            bool paymentVerified =
+                trainer.PaymentVerified;
+
+            bool financeApproved =
+                trainer.FinanceApproved;
+
             ViewBag.TrainerName = trainer.CandidateName;
             ViewBag.RegistrationNo = trainer.RegistrationNo;
-            ViewBag.JobRole = jobRoleName;
             ViewBag.RegistrationDate = trainer.CreatedDate;
-
-            // Original registration status
             ViewBag.RegistrationStatus = trainer.Status;
-
-            // Trainer active/inactive
             ViewBag.IsActive = trainer.IsActive;
+            ViewBag.CertificateUploaded = trainer.CertificateUploaded;
+            ViewBag.CertificateFileName = trainer.CertificateFileName;
 
-            // =========================================================
-            // SCREENING STATUS
-            // =========================================================
+            ViewBag.JobRole = jobRoleName ?? "-";
+
+            ViewBag.PaymentPaid = paymentSubmitted;
+            ViewBag.PaymentVerified = paymentVerified;
+            ViewBag.FinanceApproved = financeApproved;
+
+            ViewBag.PaymentCompleted =
+                paymentSubmitted &&
+                paymentVerified &&
+                financeApproved;
+
+            bool batchAssigned = batch != null;
+
+            ViewBag.BatchAssigned = batchAssigned;
+            ViewBag.BatchCode = batch?.BatchCode ?? "-";
+            ViewBag.BatchName = batch?.BatchName ?? "-";
+            ViewBag.BatchStartDate = batch?.StartDate;
+            ViewBag.BatchEndDate = batch?.EndDate;
+
+            bool resultUploaded =
+                batchMapping != null &&
+                batchMapping.ResultUploaded;
+
+            ViewBag.ResultUploaded = resultUploaded;
+            ViewBag.RaiseReq = trainer.RaiseReq;
             if (screening != null)
             {
-                ViewBag.ScreeningStatus = screening.Status;
+                ViewBag.ScreeningStatus =
+                    string.IsNullOrWhiteSpace(screening.Status)
+                        ? "Scheduled"
+                        : screening.Status;
 
-                ViewBag.BatchCode = screening.Batch?.BatchCode;
-                ViewBag.BatchName = screening.Batch?.BatchName;
-                ViewBag.BatchStartDate = screening.Batch?.StartDate;
-                ViewBag.BatchEndDate = screening.Batch?.EndDate;
-
-                // Payment based on screening result
-                //       if (string.Equals(
-                //screening.Status,
-                //"Success",
-                //StringComparison.OrdinalIgnoreCase))
-                //       {
-                //           ViewBag.PaymentStatus =
-                //               !trainer.PaymentVerified
-                //                   ? (string.IsNullOrWhiteSpace(trainer.PaymentStatus)
-                //                       ? "Pending"
-                //                       : trainer.PaymentStatus)
-                //                   : "Success";
-                //       }
-                //       else
-                //       {
-                //           ViewBag.PaymentStatus = "Not Applicable";
-                //       }
                 if (string.Equals(
-               screening.Status,
-               "Success",
-               StringComparison.OrdinalIgnoreCase))
+                        screening.Status,
+                        "Success",
+                        StringComparison.OrdinalIgnoreCase))
                 {
-                    if (trainer.PaymentVerified && trainer.FinanceApproved)
+                    if (!paymentSubmitted)
                     {
-                        ViewBag.PaymentStatus = "Success";
+                        ViewBag.PaymentStatus = "Payment Pending";
+                    }
+                    else if (!paymentVerified)
+                    {
+                        ViewBag.PaymentStatus = "Verification Pending";
+                    }
+                    else if (!financeApproved)
+                    {
+                        ViewBag.PaymentStatus = "Finance Approval Pending";
                     }
                     else
                     {
-                        ViewBag.PaymentStatus =
-                            string.IsNullOrWhiteSpace(trainer.PaymentStatus)
-                                ? "Pending"
-                                : trainer.PaymentStatus;
+                        ViewBag.PaymentStatus = "Completed";
                     }
                 }
                 else
@@ -1122,30 +1149,41 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
 
                 return View(new ScreeningScheduleVM
                 {
-                    BatchId = screening.BatchId,
-                    TrainerRegistrationId = screening.TrainerRegistrationId,
-                    ScreeningDate = screening.ScreeningDate,
-                    StartTime = screening.StartTime,
-                    EndTime = screening.EndTime,
-                    ScreeningMode = screening.ScreeningMode,
-                    Location = screening.Location,
-                    MeetingLink = screening.MeetingLink,
-                    Remarks = screening.Remarks
+                    TrainerRegistrationId =
+                        screening.TrainerRegistrationId,
+
+                    ScreeningDate =
+                        screening.ScreeningDate,
+
+                    StartTime =
+                        screening.StartTime,
+
+                    EndTime =
+                        screening.EndTime,
+
+                    ScreeningMode =
+                        screening.ScreeningMode,
+
+                    Location =
+                        screening.Location,
+
+                    MeetingLink =
+                        screening.MeetingLink,
+
+                    Remarks =
+                        screening.Remarks
                 });
             }
-
-            // =========================================================
-            // SCREENING NOT SCHEDULED
-            // =========================================================
-
             ViewBag.ScreeningStatus = "Awaiting Schedule";
             ViewBag.PaymentStatus = "Not Applicable";
+           
 
             return View(new ScreeningScheduleVM
             {
                 TrainerRegistrationId = trainer.Id
             });
         }
+
         [HttpGet]
         public async Task<IActionResult> Payment()
         {
@@ -1240,6 +1278,62 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
             await _context.SaveChangesAsync();
 
             TempData["msg"] = "Payment completed successfully.";
+
+            return RedirectToAction(nameof(ApplicationStatus));
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RaiseCertificateRequest()
+        {
+            var email = User.Identity?.Name;
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            email = email.Trim();
+
+            var trainer = await _context.TrainerRegistration
+                .FirstOrDefaultAsync(x =>
+                    x.Email != null &&
+                    x.Email.Trim().ToLower() == email.ToLower());
+
+            if (trainer == null)
+            {
+                TempData["error"] = "Trainer application not found.";
+                return RedirectToAction(nameof(ApplicationStatus));
+            }
+
+            var batchMapping = await _context.BatchMasterTrainers
+                .AsNoTracking()
+                .Where(x => x.TrainerRegistrationId == trainer.Id)
+                .OrderByDescending(x => x.Id)
+                .FirstOrDefaultAsync();
+
+            if (batchMapping == null || !batchMapping.ResultUploaded)
+            {
+                TempData["error"] =
+                    "Certificate request cannot be raised because the result has not been uploaded.";
+
+                return RedirectToAction(nameof(ApplicationStatus));
+            }
+
+            if (trainer.RaiseReq)
+            {
+                TempData["msg"] =
+                    "Certificate request has already been raised.";
+
+                return RedirectToAction(nameof(ApplicationStatus));
+            }
+
+            trainer.RaiseReq = true;
+            trainer.UpdatedDate = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            TempData["msg"] =
+                "Certificate request raised successfully.";
 
             return RedirectToAction(nameof(ApplicationStatus));
         }

@@ -3,18 +3,54 @@
 @{
     Layout = "_Layout";
 
-    string trainerName = ViewBag.TrainerName?.ToString() ?? "-";
-    string registrationNo = ViewBag.RegistrationNo?.ToString() ?? "-";
-    string registrationStatus = ViewBag.RegistrationStatus?.ToString() ?? "Pending";
+    // =========================================================
+    // BASIC TRAINER INFORMATION
+    // =========================================================
+
+    string trainerName =
+        ViewBag.TrainerName?.ToString() ?? "-";
+
+    string registrationNo =
+        ViewBag.RegistrationNo?.ToString() ?? "-";
+
+    string registrationStatus =
+        ViewBag.RegistrationStatus?.ToString() ?? "Pending";
+
+    string jobRole =
+        ViewBag.JobRole?.ToString() ?? "-";
+
+
+    // =========================================================
+    // SCREENING
+    // =========================================================
 
     string screeningStatus =
         ViewBag.ScreeningStatus?.ToString() ?? "Awaiting Schedule";
 
-    string paymentStatus =
-        ViewBag.PaymentStatus?.ToString() ?? "Pending";
 
-    string jobRole =
-        ViewBag.JobRole?.ToString() ?? "-";
+    // =========================================================
+    // PAYMENT / FINANCE
+    // =========================================================
+
+    string paymentStatus =
+        ViewBag.PaymentStatus?.ToString() ?? "Not Applicable";
+
+    bool paymentPaid =
+        ViewBag.PaymentPaid is bool paid && paid;
+
+    bool paymentVerified =
+        ViewBag.PaymentVerified is bool verified && verified;
+
+    bool financeApproved =
+        ViewBag.FinanceApproved is bool finance && finance;
+
+
+    // =========================================================
+    // BATCH
+    // =========================================================
+
+    bool batchAssigned =
+        ViewBag.BatchAssigned is bool assigned && assigned;
 
     string batchCode =
         ViewBag.BatchCode?.ToString() ?? "-";
@@ -22,17 +58,55 @@
     string batchName =
         ViewBag.BatchName?.ToString() ?? "-";
 
+
+    // =========================================================
+    // ASSESSMENT
+    // =========================================================
+
+    bool resultUploaded =
+           ViewBag.ResultUploaded is bool uploaded && uploaded;
+    bool raiseReq =
+    ViewBag.RaiseReq is bool raised && raised;
+
+    // =========================================================
+    // DATE / SCREENING FLAGS
+    // =========================================================
+
+    bool registrationCompleted =
+        ViewBag.RegistrationDate != null;
+
     bool screeningScheduled =
-        !string.IsNullOrWhiteSpace(Model.ScreeningDate?.ToString())
-        && screeningStatus == "Scheduled";
+        string.Equals(
+            screeningStatus,
+            "Scheduled",
+            StringComparison.OrdinalIgnoreCase);
 
-    bool screeningCompleted =
-        screeningStatus == "Completed" ||
-        screeningStatus == "Success";
+    bool screeningSuccess =
+        string.Equals(
+            screeningStatus,
+            "Success",
+            StringComparison.OrdinalIgnoreCase);
 
-    bool paymentCompleted =
-        paymentStatus == "Success";
+    bool screeningRejected =
+        string.Equals(
+            screeningStatus,
+            "Rejected",
+            StringComparison.OrdinalIgnoreCase);
+
+    bool screeningOnHold =
+        string.Equals(
+            screeningStatus,
+            "On Hold",
+            StringComparison.OrdinalIgnoreCase);
+
+    bool certificateUploaded =
+ViewBag.CertificateUploaded is bool certUploaded && certUploaded;
+
+    string certificateFileName =
+        ViewBag.CertificateFileName?.ToString() ?? "";
+ 
 }
+
 
 <!-- ========================================================= -->
 <!-- PAGE HEADER -->
@@ -50,7 +124,8 @@
 
             <div class="nk-block-des">
                 <p>
-                    Track your application, screening, batch and payment status.
+                    Track your registration, screening, payment,
+                    finance approval, batch and assessment status.
                 </p>
             </div>
 
@@ -70,26 +145,36 @@
     <div class="card-inner">
 
         <h5 class="title mb-4">
-            Application Status
+            Application Journey
         </h5>
 
         <div class="row g-3">
 
-            <!-- REGISTERED -->
-            <div class="col-md-3">
+            <!-- ================================================= -->
+            <!-- 1. REGISTRATION -->
+            <!-- ================================================= -->
+
+            <div class="col-md-4 col-lg-2">
 
                 <div class="border rounded p-3 text-center h-100">
 
-                    <div class="fs-4 text-success mb-2">
-                        ✓
+                    <div class="fs-4
+                        @(registrationCompleted
+                            ? "text-success"
+                            : "text-warning") mb-2">
+
+                        @(registrationCompleted ? "✓" : "1")
+
                     </div>
 
                     <div class="fw-semibold">
-                        Registered
+                        Registration
                     </div>
 
                     <small class="text-soft">
-                        Completed
+                        @(registrationCompleted
+                            ? "Completed"
+                            : registrationStatus)
                     </small>
 
                 </div>
@@ -97,19 +182,30 @@
             </div>
 
 
-            <!-- SCREENING -->
-            <div class="col-md-3">
+            <!-- ================================================= -->
+            <!-- 2. SCREENING -->
+            <!-- ================================================= -->
+
+            <div class="col-md-4 col-lg-2">
 
                 <div class="border rounded p-3 text-center h-100">
 
                     <div class="fs-4
-                        @(screeningCompleted
+                        @(screeningSuccess
                             ? "text-success"
-                            : screeningScheduled
-                                ? "text-primary"
-                                : "text-warning") mb-2">
+                            : screeningRejected
+                                ? "text-danger"
+                                : screeningScheduled
+                                    ? "text-primary"
+                                    : screeningOnHold
+                                        ? "text-warning"
+                                        : "text-secondary") mb-2">
 
-                        @(screeningCompleted ? "✓" : "2")
+                        @(screeningSuccess
+                            ? "✓"
+                            : screeningRejected
+                                ? "!"
+                                : "2")
 
                     </div>
 
@@ -126,19 +222,22 @@
             </div>
 
 
-            <!-- PAYMENT -->
-            <div class="col-md-3">
+            <!-- ================================================= -->
+            <!-- 3. PAYMENT -->
+            <!-- ================================================= -->
+
+            <div class="col-md-4 col-lg-2">
 
                 <div class="border rounded p-3 text-center h-100">
 
                     <div class="fs-4
-                        @(paymentCompleted
+                        @(paymentPaid
                             ? "text-success"
-                            : screeningCompleted
+                            : screeningSuccess
                                 ? "text-warning"
                                 : "text-secondary") mb-2">
 
-                        @(paymentCompleted ? "✓" : "3")
+                        @(paymentPaid ? "✓" : "3")
 
                     </div>
 
@@ -155,21 +254,105 @@
             </div>
 
 
-            <!-- CERTIFIED -->
-            <div class="col-md-3">
+            <!-- ================================================= -->
+            <!-- 4. FINANCE -->
+            <!-- ================================================= -->
+
+            <div class="col-md-4 col-lg-2">
 
                 <div class="border rounded p-3 text-center h-100">
 
-                    <div class="fs-4 text-secondary mb-2">
-                        4
+                    <div class="fs-4
+                        @(financeApproved
+                            ? "text-success"
+                            : paymentVerified
+                                ? "text-primary"
+                                : "text-secondary") mb-2">
+
+                        @(financeApproved ? "✓" : "4")
+
                     </div>
 
                     <div class="fw-semibold">
-                        Certified
+                        Finance
                     </div>
 
                     <small class="text-soft">
-                        Pending
+
+                        @(financeApproved
+                            ? "Approved"
+                            : paymentVerified
+                                ? "Approval Pending"
+                                : "Pending")
+
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- 5. BATCH -->
+            <!-- ================================================= -->
+
+            <div class="col-md-4 col-lg-2">
+
+                <div class="border rounded p-3 text-center h-100">
+
+                    <div class="fs-4
+                        @(batchAssigned
+                            ? "text-success"
+                            : financeApproved
+                                ? "text-primary"
+                                : "text-secondary") mb-2">
+
+                        @(batchAssigned ? "✓" : "5")
+
+                    </div>
+
+                    <div class="fw-semibold">
+                        Batch
+                    </div>
+
+                    <small class="text-soft">
+
+                        @(batchAssigned
+                            ? "Assigned"
+                            : financeApproved
+                                ? "Awaiting Assignment"
+                                : "Pending")
+
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- 6. ASSESSMENT -->
+            <!-- ================================================= -->
+
+            <div class="col-md-4 col-lg-2">
+
+                <div class="border rounded p-3 text-center h-100">
+
+                    <div class="fs-4
+            @(resultUploaded
+                                         ? "text-success"
+                                         : "text-secondary") mb-2">
+
+                        @(resultUploaded ? "✓" : "6")
+
+                    </div>
+
+                    <div class="fw-semibold">
+                        Result
+                    </div>
+
+                    <small class="text-soft">
+                        @(resultUploaded ? "Done" : "Pending")
                     </small>
 
                 </div>
@@ -193,6 +376,10 @@
 
         <div class="row g-4">
 
+            <!-- ================================================= -->
+            <!-- TRAINER NAME -->
+            <!-- ================================================= -->
+
             <div class="col-md-4">
 
                 <label class="form-label">
@@ -206,6 +393,10 @@
             </div>
 
 
+            <!-- ================================================= -->
+            <!-- REGISTRATION NUMBER -->
+            <!-- ================================================= -->
+
             <div class="col-md-4">
 
                 <label class="form-label">
@@ -218,6 +409,10 @@
 
             </div>
 
+
+            <!-- ================================================= -->
+            <!-- APPLICATION STATUS -->
+            <!-- ================================================= -->
 
             <div class="col-md-4">
 
@@ -243,6 +438,14 @@
                             Rejected
                         </span>
                     }
+                    else if (registrationStatus.Equals(
+                        "On Hold",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        <span class="badge badge-dim bg-warning">
+                            On Hold
+                        </span>
+                    }
                     else
                     {
                         <span class="badge badge-dim bg-warning">
@@ -262,7 +465,7 @@
 
 
 <!-- ========================================================= -->
-<!-- TRAINING / SCREENING TABLE -->
+<!-- APPLICATION DETAILS -->
 <!-- ========================================================= -->
 
 <div class="card card-bordered">
@@ -282,7 +485,7 @@
                     <tr>
 
                         <th>
-                            Date
+                            Registration Date
                         </th>
 
                         <th>
@@ -298,19 +501,18 @@
                         </th>
 
                         <th>
-                            Batch ID
+                            Finance
                         </th>
 
                         <th>
-                            Training Mode
+                            Batch
                         </th>
 
                         <th>
-                            Batch Start Date
+                            Result
                         </th>
-
                         <th>
-                            Batch End Date
+                            Action
                         </th>
 
                     </tr>
@@ -321,110 +523,151 @@
 
                     <tr>
 
-                        <!-- DATE -->
+                        <!-- ================================================= -->
+                        <!-- REGISTRATION DATE -->
+                        <!-- ================================================= -->
 
                         <td>
 
                             @(ViewBag.RegistrationDate != null
                                 ? Convert.ToDateTime(
-                                    ViewBag.RegistrationDate
-                                  ).ToString("dd-MM-yyyy")
+                                    ViewBag.RegistrationDate)
+                                    .ToString("dd-MM-yyyy")
                                 : "-")
 
                         </td>
 
 
+                        <!-- ================================================= -->
                         <!-- JOB ROLE -->
+                        <!-- ================================================= -->
 
                         <td>
-
                             @jobRole
-
                         </td>
 
 
+                        <!-- ================================================= -->
                         <!-- SCREENING -->
-
+                        <!-- ================================================= -->
+                        <!-- SCREENING -->
                         <td>
-                            @{
-                                screeningStatus = ViewBag.ScreeningStatus?.ToString() ?? "Awaiting Schedule";
 
-                                var badgeClass = screeningStatus switch
+                            @{
+                                var screeningBadgeClass = screeningStatus switch
                                 {
-                                    "Rejected" => "bg-danger",
                                     "Success" => "bg-success",
+                                    "Rejected" => "bg-danger",
                                     "Scheduled" => "bg-warning",
                                     "On Hold" => "bg-warning",
                                     "Cancelled" => "bg-secondary",
-                                    _ => "bg-warning"
+                                    _ => "bg-secondary"
                                 };
                             }
 
-                            <span class="badge badge-dim @badgeClass">
+                            <span class="badge badge-dim @screeningBadgeClass">
                                 @screeningStatus
                             </span>
 
                             @if (Model.ScreeningDate.HasValue)
                             {
                                 <div class="mt-1">
-                                    @Model.ScreeningDate.Value.ToString("dd-MM-yyyy")
+                                    @(Model.ScreeningDate.Value.ToString("dd-MM-yyyy"))
                                 </div>
                             }
 
-                            @if (Model.StartTime.HasValue && Model.EndTime.HasValue)
+                            @if (Model.StartTime.HasValue)
                             {
                                 <div>
-                                    @Model.StartTime.Value.ToString(@"hh\:mm")
-                                    -
-                                    @Model.EndTime.Value.ToString(@"hh\:mm")
+                                    @(Model.StartTime.Value.ToString(@"hh\:mm"))
+
+                                    @if (Model.EndTime.HasValue)
+                                    {
+                                        <span>
+                                            -
+                                            @(Model.EndTime.Value.ToString(@"hh\:mm"))
+                                        </span>
+                                    }
                                 </div>
                             }
+
                         </td>
 
 
+                        <!-- ================================================= -->
                         <!-- PAYMENT -->
+                        <!-- ================================================= -->
 
                         <td>
-                            @{
-                                 paymentStatus =
-                                ViewBag.PaymentStatus?.ToString() ?? "Not Applicable";
 
-                                 screeningStatus =
-                                ViewBag.ScreeningStatus?.ToString() ?? "Awaiting Schedule";
+                            @if (!screeningSuccess)
+                            {
+                                <span class="badge badge-dim bg-secondary">
+                                    Not Applicable
+                                </span>
                             }
-
-                            @if (screeningStatus.Equals("Success",
-                                                        StringComparison.OrdinalIgnoreCase)
-                                                        && paymentStatus.Equals("Pending",
-                                                        StringComparison.OrdinalIgnoreCase))
+                            else if (!paymentPaid)
                             {
                                 <a href="@Url.Content("~/Trainer/Trainer/Payment")"
                                    class="btn btn-sm btn-primary">
+
+                                    <em class="icon ni ni-wallet"></em>
+
                                     Pay Now
+
                                 </a>
                             }
-                            else if (paymentStatus.Equals(
-                            "Success",
-                            StringComparison.OrdinalIgnoreCase))
+                            else if (!paymentVerified)
                             {
-                                <span class="badge badge-dim bg-success">
-                                    Success
+                                <span class="badge badge-dim bg-warning">
+                                    Verification Pending
                                 </span>
                             }
                             else
                             {
-                                <span class="badge badge-dim bg-secondary">
-                                    @paymentStatus
+                                <span class="badge badge-dim bg-success">
+                                    Payment Verified
                                 </span>
                             }
+
                         </td>
 
 
-                        <!-- BATCH -->
+                        <!-- ================================================= -->
+                        <!-- FINANCE -->
+                        <!-- ================================================= -->
 
                         <td>
 
-                            @if (Model.BatchId.HasValue)
+                            @if (!paymentVerified)
+                            {
+                                <span class="badge badge-dim bg-secondary">
+                                    Pending
+                                </span>
+                            }
+                            else if (!financeApproved)
+                            {
+                                <span class="badge badge-dim bg-warning">
+                                    Approval Pending
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-dim bg-success">
+                                    Approved
+                                </span>
+                            }
+
+                        </td>
+
+
+                        <!-- ================================================= -->
+                        <!-- BATCH -->
+                        <!-- ================================================= -->
+
+                        <td>
+
+                            @if (batchAssigned)
                             {
                                 <strong>
                                     @batchCode
@@ -439,7 +682,7 @@
                             }
                             else
                             {
-                                <span class="text-soft">
+                                <span class="badge badge-dim bg-secondary">
                                     Not Assigned
                                 </span>
                             }
@@ -447,37 +690,82 @@
                         </td>
 
 
-                        <!-- TRAINING MODE -->
+                        <!-- ================================================= -->
+                        <!-- ASSESSMENT -->
+                        <!-- ================================================= -->
 
                         <td>
-
-                            @(Model.ScreeningMode ?? "-")
-
+                            @if (resultUploaded)
+                            {
+                                <span class="badge badge-dim bg-success">
+                                    Done
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-dim bg-warning">
+                                    Pending
+                                </span>
+                            }
                         </td>
-
-
-                        <!-- BATCH START -->
-
                         <td>
 
-                            @(ViewBag.BatchStartDate != null
-                                ? Convert.ToDateTime(
-                                    ViewBag.BatchStartDate
-                                  ).ToString("dd-MM-yyyy")
-                                : "-")
+                            @if (!resultUploaded)
+                            {
+                                <span class="badge badge-dim bg-secondary">
+                                    Result Pending
+                                </span>
+                            }
+                            else if (!raiseReq)
+                            {
+                                <form action="/Trainer/Trainer/RaiseCertificateRequest"
+                                      method="post"
+                                      style="display:inline;">
 
-                        </td>
+                                    @Html.AntiForgeryToken()
 
+                                    <button type="submit"
+                                            class="btn btn-sm btn-primary">
 
-                        <!-- BATCH END -->
+                                        <em class="icon ni ni-file-check"></em>
+                                        Raise Certificate Request
 
-                        <td>
+                                    </button>
 
-                            @(ViewBag.BatchEndDate != null
-                                ? Convert.ToDateTime(
-                                    ViewBag.BatchEndDate
-                                  ).ToString("dd-MM-yyyy")
-                                : "-")
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="badge badge-dim bg-success me-1">
+
+                                    <em class="icon ni ni-check-circle"></em>
+                                    Request Raised
+
+                                </span>
+
+                                @if (certificateUploaded &&
+                                                            !string.IsNullOrWhiteSpace(certificateFileName))
+                                {
+                                    <a href="@Url.Content(
+                                                       "~/uploads/TrainerCertificates/"
+                                                       + registrationNo
+                                                       + "/"
+                                                       + certificateFileName)"
+                               download="@certificateFileName"
+                               class="btn btn-sm btn-outline-primary">
+
+                                        <em class="icon ni ni-download"></em>
+                                        Download Certificate
+
+                                    </a>
+                                                        }
+                                else
+                                {
+                                    <span class="badge badge-dim bg-warning ms-1">
+                                        Certificate Pending
+                                    </span>
+                                }
+                            }
 
                         </td>
 
@@ -495,10 +783,9 @@
 
 
 <!-- ========================================================= -->
-<!-- SCREENING LOCATION / MEETING -->
+<!-- SCREENING DETAILS -->
 <!-- ========================================================= -->
-
-@if (screeningScheduled)
+@if (Model.ScreeningDate.HasValue)
 {
     <div class="card card-bordered mt-4">
 
@@ -510,6 +797,7 @@
 
             <div class="row g-4">
 
+                <!-- SCREENING DATE -->
                 <div class="col-md-4">
 
                     <label class="form-label">
@@ -517,12 +805,13 @@
                     </label>
 
                     <div class="form-control">
-                        @(Model.ScreeningDate?.ToString("dd-MMM-yyyy") ?? "-")
+                        @(Model.ScreeningDate.Value.ToString("dd-MMM-yyyy"))
                     </div>
 
                 </div>
 
 
+                <!-- SCREENING TIME -->
                 <div class="col-md-4">
 
                     <label class="form-label">
@@ -531,7 +820,14 @@
 
                     <div class="form-control">
 
-                        @(Model.StartTime?.ToString(@"hh\:mm") ?? "-")
+                        @if (Model.StartTime.HasValue)
+                        {
+                            @Model.StartTime.Value.ToString(@"hh\:mm")
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
 
                         @if (Model.EndTime.HasValue)
                         {
@@ -546,6 +842,7 @@
                 </div>
 
 
+                <!-- SCREENING MODE -->
                 <div class="col-md-4">
 
                     <label class="form-label">
@@ -559,7 +856,11 @@
                 </div>
 
 
-                @if (Model.ScreeningMode == "Online")
+                <!-- ONLINE SCREENING -->
+                @if (string.Equals(
+                            Model.ScreeningMode,
+                            "Online",
+                            StringComparison.OrdinalIgnoreCase))
                 {
                     <div class="col-md-12">
 
@@ -569,15 +870,25 @@
 
                         <div>
 
-                            <a href="@Model.MeetingLink"
-                               target="_blank"
-                               class="btn btn-primary">
+                            @if (!string.IsNullOrWhiteSpace(Model.MeetingLink))
+                            {
+                                <a href="@Model.MeetingLink"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="btn btn-outline-primary">
 
-                                <em class="icon ni ni-video"></em>
+                                    <em class="icon ni ni-external"></em>
 
-                                Join Screening
+                                    View Meeting Link
 
-                            </a>
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-soft">
+                                    Meeting link not available.
+                                </span>
+                            }
 
                         </div>
 
@@ -585,6 +896,8 @@
                 }
                 else
                 {
+                    <!-- OFFLINE SCREENING -->
+
                     <div class="col-md-12">
 
                         <label class="form-label">
@@ -592,7 +905,26 @@
                         </label>
 
                         <div class="form-control">
-                            @(Model.Location ?? "-")
+                            @(string.IsNullOrWhiteSpace(Model.Location)
+                                                ? "-"
+                                                : Model.Location)
+                </div>
+
+                    </div>
+                        }
+
+
+                <!-- SCREENING REMARKS -->
+                @if (!string.IsNullOrWhiteSpace(Model.Remarks))
+                {
+                    <div class="col-md-12">
+
+                        <label class="form-label">
+                            Screening Remarks
+                        </label>
+
+                        <div class="form-control">
+                            @Model.Remarks
                         </div>
 
                     </div>

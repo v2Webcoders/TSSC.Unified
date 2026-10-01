@@ -749,6 +749,26 @@
 
 					</a>
 				</li>
+				<li class="nk-menu-item">
+					<a href="/HRMS/Trainer/SendToAgency"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Send to Assesment Agency
+						</span>
+
+					</a>
+				</li>
+				<li class="nk-menu-item">
+					<a href="/HRMS/Trainer/UploadCertificate"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Upload Certificate
+						</span>
+
+					</a>
+				</li>
 				
 			</ul>
 
@@ -1570,7 +1590,7 @@
 
 		@*----------------- for manage job roles -----------------------------*@
 
-	@if (isReportingManager)
+	@if (isReportingManager && isStandardEmployee)
 
 		{
 			<li class="nk-menu-item has-sub">

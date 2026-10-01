@@ -9,7 +9,7 @@ namespace TSSC.Unified.Models
     {
         [Key]
         public int Id { get; set; }
-
+        public string? UserId { get; set; }
         [Required]
         [StringLength(200)]
         public string AgencyName { get; set; } = string.Empty;
