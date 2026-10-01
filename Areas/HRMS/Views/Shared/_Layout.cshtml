@@ -284,33 +284,36 @@
 									<img class="logo-dark logo-img" src="./images/logomine.png" srcset="./images/logo-dark2x.png 2x" alt="logo-dark">
 								</a>
 							</div><!-- .nk-header-brand -->
-							
-							<div class="nk-header-news d-none d-xl-block" style="display:none !important;">
-								<div class="nk-news-list">
-									<div class="employee-search-widget">
-										<div class="search-input-wrapper">
-											<input type="text"
-												   class="form-control form-control-sm"
-												   id="employeeSearch"
-												   placeholder="Search employee..."
-												   autocomplete="off">
-											<em class="icon ni ni-search"></em>
-										</div>
-
-										<div class="search-results-dropdown" id="searchResults" style="display: none;">
-											<div class="search-results-list" id="resultsList"></div>
-											<div class="search-empty" id="emptyState" style="display: none;">
-												<em class="icon ni ni-info"></em>
-												<p>No employees found</p>
+							@if (roles.Contains("HR"))
+							{
+								<div class="nk-header-news d-none d-xl-block" style="display:none !important;" >
+									<div class="nk-news-list">
+										<div class="employee-search-widget">
+											<div class="search-input-wrapper">
+												<input type="text"
+													   class="form-control form-control-sm"
+													   id="employeeSearch"
+													   placeholder="Search employee..."
+													   autocomplete="off">
+												<em class="icon ni ni-search"></em>
 											</div>
-											<div class="search-loading" id="loadingState" style="display: none;">
-												<em class="icon ni ni-loader"></em>
-												<span>Searching...</span>
+
+											<div class="search-results-dropdown" id="searchResults" style="display: none;">
+												<div class="search-results-list" id="resultsList"></div>
+												<div class="search-empty" id="emptyState" style="display: none;">
+													<em class="icon ni ni-info"></em>
+													<p>No employees found</p>
+												</div>
+												<div class="search-loading" id="loadingState" style="display: none;">
+													<em class="icon ni ni-loader"></em>
+													<span>Searching...</span>
+												</div>
 											</div>
 										</div>
 									</div>
 								</div>
-							</div>
+							}
+							
 							
 							@* <div class="nk-header-news d-none d-xl-block">
 								<div class="nk-news-list">

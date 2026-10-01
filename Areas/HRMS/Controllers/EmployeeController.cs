@@ -241,7 +241,9 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                     var employee = new Employee
                     {
                         ApplicationUserId = appUser.Id,
-
+                        BiometricCode = string.IsNullOrWhiteSpace(model.BiometricCode)
+                        ? "0"
+                        : model.BiometricCode,
                         EmployeeCode = model.EmployeeCode,
                         FirstName = model.FirstName,
                         LastName = model.LastName,
@@ -351,10 +353,34 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                             await _userManager.DeleteAsync(user);
                     }
 
-                    ModelState.AddModelError("", ex.Message);
+                    var error = ex;
+
+                    while (error.InnerException != null)
+                    {
+                        error = error.InnerException;
+                    }
+
+                    ModelState.AddModelError("", error.Message);
 
                     return View(model);
                 }
+                //catch (Exception ex)
+                //{
+                //    await transaction.RollbackAsync();
+
+                //    // Remove Identity user if it was already created
+                //    if (appUser != null)
+                //    {
+                //        var user = await _userManager.FindByIdAsync(appUser.Id);
+
+                //        if (user != null)
+                //            await _userManager.DeleteAsync(user);
+                //    }
+
+                //    ModelState.AddModelError("", ex.Message);
+
+                //    return View(model);
+                //}
             }
 
             //===========================
@@ -442,11 +468,16 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 "DesignationName");
 
             ViewBag.Managers = new SelectList(
-                await _context.Employee
-                    .OrderBy(x => x.FirstName)
-                    .ToListAsync(),
-                "EmployeeId",
-                "FirstName");
+            await _context.Employee
+                .OrderBy(x => x.FirstName)
+                .Select(x => new
+                {
+                    x.EmployeeId,
+                    DisplayName = x.FirstName + " " + x.LastName + " (" + x.EmployeeCode + ")"
+                })
+                .ToListAsync(),
+            "EmployeeId",
+            "DisplayName");
 
             ViewBag.Roles = new SelectList(
                 await _context.Roles.Where(x => x.Name != "Admin").OrderBy(x => x.Name).ToListAsync(),
@@ -804,7 +835,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             // =====================================================
 
             ModelState.Remove(nameof(EmployeeVM.EmployeeCode));
-
+            ModelState.Remove(nameof(EmployeeVM.BiometricCode));
             ModelState.Remove(nameof(EmployeeVM.DepartmentId));
             ModelState.Remove(nameof(EmployeeVM.DesignationId));
             ModelState.Remove(nameof(EmployeeVM.ReportingManagerId));

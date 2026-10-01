@@ -87,7 +87,7 @@ namespace TSSC.Unified.Services
             // SQL
             // =====================================================
 
-                var sql = $@"
+            var sql = $@"
                 SELECT
                     UserId,
                     CAST(LogDate AS DATE) AS AttendanceDate,
@@ -320,7 +320,7 @@ namespace TSSC.Unified.Services
                         AttendanceSource =
                             "Biometric",
 
-                        
+
 
                         CreatedDate =
                             DateTime.Now
@@ -338,6 +338,13 @@ namespace TSSC.Unified.Services
 
                 else
                 {
+                    // Do not overwrite Manual, Regularization, or OD attendance
+                    if (attendance.AttendanceSource == "Manual" ||
+                        attendance.AttendanceSource == "Regularization" ||
+                        attendance.AttendanceSource == "OD")
+                    {
+                        continue;
+                    }
                     attendance.EmployeeCode =
                         employee.EmployeeCode;
 
@@ -349,11 +356,11 @@ namespace TSSC.Unified.Services
                             ? null
                             : outTime;
 
-                    attendance.AttendanceStatus =
-                        missingPunch
-                            ? "Present - Check Out Missing"
-                            : "Present";
-
+                    //attendance.AttendanceStatus =
+                    //    missingPunch
+                    //        ? "Present - Check Out Missing"
+                    //        : "Present";
+                    attendance.AttendanceStatus = attendanceStatus;
                     attendance.Remarks =
                         missingPunch
                             ? "Employee checked in but has not checked out."
