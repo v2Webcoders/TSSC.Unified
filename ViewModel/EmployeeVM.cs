@@ -194,7 +194,7 @@ namespace TSSC.Unified.ViewModel
         [Display(Name = "Relieving Date")]
         public DateTime? RelievingDate { get; set; }
 
-       
+        [Required]
         public string? BiometricCode { get; set; }
     }
 }

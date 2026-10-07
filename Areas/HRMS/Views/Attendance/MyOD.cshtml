@@ -18,7 +18,79 @@
     </div>
 
 </div>
+<div class="mb-4">
 
+    <ul class="nav nav-tabs">
+
+        <li class="nav-item">
+
+            <a asp-action="MyOD"
+               class="nav-link @(string.IsNullOrEmpty(ViewBag.Status) ? "active" : "")">
+
+                All
+
+                <span class="badge bg-primary ms-1">
+                    @ViewBag.TotalCount
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <li class="nav-item">
+
+            <a asp-action="MyOD"
+               asp-route-status="Pending"
+               class="nav-link @(ViewBag.Status == "Pending" ? "active" : "")">
+
+                Pending
+
+                <span class="badge bg-warning ms-1">
+                    @ViewBag.PendingCount
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <li class="nav-item">
+
+            <a asp-action="MyOD"
+               asp-route-status="Approved"
+               class="nav-link @(ViewBag.Status == "Approved" ? "active" : "")">
+
+                Approved
+
+                <span class="badge bg-success ms-1">
+                    @ViewBag.ApprovedCount
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <li class="nav-item">
+
+            <a asp-action="MyOD"
+               asp-route-status="Rejected"
+               class="nav-link @(ViewBag.Status == "Rejected" ? "active" : "")">
+
+                Rejected
+
+                <span class="badge bg-danger ms-1">
+                    @ViewBag.RejectedCount
+                </span>
+
+            </a>
+
+        </li>
+
+    </ul>
+
+</div>
 
 <div class="nk-block nk-block-lg">
 
@@ -60,6 +132,7 @@
                             <th>Status</th>
 
                             <th>Attachment</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
 
@@ -163,6 +236,21 @@
                                         </span>
                                     }
 
+                                </td>
+                                <td>
+                                    @if (item.Status == "Pending")
+                                    {
+                                        <a asp-action="EditOD"
+                                           asp-route-id="@item.ODRequestId"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <em class="icon ni ni-edit"></em>
+                                            Edit
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
                                 </td>
 
                             </tr>

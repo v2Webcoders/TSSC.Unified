@@ -1,0 +1,129 @@
+﻿@model TSSC.Unified.ViewModel.TeamMembersVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Team Members</h3>
+
+            @if (Model.Manager != null)
+            {
+                <div class="nk-block-des">
+                    <p>
+                        <strong>Reporting Manager:</strong>
+                        @Model.Manager.FirstName @Model.Manager.LastName
+
+                        @if (!string.IsNullOrWhiteSpace(Model.Manager.EmployeeCode))
+                        {
+                            <span>
+                                (@Model.Manager.EmployeeCode)
+                            </span>
+                        }
+                    </p>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+
+<div class="nk-block nk-block-lg">
+    <div class="card card-preview">
+
+        <div class="card-inner">
+
+            <div class="table-responsive">
+
+                <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+                    <thead>
+                        <tr>
+                            <th width="60">S.No.</th>
+                            <th>Employee Code</th>
+                            <th>Employee Name</th>
+                            <th>Department</th>
+                            <th>Designation</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model.TeamMembers.Any())
+                        {
+                            @foreach (var item in Model.TeamMembers)
+                            {
+                                <tr>
+
+                                    <td>@serial</td>
+
+                                    <td>
+                                        @item.EmployeeCode
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            @item.FirstName @item.LastName
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        @(item.Department?.DepartmentName ?? "-")
+                                    </td>
+
+                                    <td>
+                                        @(item.Designation?.DesignationName ?? "-")
+                                    </td>
+
+                                    <td>
+                                        @if (item.IsActive)
+                                        {
+                                            <span class="badge badge-dot bg-success">
+                                                Active
+                                            </span>
+                                        }
+                                        else if  (item.IsActive==false)
+                                        {
+                                            <span class="badge badge-dot bg-danger">
+                                                Inactive
+                                            </span>
+                                        }
+                                        
+                                    </td>
+
+                                </tr>
+
+                                serial++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="py-4">
+                                        <em class="icon ni ni-users fs-2 text-muted"></em>
+                                        <p class="text-muted mt-2 mb-0">
+                                            No team members found.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

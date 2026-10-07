@@ -33,14 +33,18 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             _roleManager = roleManager;
             _environment = environment;
         }
-
-        //HR ROLE LEAVE MANAGEMENT
-        public async Task<IActionResult> MyLeaves()
+        // HR ROLE LEAVE MANAGEMENT
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> MyLeaves(string? status = "Pending")
         {
-            var applicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var applicationUserId =
+                User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var employee = await _context.Employee
-                .FirstOrDefaultAsync(x => x.ApplicationUserId == applicationUserId);
+            var employee =
+                await _context.Employee
+                    .FirstOrDefaultAsync(x =>
+                        x.ApplicationUserId == applicationUserId);
 
             if (employee == null)
             {
@@ -50,8 +54,10 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             ViewBag.EmployeeId = employee.EmployeeId;
             ViewBag.IsHR = User.IsInRole("HR");
 
-            IQueryable<LeaveRequest> query = _context.LeaveRequest
-                .Include(x => x.LeaveType).Include(x => x.Employee); 
+            IQueryable<LeaveRequest> query =
+                _context.LeaveRequest
+                    .Include(x => x.LeaveType)
+                    .Include(x => x.Employee);
 
             // HR can see all leave requests
             if (!User.IsInRole("HR"))
@@ -61,12 +67,69 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     x.ApproverId == employee.EmployeeId);
             }
 
-            var leaveRequests = await query
-                .OrderByDescending(x => x.CreatedDate)
-                .ToListAsync();
+            // Counts
+            ViewBag.PendingCount =
+                await query.CountAsync(x => x.Status == "Pending");
+
+            ViewBag.ApprovedCount =
+                await query.CountAsync(x => x.Status == "Approved");
+
+            ViewBag.RejectedCount =
+                await query.CountAsync(x => x.Status == "Rejected");
+
+            // Validate status
+            if (status != "Pending" &&
+                status != "Approved" &&
+                status != "Rejected")
+            {
+                status = "Pending";
+            }
+
+            // Apply selected status
+            query = query.Where(x => x.Status == status);
+
+            var leaveRequests =
+                await query
+                    .OrderByDescending(x => x.CreatedDate)
+                    .ToListAsync();
+
+            ViewBag.Status = status;
 
             return View(leaveRequests);
         }
+        ////HR ROLE LEAVE MANAGEMENT
+        //public async Task<IActionResult> MyLeaves()
+        //{
+        //    var applicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        //    var employee = await _context.Employee
+        //        .FirstOrDefaultAsync(x => x.ApplicationUserId == applicationUserId);
+
+        //    if (employee == null)
+        //    {
+        //        return NotFound("Employee not found.");
+        //    }
+
+        //    ViewBag.EmployeeId = employee.EmployeeId;
+        //    ViewBag.IsHR = User.IsInRole("HR");
+
+        //    IQueryable<LeaveRequest> query = _context.LeaveRequest
+        //        .Include(x => x.LeaveType).Include(x => x.Employee); 
+
+        //    // HR can see all leave requests
+        //    if (!User.IsInRole("HR"))
+        //    {
+        //        query = query.Where(x =>
+        //            x.EmployeeId == employee.EmployeeId ||
+        //            x.ApproverId == employee.EmployeeId);
+        //    }
+
+        //    var leaveRequests = await query
+        //        .OrderByDescending(x => x.CreatedDate)
+        //        .ToListAsync();
+
+        //    return View(leaveRequests);
+        //}
 
         public async Task<IActionResult> Approve(int id)
         {
@@ -376,6 +439,85 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                 return RedirectToAction("Index");
             }
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BulkApproveLeave(List<int> selectedIds)
+        {
+            if (selectedIds == null || !selectedIds.Any())
+            {
+                TempData["Error"] =
+                    "Please select at least one leave request.";
+
+                return RedirectToAction(nameof(MyLeaves));
+            }
+
+            var applicationUserId =
+                User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var employee =
+                await _context.Employee
+                    .FirstOrDefaultAsync(x =>
+                        x.ApplicationUserId == applicationUserId);
+
+            if (employee == null)
+                return NotFound();
+
+            int approvedCount = 0;
+            int skippedCount = 0;
+
+            foreach (var id in selectedIds)
+            {
+                var leave =
+                    await _context.LeaveRequest
+                        .FirstOrDefaultAsync(x =>
+                            x.LeaveRequestId == id);
+
+                if (leave == null)
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+                // Only pending requests can be approved
+                if (leave.Status != "Pending")
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+                leave.Status = "Approved";
+
+                leave.ApprovedBy =
+                    employee.EmployeeId;
+
+                leave.ApprovedDate =
+                    DateTime.Now;
+
+                approvedCount++;
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Result message
+            if (approvedCount > 0 && skippedCount == 0)
+            {
+                TempData["Success"] =
+                    $"{approvedCount} leave request(s) approved successfully.";
+            }
+            else if (approvedCount > 0 && skippedCount > 0)
+            {
+                TempData["Success"] =
+                    $"{approvedCount} leave request(s) approved successfully. " +
+                    $"{skippedCount} request(s) skipped.";
+            }
+            else
+            {
+                TempData["Error"] =
+                    "No selected leave requests could be approved.";
+            }
+
+            return RedirectToAction(nameof(MyLeaves));
         }
     }
 }
