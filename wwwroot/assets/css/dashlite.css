@@ -26523,11 +26523,11 @@ div.dt-container div.dt-info {
   font-size: 0.75rem;
 }
 
-div.dt-container div.dt-paging {
+/* div.dt-container div.dt-paging {
   margin: 0;
   white-space: nowrap;
   text-align: right;
-}
+} */
 
 div.dt-container div.dt-paging ul.pagination {
   margin: 2px 0;
@@ -31081,7 +31081,7 @@ body.nav-shown {
   min-width: 320px;
 }
 .nk-header-fixed + .nk-content {
-  margin-top: 65px;
+  margin-top: 30px;
   position: relative;
 }
 .nk-header-wrap {
@@ -31470,11 +31470,11 @@ body.nav-shown {
 }
 .nk-sidebar-head {
   display: flex;
-  align-items: center;
-  padding: 14px 24px;
+/*  align-items: center;*/
+  padding: 10px 24px;
   min-width: 100%;
   width: 290px;
-  height: 65px;
+/*  height: 71px;*/
   border-bottom: 1px solid #e5e9f2;
 }
 .is-dark .nk-sidebar-head {
@@ -48444,13 +48444,55 @@ body.dark-mode.nk-body.ui-softy, body.dark-mode.nk-body.ui-shady {
 
 
 
+/* Default state (sidebar expanded) */
+.nk-menu-heading-text {
+    color: #8FA8C2 !important;
+    font-size: 11px;
+    font-weight: 625 !important;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    width: 100%;
+}
+
+.nk-menu-heading-content {
+    padding-bottom: 5px;
+    border-bottom: 1px solid #1688B5;
+    overflow: hidden;
+}
+
+/* Collapsed / icon-only sidebar: hide heading text completely
+   (matches menu item labels which are also hidden in this mode) */
+.nk-sidebar-compact .nk-menu-heading-text,
+.is-compact .nk-menu-heading-text {
+    display: none !important;
+}
+
+/* Replace with just a thin divider line so section break is still visible */
+.nk-sidebar-compact .nk-menu-heading-content,
+.is-compact .nk-menu-heading-content {
+    border-bottom: none;
+    border-top: 1px solid #1688B5;
+    padding: 0;
+    margin: 10px 12px;
+}
+
+button#btnCheckOut {
+    opacity: unset !important;
+      
+}
+
+#btnCheckIn, #btnCheckOut{
+  gap: 5px;
+}
 
 
-
-
-
-
-
+.nk-block form .btn-light:hover{
+  color: #000 !important;
+}
 
 
 

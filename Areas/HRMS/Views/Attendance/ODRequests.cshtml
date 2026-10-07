@@ -113,107 +113,119 @@
 <!-- ========================================= -->
 <!-- REQUEST TABLE -->
 <!-- ========================================= -->
+<!-- ========================================= -->
+<!-- STATUS FILTERS -->
+<!-- ========================================= -->
 
+
+<div class="mb-4">
+
+    <ul class="nav nav-tabs">
+
+        <!-- Pending -->
+        <li class="nav-item">
+
+            <a asp-action="ODRequests"
+               asp-route-status="Pending"
+               class="nav-link @(ViewBag.Status == "Pending" ? "active" : "")">
+
+                Pending
+
+                <span class="badge bg-warning ms-1">
+                    @ViewBag.PendingCount
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <!-- Approved -->
+        <li class="nav-item">
+
+            <a asp-action="ODRequests"
+               asp-route-status="Approved"
+               class="nav-link @(ViewBag.Status == "Approved" ? "active" : "")">
+
+                Approved
+
+                <span class="badge bg-success ms-1">
+                    @ViewBag.ApprovedCount
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <!-- Rejected -->
+        <li class="nav-item">
+
+            <a asp-action="ODRequests"
+               asp-route-status="Rejected"
+               class="nav-link @(ViewBag.Status == "Rejected" ? "active" : "")">
+
+                Rejected
+
+                <span class="badge bg-danger ms-1">
+                    @ViewBag.RejectedCount
+                </span>
+
+            </a>
+
+        </li>
+
+    </ul>
+
+</div>
 <div class="nk-block nk-block-lg">
 
     <div class="card card-preview">
 
         <div class="card-inner">
+            <form asp-action="BulkApproveManagerOD"
+                  method="post"
+                  id="bulkApproveODForm">
 
-            <div class="table-responsive">
-                <!-- ========================================= -->
-                <!-- STATUS FILTERS -->
-                <!-- ========================================= -->
-                <!-- ========================================= -->
-                <!-- STATUS FILTERS -->
-                <!-- ========================================= -->
-                <!-- ========================================= -->
-                <!-- STATUS FILTERS -->
-                <!-- ========================================= -->
-                <!-- ========================================= -->
-                <!-- STATUS FILTERS -->
-                <!-- ========================================= -->
+                @Html.AntiForgeryToken()
 
-                <div class="mb-4">
+                <div class="d-flex align-items-center mb-3">
 
-                    <ul class="nav nav-tabs">
+                    <button type="submit"
+                            class="btn btn-success"
+                            id="approveSelectedODBtn"
+                            disabled>
 
-                        <!-- ALL -->
+                        <em class="icon ni ni-check"></em>
+                        Approve Selected
 
-                        <li class="nav-item">
+                    </button>
 
-                            <a asp-action="ODRequests"
-                               asp-route-status="All"
-                               class="nav-link @(ViewBag.Status == "All" ? "active" : "")">
-
-                                <em class="icon ni ni-list me-1"></em>
-
-                                All
-
-                            </a>
-
-                        </li>
-
-
-                        <!-- PENDING -->
-
-                        <li class="nav-item">
-
-                            <a asp-action="ODRequests"
-                               asp-route-status="Pending"
-                               class="nav-link @(ViewBag.Status == "Pending" ? "active" : "")">
-
-                                <em class="icon ni ni-clock me-1"></em>
-
-                                Pending
-
-                            </a>
-
-                        </li>
-
-
-                        <!-- APPROVED -->
-
-                        <li class="nav-item">
-
-                            <a asp-action="ODRequests"
-                               asp-route-status="Approved"
-                               class="nav-link @(ViewBag.Status == "Approved" ? "active" : "")">
-
-                                <em class="icon ni ni-check-circle me-1"></em>
-
-                                Approved
-
-                            </a>
-
-                        </li>
-
-
-                        <!-- REJECTED -->
-
-                        <li class="nav-item">
-
-                            <a asp-action="ODRequests"
-                               asp-route-status="Rejected"
-                               class="nav-link @(ViewBag.Status == "Rejected" ? "active" : "")">
-
-                                <em class="icon ni ni-cross-circle me-1"></em>
-
-                                Rejected
-
-                            </a>
-
-                        </li>
-
-                    </ul>
+                    <span class="text-muted ms-3">
+                        Selected:
+                        <strong id="selectedODCount">0</strong>
+                    </span>
 
                 </div>
-                <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+            </form>
+            <div class="table-responsive">
+                
+
+
+                <table class="datatable-init-export table table-tranx table_custom table-bordered" data-auto-responsive="false">
 
                     <thead>
 
                         <tr>
+                            <th width="40"
+                                data-orderable="false"
+                                data-searchable="false">
 
+                                <input type="checkbox"
+                                       id="selectAllOD" />
+
+                            </th>
                             <th width="60">
                                 S.No.
                             </th>
@@ -274,7 +286,14 @@
                             foreach (var item in Model)
                             {
                                 <tr>
-
+                                    <td>
+                                        @if (item.Status == "Pending")
+                                        {
+                                            <input type="checkbox"
+                                                   class="od-checkbox"
+                                                   value="@item.ODRequestId" />
+                                        }
+                                    </td>
                                     <!-- ================================= -->
                                     <!-- SERIAL -->
                                     <!-- ================================= -->
@@ -586,3 +605,197 @@
     </div>
 
 </div>
+@section Scripts {
+   <script>
+               $(document).ready(function () {
+
+            var selectedODRequests = new Set();
+
+
+            // =====================================================
+            // ROW CHECKBOX
+            // =====================================================
+
+            $(document).on('change', '.od-checkbox', function () {
+
+                var id = $(this).val();
+
+                if ($(this).prop('checked')) {
+                    selectedODRequests.add(id);
+                }
+                else {
+                    selectedODRequests.delete(id);
+                }
+
+                updateSelectAll();
+                updateApproveButton();
+            });
+
+
+            // =====================================================
+            // SELECT ALL - CURRENT PAGE
+            // =====================================================
+
+            $(document).on('change', '#selectAllOD', function () {
+
+                var checked = $(this).prop('checked');
+
+                $('.od-checkbox').each(function () {
+
+                    var id = $(this).val();
+
+                    $(this).prop('checked', checked);
+
+                    if (checked) {
+                        selectedODRequests.add(id);
+                    }
+                    else {
+                        selectedODRequests.delete(id);
+                    }
+                });
+
+                updateSelectAll();
+                updateApproveButton();
+            });
+
+
+            // =====================================================
+            // DATATABLE REDRAW
+            // Pagination / Search / Sort
+            // =====================================================
+
+            $('.datatable-init-export').on('draw.dt', function () {
+
+                $('.od-checkbox').each(function () {
+
+                    var id = $(this).val();
+
+                    $(this).prop(
+                        'checked',
+                        selectedODRequests.has(id)
+                    );
+                });
+
+                updateSelectAll();
+                updateApproveButton();
+            });
+
+
+            // =====================================================
+            // SELECT ALL STATE
+            // =====================================================
+
+            function updateSelectAll() {
+
+                var total =
+                    $('.od-checkbox').length;
+
+                var checked =
+                    $('.od-checkbox:checked').length;
+
+                var selectAll =
+                    $('#selectAllOD');
+
+                if (total === 0) {
+
+                    selectAll.prop('checked', false);
+                    selectAll.prop('indeterminate', false);
+
+                    return;
+                }
+
+                if (checked === total) {
+
+                    selectAll.prop('checked', true);
+                    selectAll.prop('indeterminate', false);
+
+                }
+                else if (checked > 0) {
+
+                    selectAll.prop('checked', false);
+                    selectAll.prop('indeterminate', true);
+
+                }
+                else {
+
+                    selectAll.prop('checked', false);
+                    selectAll.prop('indeterminate', false);
+                }
+            }
+
+
+            // =====================================================
+            // APPROVE BUTTON
+            // =====================================================
+
+            function updateApproveButton() {
+
+                var count =
+                    selectedODRequests.size;
+
+                $('#approveSelectedODBtn')
+                    .prop('disabled', count === 0);
+
+                $('#selectedODCount')
+                    .text(count);
+            }
+
+
+            // =====================================================
+            // FORM SUBMIT
+            // =====================================================
+
+            $('#bulkApproveODForm').on('submit', function (e) {
+
+                if (selectedODRequests.size === 0) {
+
+                    e.preventDefault();
+
+                    alert(
+                        'Please select at least one OD request.'
+                    );
+
+                    return;
+                }
+
+                if (!confirm(
+                    'Are you sure you want to approve ' +
+                    selectedODRequests.size +
+                    ' selected OD request(s)?'
+                )) {
+
+                    e.preventDefault();
+
+                    return;
+                }
+
+
+                // Remove old hidden inputs
+                $('.selected-od-hidden').remove();
+
+
+                // Add all selected IDs
+                selectedODRequests.forEach(function (id) {
+
+                    $('<input>', {
+                        type: 'hidden',
+                        name: 'selectedIds',
+                        value: id,
+                        class: 'selected-od-hidden'
+                    }).appendTo('#bulkApproveODForm');
+
+                });
+
+            });
+
+
+            // =====================================================
+            // INITIAL STATE
+            // =====================================================
+
+            updateSelectAll();
+            updateApproveButton();
+
+        });
+   </script>
+}

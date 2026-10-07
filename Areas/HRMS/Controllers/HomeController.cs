@@ -234,10 +234,10 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 {
                     return RedirectToAction("EditProfile", "Employee");
                 }
-                if (employee.ProfileStatus == "Submitted")
-                {
-                    return RedirectToAction("ProfileSubmitted", "Employee");
-                }
+                //if (employee.ProfileStatus == "Submitted" || employee.ProfileStatus == "Complete")
+                //{
+                //    return RedirectToAction("ProfileSubmitted", "Employee");
+                //}
                 var today = DateTime.Today;
 
                 var attendance = await _todayAttendanceLiveService.GetTodayAttendanceAsync(employee.BiometricCode);

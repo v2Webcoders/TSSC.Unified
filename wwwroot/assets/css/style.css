@@ -113,7 +113,7 @@
   align-items: center;
   gap: 14px;
   padding: 10px 18px;
-  margin: 2px 12px;
+
   border-radius: var(--tssc-radius-sm);
   color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
@@ -180,7 +180,7 @@
 
 
 .logo-link .img-fluid{
-    height: 58px;
+    height: 50px;
 }
 
 .nk-sidebar.is-theme .nk-menu-link:hover .nk-menu-text {
@@ -252,7 +252,7 @@
 .nk-sidebar.is-theme .nk-menu-sub .nk-menu-item.active > .nk-menu-link {
   background: rgba(245, 130, 31, 0.12);
   color: var(--tssc-white);
-  border-left: 2px solid var(--tssc-accent);
+  
 }
 
 .nk-sidebar.is-theme .nk-menu-sub .nk-menu-item.active > .nk-menu-link::before {
@@ -278,7 +278,6 @@
 
 .nk-sidebar.is-theme .nk-menu-toggle:hover::after {
   color: var(--tssc-accent);
-  transform: rotate(180deg);
 }
 
 /* ============================================
@@ -290,7 +289,7 @@
   border-bottom: 1px solid var(--tssc-gray-200);
   box-shadow: var(--tssc-shadow-sm);
 }
-
+s
 /* Announcement Bar */
 .nk-header.is-light .nk-header-news .nk-news-item {
   color: var(--tssc-gray-700);
@@ -1131,36 +1130,4170 @@
 }
 
 
-.card-body.d-grid {
-    gap: 16px;
+
+
+
+
+
+
+/* =========================================================
+   TSSC HRMS — FINAL THEME (Sidebar + Dashboard Content)
+   Load this file LAST, after custom.css / EmployeeDashboard.css.
+   Remove/ignore color-fix.css and sidebar-fix.css — this file
+   replaces both and matches the ACTUAL HTML classes on the page.
+   ========================================================= */
+
+:root {
+  --tssc-navy: #0B2A4A;
+  --tssc-navy-2: #123A61;
+  --tssc-navy-3: #164675;
+  --tssc-orange: #F5821F;
+  --tssc-orange-dark: #C9660F;
+  --tssc-text: #C9D6E3;
+  --tssc-text-dim: #8FA8C2;
+  --tssc-bg: #F4F7FB;
+  --tssc-border: #E5EAF0;
+
+  --tssc-success: #16A34A;   --tssc-success-bg: #E3F8EA;
+  --tssc-warning: #B7791F;   --tssc-warning-bg: #FEF3D6;
+  --tssc-primary: #1A4B7A;   --tssc-primary-bg: #E6F0FA;
+  --tssc-danger:  #DC2626;   --tssc-danger-bg:  #FDE8E8;
+}
+
+body.nk-body { background: var(--tssc-bg) !important; }
+
+/* =========================================================
+   GLOBAL — applies to EVERY page automatically.
+   This site uses Bootstrap 5.3 utility classes (bg-success-subtle,
+   text-success, badge, alert, btn-primary, etc). Bootstrap derives
+   ALL of those colors from CSS variables below — so overriding
+   these once recolors badges, alerts, buttons, and icon circles
+   on every single page, even ones with different HTML/classes.
+   ========================================================= */
+
+:root {
+  --bs-primary: var(--tssc-navy);
+  --bs-primary-rgb: 11, 42, 74;
+  --bs-primary-bg-subtle: var(--tssc-primary-bg);
+  --bs-primary-border-subtle: #C7DBF0;
+  --bs-primary-text-emphasis: var(--tssc-primary);
+
+  --bs-success: #16A34A;
+  --bs-success-rgb: 22, 163, 74;
+  --bs-success-bg-subtle: var(--tssc-success-bg);
+  --bs-success-border-subtle: #BEEBCF;
+  --bs-success-text-emphasis: var(--tssc-success);
+
+  --bs-warning: var(--tssc-orange);
+  --bs-warning-rgb: 245, 130, 31;
+  --bs-warning-bg-subtle: var(--tssc-warning-bg);
+  --bs-warning-border-subtle: #F5DFA6;
+  --bs-warning-text-emphasis: var(--tssc-warning);
+
+  --bs-danger: #DC2626;
+  --bs-danger-rgb: 220, 38, 38;
+  --bs-danger-bg-subtle: var(--tssc-danger-bg);
+  --bs-danger-border-subtle: #F7C9C9;
+  --bs-danger-text-emphasis: var(--tssc-danger);
+
+  --bs-info: #0891B2;
+  --bs-info-rgb: 8, 145, 178;
+  --bs-info-bg-subtle: #E0F2FE;
+  --bs-info-border-subtle: #BAE6FD;
+  --bs-info-text-emphasis: #0E7490;
+
+  --bs-body-bg: var(--tssc-bg);
+  --bs-border-color: var(--tssc-border);
+  --bs-border-radius: 0.65rem;
+  --bs-border-radius-sm: 0.5rem;
+  --bs-border-radius-lg: 0.85rem;
+}
+
+/* Page titles / headings on any page */
+.nk-content h1, .nk-content h2, .nk-content h3,
+.nk-content h4, .nk-content h5 {
+  color: var(--tssc-navy) !important;
+}
+.nk-content > .container-fluid p.text-muted,
+.nk-content .nk-block-des {
+  color: #64748B !important;
+}
+
+/* Any card on any page (KPI cards already have more specific
+   .card-stat rules further below, so those still win) */
+.nk-content .card {
+  border: 1px solid var(--tssc-border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 10px rgba(11, 42, 74, 0.05) !important;
+}
+
+/* Primary buttons anywhere on the site */
+.btn-primary {
+  background: var(--tssc-navy) !important;
+  border-color: var(--tssc-navy) !important;
+}
+.btn-primary:hover, .btn-primary:focus {
+  background: var(--tssc-navy-2) !important;
+  border-color: var(--tssc-navy-2) !important;
+}
+
+/* Small round icon/nav buttons (calendar prev/next, etc.) */
+.btn-icon, .btn.rounded-circle, .btn-outline-secondary, .btn-light {
+  border-color: var(--tssc-border) !important;
+  color: var(--tssc-navy) !important;
+}
+.btn-icon:hover, .btn.rounded-circle:hover,
+.btn-outline-secondary:hover, .btn-light:hover {
+  background: var(--tssc-navy) !important;
+  color: #ffffff !important;
+  border-color: var(--tssc-navy) !important;
+}
+
+/* Tables anywhere on the site */
+.table thead th {
+  color: #8592A3 !important;
+  font-size: 11px;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  border-bottom-color: var(--tssc-border) !important;
+}
+.table td, .table th {
+  border-color: var(--tssc-border) !important;
+}
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.nk-sidebar.is-theme {
+  background: linear-gradient(180deg, var(--tssc-navy) 0%, #0E3357 100%) !important;
+  border-right: none;
+}
+
+.nk-sidebar.is-theme .nk-sidebar-head {
+  background: #ffffff !important;
+}
+
+.nk-sidebar.is-theme .nk-menu {
+  padding: 0 10px;
+}
+
+/* Section headings */
+.nk-sidebar.is-theme .nk-menu-heading-text {
+  color: var(--tssc-text-dim) !important;
+}
+.nk-sidebar.is-theme .nk-menu-heading-content {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+/* Base link */
+.nk-sidebar.is-theme .nk-menu-link {
+  color: var(--tssc-text) !important;
+  background: transparent !important;
+  border-left: 3px solid transparent;
+  border-radius: 6px;
+  padding: 9px 12px 9px 9px !important;
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: background .15s ease, color .15s ease;
+}
+.nk-sidebar.is-theme .nk-menu-link .nk-menu-icon em,
+.nk-sidebar.is-theme .nk-menu-link .nk-menu-icon .icon {
+  color: var(--tssc-orange) !important;
+  opacity: .9;
+}
+
+/* Hover */
+.nk-sidebar.is-theme .nk-menu-link:hover {
+  background: var(--tssc-navy-2) !important;
+  color: #ffffff !important;
+}
+.nk-sidebar.is-theme .nk-menu-link:hover .nk-menu-icon em {
+  color: var(--tssc-orange) !important;
+}
+
+/* Active / current page — single authoritative rule */
+.nk-sidebar.is-theme .nk-menu-item.current-page > .nk-menu-link,
+.nk-sidebar.is-theme .nk-menu-item.active > .nk-menu-link {
+  background: var(--tssc-navy-2) !important;
+  color: #ffffff !important;
+  border-left: 3px solid var(--tssc-orange) !important;
+  font-weight: 600;
+  box-shadow: none !important;
+}
+.nk-sidebar.is-theme .nk-menu-item.current-page > .nk-menu-link .nk-menu-icon em,
+.nk-sidebar.is-theme .nk-menu-item.active > .nk-menu-link .nk-menu-icon em {
+  color: var(--tssc-orange) !important;
+}
+
+/* Submenu */
+.nk-sidebar.is-theme .nk-menu-sub {
+  background: rgba(0, 0, 0, 0.16);
+  border-radius: 6px;
+  margin: 2px 0 6px 0;
+  padding: 4px 0;
+}
+.nk-sidebar.is-theme .nk-menu-sub .nk-menu-link {
+  color: var(--tssc-text-dim) !important;
+  padding: 7px 12px 7px 34px !important;
+  font-size: 13px;
+  border-left: none;
+}
+.nk-sidebar.is-theme .nk-menu-sub .nk-menu-link:hover {
+  color: #ffffff !important;
+  background: var(--tssc-navy-2) !important;
+}
+.nk-sidebar.is-theme .nk-menu-sub .nk-menu-item.active > .nk-menu-link {
+  color: var(--tssc-orange) !important;
+  background: transparent !important;
+}
+
+/* Kill the corrupted/mojibake pseudo-element character that the
+   old theme CSS injects before submenu links (shows as a broken
+   symbol like "â€º" or a stray glyph) */
+.nk-sidebar .nk-menu-sub .nk-menu-link::before,
+.nk-sidebar.is-theme .nk-menu-sub .nk-menu-link::before,
+.nk-sidebar .nk-menu-link::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* Toggle arrow — pure CSS chevron, no icon-font dependency.
+   Rendered as a flex item with margin-left:auto (the theme already
+   makes .nk-menu-link a flex container) so it always lands in the
+   right place, in every sidebar mode — no absolute-position guessing. */
+.nk-sidebar.is-theme .nk-menu-toggle {
+  display: flex !important;
+  align-items: center !important;
+}
+.nk-sidebar.is-theme .nk-menu-toggle::after {
+  content: "";
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  margin-left: auto;
+  border-right: 2px solid var(--tssc-text-dim);
+  border-bottom: 2px solid var(--tssc-text-dim);
+  transform: rotate(-45deg);
+  transition: transform .2s ease, border-color .2s ease;
+}
+.nk-sidebar.is-theme .nk-menu-item.active > .nk-menu-toggle::after {
+  transform: rotate(45deg);
+  border-color: var(--tssc-orange);
+}
+
+.nk-sidebar [data-simplebar] .simplebar-scrollbar::before {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.nk-header.is-light {
+  background: #ffffff !important;
+  border-bottom: 1px solid var(--tssc-border) !important;
+}
+.is-theme .nk-quick-nav-icon {
+  color: #ffffff !important;
+  background: var(--tssc-orange) !important;
+  border-radius: 50%;
+}
+.user-name { color: var(--tssc-navy) !important; }
+
+/* =========================================================
+   WELCOME HEADER
+   ========================================================= */
+
+h1.text-primary {
+  color: var(--tssc-navy) !important;
+}
+.text-warning {
+  color: #B7791F !important;
+}
+
+/* =========================================================
+   KPI STAT CARDS
+   ========================================================= */
+
+.card.card-stat {
+  border: 1px solid var(--tssc-border) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  position: relative;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.card.card-stat::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--tssc-border);
+}
+.card.card-stat:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(11, 42, 74, 0.08) !important;
+}
+
+.card.card-stat .stat-num {
+  color: var(--tssc-navy);
+  font-weight: 800;
+  font-size: 1.9rem;
+  line-height: 1.1;
+  margin: 6px 0 4px;
+}
+.card.card-stat .small.text-muted {
+  color: #64748B !important;
+  font-size: 13px;
+}
+
+/* Badge colors + matching top-accent per card */
+.card.card-stat .badge.bg-success-subtle {
+  background: var(--tssc-success-bg) !important;
+  color: var(--tssc-success) !important;
+}
+.card.card-stat:has(.bg-success-subtle)::before { background: var(--tssc-success); }
+
+.card.card-stat .badge.bg-warning-subtle {
+  background: var(--tssc-warning-bg) !important;
+  color: var(--tssc-warning) !important;
+}
+.card.card-stat:has(.bg-warning-subtle)::before { background: var(--tssc-warning); }
+
+.card.card-stat .badge.bg-primary-subtle {
+  background: var(--tssc-primary-bg) !important;
+  color: var(--tssc-primary) !important;
+}
+.card.card-stat:has(.bg-primary-subtle)::before { background: var(--tssc-orange); }
+
+.card.card-stat .badge.bg-danger-subtle {
+  background: var(--tssc-danger-bg) !important;
+  color: var(--tssc-danger) !important;
+}
+.card.card-stat:has(.bg-danger-subtle)::before { background: var(--tssc-danger); }
+
+.card.card-stat .badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  padding: 4px 12px;
+  border-radius: 30px;
+}
+
+/* =========================================================
+   RECENT REQUESTS + QUICK ACTIONS CARDS
+   ========================================================= */
+
+.nk-content .card.border-0.shadow-sm {
+  border: 1px solid var(--tssc-border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 10px rgba(11, 42, 74, 0.05) !important;
+}
+.nk-content h3.text-primary {
+  color: var(--tssc-navy) !important;
+  font-size: 15px;
+  letter-spacing: .2px;
+}
+
+/* Table */
+.table.table-sm thead th {
+  color: #8592A3 !important;
+  font-size: 11px;
+  letter-spacing: .5px;
+  border-bottom: 1px solid var(--tssc-border) !important;
+  padding-bottom: 10px;
+}
+.table.table-sm tbody td {
+  border-bottom: 1px solid var(--tssc-border);
+  padding: 12px 8px;
+  color: #334155;
+}
+.table.table-sm tbody td.text-center.text-muted {
+  color: #94A3B8 !important;
+}
+
+/* Quick Action buttons */
+.btn-outline-primary {
+  color: var(--tssc-navy) !important;
+  border: 1px solid #CBD8E6 !important;
+  background: #ffffff !important;
+  border-radius: 8px !important;
+  text-align: left;
+  padding: 6px 14px !important;
+  font-weight: 500;
+  font-size: 13.5px;
+  /* margin-bottom: 10px; */
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.btn-outline-primary .icon {
+  color: var(--tssc-orange) !important;
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background: var(--tssc-navy) !important;
+  border-color: var(--tssc-navy) !important;
+  color: #ffffff !important;
+}
+.btn-outline-primary:hover .icon {
+  color: var(--tssc-orange) !important;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.nk-footer {
+  background: #ffffff !important;
+  border-top: 1px solid var(--tssc-border) !important;
+}
+.nk-footer-copyright {
+  color: #8592A3 !important;
+  font-size: 13px;
 }
 
 
 
 
+/* =========================================================
+   PREMIUM MY ATTENDANCE UI
+   Paste this CSS AFTER your existing attendance CSS
+   ========================================================= */
+
+:root {
+    --att-primary: #0b3a63;
+    --att-primary-dark: #082d4d;
+    --att-orange: #f58220;
+    --att-text: #172b4d;
+    --att-muted: #718096;
+    --att-border: #e7edf4;
+    --att-bg: #f5f8fc;
+}
+
+
+/* =========================================================
+   PAGE BACKGROUND
+   ========================================================= */
+
+.nk-content {
+    background: var(--att-bg);
+}
+
+.nk-content-body {
+    color: var(--att-text);
+}
+
+
+/* =========================================================
+   PAGE HEADING
+   ========================================================= */
+
+.nk-block-head {
+    margin-bottom: 24px;
+}
+
+.nk-block-title.page-title {
+    font-size: 25px;
+    font-weight: 700;
+    color: var(--att-primary);
+    letter-spacing: -.3px;
+}
+
+.nk-block-des p {
+    color: #718096;
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+
+/* =========================================================
+   SUMMARY CARDS
+   ========================================================= */
+
+.row.g-gs.mb-4 {
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+.row.g-gs.mb-4 > [class*="col-"] {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.row.g-gs.mb-4 .card {
+    border: 1px solid var(--att-border);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 5px 18px rgba(24, 54, 85, .055);
+    transition: all .25s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.row.g-gs.mb-4 .card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--att-primary);
+    opacity: .9;
+}
+
+.row.g-gs.mb-4 .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(24, 54, 85, .10);
+}
+
+.row.g-gs.mb-4 .card-inner {
+    padding: 30px 20px;
+}
+
+.row.g-gs.mb-4 .text-soft {
+    color: #718096 !important;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.row.g-gs.mb-4 h3 {
+    color: var(--att-primary);
+    font-size: 27px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   SUMMARY ICONS
+   ========================================================= */
+
+.icon-circle {
+    width: 47px;
+    height: 47px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    box-shadow: 0 5px 12px rgba(0,0,0,.08);
+}
+
+.icon-circle.bg-success {
+    background: #16a765 !important;
+}
+
+.icon-circle.bg-danger {
+    background: #df3f3f !important;
+}
+
+.icon-circle.bg-warning {
+    background: #f58220 !important;
+}
+
+.icon-circle.bg-info {
+    background: #1498b8 !important;
+}
+
+
+/* =========================================================
+   MAIN CALENDAR CARD
+   ========================================================= */
+
+.attendance-calendar {
+    width: 100%;
+}
+
+.card.card-bordered {
+    border: 1px solid var(--att-border);
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 6px 25px rgba(25, 52, 80, .055);
+    overflow: hidden;
+}
+
+.card.card-bordered > .card-inner {
+    padding: 22px;
+}
+
+
+/* =========================================================
+   CALENDAR HEADER
+   ========================================================= */
+
+.attendance-calendar + * {
+    margin-top: 0;
+}
+
+.card-inner > .d-flex.justify-content-between.align-items-center.mb-4 {
+    min-height: 48px;
+    margin-bottom: 18px !important;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #edf1f6;
+}
+
+.card-inner > .d-flex.justify-content-between.align-items-center.mb-4 h5 {
+    color: var(--att-primary);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -.2px;
+}
+
+.card-inner > .d-flex.justify-content-between.align-items-center.mb-4 .btn {
+  /*  width: 38px; */
+    height: 38px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dce5ee;
+    border-radius: 9px;
+    color: var(--att-primary);
+    background: #fff;
+    transition: all .2s ease;
+}
+
+.card-inner > .d-flex.justify-content-between.align-items-center.mb-4 .btn:hover {
+    background: var(--att-primary);
+    color: #fff;
+    border-color: var(--att-primary);
+}
+
+
+/* =========================================================
+   LEGEND
+   ========================================================= */
+
+.card-inner > .d-flex.flex-wrap.gap-3.mb-4 {
+    gap: 18px !important;
+    padding: 3px 2px 16px;
+    margin-bottom: 15px !important;
+}
+
+.card-inner > .d-flex.flex-wrap.gap-3.mb-4 > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #66768a;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.attendance-dot {
+    width: 8px;
+    height: 8px;
+    min-width: 8px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(0,0,0,.025);
+}
+
+.attendance-dot.present {
+    background: #19a965;
+}
+
+.attendance-dot.missing {
+    background: #f58220;
+}
+
+.attendance-dot.absent {
+    background: #df3f3f;
+}
+
+.attendance-dot.leave {
+    background: #315f91;
+}
+
+.attendance-dot.holiday {
+    background: #e7a69d;
+}
+
+
+/* =========================================================
+   INFO ALERT
+   ========================================================= */
+
+.alert.alert-primary.alert-icon {
+    border: 1px solid #cfe1f3;
+    background: #eef6fd;
+    color: #24577f;
+    border-radius: 9px;
+    padding: 13px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: none;
+}
+
+.alert.alert-primary.alert-icon > .icon {
+    color: #1769aa;
+    font-size: 19px;
+    position: initial;
+}
+
+.alert.alert-primary.alert-icon strong {
+    color: #174c76;
+    font-weight: 650;
+}
+
+.alert.alert-primary.alert-icon span {
+    font-size: 12px;
+    color: #4c6b86;
+}
+
+
+/* =========================================================
+   CALENDAR WEEK HEADER
+   ========================================================= */
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    background: #f8fafc;
+    border: 1px solid #e5ebf2;
+    border-bottom: 0;
+    border-radius: 9px 9px 0 0;
+    overflow: hidden;
+}
+
+.calendar-header > div {
+    padding: 12px 8px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .45px;
+    color: #708197;
+    border-right: 1px solid #e5ebf2;
+}
+
+.calendar-header > div:last-child {
+    border-right: 0;
+}
+
+
+/* =========================================================
+   CALENDAR GRID
+   ========================================================= */
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    border-left: 1px solid #e5ebf2;
+    border-top: 1px solid #e5ebf2;
+    overflow: hidden;
+    border-radius: 0 0 9px 9px;
+}
+
+.calendar-day {
+    min-height: 118px;
+    padding: 12px;
+    background: #fff;
+    border-right: 1px solid #e5ebf2;
+    border-bottom: 1px solid #e5ebf2;
+    cursor: pointer;
+    position: relative;
+    transition: background .2s ease, box-shadow .2s ease;
+}
+
+.calendar-day:hover {
+    background: #f8fbfe;
+    box-shadow: inset 0 0 0 1px #d6e4f0;
+    z-index: 2;
+}
+
+.calendar-day.empty {
+    background: #f8fafc;
+    cursor: default;
+}
+
+.calendar-day.empty:hover {
+    background: #f8fafc;
+    box-shadow: none;
+}
+
+.day-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 27px;
+    height: 27px;
+    padding: 0 7px;
+    margin-bottom: 7px;
+    border-radius: 7px;
+    color: #40546d;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   TODAY
+   ========================================================= */
+
+.calendar-day.today {
+    box-shadow: inset 0 0 0 2px var(--att-orange);
+    background: #fffaf5;
+}
+
+.calendar-day.today .day-number {
+    background: var(--att-orange);
+    color: #fff;
+}
+
+
+/* =========================================================
+   ATTENDANCE STATUS BACKGROUNDS
+   ========================================================= */
+
+.calendar-day.present {
+    background: linear-gradient(
+        135deg,
+        rgba(25,169,101,.045),
+        rgba(25,169,101,.015)
+    );
+}
+
+.calendar-day.missing {
+    background: linear-gradient(
+        135deg,
+        rgba(245,130,32,.065),
+        rgba(245,130,32,.018)
+    );
+}
+
+.calendar-day.absent {
+    background: linear-gradient(
+        135deg,
+        rgba(223,63,63,.045),
+        rgba(223,63,63,.012)
+    );
+}
+
+.calendar-day.leave {
+    background: linear-gradient(
+        135deg,
+        rgba(49,95,145,.05),
+        rgba(49,95,145,.012)
+    );
+}
+
+
+/* =========================================================
+   DAY STATUS / TIME
+   ========================================================= */
+
+.day-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 650;
+    color: #52657b;
+    margin-bottom: 7px;
+}
+
+.day-time {
+    color: #8a98a9;
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   WEEKEND SUBTLE LOOK
+   ========================================================= */
+
+.calendar-header > div:first-child,
+.calendar-header > div:last-child {
+    color: #8a6470;
+}
+
+.calendar-grid .calendar-day:nth-child(7n+1),
+.calendar-grid .calendar-day:nth-child(7n) {
+    background-color: #fcfdff;
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+#attendanceModal .modal-content {
+    border: 0;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(17, 45, 75, .18);
+}
+
+#attendanceModal .modal-header {
+    padding: 18px 22px;
+    background: linear-gradient(
+        135deg,
+        var(--att-primary),
+        #124e7e
+    );
+    border: 0;
+}
+
+#attendanceModal .modal-title {
+    color: #fff !important;
+    font-size: 17px;
+    font-weight: 650;
+}
+
+a.btn.btn-outline-secondary.ms-2 {
+    padding: 6px 10px;
+}
+
+#attendanceModal .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: .8;
+}
+
+#attendanceModal .modal-body {
+    padding: 22px;
+}
+
+#modalDate {
+    color: var(--att-primary);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+#attendanceModal .border.rounded.p-3 {
+    border: 1px solid #e5ebf2 !important;
+    border-radius: 10px !important;
+    background: #f9fbfd;
+    transition: all .2s ease;
+}
+
+#attendanceModal .border.rounded.p-3:hover {
+    border-color: #cddce9 !important;
+    background: #f6faff;
+}
+
+#attendanceModal .text-soft {
+    color: #8090a3 !important;
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+#attendanceModal strong {
+    color: #213b57;
+    font-size: 14px;
+}
+
+#attendanceModal .modal-footer {
+    padding: 14px 22px;
+    background: #fafbfd;
+    border-top: 1px solid #edf1f5;
+}
+
+#attendanceModal .btn-primary {
+    background: var(--att-primary);
+    border-color: var(--att-primary);
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+#attendanceModal .btn-primary:hover {
+    background: var(--att-orange);
+    border-color: var(--att-orange);
+}
+
+#attendanceModal .btn-light {
+    border: 1px solid #dce4ec;
+    border-radius: 8px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+    .nk-block-title.page-title {
+        font-size: 22px;
+    }
+
+    .calendar-day {
+        min-height: 105px;
+    }
+
+    .card.card-bordered > .card-inner {
+        padding: 17px;
+    }
+}
+
+
+@media (max-width: 768px) {
+
+    .nk-block-head {
+        margin-bottom: 18px;
+    }
+
+    .nk-block-title.page-title {
+        font-size: 20px;
+    }
+
+    .row.g-gs.mb-4 .card-inner {
+        padding: 17px;
+    }
+
+    .row.g-gs.mb-4 h3 {
+        font-size: 23px;
+    }
+
+    .icon-circle {
+        width: 42px;
+        height: 42px;
+        font-size: 17px;
+    }
+
+    .calendar-day {
+        min-height: 85px;
+        padding: 8px;
+    }
+
+    .calendar-header > div {
+        padding: 10px 3px;
+        font-size: 9px;
+    }
+
+    .day-number {
+        min-width: 24px;
+        height: 24px;
+        font-size: 11px;
+    }
+
+    .day-status {
+        font-size: 9px;
+    }
+
+    .day-time {
+        font-size: 9px;
+    }
+
+    .card-inner > .d-flex.flex-wrap.gap-3.mb-4 {
+        gap: 10px 15px !important;
+    }
+}
+
+
+@media (max-width: 576px) {
+
+    .nk-content-body {
+        margin-top: 15px;
+    }
+
+    .nk-block-title.page-title {
+        font-size: 19px;
+    }
+
+    .nk-block-des p {
+        font-size: 12px;
+    }
+
+    .row.g-gs.mb-4 {
+        margin-left: -5px;
+        margin-right: -5px;
+    }
+
+    .row.g-gs.mb-4 > [class*="col-"] {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .row.g-gs.mb-4 .card-inner {
+        padding: 14px;
+    }
+
+    .row.g-gs.mb-4 .text-soft {
+        font-size: 11px;
+    }
+
+    .row.g-gs.mb-4 h3 {
+        font-size: 20px;
+    }
+
+    .icon-circle {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+
+    .card.card-bordered > .card-inner {
+        padding: 12px;
+    }
+
+    .card-inner > .d-flex.justify-content-between.align-items-center.mb-4 {
+        padding-bottom: 12px;
+        margin-bottom: 12px !important;
+    }
+
+    .card-inner > .d-flex.justify-content-between.align-items-center.mb-4 h5 {
+        font-size: 16px;
+    }
+
+    .card-inner > .d-flex.justify-content-between.align-items-center.mb-4 .btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .alert.alert-primary.alert-icon {
+        padding: 10px 11px;
+        gap: 8px;
+    }
+
+    .alert.alert-primary.alert-icon span {
+        font-size: 10px;
+    }
+
+    .calendar-day {
+        min-height: 62px;
+        padding: 5px;
+    }
+
+    .calendar-header > div {
+        padding: 8px 1px;
+        font-size: 8px;
+    }
+
+    .day-number {
+        min-width: 22px;
+        height: 22px;
+        padding: 0 5px;
+        font-size: 10px;
+        margin-bottom: 0;
+    }
+
+    .day-status,
+    .day-time {
+        display: none;
+    }
+
+    .card-inner > .d-flex.flex-wrap.gap-3.mb-4 > span {
+        font-size: 10px;
+    }
+
+    .attendance-dot {
+        width: 7px;
+        height: 7px;
+        min-width: 7px;
+    }
+}
+
+
+/* =========================================================
+   SMALL POLISH
+   ========================================================= */
+
+button,
+a,
+.calendar-day {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.calendar-day:focus-visible {
+    outline: 2px solid var(--att-orange);
+    outline-offset: -2px;
+}
+
+::selection {
+    background: #0b3a63;
+    color: #fff;
+}
+
+
+/* =========================================================
+   MARK ATTENDANCE - PREMIUM UI
+   Paste AFTER existing CSS
+   ========================================================= */
+
+:root {
+    --att-blue: #0b3a63;
+    --att-blue-dark: #082d4d;
+    --att-orange: #f58220;
+    --att-text: #17324d;
+    --att-muted: #71839a;
+    --att-border: #e2e9f1;
+    --att-bg: #f5f8fc;
+}
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.nk-content {
+    background: var(--att-bg);
+}
+
+.nk-block-lg {
+    margin-top: 10px;
+}
+
+.nk-block-lg > .card.card-preview {
+    border: 1px solid var(--att-border);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(18, 52, 82, .06);
+    overflow: hidden;
+}
+
+.nk-block-lg > .card.card-preview > .card-inner {
+    padding: 30px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.preview-block > .row > .col-12:first-child {
+    padding-bottom: 4px;
+}
+
+.preview-block h4.title {
+    color: var(--att-blue);
+    font-size: 27px;
+    font-weight: 700;
+    letter-spacing: -.4px;
+    margin: 0;
+}
+
+.preview-block h4.title::after {
+    content: "";
+    display: block;
+    width: 38px;
+    height: 3px;
+    margin-top: 8px;
+    border-radius: 10px;
+    background: var(--att-orange);
+}
+
+.preview-block .text-soft {
+    color: var(--att-muted) !important;
+}
+
+.preview-block h4.title + p {
+    font-size: 13px;
+    margin-top: 7px !important;
+}
+
+
+/* =========================================================
+   DATE BADGE
+   ========================================================= */
+
+.preview-block .badge.bg-light-primary {
+    background: #eef5fb !important;
+    color: var(--att-blue) !important;
+    border: 1px solid #d5e4f1;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+
+/* =========================================================
+   EMPLOYEE INFORMATION CARD
+   ========================================================= */
+
+.preview-block .card.border {
+    border: 1px solid var(--att-border) !important;
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(18, 52, 82, .04);
+    transition: all .2s ease;
+}
+
+.preview-block .card.border:hover {
+    box-shadow: 0 7px 22px rgba(18, 52, 82, .07);
+}
+
+.preview-block .card.border > .card-inner {
+    padding: 22px 24px;
+}
+
+
+/* =========================================================
+   FORM LABELS
+   ========================================================= */
+
+.preview-block .form-label {
+    color: #50667d;
+    font-size: 12px;
+    font-weight: 650;
+    margin-bottom: 8px;
+}
+
+
+/* =========================================================
+   READONLY INFORMATION BOXES
+   ========================================================= */
+
+.preview-block .form-control.bg-light {
+    min-height: 45px;
+    height: auto;
+    display: flex;
+    align-items: center;
+    border: 1px solid #e1e8f0;
+    border-radius: 7px;
+    background: #f4f7fb !important;
+    color: #334b64;
+    font-size: 13px;
+    box-shadow: none;
+}
+
+.preview-block .form-control.bg-light:hover {
+    background: #f1f6fa !important;
+}
+
+
+/* =========================================================
+   STATUS BADGE
+   ========================================================= */
+
+.preview-block .badge.bg-warning {
+    background: var(--att-orange) !important;
+    color: #fff !important;
+    border-radius: 5px;
+    padding: 5px 9px;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+
+/* =========================================================
+   CHECK-IN / CHECK-OUT CARDS
+   ========================================================= */
+
+.preview-block .col-md-6 > .card.border.h-100 {
+    position: relative;
+    height: 100%;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+    transition: all .25s ease;
+}
+
+.preview-block .col-md-6 > .card.border.h-100::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+}
+
+.preview-block .col-md-6:first-of-type > .card.border.h-100::before {
+    background: #16a765;
+}
+
+.preview-block .col-md-6:last-of-type > .card.border.h-100::before {
+    background: #e85b55;
+}
+
+.preview-block .col-md-6 > .card.border.h-100:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(18, 52, 82, .08);
+}
+
+
+/* =========================================================
+   CHECK CARD INNER
+   ========================================================= */
+
+.preview-block .col-md-6 > .card.border.h-100 > .card-inner {
+    padding: 24px 26px;
+}
+
+
+/* =========================================================
+   CHECK IN / OUT ICON
+   ========================================================= */
+
+.preview-block .icon-circle {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 5px 12px rgba(20, 50, 80, .08);
+}
+
+.preview-block .icon-circle.bg-light-success {
+    background: #e9f8f1 !important;
+    color: #16a765 !important;
+}
+
+.preview-block .icon-circle.bg-light-danger {
+    background: #fff0ef !important;
+    color: #e85b55 !important;
+}
+
+
+/* =========================================================
+   CHECK CARD TITLE
+   ========================================================= */
+
+.preview-block .icon-circle + div h5 {
+    color: var(--att-blue);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.preview-block .icon-circle + div small {
+    color: #7b8da2 !important;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   TIME FIELD
+   ========================================================= */
+
+.preview-block #checkInTime,
+.preview-block #checkOutTime {
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #e0e7ef;
+    border-radius: 8px;
+    background: #f5f8fb !important;
+    padding: 11px 14px;
+    color: #344b63;
+    font-size: 13px;
+}
+
+.preview-block #checkInTime .text-soft,
+.preview-block #checkOutTime .text-soft {
+    color: #8797a9 !important;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+#btnCheckIn,
+#btnCheckOut {
+    min-width: 120px;
+    min-height: 42px;
+    padding: 9px 18px;
+    border-radius: 7px;
+    border: 0;
+    font-size: 13px;
+    font-weight: 650;
+    letter-spacing: .1px;
+    transition: all .2s ease;
+}
+
+#btnCheckIn {
+    background: var(--att-blue) !important;
+    border-color: var(--att-blue) !important;
+    box-shadow: 0 5px 12px rgba(11, 58, 99, .15);
+}
+
+#btnCheckIn:hover {
+    background: var(--att-orange) !important;
+    border-color: var(--att-orange) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 7px 16px rgba(245, 130, 32, .20);
+}
+
+#btnCheckOut {
+    background: #e85b55 !important;
+    border-color: #e85b55 !important;
+    box-shadow: 0 5px 12px rgba(232, 91, 85, .12);
+}
+
+#btnCheckOut:not(:disabled):hover {
+    background: #d94d47 !important;
+    border-color: #d94d47 !important;
+    transform: translateY(-1px);
+}
+
+#btnCheckOut:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+
+/* =========================================================
+   LOCATION STATUS
+   ========================================================= */
+
+#locationInStatus,
+#locationOutStatus {
+    min-height: 17px;
+    color: #7b8da2 !important;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   LOADER
+   ========================================================= */
+
+.attendance-btn-loader {
+    width: 18px;
+    height: 18px;
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+    .nk-block-lg > .card.card-preview > .card-inner {
+        padding: 24px;
+    }
+
+    .preview-block h4.title {
+        font-size: 24px;
+    }
+
+    .preview-block .col-md-6 > .card.border.h-100 > .card-inner {
+        padding: 21px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .nk-block-lg {
+        margin-top: 5px;
+    }
+
+    .nk-block-lg > .card.card-preview {
+        border-radius: 12px;
+    }
+
+    .nk-block-lg > .card.card-preview > .card-inner {
+        padding: 18px;
+    }
+
+    .preview-block h4.title {
+        font-size: 21px;
+    }
+
+    .preview-block h4.title + p {
+        font-size: 12px;
+    }
+
+    .preview-block .badge.bg-light-primary {
+        padding: 7px 10px;
+        font-size: 10px;
+    }
+
+    .preview-block .card.border > .card-inner {
+        padding: 17px;
+    }
+
+    .preview-block .col-md-6 > .card.border.h-100 > .card-inner {
+        padding: 19px;
+    }
+
+    .preview-block .icon-circle {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        font-size: 17px;
+    }
+
+    .preview-block .icon-circle + div h5 {
+        font-size: 16px;
+    }
+
+    .preview-block .form-control.bg-light,
+    .preview-block #checkInTime,
+    .preview-block #checkOutTime {
+        min-height: 43px;
+        font-size: 12px;
+    }
+
+    #btnCheckIn,
+    #btnCheckOut {
+        min-height: 40px;
+        min-width: 110px;
+        font-size: 12px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    .nk-block-lg > .card.card-preview > .card-inner {
+        padding: 13px;
+    }
+
+    .preview-block h4.title {
+        font-size: 19px;
+    }
+
+    .preview-block .d-flex.align-items-center.justify-content-between {
+        align-items: flex-start !important;
+    }
+
+    .preview-block .badge.bg-light-primary {
+        margin-top: 2px;
+    }
+
+    .preview-block .card.border > .card-inner {
+        padding: 14px;
+    }
+
+    .preview-block .col-md-6 > .card.border.h-100 > .card-inner {
+        padding: 16px;
+    }
+
+    .preview-block .icon-circle {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        font-size: 15px;
+    }
+
+    .preview-block .icon-circle + div h5 {
+        font-size: 15px;
+    }
+
+    .preview-block .icon-circle + div small {
+        font-size: 10px;
+    }
+
+    .preview-block .form-label {
+        font-size: 11px;
+    }
+
+    #btnCheckIn,
+    #btnCheckOut {
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   FOCUS / SELECTION POLISH
+   ========================================================= */
+
+#btnCheckIn:focus,
+#btnCheckOut:focus {
+    box-shadow: 0 0 0 3px rgba(11, 58, 99, .12);
+}
+
+.preview-block .form-control:focus {
+    border-color: #b9cddd;
+    box-shadow: none;
+}
+
+::selection {
+    background: var(--att-blue);
+    color: #fff;
+}
+
+
+/* =========================================================
+   MY REGULARIZATIONS - PREMIUM UI
+   Paste after existing CSS
+   ========================================================= */
+
+:root {
+    --reg-blue: #0b3a63;
+    --reg-blue-2: #1464a5;
+    --reg-orange: #f58220;
+    --reg-text: #17324d;
+    --reg-muted: #71839a;
+    --reg-border: #e1e8f0;
+    --reg-bg: #f5f8fc;
+}
+
+
+/* =========================================================
+   PAGE BACKGROUND
+   ========================================================= */
+
+.nk-content {
+    background: var(--reg-bg);
+}
+
+.nk-block-head {
+    margin-bottom: 28px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.nk-block-title.page-title {
+    color: var(--reg-blue);
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -.35px;
+}
+
+.nk-block-des p {
+    color: var(--reg-muted);
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+
+/* =========================================================
+   REGULARIZE BUTTON
+   ========================================================= */
+
+.nk-block-tools .btn-primary {
+    border: 0;
+    border-radius: 8px;
+    background: var(--reg-blue) !important;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 650;
+    box-shadow: 0 5px 14px rgba(11, 58, 99, .16);
+    transition: all .2s ease;
+}
+
+.nk-block-tools .btn-primary:hover {
+    background: var(--reg-orange) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 7px 18px rgba(245, 130, 32, .20);
+}
+
+.nk-block-tools .btn-primary .icon {
+    font-size: 16px;
+    margin-right: 5px;
+}
+
+
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
+
+.nk-block .card.card-preview {
+    border: 1px solid var(--reg-border);
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 7px 26px rgba(20, 52, 82, .055);
+    overflow: hidden;
+}
+
+.nk-block .card-preview > .card-inner {
+    padding: 28px 30px;
+}
+
+
+/* =========================================================
+   STATUS TABS
+   ========================================================= */
+
+.nk-block .nav-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 25px !important;
+    padding: 0;
+    border-bottom: 1px solid #dfe6ee;
+}
+
+.nk-block .nav-tabs .nav-item {
+    margin-bottom: -1px;
+}
+
+.nk-block .nav-tabs .nav-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 13px 17px 14px;
+    border: 0 !important;
+    background: transparent !important;
+    color: #61758b;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all .2s ease;
+}
+
+.nk-block .nav-tabs .nav-link:hover {
+    color: var(--reg-blue);
+}
+
+.nk-block .nav-tabs .nav-link.active {
+    color: var(--reg-blue);
+}
+
+.nk-block .nav-tabs .nav-link.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    border-radius: 4px 4px 0 0;
+    background: var(--reg-orange);
+}
+
+.nk-block .nav-tabs .nav-link .icon {
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   PENDING / APPROVED / REJECTED COLORS
+   ========================================================= */
+
+.nk-block .nav-tabs .nav-item:nth-child(1) .nav-link.active {
+    color: #d97706;
+}
+
+.nk-block .nav-tabs .nav-item:nth-child(2) .nav-link.active {
+    color: #15915a;
+}
+
+.nk-block .nav-tabs .nav-item:nth-child(3) .nav-link.active {
+    color: #d94b4b;
+}
+
+
+/* =========================================================
+   DATATABLE TOP AREA
+   ========================================================= */
+
+.dt-container {
+    color: var(--reg-text);
+}
+
+.dt-container .row.justify-between {
+    margin-bottom: 5px;
+}
+
+
+/* Search */
+
+.dt-search {
+    position: relative;
+}
+
+.dt-search input.form-control {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 14px;
+    border: 1px solid #d8e1eb;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--reg-text);
+    font-size: 12px;
+    box-shadow: none;
+    transition: all .2s ease;
+}
+
+.dt-search input.form-control::placeholder {
+    color: #a1b0c1;
+}
+
+.dt-search input.form-control:focus {
+    border-color: #9dbbd3;
+    box-shadow: 0 0 0 3px rgba(11, 58, 99, .06);
+}
+
+
+/* =========================================================
+   EXPORT AREA
+   ========================================================= */
+
+.dt-export-buttons {
+    align-items: center;
+    gap: 10px;
+}
+
+.dt-export-title {
+    color: #60758b;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.dt-buttons {
+    border: 1px solid #d8e1eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.dt-buttons .btn {
+    min-width: 42px;
+    height: 42px;
+    padding: 8px 11px;
+    border: 0 !important;
+    border-right: 1px solid #d8e1eb !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    color: var(--reg-blue) !important;
+    font-size: 11px;
+    transition: all .2s ease;
+}
+
+.dt-buttons .btn:last-child {
+    border-right: 0 !important;
+}
+
+.dt-buttons .btn:hover {
+    background: #eef5fb !important;
+    color: var(--reg-orange) !important;
+}
+
+
+/* =========================================================
+   SHOW DROPDOWN
+   ========================================================= */
+
+.dt-length {
+    margin-left: 12px;
+}
+
+.dt-length label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #61758b;
+    font-size: 12px;
+}
+
+.dt-length .form-control-select {
+    position: relative;
+}
+
+.dt-length select {
+    min-width: 65px;
+    height: 42px;
+    border: 1px solid #d8e1eb;
+    border-radius: 8px;
+    background-color: #fff;
+    color: var(--reg-blue);
+    font-size: 12px;
+    box-shadow: none;
+}
+
+
+/* =========================================================
+   TABLE WRAPPER
+   ========================================================= */
+
+.datatable-wrap {
+    margin-top: 20px !important;
+    margin-bottom: 20px !important;
+    border: 1px solid #dce5ee;
+    border-radius: 9px;
+    overflow-x: auto;
+    background: #fff;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+#DataTables_Table_0 {
+    width: 100% !important;
+    margin: 0 !important;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+#DataTables_Table_0 thead th {
+    height: 66px;
+    padding: 12px 14px;
+    border: 0 !important;
+    border-right: 1px solid rgba(255,255,255,.15) !important;
+    background: var(--reg-blue-2) !important;
+    color: #fff !important;
+    font-size: 11px;
+    font-weight: 650;
+    line-height: 1.3;
+    vertical-align: middle;
+    white-space: normal;
+}
+
+#DataTables_Table_0 thead th:first-child {
+    border-radius: 8px 0 0 0;
+}
+
+#DataTables_Table_0 thead th:last-child {
+    border-right: 0 !important;
+    border-radius: 0 8px 0 0;
+}
+
+
+/* Sorting icon */
+
+#DataTables_Table_0 thead .dt-column-order {
+    opacity: .55;
+}
+
+#DataTables_Table_0 thead th.dt-ordering-asc .dt-column-order,
+#DataTables_Table_0 thead th.dt-ordering-desc .dt-column-order {
+    opacity: 1;
+}
+
+
+/* =========================================================
+   TABLE BODY
+   ========================================================= */
+
+#DataTables_Table_0 tbody td {
+    height: 54px;
+    padding: 11px 14px;
+    border-top: 1px solid #edf1f5 !important;
+    border-right: 1px solid #edf1f5 !important;
+    background: #fff;
+    color: #53677d;
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+#DataTables_Table_0 tbody tr:hover td {
+    background: #f8fbfe;
+}
+
+#DataTables_Table_0 tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+
+/* Empty state */
+
+#DataTables_Table_0 tbody td.dt-empty {
+    height: 66px;
+    padding: 20px;
+    text-align: left;
+    color: #6f8094;
+    font-size: 13px;
+    background: #fff;
+}
+
+
+/* =========================================================
+   STATUS BADGES INSIDE TABLE
+   ========================================================= */
+
+#DataTables_Table_0 .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 650;
+}
+
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+.dt-container .row.align-items-center {
+    margin-top: 8px;
+}
+
+.dt-paging .pagination {
+    display: inline-flex;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #dce5ee;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.dt-paging .page-item {
+    margin: 0 !important;
+}
+
+.dt-paging .page-link {
+    min-width: 50px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0 !important;
+    border-right: 1px solid #dce5ee !important;
+    border-radius: 0 !important;
+    background: #fff;
+    color: #536d87;
+    font-size: 12px;
+    transition: all .2s ease;
+}
+
+.dt-paging .page-item:last-child .page-link {
+    border-right: 0 !important;
+}
+
+.dt-paging .page-link:hover {
+    background: #eef5fb;
+    color: var(--reg-blue);
+}
+
+.dt-paging .page-item.disabled .page-link {
+    background: #fafbfd;
+    color: #b0bbc7;
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   TABLE INFO
+   ========================================================= */
+
+.dt-info {
+    color: #71839a;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   ORANGE BOTTOM ACCENT
+   ========================================================= */
+
+.nk-block .card-preview {
+    position: relative;
+}
+
+.nk-block .card-preview::after {
+    content: "";
+    display: block;
+    height: 5px;
+    width: calc(100% - 30px);
+    margin: 0 auto;
+    border-radius: 5px 5px 0 0;
+    background: var(--reg-orange);
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+    .nk-block-title.page-title {
+        font-size: 23px;
+    }
+
+    .nk-block .card-preview > .card-inner {
+        padding: 23px;
+    }
+
+    #DataTables_Table_0 {
+        min-width: 1050px;
+    }
+
+    .datatable-wrap {
+        overflow-x: auto;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .nk-block-head {
+        margin-bottom: 20px;
+    }
+
+    .nk-block-between {
+        gap: 15px;
+    }
+
+    .nk-block-title.page-title {
+        font-size: 20px;
+    }
+
+    .nk-block-des p {
+        font-size: 12px;
+    }
+
+    .nk-block-tools .btn-primary {
+        font-size: 11px;
+    }
+
+    .nk-block .card-preview > .card-inner {
+        padding: 16px;
+    }
+
+    .nk-block .nav-tabs {
+        gap: 2px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+
+    .nk-block .nav-tabs .nav-link {
+        padding: 11px 12px 12px;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    .dt-container .row.justify-between {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .dt-container .col-7,
+    .dt-container .col-5 {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .dt-container .text-end {
+        text-align: left !important;
+    }
+
+    .datatable-filter > .d-flex {
+        justify-content: flex-start !important;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .dt-export-buttons {
+        width: 100%;
+    }
+
+    .dt-buttons {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .dt-buttons .btn {
+        min-width: 38px;
+        height: 38px;
+        padding: 6px 9px;
+    }
+
+    .dt-length {
+        margin-left: 0;
+    }
+
+    .datatable-wrap {
+        margin-top: 15px !important;
+    }
+
+    #DataTables_Table_0 {
+        min-width: 1000px;
+    }
+
+    .dt-paging .page-link {
+        min-width: 45px;
+        height: 38px;
+    }
+
+    .nk-block .card-preview::after {
+        width: calc(100% - 20px);
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    .nk-block .card-preview > .card-inner {
+        padding: 13px;
+    }
+
+    .nk-block-title.page-title {
+        font-size: 19px;
+    }
+
+    .nk-block-tools .btn-primary span {
+        display: none;
+    }
+
+    .nk-block-tools .btn-primary {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        justify-content: center;
+    }
+
+    .nk-block-tools .btn-primary .icon {
+        margin: 0;
+        font-size: 16px;
+    }
+
+    .nk-block .nav-tabs .nav-link {
+        padding-left: 9px;
+        padding-right: 9px;
+    }
+
+    .dt-search input.form-control {
+        min-height: 40px;
+    }
+
+    .dt-export-title {
+        display: none;
+    }
+
+    .dt-buttons .btn {
+        min-width: 36px;
+    }
+
+    .dt-length select {
+        height: 38px;
+    }
+}
+
+
+
+/* =========================================================
+   APPLY OD - PREMIUM TSSC UI
+   Paste after existing CSS
+   ========================================================= */
+
+:root {
+    --od-blue: #0b3a63;
+    --od-blue-light: #1464a5;
+    --od-orange: #f58220;
+    --od-text: #17324d;
+    --od-muted: #71839a;
+    --od-border: #dfe7ef;
+    --od-bg: #f5f8fc;
+}
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.nk-content {
+    background: var(--od-bg);
+}
+
+.nk-content-body {
+    padding-bottom: 35px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.nk-block-head-sm {
+    margin-bottom: 27px;
+}
+
+.nk-block-title.page-title {
+    position: relative;
+    display: inline-block;
+    color: var(--od-blue);
+    font-size: 27px;
+    font-weight: 700;
+    letter-spacing: -.4px;
+    margin-bottom: 5px;
+}
+
+.nk-block-title.page-title::after {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 3px;
+    margin-top: 8px;
+    border-radius: 5px;
+    background: var(--od-orange);
+}
+
+.nk-block-des.text-soft p {
+    margin: 7px 0 0;
+    color: var(--od-muted) !important;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   MAIN FORM CARD
+   ========================================================= */
+
+.nk-block > .card.card-preview {
+    position: relative;
+    border: 1px solid var(--od-border);
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(18, 52, 82, .06);
+    overflow: hidden;
+}
+
+.nk-block > .card.card-preview::after {
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 0;
+    height: 4px;
+    border-radius: 5px 5px 0 0;
+    background: var(--od-orange);
+}
+
+.nk-block > .card.card-preview > .card-inner {
+    padding: 30px;
+}
+
+
+/* =========================================================
+   FORM ROW
+   ========================================================= */
+
+.nk-block form .row.g-4 {
+    row-gap: 25px !important;
+}
+
+
+/* =========================================================
+   LABELS
+   ========================================================= */
+
+.nk-block form .form-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--od-text);
+    font-size: 12px;
+    font-weight: 650;
+}
+
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+.nk-block form .form-control,
+.nk-block form .form-select {
+    border: 1px solid #d7e1eb;
+    border-radius: 7px;
+    background-color: #fff;
+    color: #344d66;
+    font-size: 13px;
+    box-shadow: none;
+    transition: all .2s ease;
+}
+
+
+/* Placeholder */
+
+.nk-block form .form-control::placeholder {
+    color: #a4b4c8;
+    opacity: 1;
+}
+
+
+/* Focus */
+
+.nk-block form .form-control:focus,
+.nk-block form .form-select:focus {
+    border-color: #8eafc9;
+    box-shadow: 0 0 0 3px rgba(11, 58, 99, .07);
+/*    background: #fff;*/
+}
+
+
+/* Hover */
+
+.nk-block form .form-control:hover,
+.nk-block form .form-select:hover {
+    border-color: #b8c9d9;
+}
+
+
+/* =========================================================
+   DATE INPUT
+   ========================================================= */
+
+.nk-block form input[type="date"],
+.nk-block form input[type="datetime-local"] {
+    color-scheme: light;
+}
+
+.nk-block form input[type="date"]::-webkit-calendar-picker-indicator,
+.nk-block form input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: .75;
+}
+
+
+/* =========================================================
+   SELECT
+   ========================================================= */
+
+.nk-block form .form-select {
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   TEXTAREA
+   ========================================================= */
+
+.nk-block form textarea.form-control {
+    min-height: 145px;
+    resize: vertical;
+    line-height: 1.6;
+    padding-top: 12px;
+}
+
+
+/* =========================================================
+   FILE UPLOAD
+   ========================================================= */
+/* 
+.nk-block form input[type="file"] {
+    padding: 6px;
+    cursor: pointer;
+} */
+
+.nk-block form input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 5px;
+    background: #eef4f9;
+    color: var(--od-blue);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.nk-block form input[type="file"]::file-selector-button:hover {
+    background: var(--od-blue);
+    color: #fff;
+}
+
+.nk-block form .text-muted {
+    display: block;
+    margin-top: 7px;
+    color: #8495a8 !important;
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   VALIDATION MESSAGE
+   ========================================================= */
+/*commment by laxmi*/
+/*.nk-block form .text-danger {
+    display: block;
+    margin-top: 5px;
+    font-size: 11px;
+    color: #d9534f !important;
+}*/
+
+
+/* =========================================================
+   PARTIAL DAY TIME FIELDS
+   ========================================================= */
+
+#fromTimeContainer,
+#toTimeContainer {
+    animation: odFieldShow .2s ease;
+}
+
+@keyframes odFieldShow {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* =========================================================
+   BUTTON AREA
+   ========================================================= */
+
+.nk-block form .mt-4 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 5px;
+    border-top: 1px solid #edf1f5;
+}
+
+
+/* =========================================================
+   SUBMIT BUTTON
+   ========================================================= */
+
+.nk-block form .btn-primary {
+
+    border: 0;
+    border-radius: 7px;
+    background: var(--od-blue) !important;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 650;
+    box-shadow: 0 5px 13px rgba(11, 58, 99, .15);
+    transition: all .2s ease;
+}
+
+.nk-block form .btn-primary:hover {
+    background: var(--od-orange) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 7px 17px rgba(245, 130, 32, .18);
+}
+
+.nk-block form .btn-primary .icon {
+    margin-right: 5px;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   CANCEL BUTTON
+   ========================================================= */
+
+.nk-block form .btn-light {
+    border: 1px solid #d8e1ea;
+    border-radius: 7px;
+    background: #fff !important;
+    color: #5e7389;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all .2s ease;
+}
+
+/* .nk-block form .btn-light:hover {
+    border-color: #b8c9d9;
+    background: #f4f7fa !important;
+    color: var(--od-blue);
+} */
+
+
+/* =========================================================
+   REQUIRED / INVALID FIELDS
+   ========================================================= */
+
+.nk-block form .input-validation-error,
+.nk-block form .form-control.is-invalid,
+.nk-block form .form-select.is-invalid {
+    border-color: #e26a64;
+}
+
+.nk-block form .input-validation-error:focus,
+.nk-block form .form-control.is-invalid:focus,
+.nk-block form .form-select.is-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(226, 106, 100, .08);
+}
+
+
+/* =========================================================
+   MOBILE / TABLET
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+    .nk-block-title.page-title {
+        font-size: 24px;
+    }
+
+    .nk-block > .card.card-preview > .card-inner {
+        padding: 24px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .nk-block-head-sm {
+        margin-bottom: 20px;
+    }
+
+    .nk-block-title.page-title {
+        font-size: 21px;
+    }
+
+    .nk-block-des.text-soft p {
+        font-size: 12px;
+    }
+
+    .nk-block > .card.card-preview {
+        border-radius: 12px;
+    }
+
+    .nk-block > .card.card-preview > .card-inner {
+        padding: 18px;
+    }
+
+    .nk-block form .row.g-4 {
+        row-gap: 18px !important;
+    }
+
+    .nk-block form .form-control,
+    .nk-block form .form-select {
+               font-size: 12px;
+    }
+
+    .nk-block form textarea.form-control {
+        min-height: 125px;
+    }
+
+    .nk-block form .mt-4 {
+        flex-wrap: wrap;
+    }
+
+    
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    .nk-block > .card.card-preview > .card-inner {
+        padding: 14px;
+    }
+
+    .nk-block-title.page-title {
+        font-size: 19px;
+    }
+
+    .nk-block form .form-label {
+        font-size: 11px;
+    }
+
+
+    .nk-block form textarea.form-control {
+        min-height: 115px;
+    }
+
+    .nk-block form .mt-4 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .nk-block form .btn-primary,
+    .nk-block form .btn-light {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+
+/* =========================================================
+   APPLY LEAVE - TSSC PREMIUM UI
+   ========================================================= */
+
+:root {
+    --leave-primary: #0b3558;
+    --leave-primary-hover: #124d7d;
+    --leave-orange: #f58220;
+    --leave-text: #17324d;
+    --leave-muted: #71839a;
+    --leave-border: #dce5ee;
+    --leave-bg: #f5f8fc;
+}
+
+
+/* =========================================================
+   PAGE BACKGROUND
+   ========================================================= */
+
+.nk-content {
+    background: var(--leave-bg);
+}
+
+.nk-content-body {
+    padding-bottom: 35px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.nk-block-head {
+    margin-bottom: 28px;
+}
+
+.nk-block-head .nk-block-between {
+    align-items: center;
+}
+
+.nk-block-title.page-title {
+    position: relative;
+    display: inline-block;
+    margin: 0;
+    color: var(--leave-primary);
+    font-size: 27px;
+    font-weight: 700;
+    letter-spacing: -.4px;
+}
+
+.nk-block-title.page-title::after {
+    content: "";
+    display: block;
+    width: 42px;
+    height: 3px;
+    margin-top: 8px;
+    border-radius: 10px;
+    background: var(--leave-orange);
+}
+
+
+/* =========================================================
+   MY LEAVE REQUESTS BUTTON
+   ========================================================= */
+
+.nk-block-head .btn-primary {
+    
+    border: 0;
+    border-radius: 7px;
+    background: var(--leave-primary) !important;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 650;
+    box-shadow: 0 5px 14px rgba(11, 53, 88, .14);
+    transition: all .2s ease;
+}
+
+.nk-block-head .btn-primary:hover {
+    background: var(--leave-orange) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 7px 17px rgba(245, 130, 32, .18);
+}
+
+.nk-block-head .btn-primary .icon {
+    margin-right: 6px;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   MAIN FORM CARD
+   ========================================================= */
+
+.nk-block > .card.card-bordered {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--leave-border) !important;
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(18, 52, 82, .06);
+}
+
+.nk-block > .card.card-bordered::after {
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 0;
+    height: 4px;
+    border-radius: 5px 5px 0 0;
+    background: var(--leave-orange);
+}
+
+.nk-block > .card.card-bordered > .card-inner {
+    padding: 29px 30px 27px;
+}
+
+
+/* =========================================================
+   FORM ROW
+   ========================================================= */
+
+.nk-block form .row.g-4 {
+    row-gap: 23px !important;
+}
+
+
+/* =========================================================
+   FORM LABEL
+   ========================================================= */
+
+.nk-block form .form-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--leave-text);
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.nk-block form .form-label .text-danger {
+    color: #e55353 !important;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   INPUTS / SELECT
+   ========================================================= */
+
+.nk-block form .form-control,
+.nk-block form .form-select {
+       border: 1px solid #d7e1eb;
+    border-radius: 7px;
+   /* background: #fff;*/
+    color: #334d66;
+    font-size: 12px;
+    box-shadow: none;
+    transition: all .2s ease;
+}
+
+
+/* Readonly employee information */
+
+.nk-block form input[readonly],
+.nk-block form input[disabled] {
+    background: #f3f6fa !important;
+    border-color: #dce4ed;
+    color: #50677e;
+    cursor: default;
+}
+
+
+/* Placeholder */
+
+.nk-block form .form-control::placeholder {
+    color: #a9b9ca;
+    opacity: 1;
+}
+
+
+/* Focus */
+
+.nk-block form .form-control:focus,
+.nk-block form .form-select:focus {
+    border-color: #8eafc9;
+/*    background: #fff;*/
+    box-shadow: 0 0 0 3px rgba(11, 53, 88, .07);
+}
+
+
+/* Hover */
+
+.nk-block form .form-control:hover,
+.nk-block form .form-select:hover {
+    border-color: #b8c9d8;
+}
+
+
+/* =========================================================
+   SELECT
+   ========================================================= */
+
+.nk-block form .form-select {
+    padding-left: 13px;
+    padding-right: 38px;
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   DATE INPUT
+   ========================================================= */
+
+.nk-block form input[type="date"] {
+    color-scheme: light;
+}
+
+.nk-block form input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: .75;
+}
+
+
+/* =========================================================
+   TOTAL DAYS
+   ========================================================= */
+
+#TotalDays {
+    background: #f4f7fa !important;
+    color: var(--leave-primary);
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   TEXTAREA
+   ========================================================= */
+
+.nk-block form textarea.form-control {
+    min-height: 122px;
+    padding: 12px 13px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   FILE UPLOAD
+   ========================================================= */
+
+.nk-block form input[type="file"] {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.nk-block form input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 5px;
+    background: #edf3f8;
+    color: var(--leave-primary);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.nk-block form input[type="file"]::file-selector-button:hover {
+    background: var(--leave-primary);
+    color: #fff;
+}
+
+.nk-block form .text-muted {
+    display: block;
+    margin-top: 6px;
+    color: #8093a8 !important;
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   VALIDATION
+   ========================================================= */
+
+.nk-block form .text-danger.field-validation-valid {
+    display: block;
+    min-height: 0;
+    margin-top: 5px;
+    font-size: 11px;
+}
+
+.nk-block form .input-validation-error,
+.nk-block form .form-control.is-invalid,
+.nk-block form .form-select.is-invalid {
+    border-color: #df6b67;
+}
+
+.nk-block form .input-validation-error:focus,
+.nk-block form .form-control.is-invalid:focus,
+.nk-block form .form-select.is-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(223, 107, 103, .08);
+}
+
+
+/* =========================================================
+   DIVIDER
+   ========================================================= */
+
+.nk-block form hr {
+    margin: 26px 0 17px;
+    border: 0;
+    border-top: 1px solid #e8edf2;
+    opacity: 1;
+}
+
+
+/* =========================================================
+   BUTTON AREA
+   ========================================================= */
+
+.nk-block form > .text-end {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+
+/* =========================================================
+   SUBMIT BUTTON
+   ========================================================= */
+
+.nk-block form .btn-primary {
+
+    border: 0;
+    border-radius: 7px;
+    background: var(--leave-primary) !important;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 650;
+    box-shadow: 0 5px 13px rgba(11, 53, 88, .14);
+    transition: all .2s ease;
+}
+
+.nk-block form .btn-primary:hover {
+    background: var(--leave-orange) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 7px 17px rgba(245, 130, 32, .18);
+}
+
+.nk-block form .btn-primary .icon {
+    margin-right: 5px;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   CANCEL BUTTON
+   ========================================================= */
+
+.nk-block form .btn-light {
+    border: 1px solid #d9e2eb;
+    border-radius: 7px;
+    background: #eef2f7 !important;
+    color: #3f5870;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all .2s ease;
+}
+
+/* .nk-block form .btn-light:hover {
+    border-color: #c3cfdb;
+    background: #e5ebf2 !important;
+    color: var(--leave-primary);
+} */
+
+
+/* =========================================================
+   MOBILE / TABLET
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+    .nk-block-title.page-title {
+        font-size: 24px;
+    }
+
+    .nk-block > .card.card-bordered > .card-inner {
+        padding: 24px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .nk-block-head {
+        margin-bottom: 20px;
+    }
+
+    .nk-block-head .nk-block-between {
+        gap: 15px;
+    }
+
+    .nk-block-title.page-title {
+        font-size: 21px;
+    }
+
+    
+
+    .nk-block > .card.card-bordered {
+        border-radius: 12px;
+    }
+
+    .nk-block > .card.card-bordered > .card-inner {
+        padding: 18px;
+    }
+
+    .nk-block form .row.g-4 {
+        row-gap: 18px !important;
+    }
+
+    .nk-block form .form-control,
+    .nk-block form .form-select {
+                font-size: 12px;
+    }
+
+    .nk-block form textarea.form-control {
+        min-height: 115px;
+    }
+
+    .nk-block form > .text-end {
+        justify-content: stretch;
+    }
+
+    .nk-block form > .text-end .btn {
+        flex: 1;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    .nk-block-head .nk-block-between {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nk-block-head .nk-block-head-content:last-child {
+        width: 100%;
+    }
+
+    .nk-block-head .nk-block-head-content:last-child .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .nk-block-title.page-title {
+        font-size: 20px;
+    }
+
+    .nk-block > .card.card-bordered > .card-inner {
+        padding: 14px;
+    }
+
+    .nk-block form .form-label {
+        font-size: 11px;
+    }
+
+ 
+
+    .nk-block form textarea.form-control {
+        min-height: 105px;
+    }
+
+    .nk-block form > .text-end {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .nk-block form > .text-end .btn {
+        width: 100%;
+    }
+}
+
+
+
+/* =========================================================
+   MY LEAVE REQUESTS - TSSC PREMIUM UI
+   ========================================================= */
+
+:root {
+    --leave-primary: #0b3558;
+    --leave-blue: #1263a3;
+    --leave-orange: #f58220;
+    --leave-text: #17324d;
+    --leave-muted: #71839a;
+    --leave-border: #dce5ee;
+    --leave-bg: #f5f8fc;
+}
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.nk-content {
+    background: var(--leave-bg);
+}
+
+.nk-content-body {
+    padding-bottom: 35px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.nk-block-head-sm {
+    margin-bottom: 26px;
+}
+
+.nk-block-head .nk-block-between {
+    align-items: center;
+}
+
+.nk-block-title.page-title {
+    position: relative;
+    display: inline-block;
+    margin: 0;
+    color: var(--leave-primary);
+    font-size: 27px;
+    font-weight: 700;
+    letter-spacing: -.4px;
+}
+
+.nk-block-title.page-title::after {
+    content: "";
+    display: block;
+    width: 42px;
+    height: 3px;
+    margin-top: 8px;
+    border-radius: 10px;
+    background: var(--leave-orange);
+}
+
+
+/* =========================================================
+   APPLY LEAVE BUTTON
+   ========================================================= */
+
+.nk-block-head .btn-primary {
+    border: 0;
+    border-radius: 7px;
+    background: var(--leave-primary) !important;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 650;
+    box-shadow: 0 5px 14px rgba(11, 53, 88, .14);
+    transition: all .2s ease;
+}
+
+.nk-block-head .btn-primary:hover {
+    background: var(--leave-orange) !important;
+    transform: translateY(-1px);
+}
+
+.nk-block-head .btn-primary .icon {
+    margin-right: 5px;
+}
+
+
+.nk-block-head-between {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
+
+.nk-block > .card.card-preview {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--leave-border) !important;
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(18, 52, 82, .06);
+}
+
+.nk-block > .card.card-preview::after {
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 0;
+    height: 4px;
+    border-radius: 5px 5px 0 0;
+    background: var(--leave-orange);
+}
+
+.nk-block > .card.card-preview > .card-inner {
+    padding: 27px 30px 25px;
+}
+
+
+/* =========================================================
+   DATATABLE TOP AREA
+   ========================================================= */
+
+#DataTables_Table_0_wrapper {
+    color: var(--leave-text);
+}
+
+
+/* Search + Export wrapper */
+
+#DataTables_Table_0_wrapper .with-export {
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+#DataTables_Table_0_wrapper .dt-search {
+    position: relative;
+}
+
+#DataTables_Table_0_wrapper .dt-search input {
+    width: 100%;
+    min-width: 260px;
+    height: 42px;
+    padding: 9px 13px;
+    border: 1px solid #d7e1eb !important;
+    border-radius: 7px !important;
+    background: #fff;
+    color: #334d66;
+    font-size: 12px;
+    outline: none;
+    box-shadow: none !important;
+    transition: all .2s ease;
+}
+
+#DataTables_Table_0_wrapper .dt-search input::placeholder {
+    color: #a3b4c7;
+}
+
+#DataTables_Table_0_wrapper .dt-search input:focus {
+    border-color: #8eafc9 !important;
+    box-shadow: 0 0 0 3px rgba(11, 53, 88, .07) !important;
+}
+
+
+/* =========================================================
+   EXPORT AREA
+   ========================================================= */
+
+#DataTables_Table_0_wrapper .datatable-filter {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+#DataTables_Table_0_wrapper .dt-export-buttons {
+    align-items: center;
+}
+
+#DataTables_Table_0_wrapper .dt-export-title {
+    margin-right: 10px;
+    color: var(--leave-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+#DataTables_Table_0_wrapper .dt-buttons {
+    display: flex;
+    overflow: hidden;
+    border: 1px solid #d8e2eb;
+    border-radius: 7px;
+}
+
+
+/* Export buttons */
+
+#DataTables_Table_0_wrapper .dt-buttons .btn {
+    min-width: 42px;
+    height: 40px;
+    padding: 7px 11px;
+    border: 0 !important;
+    border-right: 1px solid #d8e2eb !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    color: #587089 !important;
+    font-size: 11px;
+    box-shadow: none !important;
+    transition: all .2s ease;
+}
+
+#DataTables_Table_0_wrapper .dt-buttons .btn:last-child {
+    border-right: 0 !important;
+}
+
+#DataTables_Table_0_wrapper .dt-buttons .btn:hover {
+    background: #edf4f9 !important;
+    color: var(--leave-primary) !important;
+}
+
+
+/* =========================================================
+   SHOW DROPDOWN
+   ========================================================= */
+
+#DataTables_Table_0_wrapper .dt-length {
+    margin-left: 12px;
+}
+
+#DataTables_Table_0_wrapper .dt-length label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0;
+    color: var(--leave-muted);
+    font-size: 12px;
+}
+
+#DataTables_Table_0_wrapper .form-control-select {
+    display: inline-block;
+}
+
+#DataTables_Table_0_wrapper .dt-length select {
+    width: 65px;
+    height: 40px;
+    padding: 5px 25px 5px 10px;
+    border: 1px solid #d8e2eb;
+    border-radius: 7px;
+    background-color: #fff;
+    color: var(--leave-text);
+    font-size: 12px;
+    box-shadow: none;
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   TABLE WRAPPER
+   ========================================================= */
+
+#DataTables_Table_0_wrapper .datatable-wrap {
+    margin-top: 5px !important;
+    margin-bottom: 18px !important;
+    overflow-x: auto;
+    border: 1px solid #dbe4ec;
+    border-radius: 8px;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+#DataTables_Table_0 {
+    width: 100% !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+#DataTables_Table_0 thead th {
+    height: 52px;
+    padding: 11px 13px !important;
+    border: 0 !important;
+    border-right: 1px solid rgba(255,255,255,.16) !important;
+    background: var(--leave-blue) !important;
+    color: #fff !important;
+    font-size: 11px;
+    font-weight: 650;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+#DataTables_Table_0 thead th:first-child {
+    border-radius: 7px 0 0 0;
+}
+
+#DataTables_Table_0 thead th:last-child {
+    border-right: 0 !important;
+    border-radius: 0 7px 0 0;
+}
+
+
+/* DataTable sorting arrows */
+
+#DataTables_Table_0 thead .dt-column-order {
+    opacity: .55;
+}
+
+#DataTables_Table_0 thead th.dt-ordering-asc,
+#DataTables_Table_0 thead th.dt-ordering-desc {
+    background: #0e5892 !important;
+}
+
+
+/* =========================================================
+   TABLE BODY
+   ========================================================= */
+
+#DataTables_Table_0 tbody td {
+    padding: 13px !important;
+    border-top: 1px solid #e8edf2 !important;
+    border-right: 1px solid #edf1f5 !important;
+    color: #526a80;
+    background: #fff;
+    font-size: 11px;
+    vertical-align: middle;
+}
+
+#DataTables_Table_0 tbody tr {
+    transition: background .15s ease;
+}
+
+#DataTables_Table_0 tbody tr:hover td {
+    background: #f7fafc;
+}
+
+#DataTables_Table_0 tbody td:last-child {
+    border-right: 0 !important;
+}
+
+
+/* Empty table */
+
+#DataTables_Table_0 tbody .dt-empty {
+    height: 100px;
+    padding: 30px !important;
+    text-align: center;
+    color: #91a1b1;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   STATUS BADGES
+   ========================================================= */
+
+#DataTables_Table_0 .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 72px;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 650;
+}
+
+
+/* Pending */
+
+#DataTables_Table_0 .bg-warning {
+    background: #fff3df !important;
+    color: #d77b00 !important;
+}
+
+
+/* Approved */
+
+#DataTables_Table_0 .bg-success {
+    background: #e7f7ee !important;
+    color: #159451 !important;
+}
+
+
+/* Rejected */
+
+#DataTables_Table_0 .bg-danger {
+    background: #fdebea !important;
+    color: #d94d48 !important;
+}
+
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+#DataTables_Table_0 tbody .btn {
+    min-height: 32px;
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+#DataTables_Table_0 tbody .btn-primary {
+    background: var(--leave-primary) !important;
+    border-color: var(--leave-primary) !important;
+}
+
+#DataTables_Table_0 tbody .btn-primary:hover {
+    background: var(--leave-orange) !important;
+    border-color: var(--leave-orange) !important;
+}
+
+#DataTables_Table_0 tbody .btn-danger {
+    background: #fff;
+    border-color: #e4b9b7;
+    color: #cf504b;
+}
+
+#DataTables_Table_0 tbody .btn-danger:hover {
+    background: #fdebea;
+}
+
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+#DataTables_Table_0_wrapper .dt-paging {
+    margin-top: 3px;
+text-align: left;
+}
+
+#DataTables_Table_0_wrapper .pagination {
+    margin: 0;
+    gap: 0;
+}
+
+#DataTables_Table_0_wrapper .pagination .page-item {
+    margin: 0;
+}
+
+#DataTables_Table_0_wrapper .pagination .page-link {
+    min-width: 45px;
+    height: 37px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d9e3ec !important;
+    background: #fff !important;
+    color: #55708a !important;
+    font-size: 11px;
+    box-shadow: none !important;
+}
+
+#DataTables_Table_0_wrapper .pagination .page-item:first-child .page-link {
+    border-radius: 6px 0 0 6px;
+}
+
+#DataTables_Table_0_wrapper .pagination .page-item:last-child .page-link {
+    border-radius: 0 6px 6px 0;
+}
+
+#DataTables_Table_0_wrapper .pagination .page-link:hover {
+    background: #edf4f9 !important;
+    color: var(--leave-primary) !important;
+}
+
+#DataTables_Table_0_wrapper .pagination .disabled .page-link {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   DATATABLE INFO
+   ========================================================= */
+
+#DataTables_Table_0_wrapper .dt-info {
+    color: #7b8da0;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+    .nk-block-title.page-title {
+        font-size: 24px;
+    }
+
+    .nk-block > .card.card-preview > .card-inner {
+        padding: 23px;
+    }
+
+    #DataTables_Table_0_wrapper .with-export {
+        row-gap: 12px;
+    }
+
+    #DataTables_Table_0_wrapper .dt-search input {
+        min-width: 220px;
+    }
+}
+
+
+@media (max-width: 767px) {
+
+    .nk-block-head-sm {
+        margin-bottom: 20px;
+    }
+
+    .nk-block-title.page-title {
+        font-size: 21px;
+    }
+
+    .nk-block > .card.card-preview {
+        border-radius: 12px;
+    }
+
+    .nk-block > .card.card-preview > .card-inner {
+        padding: 17px;
+    }
+
+    #DataTables_Table_0_wrapper .with-export {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+
+    #DataTables_Table_0_wrapper .with-export > .col-7,
+    #DataTables_Table_0_wrapper .with-export > .col-5 {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    #DataTables_Table_0_wrapper .dt-search input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    #DataTables_Table_0_wrapper .col-5.text-end {
+        text-align: left !important;
+    }
+
+    #DataTables_Table_0_wrapper .datatable-filter {
+        width: 100%;
+    }
+
+    #DataTables_Table_0_wrapper .datatable-filter > div {
+        justify-content: space-between !important;
+        width: 100%;
+    justify-content: end;
+
+    }
+
+    #DataTables_Table_0_wrapper .dt-export-title {
+        display: none;
+    }
+
+    #DataTables_Table_0_wrapper .dt-buttons {
+        max-width: 100%;
+    }
+
+    #DataTables_Table_0_wrapper .dt-buttons .btn {
+        min-width: 38px;
+        padding: 7px 8px;
+    }
+
+    #DataTables_Table_0_wrapper .dt-length {
+        margin-left: 7px;
+    }
+
+    #DataTables_Table_0_wrapper .datatable-wrap {
+        border-radius: 7px;
+    }
+
+    #DataTables_Table_0 {
+        min-width: 850px !important;
+    }
+
+    #DataTables_Table_0_wrapper .dt-info {
+        text-align: left;
+        margin-top: 8px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    .nk-block-head .nk-block-between {
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .nk-block-head .nk-block-head-content:last-child {
+        width: 100%;
+    }
+
+    .nk-block-head .nk-block-head-content:last-child .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .nk-block-title.page-title {
+        font-size: 20px;
+    }
+
+    #DataTables_Table_0_wrapper .dt-export-buttons {
+        flex: 1;
+    }
+
+    #DataTables_Table_0_wrapper .dt-buttons {
+        width: 100%;
+    }
+
+    #DataTables_Table_0_wrapper .dt-buttons .btn {
+        flex: 1;
+        min-width: 0;
+    }
+
+    #DataTables_Table_0_wrapper .dt-length select {
+        width: 60px;
+    }
+
+    #DataTables_Table_0_wrapper .pagination .page-link {
+        min-width: 42px;
+    }
+}
 
 
 
 
+.table-responsive {
+    overflow-x: inherit;
+    }
 
 
 
+.btn-group, .btn-group-vertical {
+        gap: 7px;
+}
 
 
+.badge-dot:before{
+    display: none;
+}
+
+/* =========================================================
+   COMPANY POLICIES - PREMIUM UI
+   ========================================================= */
+
+.nk-content .nk-block-head {
+    margin-bottom: 28px;
+}
+
+.nk-content .nk-block-title.page-title {
+    color: #0b2d4f;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    position: relative;
+    padding-bottom: 14px;
+}
+
+.nk-content .nk-block-title.page-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 52px;
+    height: 4px;
+    background: #f58220;
+    border-radius: 10px;
+}
 
 
+/* Main card */
+.nk-content .card.card-preview {
+    border: 1px solid #dce5ef;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 8px 25px rgba(11, 45, 79, 0.07);
+    overflow: hidden;
+}
+
+.nk-content .card-preview .card-inner {
+    padding: 28px;
+}
 
 
+/* Table wrapper */
+.nk-content .table_custom {
+    width: 100%;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #d9e3ee;
+    border-radius: 10px;
+    overflow: hidden;
+}
 
 
+/* Table header */
+.nk-content .table_custom thead th {
+    background: #1164a5 !important;
+    color: #ffffff !important;
+    border: 0 !important;
+    padding: 16px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: none;
+    vertical-align: middle;
+    white-space: nowrap;
+}
 
 
+/* Header rounded corners */
+.nk-content .table_custom thead th:first-child {
+    border-radius: 9px 0 0 0;
+}
+
+.nk-content .table_custom thead th:last-child {
+    border-radius: 0 9px 0 0;
+}
 
 
+/* Table body */
+.nk-content .table_custom tbody td {
+    padding: 17px 18px;
+    color: #344f6b;
+    font-size: 14px;
+    border-color: #dce5ef;
+    vertical-align: middle;
+    background: #ffffff;
+}
 
 
+/* Alternate row */
+.nk-content .table_custom tbody tr:nth-child(even) td {
+    background: #f8fafc;
+}
 
 
+/* Hover effect */
+.nk-content .table_custom tbody tr {
+    transition: all 0.2s ease;
+}
+
+.nk-content .table_custom tbody tr:hover td {
+    background: #eef6ff;
+}
+
+
+/* Policy name */
+.nk-content .table_custom tbody td strong {
+    color: #123d63;
+    font-weight: 600;
+}
+
+
+/* First column */
+/* .nk-content .table_custom tbody td:first-child {
+    color: #183f63;
+    font-weight: 600;
+    text-align: center;
+} */
+
+
+/* Date */
+.nk-content .table_custom tbody td:nth-child(4) {
+    color: #536f8b;
+    white-space: nowrap;
+}
+
+
+/* View button */
+.nk-content .table_custom .btn-primary {
+    background: #0b3155 !important;
+    border: 0 !important;
+    color: #ffffff !important;
+    border-radius: 5px;
+    padding: 6px 15px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    box-shadow: none;
+}
+
+.nk-content .table_custom .btn-primary:hover {
+    background: #f5821f !important;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(17, 100, 165, 0.20);
+}
+
+.nk-content .table_custom .btn-primary em {
+    font-size: 15px;
+}
+
+
+/* Orange bottom accent */
+.nk-content .card-preview::after {
+    content: "";
+    display: block;
+    height: 5px;
+    background: #f58220;
+    border-radius: 0 0 16px 16px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+    .nk-content .card-preview .card-inner {
+        padding: 20px;
+    }
+
+    .nk-content .nk-block-title.page-title {
+        font-size: 26px;
+    }
+
+    .nk-content .table_custom {
+        min-width: 850px;
+    }
+
+    .nk-content .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+
+@media (max-width: 575px) {
+
+    .nk-content .nk-block-title.page-title {
+        font-size: 23px;
+    }
+
+    .nk-content .card-preview .card-inner {
+        padding: 14px;
+    }
+
+    .nk-content .table_custom thead th,
+    .nk-content .table_custom tbody td {
+        padding: 13px 12px;
+    }
+
+    .nk-content .table_custom .btn-primary {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
+
+.holiday-calendar th {
+    text-align: center;
+    background: #0d3053 !important;
+}
+
+.table thead th {
+    color: #ffffff !important;
+    font-size: 12px;
+}
+
+.nk-block form .btn-light:hover{
+        background: var(--tssc-navy) !important;
+    color: #ffffff !important;
+    border-color: var(--tssc-navy) !important;
+}
 
 
 

@@ -79,6 +79,9 @@ builder.Services.AddScoped<
 builder.Services.AddHostedService<BiometricAttendanceScheduler>();
 builder.Services.AddScoped<ITodayAttendanceLiveService, TodayAttendanceLiveService>();
 builder.Services.AddScoped<ILeaveService, LeaveService>();
+
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<IMenuCountService, MenuCountService>();
 var app = builder.Build();
 
 

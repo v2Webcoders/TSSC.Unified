@@ -298,6 +298,9 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
                     await _context.SaveChangesAsync();
 
+                    // Initialize leave balance after EmployeeId is generated
+                    await InitializeLeaveBalanceAsync(employee.EmployeeId);
+
                     // Send welcome email
                     //try
                     {
@@ -364,89 +367,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
                     return View(model);
                 }
-                //catch (Exception ex)
-                //{
-                //    await transaction.RollbackAsync();
-
-                //    // Remove Identity user if it was already created
-                //    if (appUser != null)
-                //    {
-                //        var user = await _userManager.FindByIdAsync(appUser.Id);
-
-                //        if (user != null)
-                //            await _userManager.DeleteAsync(user);
-                //    }
-
-                //    ModelState.AddModelError("", ex.Message);
-
-                //    return View(model);
-                //}
             }
-
-            //===========================
-            // UPDATE
-            //===========================
-
-            var emp = await _context.Employee.FindAsync(model.EmployeeId);
-
-            if (emp == null)
-                return NotFound();
-            // New Fields
-            emp.Prefix = model.Prefix;
-            emp.BranchId = model.BranchId;
-            emp.SubBranchId = model.SubBranchId;
-            emp.NoticePeriod = model.NoticePeriod;
-            emp.EmployeeCode = model.EmployeeCode;
-            emp.FirstName = model.FirstName;
-            emp.LastName = model.LastName;
-            emp.Gender = model.Gender;
-            emp.DOB = model.DOB;
-            emp.BloodGroup = model.BloodGroup;
-            emp.MaritalStatus = model.MaritalStatus;
-
-            emp.DepartmentId = model.DepartmentId.Value;
-            emp.DesignationId = model.DesignationId.Value;
-            emp.ReportingManagerId = model.ReportingManagerId;
-            emp.JoiningDate = model.JoiningDate.Value;
-            emp.EmployeeType = model.EmployeeType;
-            emp.EmploymentStatus = model.EmploymentStatus;
-
-            emp.OfficialEmail = model.OfficialEmail;
-            emp.PersonalEmail = model.PersonalEmail;
-            emp.MobileNo = model.MobileNo;
-            emp.AlternateMobile = model.AlternateMobile;
-
-            emp.CurrentAddress = model.CurrentAddress;
-            emp.PermanentAddress = model.PermanentAddress;
-
-            emp.AadhaarNo = model.AadhaarNo;
-            emp.PANNo = model.PANNo;
-            emp.PassportNo = model.PassportNo;
-            emp.UANNo = model.UANNo;
-            emp.PFNo = model.PFNo;
-            emp.ESICNo = model.ESICNo;
-
-            emp.BankName = model.BankName;
-            emp.AccountNo = model.AccountNo;
-            emp.IFSCCode = model.IFSCCode;
-
-            emp.CTC = model.CTC;
-            emp.BasicSalary = model.BasicSalary;
-            emp.HRA = model.HRA;
-            emp.SpecialAllowance = model.SpecialAllowance;
-
-            emp.IsActive = model.IsActive;
-            emp.ModifiedBy = User.Identity!.Name;
-            emp.ModifiedDate = DateTime.Now;
-            if (!string.IsNullOrEmpty(photoPath))
-            {
-                emp.PhotoPath = photoPath;
-            }
-            _context.Employee.Update(emp);
-            await _context.SaveChangesAsync();
-
-            TempData["msg"] = "Employee updated successfully.";
-
             return RedirectToAction(nameof(EmployeeList));
         }
         private async Task LoadDropDowns()
@@ -1978,84 +1899,87 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             {
                 emp.PhotoPath = photoPath;
             }
+            // Normal HR update
+            emp.EmploymentStatus = model.EmploymentStatus;
+            emp.IsActive = model.IsActive;
 
-            if (submitAction == "activate" &&
-                emp.ProfileStatus == "Submitted")
-            {
-                // HR has reviewed and approved the employee
-                emp.ProfileStatus = "Active";
-                emp.IsActive = true;
-            }
-            else
-            {
-                // Normal HR update
-                emp.EmploymentStatus = model.EmploymentStatus;
-                emp.IsActive = model.IsActive;
-            }
+            //if (submitAction == "activate" &&
+            //    emp.ProfileStatus == "Submitted")
+            //{
+            //    // HR has reviewed and approved the employee
+            //    emp.ProfileStatus = "Active";
+            //    emp.IsActive = true;
+            //}
+            //else
+            //{
+            //    // Normal HR update
+            //    emp.EmploymentStatus = model.EmploymentStatus;
+            //    emp.IsActive = model.IsActive;
+            //}
 
             _context.Employee.Update(emp);
            
-            if (submitAction == "activate" )
-            {
-                var today = DateTime.Today;
+            //if (submitAction == "activate" )
+            //{
+            //    var today = DateTime.Today;
 
-                var leavePolicies = await _context.LeavePolicy
-                    .Where(x => x.IsActive
-                        && x.EffectiveFrom <= today
-                        && (x.EffectiveTo == null ||
-                            x.EffectiveTo >= today))
-                    .ToListAsync();
+            //    var leavePolicies = await _context.LeavePolicy
+            //        .Where(x => x.IsActive
+            //            && x.EffectiveFrom <= today
+            //            && (x.EffectiveTo == null ||
+            //                x.EffectiveTo >= today))
+            //        .ToListAsync();
 
-                foreach (var policy in leavePolicies)
-                {
-                    decimal initialLeaveBalance = 0m;
+            //    foreach (var policy in leavePolicies)
+            //    {
+            //        decimal initialLeaveBalance = 0m;
 
-                    var joiningDate = emp.JoiningDate;
+            //        var joiningDate = emp.JoiningDate;
 
-                    // Employee joined in the current month
-                    if (joiningDate.Year == today.Year &&
-                        joiningDate.Month == today.Month)
-                    {
-                        // Joined between 1st and 15th
-                        if (joiningDate.Day <= 15)
-                        {
-                            initialLeaveBalance = policy.MonthlyAllocation;
-                        }
-                        // Joined between 16th and end of month
-                        else
-                        {
-                            initialLeaveBalance = 0m;
-                        }
-                    }
+            //        // Employee joined in the current month
+            //        if (joiningDate.Year == today.Year &&
+            //            joiningDate.Month == today.Month)
+            //        {
+            //            // Joined between 1st and 15th
+            //            if (joiningDate.Day <= 15)
+            //            {
+            //                initialLeaveBalance = policy.MonthlyAllocation;
+            //            }
+            //            // Joined between 16th and end of month
+            //            else
+            //            {
+            //                initialLeaveBalance = 0m;
+            //            }
+            //        }
 
-                    // Check if balance already exists
-                    var existingBalance = await _context.EmployeeLeaveBalance
-                        .FirstOrDefaultAsync(x =>
-                            x.EmployeeId == emp.EmployeeId &&
-                            x.LeaveTypeId == policy.LeaveTypeId);
+            //        // Check if balance already exists
+            //        var existingBalance = await _context.EmployeeLeaveBalance
+            //            .FirstOrDefaultAsync(x =>
+            //                x.EmployeeId == emp.EmployeeId &&
+            //                x.LeaveTypeId == policy.LeaveTypeId);
 
-                    if (existingBalance == null)
-                    {
-                        var leaveBalance = new EmployeeLeaveBalance
-                        {
-                            EmployeeId = emp.EmployeeId,
-                            LeaveTypeId = policy.LeaveTypeId,
-                            OpeningBalance = initialLeaveBalance,
-                            UsedLeaves = 0,
-                            Adjustment = 0,
-                            LastUpdated = DateTime.Now
-                        };
+            //        if (existingBalance == null)
+            //        {
+            //            var leaveBalance = new EmployeeLeaveBalance
+            //            {
+            //                EmployeeId = emp.EmployeeId,
+            //                LeaveTypeId = policy.LeaveTypeId,
+            //                OpeningBalance = initialLeaveBalance,
+            //                UsedLeaves = 0,
+            //                Adjustment = 0,
+            //                LastUpdated = DateTime.Now
+            //            };
 
-                        _context.EmployeeLeaveBalance.Add(leaveBalance);
-                    }
-                    else
-                    {
-                        // Update existing leave balance
-                        existingBalance.OpeningBalance = initialLeaveBalance;
-                        existingBalance.LastUpdated = DateTime.Now;
-                    }
-                }
-            }
+            //            _context.EmployeeLeaveBalance.Add(leaveBalance);
+            //        }
+            //        else
+            //        {
+            //            // Update existing leave balance
+            //            existingBalance.OpeningBalance = initialLeaveBalance;
+            //            existingBalance.LastUpdated = DateTime.Now;
+            //        }
+            //    }
+            //}
             await _context.SaveChangesAsync();
             TempData["msg"] = "Employee updated successfully.";
 
@@ -2153,12 +2077,10 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             // Photo upload here if required
 
             // Employee has submitted profile for HR review
-            employee.ProfileStatus = "Submitted";
-            employee.IsActive = false;
-
+            employee.ProfileStatus = "Complete";
             await _context.SaveChangesAsync();
 
-            TempData["msg"] = "Your profile has been submitted successfully for HR verification.";
+            TempData["msg"] = "Your profile has been submitted successfully.";
 
             return RedirectToAction(nameof(ProfileSubmitted));
         }
@@ -2214,6 +2136,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "HR")]
         public async Task<JsonResult> SearchEmployees(string query)
         {
             if (string.IsNullOrWhiteSpace(query))
@@ -2255,6 +2178,76 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             .ToListAsync();
 
             return Json(results);
+        }
+
+        private async Task InitializeLeaveBalanceAsync(int employeeId)
+        {
+            var emp = await _context.Employee
+                .FirstOrDefaultAsync(x => x.EmployeeId == employeeId);
+
+            if (emp == null)
+                return;
+
+            var today = DateTime.Today;
+
+            var leavePolicies = await _context.LeavePolicy
+                .Where(x => x.IsActive
+                    && x.EffectiveFrom <= today
+                    && (x.EffectiveTo == null ||
+                        x.EffectiveTo >= today))
+                .ToListAsync();
+
+            foreach (var policy in leavePolicies)
+            {
+                decimal initialLeaveBalance = 0m;
+
+                var joiningDate = emp.JoiningDate;
+
+                // Employee joined in the current month
+                if (joiningDate.Year == today.Year &&
+                    joiningDate.Month == today.Month)
+                {
+                    // Joined between 1st and 15th
+                    if (joiningDate.Day <= 15)
+                    {
+                        initialLeaveBalance = policy.MonthlyAllocation;
+                    }
+                    // Joined between 16th and end of month
+                    else
+                    {
+                        initialLeaveBalance = 0m;
+                    }
+                }
+
+                // Check if balance already exists
+                var existingBalance = await _context.EmployeeLeaveBalance
+                    .FirstOrDefaultAsync(x =>
+                        x.EmployeeId == emp.EmployeeId &&
+                        x.LeaveTypeId == policy.LeaveTypeId);
+
+                if (existingBalance == null)
+                {
+                    var leaveBalance = new EmployeeLeaveBalance
+                    {
+                        EmployeeId = emp.EmployeeId,
+                        LeaveTypeId = policy.LeaveTypeId,
+                        OpeningBalance = initialLeaveBalance,
+                        UsedLeaves = 0,
+                        Adjustment = 0,
+                        LastUpdated = DateTime.Now
+                    };
+
+                    _context.EmployeeLeaveBalance.Add(leaveBalance);
+                }
+                else
+                {
+                    // Update existing leave balance
+                    existingBalance.OpeningBalance = initialLeaveBalance;
+                    existingBalance.LastUpdated = DateTime.Now;
+                }
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

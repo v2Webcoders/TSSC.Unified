@@ -205,7 +205,7 @@
                                 </label>
 
                                 <input asp-for="RequestedInTime"
-                                       type="datetime-local"
+                                       type="time"
                                        class="form-control" />
 
                                 <span asp-validation-for="RequestedInTime"
@@ -231,10 +231,12 @@
 
                                 </label>
 
-                                <input asp-for="RequestedOutTime"
+                                @* <input asp-for="RequestedOutTime"
                                        type="datetime-local"
+                                       class="form-control" /> *@
+                                <input asp-for="RequestedOutTime"
+                                       type="time"
                                        class="form-control" />
-
                                 <span asp-validation-for="RequestedOutTime"
                                       class="text-danger">
                                 </span>

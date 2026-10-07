@@ -25,7 +25,6 @@
 
                 <div class="toggle-expand-content" data-content="pageMenu">
                     <ul class="nk-block-tools g-3">
-
                         <li class="nk-block-tools-opt">
                             <a asp-action="Create"
                                class="btn btn-primary">
@@ -33,16 +32,73 @@
                                 <span>Apply Leave</span>
                             </a>
                         </li>
-
                     </ul>
                 </div>
-
             </div>
         </div>
 
     </div>
 </div>
+<div class="mb-4">
 
+    <ul class="nav nav-tabs">
+
+        <!-- Pending -->
+        <li class="nav-item">
+
+            <a asp-action="ManageLeaves"
+               asp-route-status="Pending"
+               class="nav-link @(ViewBag.Status == "Pending" ? "active" : "")">
+
+                Pending
+
+                <span class="badge bg-warning ms-1">
+                    @ViewBag.PendingCount
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <!-- Approved -->
+        <li class="nav-item">
+
+            <a asp-action="ManageLeaves"
+               asp-route-status="Approved"
+               class="nav-link @(ViewBag.Status == "Approved" ? "active" : "")">
+
+                Approved
+
+                <span class="badge bg-success ms-1">
+                    @ViewBag.ApprovedCount
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <!-- Rejected -->
+        <li class="nav-item">
+
+            <a asp-action="ManageLeaves"
+               asp-route-status="Rejected"
+               class="nav-link @(ViewBag.Status == "Rejected" ? "active" : "")">
+
+                Rejected
+
+                <span class="badge bg-danger ms-1">
+                    @ViewBag.RejectedCount
+                </span>
+
+            </a>
+
+        </li>
+
+    </ul>
+
+</div>
 <div class="nk-block nk-block-lg">
     <div class="card card-preview">
         @if (TempData["Error"] != null)
@@ -60,13 +116,52 @@
             </div>
         }
         <div class="card-inner">
+            <!-- Approve button form -->
+            <form asp-action="BulkApproveLeave"
+                  method="post"
+                  id="bulkApproveForm">
 
+                @Html.AntiForgeryToken()
+
+                <div class="d-flex align-items-center mb-3">
+
+                    <button type="submit"
+                            class="btn btn-success"
+                            id="approveSelectedBtn"
+                            disabled>
+
+                        <em class="icon ni ni-check"></em>
+                        Approve Selected
+                    </button>
+
+                    <span class="text-muted ms-3">
+                        Selected: <strong id="selectedCount">0</strong>
+                    </span>
+
+                </div>
+
+            </form>
             <div class="table-responsive">
-
-                <table class="datatable-init-export table table-tranx table_custom table-bordered">
-
+                <table class="datatable-init-export table table-tranx table_custom table-bordered" data-auto-responsive="false">
                     <thead>
                         <tr>
+                            <th width="50"
+                                data-orderable="false"
+                                data-searchable="false">
+
+                                <div class="custom-control custom-control-sm custom-checkbox">
+
+                                    <input type="checkbox"
+                                           class="custom-control-input"
+                                           id="selectAll">
+
+                                    <label class="custom-control-label"
+                                           for="selectAll">
+                                    </label>
+
+                                </div>
+
+                            </th>
                             <th width="60">S.No.</th>
                             <th>Employee Name</th>
                             <th>Leave Type</th>
@@ -85,7 +180,23 @@
                         @foreach (var item in Model)
                         {
                             <tr>
+                                <td>
+                                    @if (item.Status == "Pending")
+                                    {
+                                        <div class="custom-control custom-control-sm custom-checkbox">
 
+                                            <input type="checkbox"
+                                                   class="custom-control-input leave-checkbox"
+                                                   value="@item.LeaveRequestId"
+                                                   id="leave_@item.LeaveRequestId">
+
+                                            <label class="custom-control-label"
+                                                   for="leave_@item.LeaveRequestId">
+                                            </label>
+
+                                        </div>
+                                    }
+                                </td>
                                 <td>@serial</td>
                                 <td>
                                     @item.Employee?.FirstName @item.Employee?.LastName
@@ -153,9 +264,6 @@
                                         </small>
                                     }
                                 </td>
-
-                               
-
                                 <td>
                                     <div class="btn-group">
 
@@ -246,5 +354,176 @@
 
     </div>
 </div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
 
+            // Stores selected LeaveRequestId values
+            var selectedLeaves = new Set();
+
+
+            // =========================================================
+            // INDIVIDUAL CHECKBOX
+            // =========================================================
+            $(document).on('change', '.leave-checkbox', function () {
+
+                var id = $(this).val();
+
+                if ($(this).is(':checked')) {
+                    selectedLeaves.add(id);
+                }
+                else {
+                    selectedLeaves.delete(id);
+                }
+
+                updateSelectAll();
+                updateApproveButton();
+            });
+
+
+            // =========================================================
+            // SELECT ALL - CURRENT PAGE
+            // =========================================================
+            $(document).on('change', '#selectAll', function () {
+
+                var checked = $(this).is(':checked');
+
+                $('.leave-checkbox').each(function () {
+
+                    var id = $(this).val();
+
+                    if (checked) {
+                        selectedLeaves.add(id);
+                    }
+                    else {
+                        selectedLeaves.delete(id);
+                    }
+
+                    $(this).prop('checked', checked);
+                });
+
+                updateSelectAll();
+                updateApproveButton();
+            });
+
+
+            // =========================================================
+            // DATATABLE PAGE / SEARCH / SORT
+            // Restore previously selected checkboxes
+            // =========================================================
+            $('.datatable-init-export').on('draw.dt', function () {
+
+                $('.leave-checkbox').each(function () {
+
+                    var id = $(this).val();
+
+                    $(this).prop(
+                        'checked',
+                        selectedLeaves.has(id)
+                    );
+                });
+
+                updateSelectAll();
+                updateApproveButton();
+            });
+
+
+            // =========================================================
+            // SELECT ALL STATE
+            // =========================================================
+            function updateSelectAll() {
+
+                var total =
+                    $('.leave-checkbox').length;
+
+                var checked =
+                    $('.leave-checkbox:checked').length;
+
+                $('#selectAll').prop(
+                    'checked',
+                    total > 0 && total === checked
+                );
+
+                $('#selectAll').prop(
+                    'indeterminate',
+                    checked > 0 && checked < total
+                );
+            }
+
+
+            // =========================================================
+            // APPROVE BUTTON
+            // =========================================================
+            function updateApproveButton() {
+
+                var count =
+                    selectedLeaves.size;
+
+                $('#approveSelectedBtn')
+                    .prop('disabled', count === 0);
+
+                $('#selectedCount')
+                    .text(count);
+            }
+
+
+            // =========================================================
+            // FORM SUBMIT
+            // Send ALL selected IDs, including IDs from other pages
+            // =========================================================
+            $('#bulkApproveForm').on('submit', function (e) {
+
+                if (selectedLeaves.size === 0) {
+
+                    e.preventDefault();
+
+                    alert(
+                        'Please select at least one leave request.'
+                    );
+
+                    return;
+                }
+
+
+                // Confirmation
+                if (!confirm(
+                    'Are you sure you want to approve ' +
+                    selectedLeaves.size +
+                    ' selected leave request(s)?'
+                )) {
+
+                    e.preventDefault();
+
+                    return;
+                }
+
+
+                // Remove previously created hidden inputs
+                $('.selected-hidden').remove();
+
+
+                // Add every selected ID to the form
+                selectedLeaves.forEach(function (id) {
+
+                    $('<input>', {
+                        type: 'hidden',
+                        name: 'selectedIds',
+                        value: id,
+                        class: 'selected-hidden'
+                    }).appendTo('#bulkApproveForm');
+
+                });
+
+            });
+
+
+            // =========================================================
+            // INITIAL STATE
+            // =========================================================
+            updateSelectAll();
+            updateApproveButton();
+
+        });
+    </script>
+}
 

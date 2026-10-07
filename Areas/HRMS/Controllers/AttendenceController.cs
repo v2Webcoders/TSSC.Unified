@@ -565,11 +565,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
         // Requested correction
         // Keep these blank for the employee
-        RequestedInTime =
-            null,
-
-        RequestedOutTime =
-            null,
+        RequestedInTime = attendanceDate,
+        RequestedOutTime = attendanceDate,
 
         Status =
             "Pending"
@@ -1146,10 +1143,28 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             }
 
 
+
+
             // =====================================================
             // CREATE REGULARIZATION REQUEST
             // =====================================================
+            // =====================================================
+            // COMBINE FIXED ATTENDANCE DATE WITH REQUESTED TIME
+            // =====================================================
 
+            if (model.RequestedInTime.HasValue)
+            {
+                model.RequestedInTime =
+                    model.AttendanceDate.Date +
+                    model.RequestedInTime.Value.TimeOfDay;
+            }
+
+            if (model.RequestedOutTime.HasValue)
+            {
+                model.RequestedOutTime =
+                    model.AttendanceDate.Date +
+                    model.RequestedOutTime.Value.TimeOfDay;
+            }
             var request =
                 new AttendanceRegularization
                 {
@@ -1326,14 +1341,14 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> RegularizationRequests()
+        public async Task<IActionResult> RegularizationRequests(
+        string? status = "Pending")
         {
             var currentUser =
                 await _userManager.GetUserAsync(User);
 
             if (currentUser == null)
                 return Unauthorized();
-
 
             var employee =
                 await _context.Employee
@@ -1343,16 +1358,39 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             if (employee == null)
                 return Unauthorized();
 
-
-            var requests =
-                await _context.AttendanceRegularization
+            var query =
+                _context.AttendanceRegularization
                     .Include(x => x.Employee)
                     .Where(x =>
-                        x.ApproverId == employee.EmployeeId
-                        )
+                        x.ApproverId == employee.EmployeeId);
+
+            // Counts
+            ViewBag.PendingCount =
+                await query.CountAsync(x => x.Status == "Pending");
+
+            ViewBag.ApprovedCount =
+                await query.CountAsync(x => x.Status == "Approved");
+
+            ViewBag.RejectedCount =
+                await query.CountAsync(x => x.Status == "Rejected");
+
+            // Validate status
+            if (status != "Pending" &&
+                status != "Approved" &&
+                status != "Rejected")
+            {
+                status = "Pending";
+            }
+
+            // Apply selected status
+            query = query.Where(x => x.Status == status);
+
+            var requests =
+                await query
                     .OrderByDescending(x => x.CreatedDate)
                     .ToListAsync();
 
+            ViewBag.Status = status;
 
             return View(requests);
         }
@@ -2058,45 +2096,43 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             return RedirectToAction(
                 nameof(MyOD));
         }
+        //[Authorize]
+        //[HttpGet]
+        //public async Task<IActionResult> MyOD()
+        //{
+        //    var currentUser =
+        //        await _userManager.GetUserAsync(User);
+
+        //    if (currentUser == null)
+        //        return Unauthorized();
+
+
+        //    var employee =
+        //        await _context.Employee
+        //            .FirstOrDefaultAsync(x =>
+        //                x.ApplicationUserId == currentUser.Id);
+
+        //    if (employee == null)
+        //        return Unauthorized();
+
+
+        //    var requests =
+        //        await _context.ODRequest
+        //            .Include(x => x.Approver)
+        //            .Where(x =>
+        //                x.EmployeeId ==
+        //                    employee.EmployeeId)
+        //            .OrderByDescending(
+        //                x => x.CreatedDate)
+        //            .ToListAsync();
+
+
+        //    return View(requests);
+        //}
+
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> MyOD()
-        {
-            var currentUser =
-                await _userManager.GetUserAsync(User);
-
-            if (currentUser == null)
-                return Unauthorized();
-
-
-            var employee =
-                await _context.Employee
-                    .FirstOrDefaultAsync(x =>
-                        x.ApplicationUserId == currentUser.Id);
-
-            if (employee == null)
-                return Unauthorized();
-
-
-            var requests =
-                await _context.ODRequest
-                    .Include(x => x.Approver)
-                    .Where(x =>
-                        x.EmployeeId ==
-                            employee.EmployeeId)
-                    .OrderByDescending(
-                        x => x.CreatedDate)
-                    .ToListAsync();
-
-
-            return View(requests);
-        }
-
-
-        [Authorize]
-        [HttpGet]
-        public async Task<IActionResult> ODRequests(
-        string status = "Pending")
+        public async Task<IActionResult> MyOD(string? status)
         {
             var currentUser =
                 await _userManager.GetUserAsync(User);
@@ -2116,13 +2152,81 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             var query =
                 _context.ODRequest
-                    .Include(x => x.Employee)
                     .Include(x => x.Approver)
                     .Where(x =>
-                        x.ApproverId ==
+                        x.EmployeeId ==
                             employee.EmployeeId);
 
 
+            // Status counts
+            ViewBag.TotalCount = await query.CountAsync();
+
+            ViewBag.PendingCount =
+                await query.CountAsync(x => x.Status == "Pending");
+
+            ViewBag.ApprovedCount =
+                await query.CountAsync(x => x.Status == "Approved");
+
+            ViewBag.RejectedCount =
+                await query.CountAsync(x => x.Status == "Rejected");
+
+
+            // Apply selected status filter
+            if (!string.IsNullOrEmpty(status))
+            {
+                query = query.Where(x => x.Status == status);
+            }
+
+
+            ViewBag.Status = status;
+
+
+            var requests =
+                await query
+                    .OrderByDescending(
+                        x => x.CreatedDate)
+                    .ToListAsync();
+
+
+            return View(requests);
+        }
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> ODRequests(
+    string status = "Pending")
+        {
+            var currentUser =
+                await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return Unauthorized();
+
+            var employee =
+                await _context.Employee
+                    .FirstOrDefaultAsync(x =>
+                        x.ApplicationUserId == currentUser.Id);
+
+            if (employee == null)
+                return Unauthorized();
+
+            var query =
+                _context.ODRequest
+                    .Include(x => x.Employee)
+                    .Include(x => x.Approver)
+                    .Where(x =>
+                        x.ApproverId == employee.EmployeeId);
+
+            // Counts - keep the same logic
+            ViewBag.PendingCount =
+                await query.CountAsync(x => x.Status == "Pending");
+
+            ViewBag.ApprovedCount =
+                await query.CountAsync(x => x.Status == "Approved");
+
+            ViewBag.RejectedCount =
+                await query.CountAsync(x => x.Status == "Rejected");
+
+            // Keep existing "All" logic
             if (!string.Equals(
                 status,
                 "All",
@@ -2133,13 +2237,11 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                         x.Status == status);
             }
 
-
             var requests =
                 await query
                     .OrderByDescending(
                         x => x.CreatedDate)
                     .ToListAsync();
-
 
             ViewBag.Status = status;
 
@@ -3787,6 +3889,931 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
 
             return RedirectToAction(nameof(AllRegularizations));
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> EditOD(int id)
+        {
+            var currentUser =
+                await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return Unauthorized();
+
+
+            // =====================================================
+            // FIND EMPLOYEE
+            // =====================================================
+
+            var employee =
+                await _context.Employee
+                    .FirstOrDefaultAsync(x =>
+                        x.ApplicationUserId == currentUser.Id);
+
+            if (employee == null)
+            {
+                TempData["Error"] =
+                    "Employee record not found.";
+
+                return RedirectToAction(nameof(MyOD));
+            }
+
+
+            // =====================================================
+            // FIND OD REQUEST
+            // =====================================================
+
+            var request =
+                await _context.ODRequest
+                    .FirstOrDefaultAsync(x =>
+                        x.ODRequestId == id
+                        &&
+                        x.EmployeeId == employee.EmployeeId);
+
+
+            if (request == null)
+            {
+                TempData["Error"] =
+                    "OD request not found.";
+
+                return RedirectToAction(nameof(MyOD));
+            }
+
+
+            // =====================================================
+            // ONLY PENDING REQUEST CAN BE EDITED
+            // =====================================================
+
+            if (request.Status != "Pending")
+            {
+                TempData["Error"] =
+                    "Only pending OD requests can be edited.";
+
+                return RedirectToAction(nameof(MyOD));
+            }
+
+
+            return View(request);
+        }
+
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditOD(
+        int id,
+        ODRequest model,
+        IFormFile? AttachmentFile)
+        {
+            var currentUser =
+                await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return Unauthorized();
+
+
+            // =====================================================
+            // FIND EMPLOYEE
+            // =====================================================
+
+            var employee =
+                await _context.Employee
+                    .FirstOrDefaultAsync(x =>
+                        x.ApplicationUserId == currentUser.Id);
+
+            if (employee == null)
+            {
+                TempData["Error"] =
+                    "Employee record not found.";
+
+                return RedirectToAction(
+                    nameof(MyOD));
+            }
+
+
+            // =====================================================
+            // FIND EXISTING OD REQUEST
+            // =====================================================
+
+            var request =
+                await _context.ODRequest
+                    .FirstOrDefaultAsync(x =>
+                        x.ODRequestId == id
+                        &&
+                        x.EmployeeId == employee.EmployeeId);
+
+
+            if (request == null)
+            {
+                TempData["Error"] =
+                    "OD request not found.";
+
+                return RedirectToAction(
+                    nameof(MyOD));
+            }
+
+
+            // =====================================================
+            // ONLY PENDING REQUEST CAN BE EDITED
+            // =====================================================
+
+            if (request.Status != "Pending")
+            {
+                TempData["Error"] =
+                    "Only pending OD requests can be edited.";
+
+                return RedirectToAction(
+                    nameof(MyOD));
+            }
+
+
+            // =====================================================
+            // VALIDATE OD DATE
+            // =====================================================
+
+            if (!model.ODDate.HasValue)
+            {
+                ModelState.AddModelError(
+                    nameof(model.ODDate),
+                    "Please select OD date.");
+
+                return View(model);
+            }
+
+
+            // Remove time portion
+            model.ODDate =
+                model.ODDate.Value.Date;
+
+
+            // =====================================================
+            // VALIDATE PAST DATE
+            // =====================================================
+
+            if (model.ODDate.Value < DateTime.Today)
+            {
+                ModelState.AddModelError(
+                    nameof(model.ODDate),
+                    "OD date cannot be in the past.");
+
+                return View(model);
+            }
+
+
+            // =====================================================
+            // VALIDATE OD TYPE
+            // =====================================================
+
+            if (string.IsNullOrWhiteSpace(model.ODType))
+            {
+                ModelState.AddModelError(
+                    nameof(model.ODType),
+                    "Please select OD type.");
+
+                return View(model);
+            }
+
+
+            // =====================================================
+            // VALIDATE PURPOSE
+            // =====================================================
+
+            if (string.IsNullOrWhiteSpace(model.Purpose))
+            {
+                ModelState.AddModelError(
+                    nameof(model.Purpose),
+                    "Please enter the purpose of OD.");
+
+                return View(model);
+            }
+
+
+            // =====================================================
+            // VALIDATE PARTIAL DAY
+            // =====================================================
+
+            if (model.ODType == "Partial Day")
+            {
+                if (!model.RequestedFromTime.HasValue)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.RequestedFromTime),
+                        "Please provide OD From time.");
+
+                    return View(model);
+                }
+
+
+                if (!model.RequestedToTime.HasValue)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.RequestedToTime),
+                        "Please provide OD To time.");
+
+                    return View(model);
+                }
+
+
+                if (model.RequestedToTime <=
+                    model.RequestedFromTime)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.RequestedToTime),
+                        "OD To Time must be later than From Time.");
+
+                    return View(model);
+                }
+
+
+                // Make sure partial-day times belong to OD date
+                if (model.RequestedFromTime.Value.Date !=
+                    model.ODDate.Value.Date)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.RequestedFromTime),
+                        "From Time must be on the selected OD date.");
+
+                    return View(model);
+                }
+
+
+                if (model.RequestedToTime.Value.Date !=
+                    model.ODDate.Value.Date)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.RequestedToTime),
+                        "To Time must be on the selected OD date.");
+
+                    return View(model);
+                }
+            }
+
+
+            // =====================================================
+            // CHECK DUPLICATE OD
+            // =====================================================
+
+            bool duplicateOD =
+                await _context.ODRequest
+                    .AnyAsync(x =>
+                        x.ODRequestId != id
+                        &&
+                        x.EmployeeId ==
+                            employee.EmployeeId
+                        &&
+                        x.ODDate ==
+                            model.ODDate.Value
+                        &&
+                        (
+                            x.Status == "Pending"
+                            ||
+                            x.Status == "Approved"
+                        ));
+
+
+            if (duplicateOD)
+            {
+                ModelState.AddModelError(
+                    nameof(model.ODDate),
+                    "An OD request already exists for this date.");
+
+                return View(model);
+            }
+
+
+            // =====================================================
+            // REPORTING MANAGER
+            // =====================================================
+
+            if (!employee.ReportingManagerId.HasValue)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "No reporting manager is assigned to this employee.");
+
+                return View(model);
+            }
+
+
+            // =====================================================
+            // ATTACHMENT
+            // =====================================================
+
+            if (AttachmentFile != null &&
+                AttachmentFile.Length > 0)
+            {
+                var extension =
+                    Path.GetExtension(
+                        AttachmentFile.FileName)
+                        .ToLowerInvariant();
+
+
+                var allowedExtensions =
+                    new[]
+                    {
+                ".pdf",
+                ".jpg",
+                ".jpeg",
+                ".png"
+                    };
+
+
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError(
+                        "AttachmentFile",
+                        "Only PDF, JPG, JPEG and PNG files are allowed.");
+
+                    return View(model);
+                }
+
+
+                var uploadPath =
+                    Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot",
+                        "uploads",
+                        "od");
+
+
+                if (!Directory.Exists(uploadPath))
+                    Directory.CreateDirectory(uploadPath);
+
+
+                var fileName =
+                    Guid.NewGuid().ToString()
+                    + extension;
+
+
+                var filePath =
+                    Path.Combine(
+                        uploadPath,
+                        fileName);
+
+
+                await using var stream =
+                    new FileStream(
+                        filePath,
+                        FileMode.Create);
+
+
+                await AttachmentFile.CopyToAsync(stream);
+
+
+                // Replace attachment with new file
+                request.Attachment = fileName;
+            }
+
+
+            // =====================================================
+            // UPDATE OD REQUEST
+            // =====================================================
+
+            request.ODDate =
+                model.ODDate.Value;
+
+            request.ODType =
+                model.ODType;
+
+            request.RequestedFromTime =
+                model.ODType == "Partial Day"
+                    ? model.RequestedFromTime
+                    : null;
+
+            request.RequestedToTime =
+                model.ODType == "Partial Day"
+                    ? model.RequestedToTime
+                    : null;
+
+            request.Location =
+                model.Location;
+
+            request.Purpose =
+                model.Purpose.Trim();
+
+            request.Reason =
+                model.Reason?.Trim();
+
+            request.ApproverId =
+                employee.ReportingManagerId;
+
+            // Keep status Pending
+            request.Status =
+                "Pending";
+
+
+            await _context.SaveChangesAsync();
+
+
+            // =====================================================
+            // SUCCESS
+            // =====================================================
+
+            TempData["Success"] =
+                "OD request updated successfully.";
+
+
+            return RedirectToAction(
+                nameof(MyOD));
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BulkApproveOD(List<int> selectedIds)
+        {
+            // =========================================
+            // VALIDATE SELECTION
+            // =========================================
+
+            if (selectedIds == null || !selectedIds.Any())
+            {
+                TempData["Error"] =
+                    "Please select at least one OD request.";
+
+                return RedirectToAction(
+                    User.IsInRole("HR")
+                        ? nameof(AllODRequests)
+                        : nameof(ODRequests));
+            }
+
+
+            // =========================================
+            // CURRENT USER
+            // =========================================
+
+            var currentUser =
+                await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return Unauthorized();
+
+
+            var employee =
+                await _context.Employee
+                    .FirstOrDefaultAsync(x =>
+                        x.ApplicationUserId == currentUser.Id);
+
+            if (employee == null)
+                return Unauthorized();
+
+
+            bool isHR =
+                User.IsInRole("HR");
+
+
+            int approvedCount = 0;
+            int skippedCount = 0;
+
+
+            // =========================================
+            // PROCESS SELECTED REQUESTS
+            // =========================================
+
+            foreach (var id in selectedIds)
+            {
+                // =========================================
+                // FIND REQUEST
+                // =========================================
+
+                var request =
+                    await _context.ODRequest
+                        .Include(x => x.Employee)
+                        .FirstOrDefaultAsync(x =>
+                            x.ODRequestId == id);
+
+                if (request == null)
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+
+                // =========================================
+                // AUTHORIZATION
+                // HR OR ASSIGNED APPROVER
+                // =========================================
+
+                bool isApprover =
+                    request.ApproverId ==
+                    employee.EmployeeId;
+
+                if (!isHR && !isApprover)
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+
+                // =========================================
+                // ONLY PENDING REQUEST CAN BE APPROVED
+                // =========================================
+
+                if (request.Status != "Pending")
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+
+                // =========================================
+                // APPROVE REQUEST
+                // =========================================
+
+                request.Status =
+                    "Approved";
+
+                request.ApprovedDate =
+                    DateTime.Now;
+
+                request.ApprovalRemarks =
+                    isHR
+                        ? "OD request approved by HR."
+                        : "OD request approved by Reporting Manager.";
+
+
+                // =========================================
+                // CREATE / UPDATE ATTENDANCE
+                // =========================================
+
+                await CreateODAttendance(request);
+
+
+                approvedCount++;
+            }
+
+
+            // =========================================
+            // SAVE ALL CHANGES ONCE
+            // =========================================
+
+            await _context.SaveChangesAsync();
+
+
+            // =========================================
+            // RESULT MESSAGE
+            // =========================================
+
+            if (approvedCount > 0 && skippedCount == 0)
+            {
+                TempData["Success"] =
+                    $"{approvedCount} OD request(s) approved successfully.";
+            }
+            else if (approvedCount > 0 && skippedCount > 0)
+            {
+                TempData["Success"] =
+                    $"{approvedCount} OD request(s) approved successfully. " +
+                    $"{skippedCount} request(s) skipped.";
+            }
+            else
+            {
+                TempData["Error"] =
+                    "No selected OD requests could be approved.";
+            }
+
+
+            // =========================================
+            // REDIRECT
+            // =========================================
+
+            return RedirectToAction(
+                isHR
+                    ? nameof(AllODRequests)
+                    : nameof(ODRequests));
+        }
+
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BulkApproveManagerRegularization(
+        List<int> selectedIds)
+        {
+            if (selectedIds == null || !selectedIds.Any())
+            {
+                TempData["Error"] =
+                    "Please select at least one regularization request.";
+
+                return RedirectToAction(nameof(RegularizationRequests));
+            }
+
+            var currentUser =
+                await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return Unauthorized();
+
+            var employee =
+                await _context.Employee
+                    .FirstOrDefaultAsync(x =>
+                        x.ApplicationUserId == currentUser.Id);
+
+            if (employee == null)
+                return Unauthorized();
+
+            int approvedCount = 0;
+            int skippedCount = 0;
+
+            // =========================================
+            // PROCESS SELECTED REQUESTS
+            // =========================================
+
+            foreach (var id in selectedIds)
+            {
+                // =========================================
+                // FIND REQUEST
+                // =========================================
+
+                var request =
+                    await _context.AttendanceRegularization
+                        .Include(x => x.Employee)
+                        .FirstOrDefaultAsync(x =>
+                            x.RegularizationId == id);
+
+                if (request == null)
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+                // =========================================
+                // SECURITY CHECK
+                // MANAGER CAN APPROVE ONLY HIS REQUESTS
+                // =========================================
+
+                if (request.ApproverId != employee.EmployeeId)
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+                // =========================================
+                // ONLY PENDING REQUESTS
+                // =========================================
+
+                if (request.Status != "Pending")
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+                // =========================================
+                // FIND ATTENDANCE
+                // =========================================
+
+                var attendance =
+                    await _context.EmployeeAttendance
+                        .FirstOrDefaultAsync(x =>
+                            x.EmployeeId == request.EmployeeId &&
+                            x.AttendanceDate == request.AttendanceDate);
+
+                // =========================================
+                // DETERMINE ATTENDANCE STATUS
+                // =========================================
+
+                string baseAttendanceStatus;
+
+                if (!request.RequestedInTime.HasValue)
+                {
+                    baseAttendanceStatus = "Absent";
+                }
+                else if (
+                    request.RequestedInTime.Value.TimeOfDay
+                    < new TimeSpan(10, 0, 0))
+                {
+                    // Before 10:00 AM
+                    baseAttendanceStatus = "Present";
+                }
+                else if (
+                    request.RequestedInTime.Value.TimeOfDay
+                    < new TimeSpan(11, 0, 0))
+                {
+                    // 10:00 AM - 10:59 AM
+                    baseAttendanceStatus = "Late";
+                }
+                else
+                {
+                    // 11:00 AM onwards
+                    baseAttendanceStatus = "Half Day";
+                }
+
+                // =========================================
+                // CREATE ATTENDANCE
+                // =========================================
+
+                if (attendance == null)
+                {
+                    attendance = new EmployeeAttendance
+                    {
+                        EmployeeId =
+                            request.EmployeeId,
+
+                        EmployeeCode =
+                            request.Employee?.EmployeeCode ?? "",
+
+                        AttendanceDate =
+                            request.AttendanceDate,
+
+                        InTime =
+                            request.RequestedInTime,
+
+                        OutTime =
+                            request.RequestedOutTime,
+
+                        AttendanceStatus =
+                            baseAttendanceStatus,
+
+                        Remarks =
+                            "Attendance created through approved regularization request.",
+
+                        AttendanceSource =
+                            "Regularization",
+
+                        CreatedDate =
+                            DateTime.Now
+                    };
+
+                    _context.EmployeeAttendance.Add(attendance);
+                }
+                else
+                {
+                    // =========================================
+                    // UPDATE EXISTING ATTENDANCE
+                    // =========================================
+
+                    if (request.RequestedInTime.HasValue)
+                    {
+                        attendance.InTime =
+                            request.RequestedInTime;
+                    }
+
+                    if (request.RequestedOutTime.HasValue)
+                    {
+                        attendance.OutTime =
+                            request.RequestedOutTime;
+                    }
+
+                    attendance.AttendanceStatus =
+                        baseAttendanceStatus;
+
+                    attendance.AttendanceSource =
+                        "Regularization";
+
+                    attendance.Remarks =
+                        "Attendance updated through approved regularization request.";
+                }
+
+                // =========================================
+                // APPROVE REQUEST
+                // =========================================
+
+                request.Status =
+                    "Approved";
+
+                request.ApprovedDate =
+                    DateTime.Now;
+
+                request.ApprovalRemarks =
+                    "Attendance regularization approved by Reporting Manager.";
+
+                approvedCount++;
+            }
+
+            // =========================================
+            // SAVE ALL CHANGES ONCE
+            // =========================================
+
+            await _context.SaveChangesAsync();
+
+            // =========================================
+            // RESULT MESSAGE
+            // =========================================
+
+            if (approvedCount > 0 && skippedCount == 0)
+            {
+                TempData["Success"] =
+                    $"{approvedCount} regularization request(s) approved successfully.";
+            }
+            else if (approvedCount > 0 && skippedCount > 0)
+            {
+                TempData["Success"] =
+                    $"{approvedCount} request(s) approved successfully. " +
+                    $"{skippedCount} request(s) skipped.";
+            }
+            else
+            {
+                TempData["Error"] =
+                    "No selected regularization requests could be approved.";
+            }
+
+            return RedirectToAction(nameof(RegularizationRequests));
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BulkApproveManagerOD(
+        List<int> selectedIds)
+        {
+            if (selectedIds == null || !selectedIds.Any())
+            {
+                TempData["Error"] =
+                    "Please select at least one OD request.";
+
+                return RedirectToAction(nameof(ODRequests));
+            }
+
+            var currentUser =
+                await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return Unauthorized();
+
+            var employee =
+                await _context.Employee
+                    .FirstOrDefaultAsync(x =>
+                        x.ApplicationUserId == currentUser.Id);
+
+            if (employee == null)
+                return Unauthorized();
+
+            int approvedCount = 0;
+            int skippedCount = 0;
+
+            foreach (var id in selectedIds)
+            {
+                var request =
+                    await _context.ODRequest
+                        .Include(x => x.Employee)
+                        .FirstOrDefaultAsync(x =>
+                            x.ODRequestId == id);
+
+                if (request == null)
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+                // Only the assigned reporting manager can approve
+                if (request.ApproverId != employee.EmployeeId)
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+                // Only Pending requests can be approved
+                if (request.Status != "Pending")
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+                // =====================================================
+                // APPROVE
+                // =====================================================
+
+                request.Status = "Approved";
+
+                request.ApprovedDate = DateTime.Now;
+
+                request.ApprovalRemarks =
+                    "OD request approved by Reporting Manager.";
+
+                // =====================================================
+                // CREATE / UPDATE ATTENDANCE
+                // Same logic as single approval
+                // =====================================================
+
+                await CreateODAttendance(request);
+
+                approvedCount++;
+            }
+
+            await _context.SaveChangesAsync();
+
+            // =====================================================
+            // RESULT MESSAGE
+            // =====================================================
+
+            if (approvedCount > 0 && skippedCount == 0)
+            {
+                TempData["Success"] =
+                    $"{approvedCount} OD request(s) approved and attendance updated successfully.";
+            }
+            else if (approvedCount > 0 && skippedCount > 0)
+            {
+                TempData["Success"] =
+                    $"{approvedCount} OD request(s) approved successfully. " +
+                    $"{skippedCount} request(s) skipped.";
+            }
+            else
+            {
+                TempData["Error"] =
+                    "No selected OD requests could be approved.";
+            }
+
+            return RedirectToAction(nameof(ODRequests));
         }
     }
 }

@@ -177,16 +177,77 @@
 <div class="nk-block nk-block-lg">
 
     <div class="card card-preview">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-icon alert-dismissible fade show" role="alert">
+                <em class="icon ni ni-check-circle"></em>
+                <strong>@TempData["Success"]</strong>
 
+                <button type="button"
+                        class="close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close">
+                    
+                </button>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-icon alert-dismissible fade show" role="alert">
+                <em class="icon ni ni-cross-circle"></em>
+                <strong>@TempData["Error"]</strong>
+
+                <button type="button"
+                        class="close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close">
+                    
+                </button>
+            </div>
+        }
         <div class="card-inner">
 
             <div class="table-responsive">
+                <form asp-action="BulkApproveOD"
+                      method="post"
+                      id="bulkApproveForm">
 
-                <table class="datatable-init-export table table-tranx table_custom table-bordered">
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit"
+                            class="btn btn-success mb-3"
+                            id="approveSelectedBtn"
+                            disabled
+                            onclick="return confirm('Are you sure you want to approve the selected OD requests?');">
+
+                        <em class="icon ni ni-check"></em>
+                        Approve Selected
+                    </button>
+
+                    <div class="table-responsive">
+                        <!-- your existing table -->
+                    </div>
+
+                </form>
+                <table class="datatable-init-export table table-tranx table_custom table-bordered" data-auto-responsive="false"
+                       data-auto-responsive="false">
 
                     <thead>
 
                         <tr>
+
+                            <th width="50" data-orderable="false">
+                                <div class="custom-control custom-control-sm custom-checkbox">
+                                    <input type="checkbox"
+                                           class="custom-control-input"
+                                           id="selectAll">
+
+                                    <label class="custom-control-label"
+                                           for="selectAll">
+                                    </label>
+                                </div>
+                            </th>
 
                             <th width="60">
                                 S.No.
@@ -246,7 +307,24 @@
                         @foreach (var item in Model)
                         {
                             <tr>
+                                <td>
+                                    @if (item.Status == "Pending")
+                                    {
+                                        <div class="custom-control custom-control-sm custom-checkbox">
 
+                                            <input type="checkbox"
+                                                   class="custom-control-input od-checkbox"
+                                                   name="selectedIds"
+                                                   value="@item.ODRequestId"
+                                                   id="od_@item.ODRequestId">
+
+                                            <label class="custom-control-label"
+                                                   for="od_@item.ODRequestId">
+                                            </label>
+
+                                        </div>
+                                    }
+                                </td>
                                 <!-- ================================= -->
                                 <!-- SERIAL -->
                                 <!-- ================================= -->
@@ -260,7 +338,7 @@
                                 <!-- EMPLOYEE -->
                                 <!-- ================================= -->
 
-                                <td>
+                                <td style="min-width:150px;">
 
                                     <strong>
                                         @item.Employee?.FirstName @item.Employee?.LastName
@@ -491,8 +569,8 @@
                                             <br />
 
                                             <small class="text-muted">
-                                                @item.ApprovedDate.Value
-                                                    .ToString("dd-MMM-yyyy hh:mm tt")
+                                                @(item.ApprovedDate.Value
+                                                    .ToString("dd-MMM-yyyy hh:mm tt"))
                                             </small>
                                         }
                                     }
@@ -506,8 +584,8 @@
 
                                         <small class="text-muted">
                                             Applied:
-                                            @item.CreatedDate
-                                                .ToString("dd-MMM-yyyy hh:mm tt")
+                                            @(item.CreatedDate
+                                                .ToString("dd-MMM-yyyy hh:mm tt"))
                                         </small>
                                     }
 
@@ -598,3 +676,185 @@
     </div>
 
 </div>
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+
+            var selectedODs = new Set();
+
+
+            // =====================================================
+            // INDIVIDUAL CHECKBOX
+            // =====================================================
+
+            $(document).on('change', '.od-checkbox', function () {
+
+                var id = $(this).val();
+
+                if ($(this).is(':checked')) {
+                    selectedODs.add(id);
+                }
+                else {
+                    selectedODs.delete(id);
+                }
+
+                updateSelectAll();
+                updateApproveButton();
+            });
+
+
+            // =====================================================
+            // SELECT ALL - CURRENT PAGE
+            // =====================================================
+
+            $(document).on('change', '#selectAll', function () {
+
+                var checked = $(this).is(':checked');
+
+                $('.od-checkbox').each(function () {
+
+                    var id = $(this).val();
+
+                    if (checked) {
+                        selectedODs.add(id);
+                    }
+                    else {
+                        selectedODs.delete(id);
+                    }
+
+                    $(this).prop('checked', checked);
+                });
+
+                updateSelectAll();
+                updateApproveButton();
+            });
+
+
+            // =====================================================
+            // DATATABLE PAGE / SEARCH / SORT
+            // Restore previously selected checkboxes
+            // =====================================================
+
+            $('.datatable-init-export').on('draw.dt', function () {
+
+                $('.od-checkbox').each(function () {
+
+                    var id = $(this).val();
+
+                    $(this).prop(
+                        'checked',
+                        selectedODs.has(id)
+                    );
+                });
+
+                updateSelectAll();
+                updateApproveButton();
+            });
+
+
+            // =====================================================
+            // SELECT ALL STATE
+            // =====================================================
+
+            function updateSelectAll() {
+
+                var total =
+                    $('.od-checkbox').length;
+
+                var checked =
+                    $('.od-checkbox:checked').length;
+
+                $('#selectAll').prop(
+                    'checked',
+                    total > 0 && total === checked
+                );
+
+                $('#selectAll').prop(
+                    'indeterminate',
+                    checked > 0 && checked < total
+                );
+            }
+
+
+            // =====================================================
+            // APPROVE BUTTON
+            // =====================================================
+
+            function updateApproveButton() {
+
+                var count =
+                    selectedODs.size;
+
+                $('#approveSelectedBtn')
+                    .prop(
+                        'disabled',
+                        count === 0
+                    );
+
+                $('#selectedCount')
+                    .text(count);
+            }
+
+
+            // =====================================================
+            // SUBMIT
+            // =====================================================
+
+            $('#bulkApproveForm').on('submit', function (e) {
+
+                if (selectedODs.size === 0) {
+
+                    e.preventDefault();
+
+                    alert(
+                        'Please select at least one OD request.'
+                    );
+
+                    return;
+                }
+
+
+                // Confirmation first
+                if (!confirm(
+                    'Are you sure you want to approve ' +
+                    selectedODs.size +
+                    ' selected OD request(s)?'
+                )) {
+
+                    e.preventDefault();
+
+                    return;
+                }
+
+
+                // Remove old hidden inputs
+                $('.selected-hidden').remove();
+
+
+                // Add ALL selected IDs
+                selectedODs.forEach(function (id) {
+
+                    $('<input>', {
+                        type: 'hidden',
+                        name: 'selectedIds',
+                        value: id,
+                        class: 'selected-hidden'
+                    }).appendTo('#bulkApproveForm');
+
+                });
+
+            });
+
+
+            // =====================================================
+            // INITIAL STATE
+            // =====================================================
+
+            updateSelectAll();
+            updateApproveButton();
+
+        });
+
+    </script>
+}

@@ -541,7 +541,7 @@
                             </a>
 
 
-                            <a asp-controller="LeaveAdjustment"
+                           @*  <a asp-controller="LeaveAdjustment"
                                asp-action="Index"
                                class="btn btn-outline-primary">
 
@@ -549,8 +549,7 @@
 
                                 Adjust Leave Balance
 
-                            </a>
-
+                            </a> *@
 
                             <a asp-controller="HRPolicy"
                                asp-action="Index"
@@ -561,7 +560,15 @@
                                 Manage HR Policies
 
                             </a>
+                            <a asp-controller="Team"
+                               asp-action="TeamMembers"
+                               class="btn btn-outline-primary">
 
+                                <em class="icon ni ni-users me-1"></em>
+
+                                My Team
+
+                            </a>
                         </div>
 
                     </div>
