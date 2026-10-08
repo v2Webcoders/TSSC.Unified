@@ -1,0 +1,264 @@
+﻿@model IEnumerable<TSSC.Unified.Models.Grievance>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Grievance List
+            </h3>
+        </div>
+
+        <div class="nk-block-head-content">
+            <div class="toggle-wrap nk-block-tools-toggle">
+
+                <a href="#"
+                   class="btn btn-icon btn-trigger toggle-expand me-n1"
+                   data-target="pageMenu">
+                    <em class="icon ni ni-more-v"></em>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="card card-bordered">
+
+    <div class="card-inner">
+
+        <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer dtr-inline collapsed">
+
+            <thead>
+                <tr>
+
+                    <th>S.No.</th>
+
+                    <th>Grievance No.</th>
+
+                    <th>Name</th>
+
+                    <th>Mobile</th>
+
+                    <th>Email</th>
+
+                    <th>Description</th>
+
+                    <th>Priority</th>
+
+                    <th>Status</th>
+
+                    <th>Attachment</th>
+
+                    <th>Created On</th>
+
+                    <th>Updated On</th>
+
+                    <th>Action</th>
+
+                </tr>
+            </thead>
+
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <!-- Serial Number -->
+                        <td>
+                            @serial
+                        </td>
+
+
+                        <!-- Grievance Number -->
+                        <td>
+                            <strong>
+                                @item.GrievanceNo
+                            </strong>
+                        </td>
+
+
+                        <!-- Name -->
+                        <td>
+                            @item.Name
+                        </td>
+
+
+                        <!-- Mobile -->
+                        <td>
+                            @item.MobileNumber
+                        </td>
+
+
+                        <!-- Email -->
+                        <td>
+                            @item.Email
+                        </td>
+
+
+                        <!-- Description -->
+                        <td>
+
+                            @if (!string.IsNullOrEmpty(item.Description))
+                            {
+                                if (item.Description.Length > 80)
+                                {
+                                    @item.Description.Substring(0, 80)
+                                    <span>...</span>
+                                }
+                                else
+                                {
+                                    @item.Description
+                                }
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+
+                        </td>
+
+
+                        <!-- Priority -->
+                        <td>
+
+                            @if (item.Priority == "High")
+                            {
+                                <span class="badge badge-dot bg-danger">
+                                    High
+                                </span>
+                            }
+                            else if (item.Priority == "Low")
+                            {
+                                <span class="badge badge-dot bg-secondary">
+                                    Low
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-dot bg-warning">
+                                    Normal
+                                </span>
+                            }
+
+                        </td>
+
+
+                        <!-- Status -->
+                        <td>
+
+                            @if (item.Status == "Resolved")
+                            {
+                                <span class="badge badge-dot bg-success">
+                                    Resolved
+                                </span>
+                            }
+                            else if (item.Status == "In Progress")
+                            {
+                                <span class="badge badge-dot bg-info">
+                                    In Progress
+                                </span>
+                            }
+                            else if (item.Status == "Rejected")
+                            {
+                                <span class="badge badge-dot bg-danger">
+                                    Rejected
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-dot bg-warning">
+                                    Submitted
+                                </span>
+                            }
+
+                        </td>
+
+
+                        <!-- Attachment -->
+                        <td>
+
+                            @if (!string.IsNullOrEmpty(item.AttachmentPath))
+                            {
+                                <a href="@item.AttachmentPath"
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-primary">
+
+                                    <em class="icon ni ni-file-text"></em>
+                                    View
+
+                                </a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+
+                        </td>
+
+
+                        <!-- Created On -->
+                        <td>
+                            @item.CreatedDate.ToString("dd-MMM-yyyy hh:mm tt")
+                        </td>
+
+
+                        <!-- Updated On -->
+                        <td>
+                            @item.UpdatedDate?.ToString("dd-MMM-yyyy hh:mm tt")
+                        </td>
+
+
+                        <!-- Action -->
+                        <td>
+
+                            <div class="btn-group" role="group">
+
+                                <a asp-action="GrievanceDetails"
+                                   asp-controller="Grievance"
+                                   asp-route-id="@item.Id"
+                                   asp-route-returnUrl="@Context.Request.Path"
+                                   class="btn btn-sm btn-outline-primary"
+                                   title="View Grievance">
+
+                                    <em class="icon ni ni-eye"></em>
+
+                                </a>
+
+
+                               @*  <a asp-action="EditGrievance"
+                                   asp-controller="Grievance"
+                                   asp-route-id="@item.Id"
+                                   class="btn btn-sm btn-outline-warning"
+                                   title="Edit Grievance">
+
+                                    <em class="icon ni ni-edit"></em>
+
+                                </a> *@
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    serial++;
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>

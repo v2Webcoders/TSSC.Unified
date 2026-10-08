@@ -775,7 +775,7 @@
 		</li>
 	}
 	
-	@if (isFinanceEmployee)
+	@if (User.IsInRole("Finance"))
 	{
 		<li class="nk-menu-heading">
 			<div class="nk-menu-heading-content">
@@ -1298,8 +1298,7 @@
 	}
 	<!-- MANAGER - REPORTING MANAGER ONLY -->
 	<!-- ===================================================== -->
-
-	@if (isReportingManager || showReimbursementApproverMenu || isFinanceEmployee || isHR || isFinanceHead || isCEO) ;)
+	@if (isReportingManager || showReimbursementApproverMenu || isFinanceEmployee || isHR || isFinanceHead || isCEO || User.IsInRole("GrievanceTeam")) ;)
 
 	{
 		<li class="nk-menu-heading">
@@ -1675,6 +1674,92 @@
 
 		}
 
+	@if (User.IsInRole("GrievanceTeam"))
+	{
+		<li class="nk-menu-item has-sub">
+
+			<a href="#"
+			   class="nk-menu-link nk-menu-toggle">
+
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-alert-circle"></em>
+				</span>
+
+				<span class="nk-menu-text">
+					Grievance Management
+				</span>
+
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<!-- All Grievances -->
+
+				<li class="nk-menu-item">
+
+					<a href="/HRMS/Grievance/GrievanceList"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							All Grievances
+						</span>
+
+					</a>
+
+				</li>
+
+
+				<!-- Pending Grievances -->
+
+				<li class="nk-menu-item">
+
+					<a href="/HRMS/Grievance/PendingGrievance"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Pending Grievances
+						</span>
+
+					</a>
+
+				</li>
+
+
+				<!-- In Progress -->
+
+				<li class="nk-menu-item">
+
+					<a href="/HRMS/Grievance/InProgressGrievance"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							In Progress
+						</span>
+
+					</a>
+
+				</li>
+
+
+				<!-- Resolved -->
+
+				<li class="nk-menu-item">
+
+					<a href="/HRMS/Grievance/ResolvedGrievance"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Resolved Grievances
+						</span>
+
+					</a>
+
+				</li>
+
+			</ul>
+
+		</li>
+	}
 
 	}
 

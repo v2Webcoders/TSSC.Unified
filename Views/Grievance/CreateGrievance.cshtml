@@ -1,0 +1,784 @@
+﻿@using TSSC.Unified.ViewModel
+@model GrievanceViewModel
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "~/Views/Shared/_RegistrationLayout.cshtml";
+    ViewData["Title"] = "Grievance";
+}
+
+<div class="reg-hero">
+    <h1 id="formTitle">Submit Your Grievance</h1>
+    <p>Please provide the required details to submit your grievance.</p>
+</div>
+
+<div class="form-shell">
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <form asp-controller="Grievance"
+          asp-action="SubmitGrievance"
+          method="post"
+          enctype="multipart/form-data"
+          id="grievanceForm">
+
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <p class="alert alert-primary">
+            Note: Fields marked <span class="req">*</span> are mandatory.
+        </p>
+
+
+        <!-- STEP 1 : PERSONAL DETAILS -->
+        <div class="accordion open" data-step="1">
+
+            <div class="acc-head" onclick="toggleAcc(this)">
+                <div class="left">
+                    <div class="step-num">1</div>
+                    <div class="title">Personal Details</div>
+                </div>
+            </div>
+
+            <div class="acc-body">
+
+                <div class="form-grid">
+
+                    <!-- NAME -->
+                    <div class="field">
+                        <label asp-for="Name">
+                            Name <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="Name"
+                               type="text"
+                               placeholder="Enter your full name"
+                               autocomplete="name" />
+
+                        <span asp-validation-for="Name"
+                              class="text-danger"></span>
+                    </div>
+
+
+                    <!-- MOBILE -->
+                    <div class="field">
+
+                        <label asp-for="MobileNumber">
+                            Mobile Number <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="MobileNumber"
+                               type="text"
+                               maxlength="10"
+                               inputmode="numeric"
+                               placeholder="Enter 10 digit mobile number"
+                               autocomplete="tel" />
+
+                        <span asp-validation-for="MobileNumber"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+                    <div class="field full">
+
+                        <label asp-for="Email">
+                            Email Address <span class="req">*</span>
+                        </label>
+
+                        <div class="email-verification-row">
+
+                            <input asp-for="Email"
+                                   id="Email"
+                                   type="email"
+                                   placeholder="Enter your email address"
+                                   autocomplete="email" />
+
+                            <button type="button"
+                                    id="btnSendOtp"
+                                    class="btn-verify">
+                                Verify Email
+                            </button>
+
+                        </div>
+
+                        <span asp-validation-for="Email"
+                              class="text-danger"></span>
+
+                        <div id="emailStatus"
+                             class="verification-status">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- STEP 2 : EMAIL VERIFICATION -->
+        <div class="accordion open" data-step="2">
+
+            <div class="acc-head">
+
+                <div class="left">
+                    <div class="step-num">2</div>
+                    <div class="title">Email Verification</div>
+                </div>
+
+            </div>
+
+            <div class="acc-body">
+
+                <div class="form-grid">
+
+                    <div class="field full">
+
+                        <label>
+                            Email Verification OTP
+                        </label>
+
+                        <div class="otp-area">
+
+                            <input type="text"
+                                   id="Otp"
+                                   maxlength="6"
+                                   inputmode="numeric"
+                                   placeholder="Enter 6 digit OTP"
+                                   autocomplete="one-time-code" />
+
+                            <button type="button"
+                                    id="btnVerifyOtp"
+                                    class="btn-primary otp-btn">
+                                Verify OTP
+                            </button>
+
+                        </div>
+
+                        <div id="otpStatus"
+                             class="verification-status">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- STEP 3 : GRIEVANCE DETAILS -->
+        <div class="accordion open" data-step="3">
+
+            <div class="acc-head" onclick="toggleAcc(this)">
+
+                <div class="left">
+
+                    <div class="step-num">3</div>
+
+                    <div class="title">
+                        Grievance Details
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="acc-body">
+
+                <div class="form-grid">
+
+                    <!-- DESCRIPTION -->
+                    <div class="field full">
+
+                        <label asp-for="Description">
+                            Grievance Description
+                            <span class="req">*</span>
+                        </label>
+
+                        <textarea asp-for="Description"
+                                  rows="7"
+                                  maxlength="5000"
+                                  placeholder="Please describe your grievance in detail..."></textarea>
+
+                        <span asp-validation-for="Description"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <!-- ATTACHMENT -->
+                    <div class="field full">
+
+                        <label asp-for="Attachment">
+                            Supporting Document
+                        </label>
+
+                        <input asp-for="Attachment"
+                               id="Attachment"
+                               type="file"
+                               accept=".pdf,.jpg,.jpeg,.png" />
+
+                        <small class="file-help">
+                            Allowed formats: PDF, JPG, JPEG, PNG.
+                            Maximum file size: 5 MB.
+                        </small>
+
+                        <span asp-validation-for="Attachment"
+                              class="text-danger"></span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- EMAIL VERIFIED FLAG -->
+        <input type="hidden"
+               id="EmailVerified"
+               value="false" />
+
+
+        <!-- SUBMIT -->
+        <div class="form-actions"
+             style="justify-content:flex-end;">
+
+            <button type="submit"
+                    id="btnSubmit"
+                    class="btn-primary"
+                    style="width:auto;
+                           flex:0 0 auto;
+                           padding:13px 28px;">
+
+                Submit Grievance
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<style>
+
+    .email-verification-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+        .email-verification-row input {
+            flex: 1;
+        }
+
+    .btn-verify {
+        height: 46px;
+        padding: 0 20px;
+        border: 0;
+        border-radius: 6px;
+        background: #198754;
+        color: #fff;
+        font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+        .btn-verify:hover {
+            background: #157347;
+        }
+
+        .btn-verify:disabled {
+            opacity: .7;
+            cursor: not-allowed;
+        }
+
+    .otp-area {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+        .otp-area input {
+            max-width: 300px;
+            letter-spacing: 4px;
+            text-align: center;
+        }
+
+    .otp-btn {
+        width: auto !important;
+        flex: 0 0 auto !important;
+        padding: 13px 24px !important;
+    }
+
+    .verification-status {
+        margin-top: 8px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .success-text {
+        color: #198754;
+    }
+
+    .error-text {
+        color: #dc3545;
+    }
+
+    .file-help {
+        display: block;
+        margin-top: 6px;
+        color: #777;
+        font-size: 12px;
+    }
+
+
+    @@media (max-width: 767px) {
+
+        .email-verification-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-verify {
+            width: 100%;
+        }
+
+        .otp-area {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+            .otp-area input {
+                max-width: 100%;
+            }
+
+        .otp-btn {
+            width: 100% !important;
+        }
+    }
+
+</style>
+
+
+<script>
+
+    let emailVerified = false;
+
+    const emailInput =
+        document.getElementById("Email");
+
+    const otpInput =
+        document.getElementById("Otp");
+
+    const btnSendOtp =
+        document.getElementById("btnSendOtp");
+
+    const btnVerifyOtp =
+        document.getElementById("btnVerifyOtp");
+
+    const emailStatus =
+        document.getElementById("emailStatus");
+
+    const otpStatus =
+        document.getElementById("otpStatus");
+
+    const emailVerifiedInput =
+        document.getElementById("EmailVerified");
+
+
+    /*
+     * SEND OTP
+     */
+    btnSendOtp.addEventListener("click", async function () {
+
+        const email =
+            emailInput.value.trim();
+
+        if (!email) {
+
+            emailStatus.innerHTML =
+                '<span class="error-text">' +
+                'Please enter your email address.' +
+                '</span>';
+
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+
+            emailStatus.innerHTML =
+                '<span class="error-text">' +
+                'Please enter a valid email address.' +
+                '</span>';
+
+            return;
+        }
+
+
+        btnSendOtp.disabled = true;
+        btnSendOtp.innerText = "Sending...";
+
+
+        try {
+
+            const token =
+                document.querySelector(
+                    'input[name="__RequestVerificationToken"]'
+                ).value;
+
+
+            const formData =
+                new FormData();
+
+            formData.append("email", email);
+
+            formData.append(
+                "__RequestVerificationToken",
+                token
+            );
+
+
+            const response =
+                await fetch(
+                    '@Url.Action("SendEmailOtp", "Grievance")',
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            if (result.success) {
+
+                emailStatus.innerHTML =
+                    '<span class="success-text">' +
+                    'OTP has been sent to your email address.' +
+                    '</span>';
+
+                otpStatus.innerHTML =
+                    '<span class="success-text">' +
+                    'Please enter the OTP received on your email.' +
+                    '</span>';
+
+                otpInput.focus();
+
+            }
+            else {
+
+                emailStatus.innerHTML =
+                    '<span class="error-text">' +
+                    (result.message ||
+                        "Unable to send OTP.") +
+                    '</span>';
+
+            }
+
+        }
+        catch {
+
+            emailStatus.innerHTML =
+                '<span class="error-text">' +
+                'Something went wrong while sending OTP.' +
+                '</span>';
+
+        }
+        finally {
+
+            if (!emailVerified) {
+
+                btnSendOtp.disabled = false;
+                btnSendOtp.innerText = "Verify Email";
+
+            }
+
+        }
+
+    });
+
+
+    /*
+     * VERIFY OTP
+     */
+    btnVerifyOtp.addEventListener("click", async function () {
+
+        const email =
+            emailInput.value.trim();
+
+        const otp =
+            otpInput.value.trim();
+
+
+        if (!/^\d{6}$/.test(otp)) {
+
+            otpStatus.innerHTML =
+                '<span class="error-text">' +
+                'Please enter a valid 6 digit OTP.' +
+                '</span>';
+
+            return;
+        }
+
+
+        btnVerifyOtp.disabled = true;
+        btnVerifyOtp.innerText = "Verifying...";
+
+
+        try {
+
+            const token =
+                document.querySelector(
+                    'input[name="__RequestVerificationToken"]'
+                ).value;
+
+
+            const formData =
+                new FormData();
+
+            formData.append("email", email);
+            formData.append("otp", otp);
+
+            formData.append(
+                "__RequestVerificationToken",
+                token
+            );
+
+
+            const response =
+                await fetch(
+                    '@Url.Action("VerifyEmailOtp", "Grievance")',
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            if (result.success) {
+
+                emailVerified = true;
+
+                emailVerifiedInput.value = "true";
+
+                emailInput.readOnly = true;
+
+                otpInput.readOnly = true;
+
+                btnSendOtp.disabled = true;
+
+                btnSendOtp.innerText = "Verified";
+
+                btnVerifyOtp.disabled = true;
+
+                btnVerifyOtp.innerText = "Verified";
+
+
+                emailStatus.innerHTML =
+                    '<span class="success-text">' +
+                    '✓ Email verified successfully.' +
+                    '</span>';
+
+                otpStatus.innerHTML = "";
+
+            }
+            else {
+
+                otpStatus.innerHTML =
+                    '<span class="error-text">' +
+                    (result.message ||
+                        "Invalid OTP.") +
+                    '</span>';
+
+                btnVerifyOtp.disabled = false;
+                btnVerifyOtp.innerText = "Verify OTP";
+
+            }
+
+        }
+        catch {
+
+            otpStatus.innerHTML =
+                '<span class="error-text">' +
+                'Something went wrong while verifying OTP.' +
+                '</span>';
+
+            btnVerifyOtp.disabled = false;
+            btnVerifyOtp.innerText = "Verify OTP";
+
+        }
+
+    });
+
+
+    /*
+     * EMAIL CHANGE
+     */
+    emailInput.addEventListener("input", function () {
+
+        if (emailVerified) {
+
+            emailVerified = false;
+
+            emailVerifiedInput.value = "false";
+
+            emailInput.readOnly = false;
+
+            otpInput.readOnly = false;
+
+            btnSendOtp.disabled = false;
+
+            btnSendOtp.innerText = "Verify Email";
+
+            btnVerifyOtp.disabled = false;
+
+            btnVerifyOtp.innerText = "Verify OTP";
+
+            emailStatus.innerHTML =
+                '<span class="error-text">' +
+                'Email changed. Please verify again.' +
+                '</span>';
+
+        }
+
+    });
+
+
+    /*
+     * FORM SUBMIT
+     */
+    document.getElementById("grievanceForm")
+        .addEventListener("submit", function (e) {
+
+            if (!emailVerified) {
+
+                e.preventDefault();
+
+                emailStatus.innerHTML =
+                    '<span class="error-text">' +
+                    'Please verify your email before submitting the grievance.' +
+                    '</span>';
+
+                emailInput.focus();
+
+                return false;
+            }
+
+        });
+
+
+    /*
+     * MOBILE NUMBER
+     */
+    document.getElementById("MobileNumber")
+        .addEventListener("input", function () {
+
+            this.value =
+                this.value
+                    .replace(/\D/g, "")
+                    .substring(0, 10);
+
+        });
+
+
+    /*
+     * OTP NUMBER ONLY
+     */
+    otpInput.addEventListener("input", function () {
+
+        this.value =
+            this.value
+                .replace(/\D/g, "")
+                .substring(0, 6);
+
+    });
+
+
+    /*
+     * FILE VALIDATION
+     */
+    document.getElementById("Attachment")
+        .addEventListener("change", function () {
+
+            const file = this.files[0];
+
+            if (!file)
+                return;
+
+
+            const allowed =
+                [".pdf", ".jpg", ".jpeg", ".png"];
+
+
+            const fileName =
+                file.name.toLowerCase();
+
+
+            const valid =
+                allowed.some(ext =>
+                    fileName.endsWith(ext)
+                );
+
+
+            if (!valid) {
+
+                alert(
+                    "Only PDF, JPG, JPEG and PNG files are allowed."
+                );
+
+                this.value = "";
+
+                return;
+            }
+
+
+            if (file.size > 5 * 1024 * 1024) {
+
+                alert(
+                    "File size must not exceed 5 MB."
+                );
+
+                this.value = "";
+
+            }
+
+        });
+
+
+    function isValidEmail(email) {
+
+        return /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/
+            .test(email);
+
+    }
+
+
+ 
+    function toggleAcc(element) {
+
+        const accordion =
+            element.closest(".accordion");
+
+        if (!accordion)
+            return;
+
+        accordion.classList.toggle("open");
+
+    }
+
+</script>

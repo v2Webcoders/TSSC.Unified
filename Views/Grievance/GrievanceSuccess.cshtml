@@ -1,0 +1,241 @@
+﻿@{
+    Layout = "~/Views/Shared/_RegistrationLayout.cshtml";
+
+    var grievanceNo = ViewBag.GrievanceNo as string ?? "";
+}
+
+<style>
+    .success-wrapper {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 50px 15px;
+        background: #f6f8fb;
+    }
+
+    .success-card {
+        width: 100%;
+        max-width: 650px;
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 45px 40px;
+        text-align: center;
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e9edf3;
+    }
+
+    .success-icon {
+        width: 85px;
+        height: 85px;
+        margin: 0 auto 25px;
+        border-radius: 50%;
+        background: #eaf8ef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #198754;
+        font-size: 42px;
+        font-weight: 700;
+    }
+
+    .success-card h1 {
+        margin: 0 0 12px;
+        font-size: 30px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .success-card .success-text {
+        font-size: 16px;
+        line-height: 1.7;
+        color: #6b7280;
+        margin-bottom: 25px;
+    }
+
+    .grievance-number-box {
+        background: #f7f9fc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 18px 20px;
+        margin: 25px 0;
+    }
+
+    .grievance-number-label {
+        display: block;
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 7px;
+    }
+
+    .grievance-number {
+        display: block;
+        font-size: 23px;
+        font-weight: 700;
+        color: #0d6efd;
+        letter-spacing: 1px;
+    }
+
+    .info-box {
+        text-align: left;
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 18px 20px;
+        margin: 25px 0;
+    }
+
+        .info-box p {
+            margin: 7px 0;
+            font-size: 14px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        .info-box strong {
+            color: #1f2937;
+        }
+
+    .success-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 28px;
+        flex-wrap: wrap;
+    }
+
+    .btn-success-page {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 170px;
+        padding: 12px 22px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .btn-home {
+        background: #0d6efd;
+        color: #fff !important;
+    }
+
+        .btn-home:hover {
+            background: #0b5ed7;
+            transform: translateY(-1px);
+        }
+
+    .btn-new {
+        background: #fff;
+        color: #0d6efd !important;
+        border: 1px solid #0d6efd;
+    }
+
+        .btn-new:hover {
+            background: #f0f6ff;
+        }
+
+    .thank-you {
+        margin-top: 25px;
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    @@media (max-width: 576px) {
+        .success-wrapper {
+            padding: 30px 12px;
+        }
+
+        .success-card {
+            padding: 35px 20px;
+            border-radius: 14px;
+        }
+
+            .success-card h1 {
+                font-size: 25px;
+            }
+
+        .success-icon {
+            width: 72px;
+            height: 72px;
+            font-size: 34px;
+        }
+
+        .grievance-number {
+            font-size: 20px;
+        }
+
+        .btn-success-page {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="success-wrapper">
+
+    <div class="success-card">
+
+        <!-- Success Icon -->
+        <div class="success-icon">
+            ✓
+        </div>
+
+        <!-- Heading -->
+        <h1>Grievance Submitted Successfully</h1>
+
+        <p class="success-text">
+            Thank you for submitting your grievance.
+            Your grievance has been successfully registered with TSSC.
+        </p>
+
+        <!-- Grievance Number -->
+        <div class="grievance-number-box">
+
+            <span class="grievance-number-label">
+                Your Grievance Number
+            </span>
+
+            <span class="grievance-number">
+                @grievanceNo
+            </span>
+
+        </div>
+
+        <!-- Information -->
+        <div class="info-box">
+
+            <p>
+                <strong>✓</strong>
+                Please keep your grievance number safe for future reference.
+            </p>
+
+            <p>
+                <strong>✓</strong>
+                Our concerned team will review your grievance and take appropriate action.
+            </p>
+
+            <p>
+                <strong>✓</strong>
+                You may be contacted if additional information is required.
+            </p>
+
+        </div>
+
+        <!-- Buttons -->
+        <div class="success-actions">
+
+            <a href="@Url.Action("CreateGrievance", "Grievance")"
+               class="btn-success-page btn-new">
+                Submit Another Grievance
+            </a>
+
+        </div>
+
+        <div class="thank-you">
+            Thank you for bringing this matter to our attention.
+        </div>
+
+    </div>
+
+</div>

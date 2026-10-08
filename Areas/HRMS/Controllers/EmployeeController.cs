@@ -261,10 +261,10 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                         JoiningDate = model.JoiningDate.Value,
                         EmployeeType = model.EmployeeType,
                         EmploymentStatus = model.EmploymentStatus,
-                        ProfileStatus="Pending",
+                        ProfileStatus = "Pending",
                         OfficialEmail = model.OfficialEmail,
                         PersonalEmail = model.PersonalEmail,
-                        MobileNo = model.MobileNo,
+                        MobileNo = /*model.MobileNo,*/"9999999999",
                         AlternateMobile = model.AlternateMobile,
 
                         CurrentAddress = model.CurrentAddress,

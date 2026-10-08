@@ -69,6 +69,7 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<AppdbContext>()
 .AddDefaultTokenProviders();
 
+builder.Services.AddScoped<IPasswordHasher<string>, PasswordHasher<string>>();
 // Register repository
 //builder.Services.AddScoped<ILookupRepository, Repository>();
 builder.Services.AddScoped<EmailService>();

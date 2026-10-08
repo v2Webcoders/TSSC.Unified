@@ -170,7 +170,16 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
                 Text = x.JobRoleTitle
             })
             .ToList();
-
+            //TP
+            model.TPList = _context.TPRegistrations
+    .AsNoTracking()
+    .OrderBy(x => x.OrganizationName)
+    .Select(x => new SelectListItem
+    {
+        Value = x.Id.ToString(),
+        Text = x.OrganizationName
+    })
+    .ToList();
             // State
             model.StateList = _context.State
                 .Select(x => new SelectListItem

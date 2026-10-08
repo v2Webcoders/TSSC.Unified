@@ -75,7 +75,7 @@ namespace QUIZAPP
         public DbSet<TPRegistration> TPRegistrations { get; set; }
         public DbSet<TPRegistrationDocument> TPRegistrationDocuments { get; set; }
 
-        
+
         public DbSet<TrainerRegistrationExperience> TrainerRegistrationExperience { get; set; }
 
 
@@ -86,7 +86,11 @@ namespace QUIZAPP
         public DbSet<ScreeningSchedule> ScreeningSchedule { get; set; }
         public DbSet<AssessmentAgency> AssessmentAgency { get; set; }
 
-        public DbSet<CertificateGenerationAssessmentDetail> CertificateGenerationAssessmentDetail{ get; set; }
+        public DbSet<CertificateGenerationAssessmentDetail> CertificateGenerationAssessmentDetail { get; set; }
 
+        // ------------------------- GRIEVANCE MODULE---------------------------------------
+        public DbSet<Grievance> Grievance { get; set; }
+
+        public DbSet<GrievanceEmailVerification> GrievanceEmailVerification { get; set; }
     }
 }
