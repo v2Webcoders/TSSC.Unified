@@ -10,80 +10,130 @@ using QUIZAPP.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using iText.IO.Font.Constants;
+using iText.IO.Image;
+using iText.Kernel.Colors;
+using iText.Kernel.Font;
+using iText.Kernel.Pdf;
+using ClosedXML.Excel;
+using iText.Barcodes;
+using iText.IO.Font.Constants;
+using iText.IO.Image;
+using iText.Kernel.Colors;
+using iText.Kernel.Font;
+using iText.Kernel.Pdf;
+using iText.Layout.Element;
 
 namespace TSSC.Unified.Areas.TP.Controllers
 {
     [Area("TP")]
     public class RegistrationController : Controller
     {
+        private bool IsAjax =>
+           Request.Headers["X-Requested-With"] == "XMLHttpRequest";
         private readonly AppdbContext _context;
         private readonly IWebHostEnvironment _environment;
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly EmailService _emailService;
-
+        private readonly ILogger<RegistrationController> _logger;
         public RegistrationController(
         AppdbContext context,
         IWebHostEnvironment environment,
         UserManager<AppUser> userManager,
-        RoleManager<IdentityRole> roleManager, EmailService emailService)
+        RoleManager<IdentityRole> roleManager, EmailService emailService, ILogger<RegistrationController> logger)
         {
             _context = context;
             _environment = environment;
             _userManager = userManager;
             _roleManager = roleManager;
             _emailService = emailService;
+            _logger = logger;
         }
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult Create(string? membershipType)
         {
-            return View(new TPRegistrationVM());
-        }
+            var allowedTypes = new[]
+            {
+                "Associate Member",
+                "Industry Member",
+                "Platinum Industry Member",
+                "Academia Member"
+            };
 
+            if (string.IsNullOrWhiteSpace(membershipType) ||
+                !allowedTypes.Contains(membershipType))
+            {
+                return BadRequest("Invalid membership type.");
+            }
+
+            var model = new TPRegistrationVM
+            {
+                MembershipType = membershipType
+            };
+
+            return View(model);
+        }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [RequestFormLimits(MultipartBodyLengthLimit = 104857600)]
         public async Task<IActionResult> Create(TPRegistrationVM model)
         {
             if (!ModelState.IsValid)
-                return View(model);
+                return InvalidResult(model);
 
             const long maxPdfSize = 2 * 1024 * 1024; // 2 MB
 
             var uploadedFiles = new (IFormFile? File, string FieldName, string Label)[]
             {
-            (model.FinancialDocuments, nameof(model.FinancialDocuments), "Financial Documents"),
-            (model.RegistrationCertificate, nameof(model.RegistrationCertificate), "Registration Certificate"),
-            (model.PANCardCopy, nameof(model.PANCardCopy), "PAN Card Copy"),
-            (model.GSTCertificate, nameof(model.GSTCertificate), "GST Certificate"),
-            (model.AddressProof, nameof(model.AddressProof), "Address Proof"),
-            (model.CancelledCheque, nameof(model.CancelledCheque), "Cancelled Cheque"),
-            (model.UndertakingDocument, nameof(model.UndertakingDocument), "Undertaking"),
-            (model.AuthorizedPersonIdProof, nameof(model.AuthorizedPersonIdProof), "Authorized Person ID Proof")
+        (model.FinancialDocuments, nameof(model.FinancialDocuments), "Financial Documents"),
+        (model.RegistrationCertificate, nameof(model.RegistrationCertificate), "Registration Certificate"),
+        (model.PANCardCopy, nameof(model.PANCardCopy), "PAN Card Copy"),
+        (model.GSTCertificate, nameof(model.GSTCertificate), "GST Certificate"),
+        (model.AddressProof, nameof(model.AddressProof), "Address Proof"),
+        (model.CancelledCheque, nameof(model.CancelledCheque), "Cancelled Cheque"),
+        (model.UndertakingDocument, nameof(model.UndertakingDocument), "Undertaking"),
+        (model.AuthorizedPersonIdProof, nameof(model.AuthorizedPersonIdProof), "Authorized Person ID Proof")
             };
 
-            foreach (var uploadedFile in uploadedFiles)
+            foreach (var (file, fieldName, label) in uploadedFiles)
             {
-                if (uploadedFile.File == null || uploadedFile.File.Length == 0)
+                if (file == null || file.Length == 0)
                     continue;
 
-                var extension = Path.GetExtension(uploadedFile.File.FileName);
+                var extension = Path.GetExtension(file.FileName);
+
+                var allowed = fieldName is nameof(model.CancelledCheque)
+                                        or nameof(model.AuthorizedPersonIdProof)
+                    ? new[] { ".pdf", ".jpg", ".jpeg", ".png" }
+                    : new[] { ".pdf" };
+
+                if (!allowed.Contains(extension, StringComparer.OrdinalIgnoreCase))
+                {
+                    ModelState.AddModelError(fieldName, $"{label}: file type not allowed.");
+                    continue;
+                }
+
+                if (!await HasValidSignatureAsync(file, extension))
+                {
+                    ModelState.AddModelError(fieldName, $"{label}: file content does not match its type.");
+                    continue;
+                }
 
                 if (extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase) &&
-                    uploadedFile.File.Length > maxPdfSize)
+                    file.Length > maxPdfSize)
                 {
-                    ModelState.AddModelError(
-                        uploadedFile.FieldName,
-                        $"{uploadedFile.Label} PDF must not exceed 2 MB.");
+                    ModelState.AddModelError(fieldName, $"{label} PDF must not exceed 2 MB.");
                 }
             }
 
             if (!ModelState.IsValid)
-                return View(model);
+                return InvalidResult(model);
 
             if (!await _roleManager.RoleExistsAsync("TrainingPartner"))
             {
                 ModelState.AddModelError("", "TrainingPartner role is not configured.");
-                return View(model);
+                return InvalidResult(model);
             }
 
             var existingUser = await _userManager.FindByEmailAsync(model.Email);
@@ -91,7 +141,7 @@ namespace TSSC.Unified.Areas.TP.Controllers
             {
                 ModelState.AddModelError(nameof(model.Email),
                     "An account already exists with this email address.");
-                return View(model);
+                return InvalidResult(model);
             }
 
             TPRegistration? application = null;
@@ -102,12 +152,17 @@ namespace TSSC.Unified.Areas.TP.Controllers
             {
                 application = new TPRegistration
                 {
+                    MembershipType = model.MembershipType,
                     OrganizationName = model.OrganizationName,
                     OrganizationType = model.OrganizationType,
                     RegistrationNumber = model.RegistrationNumber,
                     DateOfIncorporation = model.DateOfIncorporation,
                     PANNumber = model.PANNumber.ToUpperInvariant(),
-                    GSTNumber = model.GSTNumber?.ToUpperInvariant(),
+
+                    IsGSTAvailable = model.IsGSTAvailable,
+                    GSTNumber = model.IsGSTAvailable
+                        ? model.GSTNumber?.Trim().ToUpperInvariant()
+                        : null,
 
                     SectorExperience = model.SectorExperience,
                     YearsOfExperience = model.YearsOfExperience,
@@ -135,36 +190,25 @@ namespace TSSC.Unified.Areas.TP.Controllers
                     AuthorizedPersonMobile = model.AuthorizedPersonMobile,
 
                     DeclarationAccepted = model.DeclarationAccepted,
+
                     Status = "Submitted",
+                    OverallApprovalStatus = "In_Progress",
+                    CurrentStage = "REGIONAL",
+
                     CreatedOn = DateTime.UtcNow
                 };
 
                 _context.TPRegistrations.Add(application);
                 await _context.SaveChangesAsync();
 
-                var documents = new List<(IFormFile? File, string DocumentType)>
-        {
-            (model.FinancialDocuments, "Financial Documents"),
-            (model.RegistrationCertificate, "Registration Certificate"),
-            (model.PANCardCopy, "PAN Card Copy"),
-            (model.GSTCertificate, "GST Certificate"),
-            (model.AddressProof, "Address Proof"),
-            (model.CancelledCheque, "Cancelled Cheque"),
-            (model.UndertakingDocument, "Undertaking"),
-            (model.AuthorizedPersonIdProof, "Authorized Person ID Proof")
-        };
-
-                foreach (var document in documents.Where(x => x.File != null))
+                foreach (var (file, _, label) in uploadedFiles.Where(x => x.File != null && x.File.Length > 0))
                 {
-                    var savedFileName = await SaveFileAsync(
-                        document.File!,
-                        application.Id,
-                        document.DocumentType);
+                    var savedFileName = await SaveFileAsync(file!, application.Id, label);
 
                     _context.TPRegistrationDocuments.Add(new TPRegistrationDocument
                     {
                         TPRegistrationId = application.Id,
-                        DocumentType = document.DocumentType,
+                        DocumentType = label,
                         FileName = savedFileName,
                         UploadedOn = DateTime.UtcNow
                     });
@@ -172,7 +216,6 @@ namespace TSSC.Unified.Areas.TP.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Generate a secure temporary password, then send a password-set/reset link.
                 var temporaryPassword = GenerateTemporaryPassword();
                 var user = new AppUser
                 {
@@ -180,9 +223,8 @@ namespace TSSC.Unified.Areas.TP.Controllers
                     Email = model.Email,
                     PhoneNumber = model.MobileNumber,
                     EmailConfirmed = false,
-                    Password=temporaryPassword
+                    Password = temporaryPassword
                 };
-                
 
                 var createUserResult = await _userManager.CreateAsync(user, temporaryPassword);
                 if (!createUserResult.Succeeded)
@@ -199,14 +241,11 @@ namespace TSSC.Unified.Areas.TP.Controllers
 
                 await transaction.CommitAsync();
 
-
-                // Send only after registration, documents, account, and role are committed.
+                // Send only after everything is committed.
                 try
                 {
                     var templatePath = Path.Combine(
-                        _environment.WebRootPath,
-                        "email-templates",
-                        "tp_registration-submitted.html");
+                        _environment.WebRootPath, "emailtemplates", "tp_registration-submitted.html");
 
                     await _emailService.SendEmailAsync(
                         user.Email!,
@@ -223,15 +262,16 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 }
                 catch (Exception emailException)
                 {
-                    // Do not roll back the successfully committed registration because SMTP failed.
-                    //_logger.LogError(
-                    //    emailException,
-                    //    "TP Registration {ApplicationId} completed, but the acknowledgement email failed.",
-                    //    application.Id);
+                    _logger.LogError(emailException,
+                        "TP Registration {ApplicationId} saved, but the acknowledgement email failed.",
+                        application.Id);
                 }
 
                 TempData["Success"] =
                     "TP registration submitted successfully. Your account has been created.";
+
+                if (IsAjax)
+                    return Json(new { redirectUrl = Url.Action(nameof(Confirmation)) });
 
                 return RedirectToAction(nameof(Confirmation));
             }
@@ -239,23 +279,287 @@ namespace TSSC.Unified.Areas.TP.Controllers
             {
                 await transaction.RollbackAsync();
 
-                // Uploaded files are outside the database transaction, so remove them manually.
                 if (application != null)
                 {
-                    var uploadFolder = Path.Combine(
-                        _environment.WebRootPath,
-                        "uploads",
-                        "tp-registrations",
-                        application.Id.ToString());
+                    try
+                    {
+                        var uploadFolder = Path.Combine(
+                            _environment.WebRootPath, "uploads", "tp-registrations",
+                            application.Id.ToString());
 
-                    if (Directory.Exists(uploadFolder))
-                        Directory.Delete(uploadFolder, recursive: true);
+                        if (Directory.Exists(uploadFolder))
+                            Directory.Delete(uploadFolder, recursive: true);
+                    }
+                    catch (Exception cleanupEx)
+                    {
+                        _logger.LogWarning(cleanupEx, "Upload cleanup failed for {Id}", application.Id);
+                    }
                 }
 
-                ModelState.AddModelError("", $"Registration could not be submitted: {ex.Message}");
-                return View(model);
+                _logger.LogError(ex, "TP registration failed.");
+
+                // Shows the real error only when running in Development
+                var message = _environment.IsDevelopment()
+                    ? (ex.InnerException?.Message ?? ex.Message)
+                    : "Registration could not be submitted. Please try again.";
+
+                ModelState.AddModelError("", message);
+                return InvalidResult(model);
             }
         }
+
+        // ---------- helpers: add to the controller ----------
+
+        private IActionResult InvalidResult(TPRegistrationVM model)
+        {
+            if (!IsAjax)
+                return View(model);
+
+            var errors = ModelState
+                .Where(kv => kv.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    kv => kv.Key,
+                    kv => kv.Value!.Errors.Select(e => e.ErrorMessage).ToArray());
+
+            return BadRequest(new { errors });
+        }
+
+        private static async Task<bool> HasValidSignatureAsync(IFormFile file, string extension)
+        {
+            var header = new byte[8];
+            await using var stream = file.OpenReadStream();
+            var read = await stream.ReadAsync(header.AsMemory(0, header.Length));
+            if (read < 4) return false;
+
+            return extension.ToLowerInvariant() switch
+            {
+                ".pdf" => header[0] == 0x25 && header[1] == 0x50 && header[2] == 0x44 && header[3] == 0x46, // %PDF
+                ".jpg" or ".jpeg" => header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF,
+                ".png" => header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47,
+                _ => false
+            };
+        }
+
+        //[HttpPost]
+        //[RequestFormLimits(MultipartBodyLengthLimit = 104857600)]
+        //public async Task<IActionResult> Create(TPRegistrationVM model)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return View(model);
+
+        //    const long maxPdfSize = 2 * 1024 * 1024; // 2 MB
+
+        //    var uploadedFiles = new (IFormFile? File, string FieldName, string Label)[]
+        //    {
+        //    (model.FinancialDocuments, nameof(model.FinancialDocuments), "Financial Documents"),
+        //    (model.RegistrationCertificate, nameof(model.RegistrationCertificate), "Registration Certificate"),
+        //    (model.PANCardCopy, nameof(model.PANCardCopy), "PAN Card Copy"),
+        //    (model.GSTCertificate, nameof(model.GSTCertificate), "GST Certificate"),
+        //    (model.AddressProof, nameof(model.AddressProof), "Address Proof"),
+        //    (model.CancelledCheque, nameof(model.CancelledCheque), "Cancelled Cheque"),
+        //    (model.UndertakingDocument, nameof(model.UndertakingDocument), "Undertaking"),
+        //    (model.AuthorizedPersonIdProof, nameof(model.AuthorizedPersonIdProof), "Authorized Person ID Proof")
+        //    };
+
+        //    foreach (var uploadedFile in uploadedFiles)
+        //    {
+        //        if (uploadedFile.File == null || uploadedFile.File.Length == 0)
+        //            continue;
+
+        //        var extension = Path.GetExtension(uploadedFile.File.FileName);
+
+        //        if (extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase) &&
+        //            uploadedFile.File.Length > maxPdfSize)
+        //        {
+        //            ModelState.AddModelError(
+        //                uploadedFile.FieldName,
+        //                $"{uploadedFile.Label} PDF must not exceed 2 MB.");
+        //        }
+        //    }
+
+        //    if (!ModelState.IsValid)
+        //        return View(model);
+
+        //    if (!await _roleManager.RoleExistsAsync("TrainingPartner"))
+        //    {
+        //        ModelState.AddModelError("", "TrainingPartner role is not configured.");
+        //        return View(model);
+        //    }
+
+        //    var existingUser = await _userManager.FindByEmailAsync(model.Email);
+        //    if (existingUser != null)
+        //    {
+        //        ModelState.AddModelError(nameof(model.Email),
+        //            "An account already exists with this email address.");
+        //        return View(model);
+        //    }
+
+        //    TPRegistration? application = null;
+
+        //    await using var transaction = await _context.Database.BeginTransactionAsync();
+
+        //    try
+        //    {
+        //        application = new TPRegistration
+        //        {
+        //            OrganizationName = model.OrganizationName,
+        //            OrganizationType = model.OrganizationType,
+        //            RegistrationNumber = model.RegistrationNumber,
+        //            DateOfIncorporation = model.DateOfIncorporation,
+        //            PANNumber = model.PANNumber.ToUpperInvariant(),
+        //            // GST
+        //            IsGSTAvailable = model.IsGSTAvailable,
+        //            GSTNumber = model.IsGSTAvailable
+        //? model.GSTNumber?.Trim().ToUpperInvariant()
+        //: null,
+
+        //            SectorExperience = model.SectorExperience,
+        //            YearsOfExperience = model.YearsOfExperience,
+        //            PreviousProjects = model.PreviousProjects,
+        //            TrainingCentersCount = model.TrainingCentersCount,
+        //            TrainersAvailableCount = model.TrainersAvailableCount,
+
+        //            RegisteredOfficeAddress = model.RegisteredOfficeAddress,
+        //            State = model.State,
+        //            District = model.District,
+        //            City = model.City,
+        //            PinCode = model.PinCode,
+        //            Email = model.Email,
+        //            MobileNumber = model.MobileNumber,
+        //            AlternateContactPerson = model.AlternateContactPerson,
+
+        //            AnnualTurnoverLast3Years = model.AnnualTurnoverLast3Years,
+        //            BankAccountNumber = model.BankAccountNumber,
+        //            IFSCCode = model.IFSCCode,
+        //            BankName = model.BankName,
+
+        //            AuthorizedSignatoryName = model.AuthorizedSignatoryName,
+        //            Designation = model.Designation,
+        //            AuthorizedPersonEmail = model.AuthorizedPersonEmail,
+        //            AuthorizedPersonMobile = model.AuthorizedPersonMobile,
+
+        //            DeclarationAccepted = model.DeclarationAccepted,
+        //            Status = "Submitted",
+        //            CreatedOn = DateTime.UtcNow
+        //        };
+
+        //        _context.TPRegistrations.Add(application);
+        //        await _context.SaveChangesAsync();
+
+        //        var documents = new List<(IFormFile? File, string DocumentType)>
+        //{
+        //    (model.FinancialDocuments, "Financial Documents"),
+        //    (model.RegistrationCertificate, "Registration Certificate"),
+        //    (model.PANCardCopy, "PAN Card Copy"),
+        //    (model.GSTCertificate, "GST Certificate"),
+        //    (model.AddressProof, "Address Proof"),
+        //    (model.CancelledCheque, "Cancelled Cheque"),
+        //    (model.UndertakingDocument, "Undertaking"),
+        //    (model.AuthorizedPersonIdProof, "Authorized Person ID Proof")
+        //};
+
+        //        foreach (var document in documents.Where(x => x.File != null))
+        //        {
+        //            var savedFileName = await SaveFileAsync(
+        //                document.File!,
+        //                application.Id,
+        //                document.DocumentType);
+
+        //            _context.TPRegistrationDocuments.Add(new TPRegistrationDocument
+        //            {
+        //                TPRegistrationId = application.Id,
+        //                DocumentType = document.DocumentType,
+        //                FileName = savedFileName,
+        //                UploadedOn = DateTime.UtcNow
+        //            });
+        //        }
+
+        //        await _context.SaveChangesAsync();
+
+        //        // Generate a secure temporary password, then send a password-set/reset link.
+        //        var temporaryPassword = GenerateTemporaryPassword();
+        //        var user = new AppUser
+        //        {
+        //            UserName = model.Email,
+        //            Email = model.Email,
+        //            PhoneNumber = model.MobileNumber,
+        //            EmailConfirmed = false,
+        //            Password=temporaryPassword
+        //        };
+
+
+        //        var createUserResult = await _userManager.CreateAsync(user, temporaryPassword);
+        //        if (!createUserResult.Succeeded)
+        //            throw new InvalidOperationException(
+        //                string.Join(" ", createUserResult.Errors.Select(x => x.Description)));
+
+        //        var addRoleResult = await _userManager.AddToRoleAsync(user, "TrainingPartner");
+        //        if (!addRoleResult.Succeeded)
+        //            throw new InvalidOperationException(
+        //                string.Join(" ", addRoleResult.Errors.Select(x => x.Description)));
+
+        //        application.ApplicationUserId = user.Id;
+        //        await _context.SaveChangesAsync();
+
+        //        await transaction.CommitAsync();
+
+
+        //        // Send only after registration, documents, account, and role are committed.
+        //        try
+        //        {
+        //            var templatePath = Path.Combine(
+        //                _environment.WebRootPath,
+        //                "email-templates",
+        //                "tp_registration-submitted.html");
+
+        //            await _emailService.SendEmailAsync(
+        //                user.Email!,
+        //                "TSSC TP Registration Submitted Successfully",
+        //                templatePath,
+        //                new Dictionary<string, string>
+        //                {
+        //                    ["Name"] = application.AuthorizedSignatoryName,
+        //                    ["OrganizationName"] = application.OrganizationName,
+        //                    ["UserName"] = user.Email!,
+        //                    ["Password"] = temporaryPassword,
+        //                    ["ApplicationId"] = application.Id.ToString()
+        //                });
+        //        }
+        //        catch (Exception emailException)
+        //        {
+        //            // Do not roll back the successfully committed registration because SMTP failed.
+        //            //_logger.LogError(
+        //            //    emailException,
+        //            //    "TP Registration {ApplicationId} completed, but the acknowledgement email failed.",
+        //            //    application.Id);
+        //        }
+
+        //        TempData["Success"] =
+        //            "TP registration submitted successfully. Your account has been created.";
+
+        //        return RedirectToAction(nameof(Confirmation));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        await transaction.RollbackAsync();
+
+        //        // Uploaded files are outside the database transaction, so remove them manually.
+        //        if (application != null)
+        //        {
+        //            var uploadFolder = Path.Combine(
+        //                _environment.WebRootPath,
+        //                "uploads",
+        //                "tp-registrations",
+        //                application.Id.ToString());
+
+        //            if (Directory.Exists(uploadFolder))
+        //                Directory.Delete(uploadFolder, recursive: true);
+        //        }
+
+        //        ModelState.AddModelError("", $"Registration could not be submitted: {ex.Message}");
+        //        return View(model);
+        //    }
+        //}
 
         public IActionResult Confirmation()
         {
@@ -295,16 +599,14 @@ namespace TSSC.Unified.Areas.TP.Controllers
 
         private static string GenerateTemporaryPassword()
         {
-            var digits = new char[8];
+            var upper = (char)('A' + RandomNumberGenerator.GetInt32(26));
+            var lower = (char)('a' + RandomNumberGenerator.GetInt32(26));
 
-            for (var i = 0; i < digits.Length; i++)
-            {
-                digits[i] = (char)('0' + RandomNumberGenerator.GetInt32(10));
-            }
+            var digits = RandomNumberGenerator.GetInt32(100000, 1000000);
 
-            return new string(digits);
+            return $"{upper}{lower}{digits}";
         }
-        
+
         public async Task<IActionResult> TestRegistrationEmail(int id = 1)
         {
             var application = await _context.TPRegistrations
@@ -362,10 +664,10 @@ namespace TSSC.Unified.Areas.TP.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            
+
 
             ViewBag.UserRole = roles.FirstOrDefault();
-            
+
 
             return View(registration);
         }
@@ -904,6 +1206,781 @@ namespace TSSC.Unified.Areas.TP.Controllers
                     $"Application could not be resubmitted: {ex.Message}");
 
                 return View(model);
+            }
+        }
+
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> PayNow(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+                return Challenge();
+
+            var application = await _context.TPRegistrations
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.ApplicationUserId == user.Id);
+
+            if (application == null)
+                return NotFound();
+
+            if (application.CurrentStage != "PAYMENT_PROCESS" ||
+                application.OverallApprovalStatus == "Rejected" ||
+                application.PaymentProcess_Status == "Approved")
+            {
+                TempData["ErrorMessage"] =
+                    "Payment submission is not available for this application.";
+
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (application.PaymentProofStatus == "Pending")
+            {
+                TempData["InfoMessage"] =
+                    "Your payment proof has already been submitted and is awaiting verification.";
+
+                return RedirectToAction("Index", "Home");
+            }
+
+            var model = new PayNowVM
+            {
+                Id = application.Id,
+                OrganizationName = application.OrganizationName,
+                PaymentProofStatus = application.PaymentProofStatus
+            };
+
+            return View(model);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [RequestSizeLimit(5 * 1024 * 1024)]
+        public async Task<IActionResult> PayNow(PayNowVM model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+                return Challenge();
+
+            // Always load the application from the database.
+            // Do not trust posted application status or organization details.
+            var application = await _context.TPRegistrations
+                .FirstOrDefaultAsync(x =>
+                    x.Id == model.Id &&
+                    x.ApplicationUserId == user.Id);
+
+            if (application == null)
+                return NotFound();
+
+            if (application.CurrentStage != "PAYMENT_PROCESS" ||
+                application.OverallApprovalStatus == "Rejected" ||
+                application.PaymentProcess_Status == "Approved")
+            {
+                return Forbid();
+            }
+
+            if (application.PaymentProofStatus == "Pending")
+            {
+                TempData["InfoMessage"] =
+                    "Your payment proof is already awaiting verification.";
+
+                return RedirectToAction("Index", "Home");
+            }
+
+            model.OrganizationName = application.OrganizationName;
+            model.PaymentProofStatus = application.PaymentProofStatus;
+            model.QRCodePath = "/images/tp-affiliation-payment-qr.png";
+
+            // Validate the screenshot on the server.
+            if (model.PaymentScreenshot == null ||
+                model.PaymentScreenshot.Length == 0)
+            {
+                ModelState.AddModelError(
+                    nameof(model.PaymentScreenshot),
+                    "Please upload your payment screenshot.");
+            }
+            else if (model.PaymentScreenshot.Length > 5 * 1024 * 1024)
+            {
+                ModelState.AddModelError(
+                    nameof(model.PaymentScreenshot),
+                    "Screenshot size cannot exceed 5 MB.");
+            }
+            else
+            {
+                var extension = Path.GetExtension(
+                    model.PaymentScreenshot.FileName).ToLowerInvariant();
+
+                if (extension != ".jpg" &&
+                    extension != ".jpeg" &&
+                    extension != ".png")
+                {
+                    ModelState.AddModelError(
+                        nameof(model.PaymentScreenshot),
+                        "Only JPG, JPEG and PNG screenshots are allowed.");
+                }
+                else if (!await IsValidPaymentImageAsync(model.PaymentScreenshot))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.PaymentScreenshot),
+                        "The uploaded file is not a valid JPG or PNG image.");
+                }
+            }
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            // Store proof OUTSIDE wwwroot so it cannot be downloaded
+            // directly through a public URL.
+            // Store payment proof inside wwwroot.
+            var uploadFolder = Path.Combine(
+                _environment.WebRootPath,
+                "uploads",
+                "TPPaymentProofs");
+
+            Directory.CreateDirectory(uploadFolder);
+
+
+
+            var extensionToSave =
+                Path.GetExtension(model.PaymentScreenshot!.FileName)
+                    .ToLowerInvariant();
+
+            var safeFileName = $"{Guid.NewGuid():N}{extensionToSave}";
+            var fullPath = Path.Combine(uploadFolder, safeFileName);
+
+            try
+            {
+                await using (var stream = new FileStream(
+                    fullPath,
+                    FileMode.CreateNew,
+                    FileAccess.Write,
+                    FileShare.None))
+                {
+                    await model.PaymentScreenshot.CopyToAsync(stream);
+                }
+
+                // Store only the generated filename, never the client filename/path.
+                application.PaymentTransactionId =
+                    model.PaymentTransactionId.Trim();
+
+                application.PaymentProofFileName = safeFileName;
+                application.PaymentProofStatus = "Pending";
+                application.PaymentProofSubmittedOn = DateTime.UtcNow;
+
+                // IMPORTANT:
+                // Do NOT set PaymentProcess_Status = "Approved".
+                // Do NOT advance CurrentStage here.
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                // Avoid leaving an orphaned upload if saving the database fails.
+                if (System.IO.File.Exists(fullPath))
+                    System.IO.File.Delete(fullPath);
+
+                throw;
+            }
+
+            TempData["SuccessMessage"] =
+                "Payment proof submitted successfully. Finance will verify your payment.";
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        private static async Task<bool> IsValidPaymentImageAsync(IFormFile file)
+        {
+            // Verify file signatures, not just the supplied extension.
+            var header = new byte[8];
+
+            await using var stream = file.OpenReadStream();
+
+            var bytesRead = await stream.ReadAsync(
+                header.AsMemory(0, header.Length));
+
+            // JPEG starts FF D8 FF
+            var isJpeg = bytesRead >= 3 &&
+                         header[0] == 0xFF &&
+                         header[1] == 0xD8 &&
+                         header[2] == 0xFF;
+
+            // PNG starts 89 50 4E 47 0D 0A 1A 0A
+            var isPng = bytesRead >= 8 &&
+                        header[0] == 0x89 &&
+                        header[1] == 0x50 &&
+                        header[2] == 0x4E &&
+                        header[3] == 0x47 &&
+                        header[4] == 0x0D &&
+                        header[5] == 0x0A &&
+                        header[6] == 0x1A &&
+                        header[7] == 0x0A;
+
+            var extension = Path.GetExtension(file.FileName)
+                .ToLowerInvariant();
+
+            return (isJpeg && (extension == ".jpg" || extension == ".jpeg"))
+                || (isPng && extension == ".png");
+        }
+
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> DownloadCertificate(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+                return Unauthorized();
+
+            // Get only the registration belonging to the logged-in TP.
+            var registration = await _context.TPRegistrations
+                .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.ApplicationUserId == user.Id);
+
+            if (registration == null)
+                return NotFound("TP registration not found.");
+
+            // Certificate must be approved before download.
+            if (!string.Equals(
+                    registration.CertificateIssuance_Status,
+                    "Approved",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return Forbid();
+            }
+
+            // Configure this path to match your actual certificate template.
+            var templatePath = Path.Combine(
+             _environment.WebRootPath,
+             "uploads",
+             "certificates",
+             "templates",
+             "TP_certificate.png");
+
+            if (!System.IO.File.Exists(templatePath))
+                return NotFound("Certificate template file was not found.");
+
+            var certificateNo = $"TP-{registration.Id:D5}";
+            var companyName = registration.OrganizationName ?? "Training Partner";
+            var membershipType = registration.MembershipType ?? "Certificate";
+
+            var description =
+                "is hereby recognized as an affiliated Training Partner.";
+
+            var issuanceDate =
+                registration.CertificateIssuance_Date ?? DateTime.UtcNow;
+
+            var startDate = issuanceDate.ToString("dd MMM yyyy");
+            var endDate = issuanceDate.AddYears(1).ToString("dd MMM yyyy");
+
+            var pdfBytes = GenerateCertificatePdf(
+                membershipType,
+                certificateNo,
+                companyName,
+                description,
+                startDate,
+                endDate,
+                templatePath);
+
+            var fileName = $"TP-Certificate-{registration.Id}.pdf";
+
+            return File(
+                pdfBytes,
+                "application/pdf",
+                fileName);
+        }
+        //    private byte[] GenerateCertificatePdf(
+        //        string certificateNo,
+        //        string companyName,
+        //        string description,
+        //        string startDate,
+        //        string endDate,
+        //        string templatePath)
+        //    {
+        //        // =====================================================
+        //        // CREATE PDF MEMORY
+        //        // =====================================================
+
+        //        using (MemoryStream outputStream =
+        //               new MemoryStream())
+        //        {
+        //            // =================================================
+        //            // A4 LANDSCAPE
+        //            // =================================================
+
+        //            iText.Kernel.Geom.PageSize pageSize =
+        //                iText.Kernel.Geom.PageSize
+        //                    .A4
+        //                    .Rotate();
+
+
+        //            // =================================================
+        //            // PDF WRITER
+        //            // =================================================
+
+        //            PdfWriter writer =
+        //                new PdfWriter(
+        //                    outputStream
+        //                );
+
+
+        //            // =================================================
+        //            // PDF DOCUMENT
+        //            // =================================================
+
+        //            PdfDocument pdf =
+        //                new PdfDocument(
+        //                    writer
+        //                );
+
+
+        //            pdf.SetDefaultPageSize(
+        //                pageSize
+        //            );
+
+
+        //            // =================================================
+        //            // LAYOUT DOCUMENT
+        //            // =================================================
+
+        //            iText.Layout.Document document =
+        //                new iText.Layout.Document(
+        //                    pdf
+        //                );
+
+
+        //            document.SetMargins(
+        //                0,
+        //                0,
+        //                0,
+        //                0
+        //            );
+
+
+        //            float pageWidth =
+        //                pageSize.GetWidth();
+
+
+        //            float pageHeight =
+        //                pageSize.GetHeight();
+
+
+        //            // =================================================
+        //            // FONTS
+        //            // =================================================
+        //            PdfFont regularFont =
+        //                PdfFontFactory.CreateFont(
+        //                    StandardFonts.HELVETICA
+        //                );
+
+        //            PdfFont boldFont =
+        //                PdfFontFactory.CreateFont(
+        //                    StandardFonts.HELVETICA_BOLD
+        //                );
+
+        //            PdfFont timesFont =
+        //                PdfFontFactory.CreateFont(
+        //                    StandardFonts.TIMES_ROMAN
+        //                );
+        //            // =================================================
+        //            // BACKGROUND IMAGE
+        //            // =================================================
+
+        //            ImageData imageData =
+        //                ImageDataFactory.Create(
+        //                    templatePath
+        //                );
+
+
+        //            Image background =
+        //                new Image(
+        //                    imageData
+        //                );
+
+
+        //            background
+        //                .ScaleAbsolute(
+        //                    pageWidth,
+        //                    pageHeight
+        //                )
+        //                .SetFixedPosition(
+        //                    0,
+        //                    0
+        //                );
+
+
+        //            document.Add(
+        //                background
+        //            );
+
+
+        //            // =================================================
+        //            // COMPANY NAME
+        //            // =================================================
+        //            Paragraph company =
+        // new Paragraph(companyName)
+        //     .SetFont(boldFont)
+        //     .SetFontSize(18)
+        //     .SetFontColor(ColorConstants.BLACK)
+        //     .SetTextAlignment(
+        //         iText.Layout.Properties.TextAlignment.CENTER
+        //     )
+        //     .SetFixedPosition(
+        //         0,
+        //         290,
+        //         pageWidth
+        //     );
+
+        //            document.Add(company);
+
+        //            // =================================================
+        //            // DESCRIPTION
+        //            // =================================================
+
+        //            Paragraph descriptionText =
+        // new Paragraph(description)
+        //     .SetFont(timesFont)
+        //     .SetFontSize(18)
+        //     .SetFontColor(ColorConstants.BLACK)
+        //     .SetTextAlignment(
+        //         iText.Layout.Properties.TextAlignment.CENTER
+        //     )
+        //     .SetFixedPosition(
+        //         0,
+        //         252,
+        //         pageWidth
+        //     );
+
+        //            document.Add(descriptionText);
+        //            // =================================================
+        //            // DATE
+        //            // =================================================
+
+        //            Paragraph dates =
+        //new Paragraph()
+        //    .SetTextAlignment(
+        //        iText.Layout.Properties.TextAlignment.CENTER
+        //    )
+        //    .SetFixedPosition(
+        //        0,
+        //        215,
+        //        pageWidth
+        //    );
+
+        //            dates.Add(
+        //                new Text(startDate)
+        //                    .SetFont(boldFont)
+        //                    .SetFontSize(20)
+        //                    .SetFontColor(ColorConstants.BLACK)
+        //            );
+
+        //            dates.Add(
+        //                new Text("  to  ")
+        //                    .SetFont(regularFont)
+        //                    .SetFontSize(20)
+        //                    .SetFontColor(ColorConstants.BLACK)
+        //            );
+
+        //            dates.Add(
+        //                new Text(endDate)
+        //                    .SetFont(boldFont)
+        //                    .SetFontSize(20)
+        //                    .SetFontColor(ColorConstants.BLACK)
+        //            );
+
+        //            document.Add(dates);
+        //            // =================================================
+        //            // ID NUMBER
+        //            // CertificateNo = ID No.
+        //            // =================================================
+
+        //            Paragraph idNumber =
+        //                new Paragraph()
+        //                    .SetTextAlignment(
+        //                        iText.Layout.Properties.TextAlignment.LEFT
+        //                    )
+        //                    .SetFixedPosition(
+        //                        88,
+        //                        75,
+        //                        220
+        //                    );
+
+        //            idNumber.Add(
+        //                new Text("ID No.: ")
+        //                    .SetFont(regularFont)
+        //                    .SetFontSize(10)
+        //                    .SetFontColor(
+        //                        ColorConstants.BLACK
+        //                    )
+        //            );
+
+        //            idNumber.Add(
+        //                new Text(certificateNo)
+        //                    .SetFont(boldFont)
+        //                    .SetFontSize(10)
+        //                    .SetFontColor(
+        //                        ColorConstants.BLACK
+        //                    )
+        //            );
+
+        //            document.Add(idNumber);
+        //            // =================================================
+        //            // CLOSE
+        //            // =================================================
+
+        //            document.Close();
+
+
+        //            // =================================================
+        //            // RETURN PDF
+        //            // =================================================
+
+        //            return outputStream.ToArray();
+        //        }
+        //    }
+
+        private byte[] GenerateCertificatePdf(
+        string membershipType,
+        string certificateNo,
+        string companyName,
+        string description,
+        string startDate,
+        string endDate,
+        string templatePath)
+        {
+            // =====================================================
+            // CREATE PDF MEMORY
+            // =====================================================
+
+            using (MemoryStream outputStream = new MemoryStream())
+            {
+                // =================================================
+                // A4 LANDSCAPE
+                // =================================================
+
+                iText.Kernel.Geom.PageSize pageSize =
+                    iText.Kernel.Geom.PageSize.A4.Rotate();
+
+                // =================================================
+                // PDF WRITER
+                // =================================================
+
+                PdfWriter writer = new PdfWriter(outputStream);
+
+                // =================================================
+                // PDF DOCUMENT
+                // =================================================
+
+                PdfDocument pdf = new PdfDocument(writer);
+
+                pdf.SetDefaultPageSize(pageSize);
+
+                // =================================================
+                // LAYOUT DOCUMENT
+                // =================================================
+
+                iText.Layout.Document document =
+                    new iText.Layout.Document(pdf);
+
+                document.SetMargins(0, 0, 0, 0);
+
+                float pageWidth = pageSize.GetWidth();
+                float pageHeight = pageSize.GetHeight();
+
+                // =================================================
+                // FONTS
+                // =================================================
+
+                PdfFont regularFont =
+                    PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
+
+                PdfFont boldFont =
+                    PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
+
+                PdfFont timesFont =
+                    PdfFontFactory.CreateFont(StandardFonts.TIMES_ROMAN);
+
+
+                string mariageFontPath = Path.Combine(
+                    _environment.WebRootPath,
+                    "Fonts",
+                    "Old English Text MT Regular.ttf"
+                );
+
+
+                if (!System.IO.File.Exists(mariageFontPath))
+                {
+                    throw new FileNotFoundException(
+                        "Mariage font file not found.",
+                        mariageFontPath
+                    );
+                }
+
+                PdfFont mariageFont = PdfFontFactory.CreateFont(
+                    mariageFontPath,
+                    iText.IO.Font.PdfEncodings.WINANSI,
+                    PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED
+                );
+                // =================================================
+                // BACKGROUND IMAGE
+                // =================================================
+
+                ImageData imageData = ImageDataFactory.Create(templatePath);
+
+                Image background = new Image(imageData);
+
+                background
+                    .ScaleAbsolute(pageWidth, pageHeight)
+                    .SetFixedPosition(0, 0);
+
+                document.Add(background);
+
+                // =================================================
+                // MEMBERSHIP TYPE HEADING (NEW)
+                // =================================================
+
+                //Paragraph membershipHeading =
+                //    new Paragraph(membershipType)
+                //        .SetFont(boldFont)
+                //        .SetFontSize(22)
+                //        .SetFontColor(ColorConstants.BLACK)
+                //        .SetTextAlignment(
+                //            iText.Layout.Properties.TextAlignment.CENTER
+                //        )
+                //        .SetFixedPosition(
+                //            0,
+                //            330,
+                //            pageWidth
+                //        );
+                Paragraph membershipHeading =
+     new Paragraph(membershipType)
+         .SetFont(mariageFont)
+         .SetFontSize(35)
+         .SetFontColor(new iText.Kernel.Colors.DeviceRgb(20, 74, 194))   // heading blue #1A46A4
+         .SetUnderline(2f, -4f)
+         .SetTextAlignment(
+             iText.Layout.Properties.TextAlignment.CENTER
+         )
+         .SetFixedPosition(
+             0,
+             343,
+             pageWidth
+         );
+
+                document.Add(membershipHeading);
+
+                document.Add(membershipHeading);
+                document.Add(membershipHeading);
+
+                // =================================================
+                // COMPANY NAME
+                // =================================================
+
+                Paragraph company =
+                    new Paragraph(companyName)
+                        .SetFont(boldFont)
+                        .SetFontSize(18)
+                        .SetFontColor(ColorConstants.BLACK)
+                        .SetTextAlignment(
+                            iText.Layout.Properties.TextAlignment.CENTER
+                        )
+                        .SetFixedPosition(0, 290, pageWidth);
+
+                document.Add(company);
+
+                // =================================================
+                // DESCRIPTION
+                // =================================================
+
+                Paragraph descriptionText =
+                    new Paragraph(description)
+                        .SetFont(timesFont)
+                        .SetFontSize(18)
+                        .SetFontColor(ColorConstants.BLACK)
+                        .SetTextAlignment(
+                            iText.Layout.Properties.TextAlignment.CENTER
+                        )
+                        .SetFixedPosition(0, 252, pageWidth);
+
+                document.Add(descriptionText);
+
+                // =================================================
+                // DATE
+                // =================================================
+
+                Paragraph dates =
+                    new Paragraph()
+                        .SetTextAlignment(
+                            iText.Layout.Properties.TextAlignment.CENTER
+                        )
+                        .SetFixedPosition(0, 215, pageWidth);
+
+                dates.Add(
+                    new Text(startDate)
+                        .SetFont(boldFont)
+                        .SetFontSize(20)
+                        .SetFontColor(ColorConstants.BLACK)
+                );
+
+                dates.Add(
+                    new Text("  to  ")
+                        .SetFont(regularFont)
+                        .SetFontSize(20)
+                        .SetFontColor(ColorConstants.BLACK)
+                );
+
+                dates.Add(
+                    new Text(endDate)
+                        .SetFont(boldFont)
+                        .SetFontSize(20)
+                        .SetFontColor(ColorConstants.BLACK)
+                );
+
+                document.Add(dates);
+
+                // =================================================
+                // ID NUMBER
+                // CertificateNo = ID No.
+                // =================================================
+
+                Paragraph idNumber =
+                    new Paragraph()
+                        .SetTextAlignment(
+                            iText.Layout.Properties.TextAlignment.LEFT
+                        )
+                        .SetFixedPosition(88, 75, 220);
+
+                idNumber.Add(
+                    new Text("ID No.: ")
+                        .SetFont(regularFont)
+                        .SetFontSize(10)
+                        .SetFontColor(ColorConstants.BLACK)
+                );
+
+                idNumber.Add(
+                    new Text(certificateNo)
+                        .SetFont(boldFont)
+                        .SetFontSize(10)
+                        .SetFontColor(ColorConstants.BLACK)
+                );
+
+                document.Add(idNumber);
+
+                // =================================================
+                // CLOSE
+                // =================================================
+
+                document.Close();
+
+                // =================================================
+                // RETURN PDF
+                // =================================================
+
+                return outputStream.ToArray();
             }
         }
     }

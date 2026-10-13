@@ -30,7 +30,7 @@ builder.Services.Configure<FormOptions>(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddMvc();
 var connString = builder.Configuration.GetConnectionString("DefaultConnectionString");
-builder.Services.AddDbContext<AppdbContext>(options => options.UseSqlServer(connString));
+builder.Services.AddDbContext<AppdbContext>(options => options.UseSqlServer(connString, sqlOptions => sqlOptions.UseCompatibilityLevel(120)));
 builder.Services.AddSingleton<IFileProvider>(
                   new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"))
                   );

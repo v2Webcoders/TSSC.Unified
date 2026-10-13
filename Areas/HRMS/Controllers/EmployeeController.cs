@@ -441,8 +441,26 @@ namespace QUIZAPP.Areas.HRMS.Controllers
          DesignationName = des.DesignationName,
          IsActive = e.IsActive,
          Username = e.ApplicationUser.UserName,
-         ProfileStatus=e.ProfileStatus
+         ProfileStatus=e.ProfileStatus,
+         ApplicationUserId = e.ApplicationUserId
      }).ToListAsync();
+
+            // Get Identity Role for each employee
+            foreach (var employee in employees)
+            {
+                if (!string.IsNullOrEmpty(employee.ApplicationUserId))
+                {
+                    var user = await _userManager.FindByIdAsync(employee.ApplicationUserId);
+
+                    if (user != null)
+                    {
+                        var roles = await _userManager.GetRolesAsync(user);
+
+                        employee.RoleName = roles.First();
+                    }
+                }
+            }
+
 
             return View(employees);
         }
@@ -2097,7 +2115,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             {
                 string baseUrl = $"{Request.Scheme}://{Request.Host}";
                 // Prepare sample email data
-                string recipientEmail = "subodh@v2web.in";
+                string recipientEmail = "subodh+1002@v2web.in";
                 string subject = "Test Email from TSSC";
 
                 // Path to your email template

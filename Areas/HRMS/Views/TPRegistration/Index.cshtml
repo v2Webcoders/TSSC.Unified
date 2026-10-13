@@ -62,7 +62,7 @@
         <div class="table-responsive">
             <div class="table-responsive">
 
-                <table class="datatable-init-export table table-tranx table_custom table-bordered">
+                <table class="datatable-init-export table table-tranx table_custom table-bordered" data-auto-responsive="false">
 
                     <thead>
                         <tr>
@@ -73,10 +73,17 @@
                             <th>Contact Details</th>
                             <th>Submitted On</th>
 
-                            <th>Regional Head</th>
-                            <th>Vertical Head</th>
+                            <th>Regional</th>
+                            <th>Affiliations</th>
                             <th>Finance</th>
+                            <th>Vertical Head</th>
+                            <th>Senior Reviewer 1</th>
+                            <th>Senior Reviewer 2</th>
                             <th>CEO</th>
+                            <th>Payment</th>
+                            <th>Certificate</th>
+
+                            <th>Current Stage</th>
 
                             <th class="text-end">Action</th>
                         </tr>
@@ -92,8 +99,13 @@
                         {
                             <tr>
 
-                                <td>@count</td>
+                                <!-- # -->
+                                <td>
+                                    @count
+                                </td>
 
+
+                                <!-- Organization -->
                                 <td>
                                     <strong>@item.OrganizationName</strong>
                                     <br />
@@ -102,10 +114,14 @@
                                     </small>
                                 </td>
 
+
+                                <!-- Registration Number -->
                                 <td>
                                     @item.RegistrationNumber
                                 </td>
 
+
+                                <!-- Applicant / Signatory -->
                                 <td>
                                     @item.AuthorizedSignatoryName
                                     <br />
@@ -114,6 +130,8 @@
                                     </small>
                                 </td>
 
+
+                                <!-- Contact -->
                                 <td>
                                     @item.Email
                                     <br />
@@ -122,100 +140,199 @@
                                     </small>
                                 </td>
 
+
+                                <!-- Submitted On -->
                                 <td>
                                     @item.CreatedOn.ToString("dd MMM yyyy")
                                 </td>
 
 
-                                <!-- Regional Head Status -->
+                                <!-- Regional -->
                                 <td>
                                     @if (item.Regional_Head_Status == "Approved")
                                     {
-                                        <span class="badge bg-success">
-                                            Approved
-                                        </span>
+                                        <span class="badge bg-success">Approved</span>
                                     }
                                     else if (item.Regional_Head_Status == "Rejected")
                                     {
-                                        <span class="badge bg-danger">
-                                            Rejected
-                                        </span>
+                                        <span class="badge bg-danger">Rejected</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-warning">
-                                            Pending
-                                        </span>
+                                        <span class="badge bg-warning">Pending</span>
                                     }
                                 </td>
 
 
-                                <!-- Vertical Head Status -->
+                                <!-- Affiliations -->
                                 <td>
-                                    @if (item.Vertical_Head_Status == "Approved")
+                                    @if (item.Affiliations_Status == "Approved")
                                     {
-                                        <span class="badge bg-success">
-                                            Approved
-                                        </span>
+                                        <span class="badge bg-success">Approved</span>
                                     }
-                                    else if (item.Vertical_Head_Status == "Rejected")
+                                    else if (item.Affiliations_Status == "Rejected")
                                     {
-                                        <span class="badge bg-danger">
-                                            Rejected
-                                        </span>
+                                        <span class="badge bg-danger">Rejected</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-warning">
-                                            Pending
-                                        </span>
+                                        <span class="badge bg-warning">Pending</span>
                                     }
                                 </td>
 
 
-                                <!-- Finance Status -->
+                                <!-- Finance -->
                                 <td>
                                     @if (item.Finance_Status == "Approved")
                                     {
-                                        <span class="badge bg-success">
-                                            Approved
-                                        </span>
+                                        <span class="badge bg-success">Approved</span>
                                     }
                                     else if (item.Finance_Status == "Rejected")
                                     {
-                                        <span class="badge bg-danger">
-                                            Rejected
-                                        </span>
+                                        <span class="badge bg-danger">Rejected</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-warning">
-                                            Pending
-                                        </span>
+                                        <span class="badge bg-warning">Pending</span>
                                     }
                                 </td>
 
 
-                                <!-- CEO Status -->
+                                <!-- Vertical Head -->
+                                <td>
+                                    @if (item.Vertical_Head_Status == "Approved")
+                                    {
+                                        <span class="badge bg-success">Approved</span>
+                                    }
+                                    else if (item.Vertical_Head_Status == "Rejected")
+                                    {
+                                        <span class="badge bg-danger">Rejected</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Pending</span>
+                                    }
+                                </td>
+
+
+                                <!-- Senior Reviewer 1 -->
+                                <td>
+                                    @if (item.SeniorReviewer1_Status == "Approved")
+                                    {
+                                        <span class="badge bg-success">Approved</span>
+                                    }
+                                    else if (item.SeniorReviewer1_Status == "Rejected")
+                                    {
+                                        <span class="badge bg-danger">Rejected</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Pending</span>
+                                    }
+                                </td>
+
+
+                                <!-- Senior Reviewer 2 -->
+                                <td>
+                                    @if (item.SeniorReviewer2_Status == "Approved")
+                                    {
+                                        <span class="badge bg-success">Approved</span>
+                                    }
+                                    else if (item.SeniorReviewer2_Status == "Rejected")
+                                    {
+                                        <span class="badge bg-danger">Rejected</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Pending</span>
+                                    }
+                                </td>
+
+
+                                <!-- CEO -->
                                 <td>
                                     @if (item.CEO_Status == "Approved")
                                     {
-                                        <span class="badge bg-success">
-                                            Approved
-                                        </span>
+                                        <span class="badge bg-success">Approved</span>
                                     }
                                     else if (item.CEO_Status == "Rejected")
                                     {
-                                        <span class="badge bg-danger">
-                                            Rejected
+                                        <span class="badge bg-danger">Rejected</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Pending</span>
+                                    }
+                                </td>
+
+
+                                <!-- Payment Process -->
+                                <td>
+                                    @if (item.PaymentProcess_Status == "Approved")
+                                    {
+                                        <span class="badge bg-success">Approved</span>
+                                    }
+                                    else if (item.PaymentProcess_Status == "Rejected")
+                                    {
+                                        <span class="badge bg-danger">Rejected</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Pending</span>
+                                    }
+                                </td>
+
+
+                                @* <!-- Finance Certificate -->
+                                <td>
+                                    @if (item.FinanceCertificate_Status == "Approved")
+                                    {
+                                        <span class="badge bg-success">Approved</span>
+                                    }
+                                    else if (item.FinanceCertificate_Status == "Rejected")
+                                    {
+                                        <span class="badge bg-danger">Rejected</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Pending</span>
+                                    }
+                                </td> *@
+
+
+                                <!-- Certificate Issuance -->
+                                <td>
+                                    @if (item.CertificateIssuance_Status == "Approved")
+                                    {
+                                        <span class="badge bg-success">Approved</span>
+                                    }
+                                    else if (item.CertificateIssuance_Status == "Rejected")
+                                    {
+                                        <span class="badge bg-danger">Rejected</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Pending</span>
+                                    }
+                                </td>
+
+
+                                <!-- Current Stage -->
+                                <td>
+
+                                    @if (!string.IsNullOrEmpty(item.CurrentStage))
+                                    {
+                                        <span class="badge bg-primary">
+                                            @item.CurrentStage
                                         </span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-warning">
-                                            Pending
+                                        <span class="badge bg-light text-dark">
+                                            -
                                         </span>
                                     }
+
                                 </td>
 
 

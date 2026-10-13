@@ -4,561 +4,645 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
-    Layout = "_Layout";
-    ViewData["Title"] = "TP Registration Details";
-    var userRole = ViewBag.UserRole as string;
+	Layout = "_Layout";
+	ViewData["Title"] = "TP Registration Details";
+	var userRole = ViewBag.UserRole as string;
 }
 
 <div class="nk-block-head">
-    <div class="nk-block-between">
-        <div class="nk-block-head-content">
-            <h3 class="nk-block-title page-title">
-                My Application
-            </h3>
+	<div class="nk-block-between">
+		<div class="nk-block-head-content">
+			<h3 class="nk-block-title page-title">
+				My Application
+			</h3>
 
-            <div class="nk-block-des text-soft">
-                <p>
-                    Application ID: <strong>#@Model.Id</strong>
-                </p>
-            </div>
-        </div>
-    </div>
+			<div class="nk-block-des text-soft">
+				<p>
+					Application ID: <strong>#@Model.Id</strong>
+				</p>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="card card-bordered">
-    <div class="card-inner">
-        <div class="row g-gs align-items-center">
-            <div class="col-md-8">
-                <h5 class="title mb-1">@Model.OrganizationName</h5>
-                <span class="text-soft">
-                    Submitted on @Model.CreatedOn.ToString("dd MMM yyyy, hh:mm tt")
-                </span>
-            </div>
+	<div class="card-inner">
+		<div class="row g-gs align-items-center">
+			<div class="col-md-8">
+				<h5 class="title mb-1">@Model.OrganizationName</h5>
+				<span class="text-soft">
+					Submitted on @Model.CreatedOn.ToString("dd MMM yyyy, hh:mm tt")
+				</span>
+			</div>
 
-            <div class="col-md-4 text-md-end">
-                @switch (Model.Status)
-                {
-                    case "Submitted":
-                        <span class="badge bg-warning">Submitted</span>
-                        break;
-                    case "Under Review":
-                        <span class="badge bg-info">Under Review</span>
-                        break;
-                    case "Approved":
-                        <span class="badge bg-success">Approved</span>
-                        break;
-                    case "Rejected":
-                        <span class="badge bg-danger">Rejected</span>
-                        break;
-                    default:
-                        <span class="badge bg-secondary">@Model.Status</span>
-                        break;
-                }
-            </div>
-        </div>
-    </div>
+			<div class="col-md-4 text-md-end">
+				@switch (Model.Status)
+				{
+					case "Submitted":
+						<span class="badge bg-warning">Submitted</span>
+						break;
+					case "Under Review":
+						<span class="badge bg-info">Under Review</span>
+						break;
+					case "Approved":
+						<span class="badge bg-success">Approved</span>
+						break;
+					case "Rejected":
+						<span class="badge bg-danger">Rejected</span>
+						break;
+					default:
+						<span class="badge bg-secondary">@Model.Status</span>
+						break;
+				}
+			</div>
+		</div>
+	</div>
 </div>
 
-@if (Model.Regional_Head_Status == "Rejected"
-   || Model.Vertical_Head_Status == "Rejected"
-   || Model.Finance_Status == "Rejected"
-   || Model.CEO_Status == "Rejected")
+@* =========================================================
+   AFFILIATION PAYMENT CARD
+   Show only when payment is pending at PAYMENT_PROCESS stage
+   ========================================================= *@
+
+@if (Model.CurrentStage == "PAYMENT_PROCESS"
+		&& Model.PaymentProcess_Status != "Approved"
+		&& Model.PaymentProcess_Status != "Rejected"
+		&& Model.OverallApprovalStatus != "Rejected")
 {
-    <div class="card border border-danger-dim border-1 mt-4">
+	<div class="card card-bordered border border-warning mt-4">
+		<div class="card-inner">
+			<div class="row g-3 align-items-center">
+				<div class="col-md-8">
+					<div class="d-flex align-items-center gap-3">
+						<div class="user-avatar bg-warning-dim">
+							<em class="icon ni ni-wallet text-warning"></em>
+						</div>
 
-        <div class="card-inner bg-danger-dim">
+						<div>
+							<h5 class="title mb-1">
+								Affiliation Fee Payment
+							</h5>
 
-            <div class="d-flex justify-content-between align-items-center gap-3">
+							<p class="text-soft mb-0">
+								Your application has reached the payment stage.
+								Please complete the affiliation fee payment
+								to proceed with certificate processing.
+							</p>
+						</div>
+					</div>
+				</div>
 
-                <div>
-                    <h5 class="mb-1 text-danger fw-bold">
-                        Application Requires Correction
-                    </h5>
+				<div class="col-md-4 text-md-end">
+					<a asp-area="TP"
+					   asp-controller="Registration"
+					   asp-action="PayNow"
+					   asp-route-id="@Model.Id"
+					   class="btn btn-success">
+						<em class="icon ni ni-wallet me-1"></em>
+						Pay Now
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+}
 
-                    <div class="text-dark small">
-                        Your application has been rejected and requires
-                        correction before it can be resubmitted.
-                    </div>
-                </div>
 
-                <a asp-area="TP"
-                   asp-controller="Registration"
-                   asp-action="Edit"
-                   asp-route-id="@Model.Id"
-                   class="btn btn-danger flex-shrink-0">
-                    Edit & Resubmit
-                </a>
 
-            </div>
+@if (Model.Regional_Head_Status == "Rejected"
+		|| Model.Vertical_Head_Status == "Rejected"
+		|| Model.Finance_Status == "Rejected"
+		|| Model.CEO_Status == "Rejected")
+{
+	<div class="card border border-danger-dim border-1 mt-4">
 
-        </div>
-    </div>
+		<div class="card-inner bg-danger-dim">
+
+			<div class="d-flex justify-content-between align-items-center gap-3">
+
+				<div>
+					<h5 class="mb-1 text-danger fw-bold">
+						Application Requires Correction
+					</h5>
+
+					<div class="text-dark small">
+						Your application has been rejected and requires
+						correction before it can be resubmitted.
+					</div>
+				</div>
+
+				<a asp-area="TP"
+				   asp-controller="Registration"
+				   asp-action="Edit"
+				   asp-route-id="@Model.Id"
+				   class="btn btn-danger flex-shrink-0">
+					Edit & Resubmit
+				</a>
+
+			</div>
+
+		</div>
+	</div>
 }
 
 <div class="card card-bordered mt-4">
-    <div class="card-inner">
-        <h5 class="title mb-4">Basic Details</h5>
+	<div class="card-inner">
+		<h5 class="title mb-4">Basic Details</h5>
 
-        <div class="row g-gs">
-            <div class="col-md-6">
-                <span class="sub-text">Organization Name</span>
-                <p><strong>@Model.OrganizationName</strong></p>
-            </div>
+		<div class="row g-gs">
+			<div class="col-md-6">
+				<span class="sub-text">Membership</span>
+				<p><strong>@Model.MembershipType</strong></p>
+			</div>
+			<div class="col-md-6">
+				<span class="sub-text">Organization Name</span>
+				<p><strong>@Model.OrganizationName</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">Type of Organization</span>
-                <p><strong>@Model.OrganizationType</strong></p>
-            </div>
+			<div class="col-md-6">
+				<span class="sub-text">Type of Organization</span>
+				<p><strong>@Model.OrganizationType</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">Registration Number</span>
-                <p><strong>@Model.RegistrationNumber</strong></p>
-            </div>
+			<div class="col-md-6">
+				<span class="sub-text">Registration Number</span>
+				<p><strong>@Model.RegistrationNumber</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">Date of Incorporation</span>
-                <p><strong>@Model.DateOfIncorporation?.ToString("dd MMM yyyy")</strong></p>
-            </div>
+			<div class="col-md-6">
+				<span class="sub-text">Date of Incorporation</span>
+				<p><strong>@Model.DateOfIncorporation?.ToString("dd MMM yyyy")</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">PAN Number</span>
-                <p><strong>@Model.PANNumber</strong></p>
-            </div>
+			<div class="col-md-6">
+				<span class="sub-text">PAN Number</span>
+				<p><strong>@Model.PANNumber</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">GST Number</span>
-                <p><strong>@(Model.GSTNumber ?? "Not provided")</strong></p>
-            </div>
-        </div>
-    </div>
+			<div class="col-md-6">
+				<span class="sub-text">GST Number</span>
+				<p><strong>@(Model.GSTNumber ?? "Not provided")</strong></p>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="card card-bordered mt-4">
-    <div class="card-inner">
-        <h5 class="title mb-4">Organization Profile</h5>
+	<div class="card-inner">
+		<h5 class="title mb-4">Organization Profile</h5>
 
-        <div class="row g-gs">
-            <div class="col-md-6">
-                <span class="sub-text">Sector Experience</span>
-                <p><strong>@Model.SectorExperience</strong></p>
-            </div>
+		<div class="row g-gs">
+			<div class="col-md-6">
+				<span class="sub-text">Sector Experience</span>
+				<p><strong>@Model.SectorExperience</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">Years of Experience</span>
-                <p><strong>@Model.YearsOfExperience</strong></p>
-            </div>
+			<div class="col-md-6">
+				<span class="sub-text">Years of Experience</span>
+				<p><strong>@Model.YearsOfExperience</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">Training Centers</span>
-                <p><strong>@(Model.TrainingCentersCount?.ToString() ?? "Not provided")</strong></p>
-            </div>
+			<div class="col-md-6">
+				<span class="sub-text">Training Centers</span>
+				<p><strong>@(Model.TrainingCentersCount?.ToString() ?? "Not provided")</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">Trainers Available</span>
-                <p><strong>@Model.TrainersAvailableCount</strong></p>
-            </div>
+			<div class="col-md-6">
+				<span class="sub-text">Trainers Available</span>
+				<p><strong>@Model.TrainersAvailableCount</strong></p>
+			</div>
 
-            <div class="col-12">
-                <span class="sub-text">Previous Projects / Work Details</span>
-                <p><strong>@(Model.PreviousProjects ?? "Not provided")</strong></p>
-            </div>
-        </div>
-    </div>
+			<div class="col-12">
+				<span class="sub-text">Previous Projects / Work Details</span>
+				<p><strong>@(Model.PreviousProjects ?? "Not provided")</strong></p>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="card card-bordered mt-4">
-    <div class="card-inner">
-        <h5 class="title mb-4">Contact Details</h5>
+	<div class="card-inner">
+		<h5 class="title mb-4">Contact Details</h5>
 
-        <div class="row g-gs">
-            <div class="col-md-6">
-                <span class="sub-text">Official Email ID</span>
-                <p><strong>@Model.Email</strong></p>
-            </div>
+		<div class="row g-gs">
+			<div class="col-md-6">
+				<span class="sub-text">Official Email ID</span>
+				<p><strong>@Model.Email</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">Mobile Number</span>
-                <p><strong>@Model.MobileNumber</strong></p>
-            </div>
+			<div class="col-md-6">
+				<span class="sub-text">Mobile Number</span>
+				<p><strong>@Model.MobileNumber</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">Alternate Contact Person</span>
-                <p><strong>@(Model.AlternateContactPerson ?? "Not provided")</strong></p>
-            </div>
+			<div class="col-md-6">
+				<span class="sub-text">Alternate Contact Person</span>
+				<p><strong>@(Model.AlternateContactPerson ?? "Not provided")</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">Location</span>
-                <p><strong>@Model.City, @Model.District, @Model.State - @Model.PinCode</strong></p>
-            </div>
+			<div class="col-md-6">
+				<span class="sub-text">Location</span>
+				<p><strong>@Model.City, @Model.District, @Model.State - @Model.PinCode</strong></p>
+			</div>
 
-            <div class="col-12">
-                <span class="sub-text">Registered Office Address</span>
-                <p><strong>@Model.RegisteredOfficeAddress</strong></p>
-            </div>
-        </div>
-    </div>
+			<div class="col-12">
+				<span class="sub-text">Registered Office Address</span>
+				<p><strong>@Model.RegisteredOfficeAddress</strong></p>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="card card-bordered mt-4">
-    <div class="card-inner">
-        <h5 class="title mb-4">Financial Details</h5>
+	<div class="card-inner">
+		<h5 class="title mb-4">Financial Details</h5>
 
-        <div class="row g-gs">
-            <div class="col-md-6">
-                <span class="sub-text">Bank Name</span>
-                <p><strong>@Model.BankName</strong></p>
-            </div>
+		<div class="row g-gs">
+			<div class="col-md-6">
+				<span class="sub-text">Bank Name</span>
+				<p><strong>@Model.BankName</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">IFSC Code</span>
-                <p><strong>@Model.IFSCCode</strong></p>
-            </div>
+			<div class="col-md-6">
+				<span class="sub-text">IFSC Code</span>
+				<p><strong>@Model.IFSCCode</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">Bank Account Number</span>
-                <p><strong>@Model.BankAccountNumber</strong></p>
-            </div>
+			<div class="col-md-6">
+				<span class="sub-text">Bank Account Number</span>
+				<p><strong>@Model.BankAccountNumber</strong></p>
+			</div>
+			<div class="col-md-6">
+				<span class="sub-text">GST Available</span>
+				<p><strong>@(Model.IsGSTAvailable ? "Yes" : "No")</strong></p>
+			</div>
 
-            <div class="col-12">
-                <span class="sub-text">Annual Turnover (Last 3 Years)</span>
-                <p><strong>@Model.AnnualTurnoverLast3Years</strong></p>
-            </div>
-        </div>
-    </div>
+			@if (Model.IsGSTAvailable)
+			{
+				<div class="col-md-6">
+					<span class="sub-text">GST Number</span>
+					<p><strong>@Model.GSTNumber</strong></p>
+				</div>
+			}
+
+
+			<div class="col-12">
+				<span class="sub-text">Annual Turnover (Last 3 Years)</span>
+				<p><strong>@Model.AnnualTurnoverLast3Years</strong></p>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="card card-bordered mt-4">
-    <div class="card-inner">
-        <h5 class="title mb-4">Authorized Person Details</h5>
+	<div class="card-inner">
+		<h5 class="title mb-4">Authorized Person Details</h5>
 
-        <div class="row g-gs">
-            <div class="col-md-6">
-                <span class="sub-text">Authorized Signatory</span>
-                <p><strong>@Model.AuthorizedSignatoryName</strong></p>
-            </div>
+		<div class="row g-gs">
+			<div class="col-md-6">
+				<span class="sub-text">Authorized Signatory</span>
+				<p><strong>@Model.AuthorizedSignatoryName</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">Designation</span>
-                <p><strong>@Model.Designation</strong></p>
-            </div>
+			<div class="col-md-6">
+				<span class="sub-text">Designation</span>
+				<p><strong>@Model.Designation</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">Email ID</span>
-                <p><strong>@Model.AuthorizedPersonEmail</strong></p>
-            </div>
+			<div class="col-md-6">
+				<span class="sub-text">Email ID</span>
+				<p><strong>@Model.AuthorizedPersonEmail</strong></p>
+			</div>
 
-            <div class="col-md-6">
-                <span class="sub-text">Mobile Number</span>
-                <p><strong>@Model.AuthorizedPersonMobile</strong></p>
-            </div>
-        </div>
-    </div>
+			<div class="col-md-6">
+				<span class="sub-text">Mobile Number</span>
+				<p><strong>@Model.AuthorizedPersonMobile</strong></p>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="card card-bordered mt-4">
-    <div class="card-inner">
-        <h5 class="title mb-4">Uploaded Documents</h5>
+	<div class="card-inner">
+		<h5 class="title mb-4">Uploaded Documents</h5>
 
-        @if (Model.Documents != null && Model.Documents.Any())
-        {
-            <div class="row g-gs">
-                @foreach (var document in Model.Documents)
-                {
-                    <div class="col-md-6">
-                        <div class="d-flex justify-content-between align-items-center border rounded p-3">
-                            <div>
-                                <strong>@document.DocumentType</strong>
-                                <br />
-                                <small class="text-soft">
-                                    Uploaded @document.UploadedOn.ToString("dd MMM yyyy")
-                                </small>
-                            </div>
+		@if (Model.Documents != null && Model.Documents.Any())
+		{
+			<div class="row g-gs">
+				@foreach (var document in Model.Documents)
+				{
+					<div class="col-md-6">
+						<div class="d-flex justify-content-between align-items-center border rounded p-3">
+							<div>
+								<strong>@document.DocumentType</strong>
+								<br />
+								<small class="text-soft">
+									Uploaded @document.UploadedOn.ToString("dd MMM yyyy")
+								</small>
+							</div>
 
-                            <a href="@Url.Content($"~/uploads/tp-registrations/{Model.Id}/{document.FileName}")"
-                               target="_blank"
-                               class="btn btn-sm btn-outline-primary">
-                                <em class="icon ni ni-eye"></em>
-                                View
-                            </a>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <p class="text-soft mb-0">No documents are available.</p>
-        }
-    </div>
+							<a href="@Url.Content($"~/uploads/tp-registrations/{Model.Id}/{document.FileName}")"
+							   target="_blank"
+							   class="btn btn-sm btn-outline-primary">
+								<em class="icon ni ni-eye"></em>
+								View
+							</a>
+						</div>
+					</div>
+				}
+			</div>
+		}
+		else
+		{
+			<p class="text-soft mb-0">No documents are available.</p>
+		}
+	</div>
 </div>
 
-<!-- =========================================================
-     APPROVAL STATUS
-========================================================= -->
 
-<div class="card card-bordered mt-4">
-    <div class="card-inner">
+@* =========================================================
+   COMPACT APPROVAL TIMELINE - TP MY APPLICATION
+   ========================================================= *@
 
-        <h5 class="title mb-4">
-            <em class="icon ni ni-check-circle me-1"></em>
-            Approval Status
-        </h5>
+<div class="card card-bordered mt-3">
+	<div class="card-inner p-3">
 
-        <!-- ================= REGIONAL HEAD ================= -->
-        <div class="border-bottom pb-4 mb-4">
+		<div class="d-flex justify-content-between align-items-center mb-3">
+			<h5 class="title mb-0">
+				<em class="icon ni ni-check-circle me-1"></em>
+				Application Status
+			</h5>
 
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <div>
-                    <h6 class="mb-1">Regional Head Approval</h6>
-                    <span class="text-soft small">
-                        Regional review of the application
-                    </span>
-                </div>
+			@if (Model.OverallApprovalStatus == "Approved")
+			{
+				<span class="badge bg-success">Completed</span>
+			}
+			else if (Model.OverallApprovalStatus == "Rejected")
+			{
+				<span class="badge bg-danger">Rejected</span>
+			}
+			else
+			{
+				<span class="badge bg-info">In Progress</span>
+			}
+		</div>
 
-                @if (Model.Regional_Head_Status == "Approved")
-                {
-                    <span class="badge bg-success">
-                        <em class="icon ni ni-check me-1"></em>
-                        Approved
-                    </span>
-                }
-                else if (Model.Regional_Head_Status == "Rejected")
-                {
-                    <span class="badge bg-danger">
-                        <em class="icon ni ni-cross me-1"></em>
-                        Rejected
-                    </span>
-                }
-                else
-                {
-                    <span class="badge bg-warning text-dark">
-                        <em class="icon ni ni-clock me-1"></em>
-                        Pending
-                    </span>
-                }
-            </div>
+		@{
+			var stages = new[]
+			{
+		new {
+		Name = "Regional Head",
+		Code = "REGIONAL",
+		Status = Model.Regional_Head_Status,
+		Remarks = Model.Regional_Head_Remarks,
+		By = Model.Regional_Head_ApprovedBy,
+		Date = Model.Regional_Head_Date
+		},
+		new {
+		Name = "Affiliations",
+		Code = "AFFILIATIONS",
+		Status = Model.Affiliations_Status,
+		Remarks = Model.Affiliations_Remarks,
+		By = Model.Affiliations_ApprovedBy,
+		Date = Model.Affiliations_Date
+		},
+		new {
+		Name = "Finance",
+		Code = "FINANCE",
+		Status = Model.Finance_Status,
+		Remarks = Model.Finance_Remarks,
+		By = Model.Finance_ApprovedBy,
+		Date = Model.Finance_Date
+		},
+		new {
+		Name = "Vertical Head",
+		Code = "VERTICAL_HEAD",
+		Status = Model.Vertical_Head_Status,
+		Remarks = Model.Vertical_Head_Remarks,
+		By = Model.Vertical_Head_ApprovedBy,
+		Date = Model.Vertical_Head_Date
+		},
+		new {
+		Name = "Senior Reviewer 1",
+		Code = "SENIOR_REVIEWER_1",
+		Status = Model.SeniorReviewer1_Status,
+		Remarks = Model.SeniorReviewer1_Remarks,
+		By = Model.SeniorReviewer1_ApprovedBy,
+		Date = Model.SeniorReviewer1_Date
+		},
+		new {
+		Name = "Senior Reviewer 2",
+		Code = "SENIOR_REVIEWER_2",
+		Status = Model.SeniorReviewer2_Status,
+		Remarks = Model.SeniorReviewer2_Remarks,
+		By = Model.SeniorReviewer2_ApprovedBy,
+		Date = Model.SeniorReviewer2_Date
+		},
+		new {
+		Name = "CEO",
+		Code = "CEO",
+		Status = Model.CEO_Status,
+		Remarks = Model.CEO_Remarks,
+		By = Model.CEO_ApprovedBy,
+		Date = Model.CEO_Date
+		},
+		new {
+		Name = "Payment",
+		Code = "PAYMENT_PROCESS",
+		Status = Model.PaymentProcess_Status,
+		Remarks = Model.PaymentProcess_Remarks,
+		By = Model.PaymentProcess_ApprovedBy,
+		Date = Model.PaymentProcess_Date
+		},
+		new {
+		Name = "Certificate Issuance",
+		Code = "CERTIFICATE_ISSUANCE",
+		Status = Model.CertificateIssuance_Status,
+		Remarks = Model.CertificateIssuance_Remarks,
+		By = Model.CertificateIssuance_ApprovedBy,
+		Date = Model.CertificateIssuance_Date
+		}
+		};
+		}
 
-            @if (!string.IsNullOrWhiteSpace(Model.Regional_Head_Remarks))
-            {
-                <div class="bg-light rounded p-3 mt-3">
-                    <small class="text-soft d-block mb-1">Remarks</small>
-                    <span>@Model.Regional_Head_Remarks</span>
-                </div>
-            }
+		@foreach (var stage in stages)
+		{
+			var isCurrent = Model.CurrentStage == stage.Code;
+			var isApproved = stage.Status == "Approved";
+			var isRejected = stage.Status == "Rejected";
+			var isPayment = stage.Code == "PAYMENT_PROCESS";
 
-            @if (Model.Regional_Head_Date.HasValue)
-            {
-                <div class="row g-3 mt-1">
+			var badgeClass = isApproved
+			? "bg-success"
+			: isRejected
+			? "bg-danger"
+			: isCurrent
+			? "bg-warning text-dark"
+			: "bg-light text-dark";
 
-                    <div class="col-md-6">
-                        <small class="text-soft d-block">Approved / Rejected By</small>
-                        <span>@Model.Regional_Head_ApprovedBy</span>
-                    </div>
+			var badgeText = isApproved
+			? "Approved"
+			: isRejected
+			? "Rejected"
+			: isCurrent
+			? (isPayment ? "Payment Due" : "In Progress")
+			: "Pending";
 
-                    <div class="col-md-6">
-                        <small class="text-soft d-block">Date</small>
-                        <span>
-                            @Model.Regional_Head_Date?.ToString("dd MMM yyyy, hh:mm tt")
-                        </span>
-                    </div>
+			<div class="border rounded p-2 mb-2">
+				<div class="d-flex justify-content-between align-items-center gap-2">
+					<div class="d-flex align-items-center gap-2">
+						@if (isApproved)
+						{
+							<em class="icon ni ni-check-circle text-success"></em>
+						}
+						else if (isRejected)
+						{
+							<em class="icon ni ni-cross-circle text-danger"></em>
+						}
+						else
+						{
+							<em class="icon ni ni-clock text-soft"></em>
+						}
 
-                </div>
-            }
+						<span class="fw-medium">@stage.Name</span>
+					</div>
 
-        </div>
-
-
-        <!-- ================= VERTICAL HEAD ================= -->
-        <div class="border-bottom pb-4 mb-4">
-
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <div>
-                    <h6 class="mb-1">Vertical Head Approval</h6>
-                    <span class="text-soft small">
-                        Vertical review of the application
-                    </span>
-                </div>
-
-                @if (Model.Vertical_Head_Status == "Approved")
-                {
-                    <span class="badge bg-success">
-                        <em class="icon ni ni-check me-1"></em>
-                        Approved
-                    </span>
-                }
-                else if (Model.Vertical_Head_Status == "Rejected")
-                {
-                    <span class="badge bg-danger">
-                        <em class="icon ni ni-cross me-1"></em>
-                        Rejected
-                    </span>
-                }
-                else
-                {
-                    <span class="badge bg-warning text-dark">
-                        <em class="icon ni ni-clock me-1"></em>
-                        Pending
-                    </span>
-                }
-            </div>
-
-            @if (!string.IsNullOrWhiteSpace(Model.Vertical_Head_Remarks))
-            {
-                <div class="bg-light rounded p-3 mt-3">
-                    <small class="text-soft d-block mb-1">Remarks</small>
-                    <span>@Model.Vertical_Head_Remarks</span>
-                </div>
-            }
-
-            @if (Model.Vertical_Head_Date.HasValue)
-            {
-                <div class="row g-3 mt-1">
-
-                    <div class="col-md-6">
-                        <small class="text-soft d-block">Approved / Rejected By</small>
-                        <span>@Model.Vertical_Head_ApprovedBy</span>
-                    </div>
-
-                    <div class="col-md-6">
-                        <small class="text-soft d-block">Date</small>
-                        <span>
-                            @Model.Vertical_Head_Date?.ToString("dd MMM yyyy, hh:mm tt")
-                        </span>
-                    </div>
-
-                </div>
-            }
-
-        </div>
-
-
-        <!-- ================= FINANCE ================= -->
-        <div class="border-bottom pb-4 mb-4">
-
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <div>
-                    <h6 class="mb-1">Finance Approval</h6>
-                    <span class="text-soft small">
-                        Financial review of the application
-                    </span>
-                </div>
-
-                @if (Model.Finance_Status == "Approved")
-                {
-                    <span class="badge bg-success">
-                        <em class="icon ni ni-check me-1"></em>
-                        Approved
-                    </span>
-                }
-                else if (Model.Finance_Status == "Rejected")
-                {
-                    <span class="badge bg-danger">
-                        <em class="icon ni ni-cross me-1"></em>
-                        Rejected
-                    </span>
-                }
-                else
-                {
-                    <span class="badge bg-warning text-dark">
-                        <em class="icon ni ni-clock me-1"></em>
-                        Pending
-                    </span>
-                }
-            </div>
-
-            @if (!string.IsNullOrWhiteSpace(Model.Finance_Remarks))
-            {
-                <div class="bg-light rounded p-3 mt-3">
-                    <small class="text-soft d-block mb-1">Remarks</small>
-                    <span>@Model.Finance_Remarks</span>
-                </div>
-            }
-
-            @if (Model.Finance_Date.HasValue)
-            {
-                <div class="row g-3 mt-1">
-
-                    <div class="col-md-6">
-                        <small class="text-soft d-block">Approved / Rejected By</small>
-                        <span>@Model.Finance_ApprovedBy</span>
-                    </div>
-
-                    <div class="col-md-6">
-                        <small class="text-soft d-block">Date</small>
-                        <span>
-                            @Model.Finance_Date?.ToString("dd MMM yyyy, hh:mm tt")
-                        </span>
-                    </div>
-
-                </div>
-            }
-
-        </div>
+					<span class="badge @badgeClass">@badgeText</span>
+				</div>
 
 
-        <!-- ================= CEO ================= -->
-        <div>
+				@* Payment status information - no duplicate Pay Now button *@
 
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <div>
-                    <h6 class="mb-1">CEO Approval</h6>
-                    <span class="text-soft small">
-                        Final approval of the application
-                    </span>
-                </div>
+				@if (isPayment)
+				{
+					<div class="mt-2 pt-2 border-top">
 
-                @if (Model.CEO_Status == "Approved")
-                {
-                    <span class="badge bg-success">
-                        <em class="icon ni ni-check me-1"></em>
-                        Approved
-                    </span>
-                }
-                else if (Model.CEO_Status == "Rejected")
-                {
-                    <span class="badge bg-danger">
-                        <em class="icon ni ni-cross me-1"></em>
-                        Rejected
-                    </span>
-                }
-                else
-                {
-                    <span class="badge bg-warning text-dark">
-                        <em class="icon ni ni-clock me-1"></em>
-                        Pending
-                    </span>
-                }
-            </div>
+						@if (isApproved)
+						{
+							<div class="text-success small">
+								<em class="icon ni ni-check-circle me-1"></em>
+								Payment verified successfully by Finance.
+							</div>
+						}
+						else if (isRejected)
+						{
+							<div class="text-danger small">
+								<em class="icon ni ni-cross-circle me-1"></em>
+								Payment verification was rejected. Please contact support.
+							</div>
+						}
+						else if (Model.PaymentProofStatus == "Pending")
+						{
+							<div class="text-warning small">
+								<em class="icon ni ni-clock me-1"></em>
+								Payment proof uploaded successfully. Awaiting Finance verification.
+							</div>
 
-            @if (!string.IsNullOrWhiteSpace(Model.CEO_Remarks))
-            {
-                <div class="bg-light rounded p-3 mt-3">
-                    <small class="text-soft d-block mb-1">Remarks</small>
-                    <span>@Model.CEO_Remarks</span>
-                </div>
-            }
+							@if (!string.IsNullOrWhiteSpace(Model.PaymentTransactionId))
+							{
+								<div class="small mt-1">
+									<strong>Transaction ID / UTR:</strong>
+									@Model.PaymentTransactionId
+								</div>
+							}
 
-            @if (Model.CEO_Date.HasValue)
-            {
-                <div class="row g-3 mt-1">
+							@if (Model.PaymentProofSubmittedOn.HasValue)
+							{
+								<div class="text-soft small mt-1">
+									<strong>Submitted on:</strong>
+									@Model.PaymentProofSubmittedOn.Value.ToString("dd-MMM-yyyy hh:mm tt")
+								</div>
+							}
 
-                    <div class="col-md-6">
-                        <small class="text-soft d-block">Approved / Rejected By</small>
-                        <span>@Model.CEO_ApprovedBy</span>
-                    </div>
+							<div class="mt-2">
+								<a asp-area="TP"
+								   asp-controller="Registration"
+								   asp-action="ViewPaymentProof"
+								   asp-route-id="@Model.Id"
+								   target="_blank"
+								   rel="noopener"
+								   class="btn btn-outline-primary btn-sm">
+									<em class="icon ni ni-eye me-1"></em>
+									View Uploaded Proof
+								</a>
+							</div>
+						}
+						else if (Model.PaymentProofStatus == "Rejected")
+						{
+							<div class="text-danger small">
+								<em class="icon ni ni-alert-circle me-1"></em>
+								Payment proof was rejected. Please resubmit the proof.
+							</div>
 
-                    <div class="col-md-6">
-                        <small class="text-soft d-block">Date</small>
-                        <span>
-                            @Model.CEO_Date?.ToString("dd MMM yyyy, hh:mm tt")
-                        </span>
-                    </div>
+							<a asp-area="TP"
+							   asp-controller="Registration"
+							   asp-action="PayNow"
+							   asp-route-id="@Model.Id"
+							   class="btn btn-outline-primary btn-sm mt-2">
+								<em class="icon ni ni-upload me-1"></em>
+								Resubmit Payment Proof
+							</a>
+						}
+						else if (isCurrent && Model.OverallApprovalStatus != "Rejected")
+						{
+							<div class="text-warning small">
+								<em class="icon ni ni-info me-1"></em>
+								Payment is pending. Use the Pay Now button at the top
+								of this page to make payment and submit your proof.
+							</div>
+						}
+						else
+						{
+							<div class="text-soft small">
+								<em class="icon ni ni-clock me-1"></em>
+								Payment has not yet been initiated.
+							</div>
+						}
 
-                </div>
-            }
+					</div>
+				}
 
-        </div>
 
-    </div>
+				@if (!string.IsNullOrWhiteSpace(stage.Remarks) ||
+						!string.IsNullOrWhiteSpace(stage.By) ||
+						stage.Date.HasValue)
+				{
+					<details class="mt-2">
+						<summary class="text-soft small" style="cursor:pointer">
+							View details
+						</summary>
+
+						<div class="bg-light rounded p-2 mt-2">
+							@if (!string.IsNullOrWhiteSpace(stage.Remarks))
+							{
+								<div class="mb-2">
+									<small class="text-soft d-block">Remarks</small>
+									<span>@stage.Remarks</span>
+								</div>
+							}
+
+							@if (!string.IsNullOrWhiteSpace(stage.By))
+							{
+								<div class="mb-1">
+									<small class="text-soft">Reviewed by: </small>
+									<span>@stage.By</span>
+								</div>
+							}
+
+							@if (stage.Date.HasValue)
+							{
+								<div>
+									<small class="text-soft">Date: </small>
+									<span>@stage.Date.Value.ToString("dd MMM yyyy, hh:mm tt")</span>
+								</div>
+							}
+						</div>
+					</details>
+				}
+			</div>
+		}
+
+	</div>
 </div>
+
 

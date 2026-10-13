@@ -198,6 +198,23 @@
                 </div>
             </div>
         }
+        @* Certificate Download Button *@
+        @if (string.Equals(
+        Model.CertificateIssuance_Status,
+        "Approved",
+        StringComparison.OrdinalIgnoreCase))
+        {
+            <div class="text-center mt-4">
+                <a asp-area="TP"
+                   asp-controller="Registration"
+                   asp-action="DownloadCertificate"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-success">
+                    <em class="icon ni ni-file-pdf me-1"></em>
+                    Download Certificate
+                </a>
+            </div>
+        }
 
         <!-- Footer Info -->
         <div class="mt-5 pt-3 border-top">

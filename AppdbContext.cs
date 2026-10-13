@@ -87,6 +87,7 @@ namespace QUIZAPP
         public DbSet<AssessmentAgency> AssessmentAgency { get; set; }
 
         public DbSet<CertificateGenerationAssessmentDetail> CertificateGenerationAssessmentDetail{ get; set; }
+        public DbSet<TPWorkflowApprover> TPWorkflowApprovers { get; set; }
 
     }
 }

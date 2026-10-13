@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCore.ReportingServices.ReportProcessing.ReportObjectModel;
+using System.Linq.Expressions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,153 +20,233 @@ namespace TSSC.Unified.Areas.HRMS.Controllers.TP
             _context = context;
             _userManager = userManager;
         }
-        //public async Task<IActionResult> Index()
+
+        //public async Task<IActionResult> Index(string tab = "pending")
         //{
         //    var user = await _userManager.GetUserAsync(User);
 
         //    if (user == null)
         //        return Unauthorized();
 
+        //    tab = (tab ?? "pending").ToLowerInvariant();
+
+        //    if (tab != "pending" &&
+        //        tab != "approved" &&
+        //        tab != "rejected")
+        //    {
+        //        tab = "pending";
+        //    }
+
+        //    var userId = user.Id;
+
+        //    Get the stages assigned to the current user's roles.
         //    var roles = await _userManager.GetRolesAsync(user);
 
-        //    IQueryable<TPRegistration> query = _context.TPRegistrations;
+        //    var approvers = await _context.TPWorkflowApprovers
+        //        .Where(x => x.IsActive)
+        //        .ToListAsync();
 
-        //    if (roles.Contains("RegionalHead"))
+        //    Only include stages assigned to this user or one of their roles.
+        //    var assignedStageCodes = approvers
+        //        .Where(x =>
+        //            (x.ApproverType == "User" &&
+        //             x.ApplicationUserId == userId)
+        //            ||
+        //            (x.ApproverType == "Role" &&
+        //             x.RoleName != null &&
+        //             roles.Contains(x.RoleName)))
+        //        .Select(x => x.StageCode)
+        //        .Distinct()
+        //        .ToList();
+
+        //    if (!assignedStageCodes.Any())
+        //        return Forbid();
+
+        //    IQueryable<TPRegistration> query =
+        //        _context.TPRegistrations;
+
+        //    if (tab == "pending")
         //    {
-        //        // Regional Head sees applications waiting for
-        //        // Regional Head approval
+        //        Show registrations currently awaiting one of this user's stages.
         //        query = query.Where(x =>
-        //            string.IsNullOrEmpty(x.Regional_Head_Status));
-        //    }
-        //    else if (roles.Contains("VerticalHead"))
-        //    {
-        //        // Vertical Head sees applications approved by
-        //        // Regional Head and waiting for Vertical Head
-        //        query = query.Where(x =>
-        //            x.Regional_Head_Status == "Approved" &&
-        //            string.IsNullOrEmpty(x.Vertical_Head_Status));
-        //    }
-        //    else if (roles.Contains("Finance"))
-        //    {
-        //        // Finance sees applications approved by
-        //        // Vertical Head and waiting for Finance
-        //        query = query.Where(x =>
-        //            x.Vertical_Head_Status == "Approved" &&
-        //            string.IsNullOrEmpty(x.Finance_Status));
-        //    }
-        //    else if (roles.Contains("CEO"))
-        //    {
-        //        // CEO sees applications approved by
-        //        // Finance and waiting for CEO
-        //        query = query.Where(x =>
-        //            x.Finance_Status == "Approved" &&
-        //            string.IsNullOrEmpty(x.CEO_Status));
+        //            assignedStageCodes.Contains(x.CurrentStage) &&
+        //            x.OverallApprovalStatus != "Approved" &&
+        //            x.OverallApprovalStatus != "Rejected");
         //    }
         //    else
         //    {
-        //        return Forbid();
+        //        For completed decisions, filter by the stages assigned to this user.
+        //         A registration appears if the user was assigned to a stage
+        //         whose recorded outcome matches the selected tab.
+        //        var matchingStageCodes = approvers
+        //            .Where(x =>
+        //                assignedStageCodes.Contains(x.StageCode))
+        //            .Select(x => x.StageCode)
+        //            .Distinct()
+        //            .ToList();
+
+        //        if (tab == "approved")
+        //        {
+        //            query = query.Where(x =>
+        //                matchingStageCodes.Contains("REGIONAL") &&
+        //                    x.Regional_Head_Status == "Approved"
+        //                ||
+        //                matchingStageCodes.Contains("AFFILIATIONS") &&
+        //                    x.Affiliations_Status == "Approved"
+        //                ||
+        //                matchingStageCodes.Contains("FINANCE") &&
+        //                    x.Finance_Status == "Approved"
+        //                ||
+        //                matchingStageCodes.Contains("VERTICAL_HEAD") &&
+        //                    x.Vertical_Head_Status == "Approved"
+        //                ||
+        //                matchingStageCodes.Contains("SENIOR_REVIEWER_1") &&
+        //                    x.SeniorReviewer1_Status == "Approved"
+        //                ||
+        //                matchingStageCodes.Contains("SENIOR_REVIEWER_2") &&
+        //                    x.SeniorReviewer2_Status == "Approved"
+        //                ||
+        //                matchingStageCodes.Contains("CEO") &&
+        //                    x.CEO_Status == "Approved"
+        //                ||
+        //                matchingStageCodes.Contains("PAYMENT_PROCESS") &&
+        //                    x.PaymentProcess_Status == "Approved"
+        //                ||
+        //                matchingStageCodes.Contains("FINANCE_CERTIFICATE") &&
+        //                    x.FinanceCertificate_Status == "Approved"
+        //                ||
+        //                matchingStageCodes.Contains("CERTIFICATE_ISSUANCE") &&
+        //                    x.CertificateIssuance_Status == "Approved");
+        //        }
+        //        else // rejected
+        //        {
+        //            query = query.Where(x =>
+        //                matchingStageCodes.Contains("REGIONAL") &&
+        //                    x.Regional_Head_Status == "Rejected"
+        //                ||
+        //                matchingStageCodes.Contains("AFFILIATIONS") &&
+        //                    x.Affiliations_Status == "Rejected"
+        //                ||
+        //                matchingStageCodes.Contains("FINANCE") &&
+        //                    x.Finance_Status == "Rejected"
+        //                ||
+        //                matchingStageCodes.Contains("VERTICAL_HEAD") &&
+        //                    x.Vertical_Head_Status == "Rejected"
+        //                ||
+        //                matchingStageCodes.Contains("SENIOR_REVIEWER_1") &&
+        //                    x.SeniorReviewer1_Status == "Rejected"
+        //                ||
+        //                matchingStageCodes.Contains("SENIOR_REVIEWER_2") &&
+        //                    x.SeniorReviewer2_Status == "Rejected"
+        //                ||
+        //                matchingStageCodes.Contains("CEO") &&
+        //                    x.CEO_Status == "Rejected"
+        //                ||
+        //                matchingStageCodes.Contains("PAYMENT_PROCESS") &&
+        //                    x.PaymentProcess_Status == "Rejected"
+        //                ||
+        //                matchingStageCodes.Contains("FINANCE_CERTIFICATE") &&
+        //                    x.FinanceCertificate_Status == "Rejected"
+        //                ||
+        //                matchingStageCodes.Contains("CERTIFICATE_ISSUANCE") &&
+        //                    x.CertificateIssuance_Status == "Rejected");
+        //        }
         //    }
 
         //    var registrations = await query
         //        .OrderByDescending(x => x.CreatedOn)
         //        .ToListAsync();
 
-        //    return View(registrations);
+        //    ViewBag.CurrentTab = tab;
+
+        //    return View(query);
         //}
 
         public async Task<IActionResult> Index(string tab = "pending")
         {
             var user = await _userManager.GetUserAsync(User);
-
             if (user == null)
                 return Unauthorized();
 
+            tab = (tab ?? "pending").ToLowerInvariant();
+            if (tab != "pending" && tab != "approved" && tab != "rejected")
+                tab = "pending";
+
+            var userId = user.Id;
             var roles = await _userManager.GetRolesAsync(user);
+
+            var approvers = await _context.TPWorkflowApprovers
+                .Where(x => x.IsActive)
+                .ToListAsync();
+
+            var assignedStageCodes = approvers
+                .Where(x =>
+                    (x.ApproverType == "User" && x.ApplicationUserId == userId) ||
+                    (x.ApproverType == "Role" && x.RoleName != null && roles.Contains(x.RoleName)))
+                .Select(x => x.StageCode)
+                .Distinct()
+                .ToList();
+
+            if (!assignedStageCodes.Any())
+                return Forbid();
 
             IQueryable<TPRegistration> query = _context.TPRegistrations;
 
-            if (roles.Contains("RegionalHead"))
+            if (tab == "pending")
             {
-                if (tab == "pending")
-                {
-                    query = query.Where(x =>
-                        string.IsNullOrEmpty(x.Regional_Head_Status) ||
-                        x.Regional_Head_Status == "Pending");
-                }
-                else if (tab == "approved")
-                {
-                    query = query.Where(x =>
-                        x.Regional_Head_Status == "Approved");
-                }
-                else if (tab == "rejected")
-                {
-                    query = query.Where(x =>
-                        x.Regional_Head_Status == "Rejected");
-                }
-            }
-            else if (roles.Contains("VerticalHead"))
-            {
-                if (tab == "pending")
-                {
-                    query = query.Where(x =>
-                        x.Regional_Head_Status == "Approved" &&
-                        (string.IsNullOrEmpty(x.Vertical_Head_Status) ||
-                         x.Vertical_Head_Status == "Pending"));
-                }
-                else if (tab == "approved")
-                {
-                    query = query.Where(x =>
-                        x.Vertical_Head_Status == "Approved");
-                }
-                else if (tab == "rejected")
-                {
-                    query = query.Where(x =>
-                        x.Vertical_Head_Status == "Rejected");
-                }
-            }
-            else if (roles.Contains("Finance"))
-            {
-                if (tab == "pending")
-                {
-                    query = query.Where(x =>
-                        x.Vertical_Head_Status == "Approved" &&
-                        (string.IsNullOrEmpty(x.Finance_Status) ||
-                         x.Finance_Status == "Pending"));
-                }
-                else if (tab == "approved")
-                {
-                    query = query.Where(x =>
-                        x.Finance_Status == "Approved");
-                }
-                else if (tab == "rejected")
-                {
-                    query = query.Where(x =>
-                        x.Finance_Status == "Rejected");
-                }
-            }
-            else if (roles.Contains("CEO"))
-            {
-                if (tab == "pending")
-                {
-                    query = query.Where(x =>
-                        x.Finance_Status == "Approved" &&
-                        (string.IsNullOrEmpty(x.CEO_Status) ||
-                         x.CEO_Status == "Pending"));
-                }
-                else if (tab == "approved")
-                {
-                    query = query.Where(x =>
-                        x.CEO_Status == "Approved");
-                }
-                else if (tab == "rejected")
-                {
-                    query = query.Where(x =>
-                        x.CEO_Status == "Rejected");
-                }
+                bool hasRegional = assignedStageCodes.Contains("REGIONAL");
+                bool hasAffil = assignedStageCodes.Contains("AFFILIATIONS");
+                bool hasFinance = assignedStageCodes.Contains("FINANCE");
+                bool hasVertical = assignedStageCodes.Contains("VERTICAL_HEAD");
+                bool hasSenior1 = assignedStageCodes.Contains("SENIOR_REVIEWER_1");
+                bool hasSenior2 = assignedStageCodes.Contains("SENIOR_REVIEWER_2");
+                bool hasCeo = assignedStageCodes.Contains("CEO");
+                bool hasPayment = assignedStageCodes.Contains("PAYMENT_PROCESS");
+                bool hasFinCert = assignedStageCodes.Contains("FINANCE_CERTIFICATE");
+                bool hasCertIssue = assignedStageCodes.Contains("CERTIFICATE_ISSUANCE");
+
+                query = query.Where(x =>
+                    x.OverallApprovalStatus != "Approved" &&
+                    x.OverallApprovalStatus != "Rejected" &&
+                    (
+                        (hasRegional && x.CurrentStage == "REGIONAL") ||
+                        (hasAffil && x.CurrentStage == "AFFILIATIONS") ||
+                        (hasFinance && x.CurrentStage == "FINANCE") ||
+                        (hasVertical && x.CurrentStage == "VERTICAL_HEAD") ||
+                        (hasSenior1 && x.CurrentStage == "SENIOR_REVIEWER_1") ||
+                        (hasSenior2 && x.CurrentStage == "SENIOR_REVIEWER_2") ||
+                        (hasCeo && x.CurrentStage == "CEO") ||
+                        (hasPayment && x.CurrentStage == "PAYMENT_PROCESS") ||
+                        (hasFinCert && x.CurrentStage == "FINANCE_CERTIFICATE") ||
+                        (hasCertIssue && x.CurrentStage == "CERTIFICATE_ISSUANCE")
+                    ));
             }
             else
             {
-                return Forbid();
+                var status = tab == "approved" ? "Approved" : "Rejected";
+
+                bool hasRegional = assignedStageCodes.Contains("REGIONAL");
+                bool hasAffil = assignedStageCodes.Contains("AFFILIATIONS");
+                bool hasFinance = assignedStageCodes.Contains("FINANCE");
+                bool hasVertical = assignedStageCodes.Contains("VERTICAL_HEAD");
+                bool hasSenior1 = assignedStageCodes.Contains("SENIOR_REVIEWER_1");
+                bool hasSenior2 = assignedStageCodes.Contains("SENIOR_REVIEWER_2");
+                bool hasCeo = assignedStageCodes.Contains("CEO");
+                bool hasPayment = assignedStageCodes.Contains("PAYMENT_PROCESS");
+                bool hasFinCert = assignedStageCodes.Contains("FINANCE_CERTIFICATE");
+                bool hasCertIssue = assignedStageCodes.Contains("CERTIFICATE_ISSUANCE");
+
+                query = query.Where(x =>
+                    (hasRegional && x.Regional_Head_Status == status) ||
+                    (hasAffil && x.Affiliations_Status == status) ||
+                    (hasFinance && x.Finance_Status == status) ||
+                    (hasVertical && x.Vertical_Head_Status == status) ||
+                    (hasSenior1 && x.SeniorReviewer1_Status == status) ||
+                    (hasSenior2 && x.SeniorReviewer2_Status == status) ||
+                    (hasCeo && x.CEO_Status == status) ||
+                    (hasPayment && x.PaymentProcess_Status == status) ||
+                    (hasFinCert && x.FinanceCertificate_Status == status) ||
+                    (hasCertIssue && x.CertificateIssuance_Status == status));
             }
 
             var registrations = await query
@@ -172,7 +254,6 @@ namespace TSSC.Unified.Areas.HRMS.Controllers.TP
                 .ToListAsync();
 
             ViewBag.CurrentTab = tab;
-
             return View(registrations);
         }
         public async Task<IActionResult> Details(int id)
@@ -221,18 +302,87 @@ namespace TSSC.Unified.Areas.HRMS.Controllers.TP
             if (decision is not ("Approved" or "Rejected"))
                 return BadRequest();
 
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+                return Unauthorized();
+
             var registration = await _context.TPRegistrations
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (registration == null)
                 return NotFound();
 
-            var user = await _userManager.GetUserAsync(User);
+            // Do not allow decisions after rejection or completion.
+            if (registration.OverallApprovalStatus == "Rejected" ||
+                registration.CurrentStage == "COMPLETED")
+            {
+                return Forbid();
+            }
 
-            if (user == null)
-                return Unauthorized();
+            var stage = registration.CurrentStage;
+
+            var validStages = new[]
+            {
+        "REGIONAL",
+        "AFFILIATIONS",
+        "FINANCE",
+        "VERTICAL_HEAD",
+        "SENIOR_REVIEWER_1",
+        "SENIOR_REVIEWER_2",
+        "CEO",
+        "PAYMENT_PROCESS",
+        "CERTIFICATE_ISSUANCE"
+    };
+
+            if (string.IsNullOrWhiteSpace(stage) ||
+                !validStages.Contains(stage))
+            {
+                return Forbid();
+            }
 
             var roles = await _userManager.GetRolesAsync(user);
+
+            // =====================================================
+            // CHECK WHETHER USER IS ASSIGNED TO CURRENT STAGE
+            // =====================================================
+
+            var stageApprovers = await _context.TPWorkflowApprovers
+                .Where(x => x.StageCode == stage && x.IsActive)
+                .ToListAsync();
+
+            var isAssigned = stageApprovers.Any(a =>
+                (
+                    string.Equals(
+                        a.ApproverType,
+                        "User",
+                        StringComparison.OrdinalIgnoreCase)
+                    &&
+                    (
+                        a.ApplicationUserId == user.Id ||
+                        a.ApplicationUserId == user.UserName ||
+                        a.ApplicationUserId == user.Email
+                    )
+                )
+                ||
+                (
+                    string.Equals(
+                        a.ApproverType,
+                        "Role",
+                        StringComparison.OrdinalIgnoreCase)
+                    &&
+                    !string.IsNullOrWhiteSpace(a.RoleName)
+                    &&
+                    roles.Contains(a.RoleName)
+                )
+            );
+
+            if (!isAssigned)
+                return Forbid();
+
+            // =====================================================
+            // GET EMPLOYEE DETAILS
+            // =====================================================
 
             var employee = await _context.Employee
                 .FirstOrDefaultAsync(x => x.ApplicationUserId == user.Id);
@@ -246,281 +396,182 @@ namespace TSSC.Unified.Areas.HRMS.Controllers.TP
             var approvedBy =
                 $"{employeeName} ({employee.EmployeeCode})";
 
+            var now = DateTime.UtcNow;
 
             // =====================================================
-            // REGIONAL HEAD
+            // UPDATE CURRENT STAGE
             // =====================================================
 
-            if (roles.Contains("RegionalHead"))
+            string? stageStatus = stage switch
             {
-                //if (!string.IsNullOrEmpty(registration.Regional_Head_Status))
-                //    return Forbid();
+                "REGIONAL" => registration.Regional_Head_Status,
+                "AFFILIATIONS" => registration.Affiliations_Status,
+                "FINANCE" => registration.Finance_Status,
+                "VERTICAL_HEAD" => registration.Vertical_Head_Status,
+                "SENIOR_REVIEWER_1" => registration.SeniorReviewer1_Status,
+                "SENIOR_REVIEWER_2" => registration.SeniorReviewer2_Status,
+                "CEO" => registration.CEO_Status,
+                "PAYMENT_PROCESS" => registration.PaymentProcess_Status,
+                "CERTIFICATE_ISSUANCE" => registration.CertificateIssuance_Status,
+                _ => null
+            };
 
-                registration.Regional_Head_Status = decision;
-                registration.Regional_Head_Remarks = remarks;
-                registration.Regional_Head_ApprovedBy = approvedBy;
-                registration.Regional_Head_Date = DateTime.UtcNow;
-            }
-
-
-            // =====================================================
-            // VERTICAL HEAD
-            // =====================================================
-
-            else if (roles.Contains("VerticalHead"))
-            {
-                if (registration.Regional_Head_Status != "Approved")
-                    return Forbid();
-
-                registration.Vertical_Head_Status = decision;
-                registration.Vertical_Head_Remarks = remarks;
-                registration.Vertical_Head_ApprovedBy = approvedBy;
-                registration.Vertical_Head_Date = DateTime.UtcNow;
-            }
-
-
-            // =====================================================
-            // FINANCE
-            // =====================================================
-
-            else if (roles.Contains("Finance"))
-            {
-                if (registration.Vertical_Head_Status != "Approved")
-                    return Forbid();
-
-                registration.Finance_Status = decision;
-                registration.Finance_Remarks = remarks;
-                registration.Finance_ApprovedBy = approvedBy;
-                registration.Finance_Date = DateTime.UtcNow;
-            }
-
-
-            // =====================================================
-            // CEO
-            // =====================================================
-
-            else if (roles.Contains("CEO"))
-            {
-                if (registration.Finance_Status != "Approved")
-                    return Forbid();
-
-                registration.CEO_Status = decision;
-                registration.CEO_Remarks = remarks;
-                registration.CEO_ApprovedBy = approvedBy;
-                registration.CEO_Date = DateTime.UtcNow;
-            }
-
-            else
+            // Only Pending stages can be processed.
+            if (!string.Equals(
+                stageStatus,
+                "Pending",
+                StringComparison.OrdinalIgnoreCase))
             {
                 return Forbid();
             }
 
-
-            // =====================================================
-            // OVERALL APPROVAL STATUS
-            // =====================================================
-
-            if (decision == "Rejected")
+            switch (stage)
             {
-                // Internal workflow status
-                registration.OverallApprovalStatus = "Rejected";
+                case "REGIONAL":
+                    registration.Regional_Head_Status = decision;
+                    registration.Regional_Head_Remarks = remarks;
+                    registration.Regional_Head_ApprovedBy = approvedBy;
+                    registration.Regional_Head_Date = now;
+                    break;
 
-                // TP-facing status
-                registration.Status = "Rejected";
+                case "AFFILIATIONS":
+                    registration.Affiliations_Status = decision;
+                    registration.Affiliations_Remarks = remarks;
+                    registration.Affiliations_ApprovedBy = approvedBy;
+                    registration.Affiliations_Date = now;
+                    break;
+
+                case "FINANCE":
+                    registration.Finance_Status = decision;
+                    registration.Finance_Remarks = remarks;
+                    registration.Finance_ApprovedBy = approvedBy;
+                    registration.Finance_Date = now;
+                    break;
+
+                case "VERTICAL_HEAD":
+                    registration.Vertical_Head_Status = decision;
+                    registration.Vertical_Head_Remarks = remarks;
+                    registration.Vertical_Head_ApprovedBy = approvedBy;
+                    registration.Vertical_Head_Date = now;
+                    break;
+
+                case "SENIOR_REVIEWER_1":
+                    registration.SeniorReviewer1_Status = decision;
+                    registration.SeniorReviewer1_Remarks = remarks;
+                    registration.SeniorReviewer1_ApprovedBy = approvedBy;
+                    registration.SeniorReviewer1_Date = now;
+                    break;
+
+                case "SENIOR_REVIEWER_2":
+                    registration.SeniorReviewer2_Status = decision;
+                    registration.SeniorReviewer2_Remarks = remarks;
+                    registration.SeniorReviewer2_ApprovedBy = approvedBy;
+                    registration.SeniorReviewer2_Date = now;
+                    break;
+
+                case "CEO":
+                    registration.CEO_Status = decision;
+                    registration.CEO_Remarks = remarks;
+                    registration.CEO_ApprovedBy = approvedBy;
+                    registration.CEO_Date = now;
+                    break;
+
+                case "PAYMENT_PROCESS":
+
+                    // Payment proof must exist before Finance can approve.
+                    if (decision == "Approved" &&
+                        (registration.PaymentProofStatus != "Pending" ||
+                         string.IsNullOrWhiteSpace(registration.PaymentProofFileName)))
+                    {
+                        return BadRequest(
+                            "Payment proof must be submitted before payment can be approved.");
+                    }
+
+                    registration.PaymentProcess_Status = decision;
+                    registration.PaymentProcess_Remarks = remarks;
+                    registration.PaymentProcess_ApprovedBy = approvedBy;
+                    registration.PaymentProcess_Date = now;
+
+                    if (decision == "Approved")
+                    {
+                        registration.PaymentProofStatus = "Verified";
+                        // Mark certificate issuance as approved.
+                        registration.CertificateIssuance_Status = "Approved";
+                        registration.CertificateIssuance_Remarks =
+                            "Certificate issuance approved after payment verification.";
+                        registration.CertificateIssuance_ApprovedBy = approvedBy;
+                        registration.CertificateIssuance_Date = now;
+
+                        // Complete the workflow.
+                        registration.CurrentStage = "COMPLETED";
+                        registration.OverallApprovalStatus = "Approved";
+                        registration.Status = "Approved";
+                        registration.OverallApprovalStatusUpdatedOn = DateTime.UtcNow;
+                    }
+                    else
+                    {
+                        // Reject the proof without rejecting the entire application.
+                        registration.PaymentProofStatus = "Rejected";
+                    }
+
+                    break;
+                case "CERTIFICATE_ISSUANCE":
+                    registration.CertificateIssuance_Status = decision;
+                    registration.CertificateIssuance_Remarks = remarks;
+                    registration.CertificateIssuance_ApprovedBy = approvedBy;
+                    registration.CertificateIssuance_Date = now;
+                    break;
             }
-            else if (
-                registration.Regional_Head_Status == "Approved" &&
-                registration.Vertical_Head_Status == "Approved" &&
-                registration.Finance_Status == "Approved" &&
-                registration.CEO_Status == "Approved")
-            {
-                // All approval stages completed
-                registration.OverallApprovalStatus = "Approved";
 
-                // TP-facing status
-                registration.Status = "Approved";
+            if (decision == "Rejected" && stage == "PAYMENT_PROCESS")
+            {
+                registration.CurrentStage = "PAYMENT_PROCESS";
+            }
+            else if (decision == "Rejected")
+            {
+                registration.OverallApprovalStatus = "Rejected";
+                registration.OverallApprovalStatusUpdatedOn = now;
+                registration.Status = "Rejected";
             }
             else
             {
-                // Approval process is still continuing
-                registration.OverallApprovalStatus = "Pending";
+                if (stage != "PAYMENT_PROCESS")
+                {
+                    registration.CurrentStage = stage switch
+                    {
+                        "REGIONAL" => "AFFILIATIONS",
+                        "AFFILIATIONS" => "FINANCE",
+                        "FINANCE" => "VERTICAL_HEAD",
+                        "VERTICAL_HEAD" => "SENIOR_REVIEWER_1",
+                        "SENIOR_REVIEWER_1" => "SENIOR_REVIEWER_2",
+                        "SENIOR_REVIEWER_2" => "CEO",
+                        "CEO" => "PAYMENT_PROCESS",
+                        "CERTIFICATE_ISSUANCE" => "COMPLETED",
+                        _ => stage
+                    };
 
-                // TP-facing status
-                registration.Status = "Under Review";
+                    if (registration.CurrentStage == "COMPLETED")
+                    {
+                        registration.OverallApprovalStatus = "Approved";
+                        registration.OverallApprovalStatusUpdatedOn = now;
+                        registration.Status = "Approved";
+                    }
+                    else
+                    {
+                        registration.OverallApprovalStatus = "In_Progress";
+                        registration.OverallApprovalStatusUpdatedOn = now;
+                        registration.Status = "Under Review";
+                    }
+                }
             }
 
+            registration.UpdatedOn = now;
 
-            registration.UpdatedOn = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
 
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Details), new { id });
         }
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Decide(
-        //int id,
-        //string decision,
-        //string? remarks)
-        //{
-        //    if (decision is not ("Approved" or "Rejected"))
-        //        return BadRequest();
-
-        //    var registration = await _context.TPRegistrations
-        //        .FirstOrDefaultAsync(x => x.Id == id);
-
-        //    if (registration == null)
-        //        return NotFound();
-
-        //    // =========================================================
-        //    // LOGGED-IN USER
-        //    // =========================================================
-
-        //    var user = await _userManager.GetUserAsync(User);
-
-        //    if (user == null)
-        //        return Unauthorized();
-
-        //    var roles = await _userManager.GetRolesAsync(user);
-
-        //    // =========================================================
-        //    // GET EMPLOYEE
-        //    // =========================================================
-
-        //    var employee = await _context.Employee
-        //        .FirstOrDefaultAsync(x => x.ApplicationUserId == user.Id);
-
-        //    if (employee == null)
-        //        return Forbid();
-
-        //    var employeeName =
-        //        $"{employee.FirstName} {employee.LastName}".Trim();
-
-        //    var approvedBy =
-        //        $"{employeeName} ({employee.EmployeeCode})";
-
-
-        //    // =========================================================
-        //    // REGIONAL HEAD
-        //    // =========================================================
-
-        //    if (roles.Contains("RegionalHead"))
-        //    {
-        //        // First approval stage
-        //        if (!string.IsNullOrEmpty(registration.Regional_Head_Status))
-        //            return Forbid();
-
-        //        registration.Regional_Head_Status = decision;
-        //        registration.Regional_Head_Remarks = remarks;
-        //        registration.Regional_Head_ApprovedBy = approvedBy;
-        //        registration.Regional_Head_Date = DateTime.UtcNow;
-        //    }
-
-
-        //    // =========================================================
-        //    // VERTICAL HEAD
-        //    // =========================================================
-
-        //    else if (roles.Contains("VerticalHead"))
-        //    {
-        //        // Regional Head must approve first
-        //        if (registration.Regional_Head_Status != "Approved")
-        //            return Forbid();
-
-        //        // Already decided
-        //        if (!string.IsNullOrEmpty(registration.Vertical_Head_Status))
-        //            return Forbid();
-
-        //        registration.Vertical_Head_Status = decision;
-        //        registration.Vertical_Head_Remarks = remarks;
-        //        registration.Vertical_Head_ApprovedBy = approvedBy;
-        //        registration.Vertical_Head_Date = DateTime.UtcNow;
-        //    }
-
-
-        //    // =========================================================
-        //    // FINANCE
-        //    // =========================================================
-
-        //    else if (roles.Contains("Finance"))
-        //    {
-        //        // Vertical Head must approve first
-        //        if (registration.Vertical_Head_Status != "Approved")
-        //            return Forbid();
-
-        //        // Already decided
-        //        if (!string.IsNullOrEmpty(registration.Finance_Status))
-        //            return Forbid();
-
-        //        registration.Finance_Status = decision;
-        //        registration.Finance_Remarks = remarks;
-        //        registration.Finance_ApprovedBy = approvedBy;
-        //        registration.Finance_Date = DateTime.UtcNow;
-        //    }
-
-
-        //    // =========================================================
-        //    // CEO
-        //    // =========================================================
-
-        //    else if (roles.Contains("CEO"))
-        //    {
-        //        // Finance must approve first
-        //        if (registration.Finance_Status != "Approved")
-        //            return Forbid();
-
-        //        // Already decided
-        //        if (!string.IsNullOrEmpty(registration.CEO_Status))
-        //            return Forbid();
-
-        //        registration.CEO_Status = decision;
-        //        registration.CEO_Remarks = remarks;
-        //        registration.CEO_ApprovedBy = approvedBy;
-        //        registration.CEO_Date = DateTime.UtcNow;
-        //    }
-
-
-        //    // =========================================================
-        //    // UNKNOWN / UNAUTHORIZED ROLE
-        //    // =========================================================
-
-        //    else
-        //    {
-        //        return Forbid();
-        //    }
-
-
-        //    // =========================================================
-        //    // OVERALL STATUS
-        //    // =========================================================
-
-        //    if (decision == "Rejected")
-        //    {
-        //        registration.OverallApprovalStatus = "Rejected";
-        //    }
-        //    else if (
-        //        registration.Regional_Head_Status == "Approved" &&
-        //        registration.Vertical_Head_Status == "Approved" &&
-        //        registration.Finance_Status == "Approved" &&
-        //        registration.CEO_Status == "Approved")
-        //    {
-        //        registration.OverallApprovalStatus = "Approved";
-        //    }
-        //    else
-        //    {
-        //        registration.OverallApprovalStatus = "Pending";
-        //    }
-
-
-        //    // =========================================================
-        //    // UPDATE TIMESTAMP
-        //    // =========================================================
-
-        //    registration.UpdatedOn = DateTime.UtcNow;
-
-        //    await _context.SaveChangesAsync();
-
-        //    return RedirectToAction(nameof(Details), new { id });
-        //}
     }
 }

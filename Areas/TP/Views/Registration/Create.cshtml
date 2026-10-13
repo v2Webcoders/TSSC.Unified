@@ -18,18 +18,25 @@
 
 	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 	<form asp-action="Create" method="post" enctype="multipart/form-data" id="tpForm">
+		<input type="hidden" asp-for="MembershipType" />
 		<div asp-validation-summary="All" class="text-danger"></div>
 		<p class="alert alert-primary">
 			Note: Fields marked <span class="req">*</span> are mandatory.
 		</p>
 		<div class="accordion open" data-step="1">
-			
+
 			<div class="acc-head" onclick="toggleAcc(this)">
 				<div class="left"><div class="step-num">1</div><div class="title">Basic Details</div></div>
 			</div>
 
 			<div class="acc-body">
 				<div class="form-grid">
+					<div class="field">
+						<label>Membership Type</label>
+						<p class="form-control-plaintext fw-bold">
+							@Model.MembershipType
+						</p>
+					</div>
 					<div class="field">
 						<label asp-for="OrganizationName">Organization Name <span class="req">*</span></label>
 						<input asp-for="OrganizationName" type="text" />
@@ -69,10 +76,44 @@
 						<span asp-validation-for="PANNumber" class="text-danger"></span>
 					</div>
 
-					<div class="field">
+					@* <div class="field">
 						<label asp-for="GSTNumber">GST Number (optional)</label>
 						<input asp-for="GSTNumber" type="text" maxlength="15" />
 						<span asp-validation-for="GSTNumber" class="text-danger"></span>
+					</div> *@
+					<div class="field">
+						<div class="d-flex align-items-center gap-4">
+
+							<!-- GST Available -->
+							<div>
+								<label class="mb-0">GST Available</label>
+
+								<div class="d-flex gap-3">
+									<label class="mb-0">
+										<input type="radio" asp-for="IsGSTAvailable" value="true" />
+										Yes
+									</label>
+
+									<label class="mb-0">
+										<input type="radio" asp-for="IsGSTAvailable" value="false" />
+										No
+									</label>
+								</div>
+
+								<span asp-validation-for="IsGSTAvailable" class="text-danger"></span>
+							</div>
+
+							<!-- GST Number -->
+							<div id="gstNumberField" style="min-width: 250px;">
+								<label asp-for="GSTNumber">GST Number</label>
+								<input asp-for="GSTNumber"
+									   type="text"
+									   maxlength="15"
+									   class="form-control" />
+								<span asp-validation-for="GSTNumber" class="text-danger"></span>
+							</div>
+
+						</div>
 					</div>
 				</div>
 			</div>
@@ -102,13 +143,15 @@
 					</div>
 
 					<div class="field full">
-						<label asp-for="PreviousProjects">Previous Projects / Work Details</label>
+						<label asp-for="PreviousProjects">Previous Projects / Work Details<span class="req">*</span></label>
 						<textarea asp-for="PreviousProjects"></textarea>
+						<span asp-validation-for="PreviousProjects" class="text-danger"></span>
 					</div>
 
 					<div class="field">
-						<label asp-for="TrainingCentersCount">Number of Training Centers (if existing)</label>
+						<label asp-for="TrainingCentersCount">Number of Training Centers (if existing)<span class="req">*</span></label>
 						<input asp-for="TrainingCentersCount" type="text" inputmode="numeric" />
+						<span asp-validation-for="TrainingCentersCount" class="text-danger"></span>
 					</div>
 
 					<div class="field">
@@ -133,13 +176,25 @@
 						<span asp-validation-for="RegisteredOfficeAddress" class="text-danger"></span>
 					</div>
 
-					<div class="field"><label asp-for="State">State <span class="req">*</span></label><input asp-for="State" type="text" /></div>
-					<div class="field"><label asp-for="District">District <span class="req">*</span></label><input asp-for="District" type="text" /></div>
-					<div class="field"><label asp-for="City">City <span class="req">*</span></label><input asp-for="City" type="text" /></div>
-					<div class="field"><label asp-for="PinCode">Pin Code <span class="req">*</span></label><input asp-for="PinCode" type="text" maxlength="6" inputmode="numeric" /></div>
-					<div class="field"><label asp-for="Email">Official Email ID <span class="req">*</span></label><input asp-for="Email" type="text" /></div>
-					<div class="field"><label asp-for="MobileNumber">Mobile Number <span class="req">*</span></label><input asp-for="MobileNumber" type="text" maxlength="10" inputmode="numeric" /></div>
-					<div class="field full"><label asp-for="AlternateContactPerson">Alternate Contact Person</label><input asp-for="AlternateContactPerson" type="text" /></div>
+					<div class="field"><label asp-for="State">State <span class="req">*</span></label><input asp-for="State" type="text" /><span asp-validation-for="State" class="text-danger"></span></div>
+					<div class="field"><label asp-for="District">District <span class="req">*</span></label><input asp-for="District" type="text" />
+						<span asp-validation-for="District" class="text-danger"></span>
+					</div>
+					<div class="field"><label asp-for="City">City <span class="req">*</span></label><input asp-for="City" type="text" />
+						<span asp-validation-for="City" class="text-danger"></span>
+					</div>
+					<div class="field"><label asp-for="PinCode">Pin Code <span class="req">*</span></label><input asp-for="PinCode" type="text" maxlength="6" inputmode="numeric" />
+						<span asp-validation-for="PinCode" class="text-danger"></span>
+					</div>
+					<div class="field"><label asp-for="Email">Official Email ID <span class="req">*</span></label><input asp-for="Email" type="text" />
+						<span asp-validation-for="Email" class="text-danger"></span>
+					</div>
+					<div class="field"><label asp-for="MobileNumber">Mobile Number <span class="req">*</span></label><input asp-for="MobileNumber" type="text" maxlength="10" inputmode="numeric" />
+						<span asp-validation-for="MobileNumber" class="text-danger"></span>
+					</div>
+					<div class="field full"><label asp-for="AlternateContactPerson">Alternate Contact Person</label><input asp-for="AlternateContactPerson" type="text" />
+						<span asp-validation-for="AlternateContactPerson" class="text-danger"></span>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -154,12 +209,21 @@
 					<div class="field full">
 						<label asp-for="AnnualTurnoverLast3Years">Annual Turnover (Last 3 Years) <span class="req">*</span></label>
 						<textarea asp-for="AnnualTurnoverLast3Years" placeholder="FY 2023-24: ₹... | FY 2024-25: ₹... | FY 2025-26: ₹..."></textarea>
+						<span asp-validation-for="AnnualTurnoverLast3Years" class="text-danger"></span>
 					</div>
 
-					<div class="field"><label asp-for="BankAccountNumber">Bank Account Number <span class="req">*</span></label><input asp-for="BankAccountNumber" type="text" /></div>
-					<div class="field"><label asp-for="IFSCCode">IFSC Code <span class="req">*</span></label><input asp-for="IFSCCode" type="text" /></div>
-					<div class="field"><label asp-for="BankName">Bank Name <span class="req">*</span></label><input asp-for="BankName" type="text" /></div>
-					<div class="field"><label asp-for="FinancialDocuments">Financial Documents (PDF) <span class="req">*</span></label><input asp-for="FinancialDocuments" type="file" accept=".pdf" /></div>
+					<div class="field"><label asp-for="BankAccountNumber">Bank Account Number <span class="req">*</span></label><input asp-for="BankAccountNumber" type="text" />
+						<span asp-validation-for="BankAccountNumber" class="text-danger"></span>
+					</div>
+					<div class="field"><label asp-for="IFSCCode">IFSC Code <span class="req">*</span></label><input asp-for="IFSCCode" type="text" />
+						<span asp-validation-for="IFSCCode" class="text-danger"></span>
+					</div>
+					<div class="field"><label asp-for="BankName">Bank Name <span class="req">*</span></label><input asp-for="BankName" type="text" />
+						<span asp-validation-for="BankName" class="text-danger"></span>
+					</div>
+					<div class="field"><label asp-for="FinancialDocuments">Financial Documents (PDF) <span class="req">*</span></label><input asp-for="FinancialDocuments" type="file" accept=".pdf" />
+						<span asp-validation-for="FinancialDocuments" class="text-danger"></span>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -171,12 +235,36 @@
 
 			<div class="acc-body">
 				<div class="form-grid">
-					<div class="field"><label asp-for="RegistrationCertificate">Registration Certificate (PDF) <span class="req">*</span></label><input asp-for="RegistrationCertificate" type="file" accept=".pdf" /></div>
-					<div class="field"><label asp-for="PANCardCopy">PAN Card Copy (PDF) <span class="req">*</span></label><input asp-for="PANCardCopy" type="file" accept=".pdf" /></div>
-					<div class="field"><label asp-for="GSTCertificate">GST Certificate (optional)</label><input asp-for="GSTCertificate" type="file" accept=".pdf" /></div>
-					<div class="field"><label asp-for="AddressProof">Address Proof (PDF) <span class="req">*</span></label><input asp-for="AddressProof" type="file" accept=".pdf" /></div>
-					<div class="field"><label asp-for="CancelledCheque">Cancelled Cheque <span class="req">*</span></label><input asp-for="CancelledCheque" type="file" accept=".pdf,.jpg,.jpeg,.png" /></div>
-					<div class="field"><label asp-for="UndertakingDocument">Undertaking (Scanned PDF) <span class="req">*</span></label><input asp-for="UndertakingDocument" type="file" accept=".pdf" /></div>
+					<div class="field">
+						<label asp-for="RegistrationCertificate">Registration Certificate (PDF) <span class="req">*</span></label>
+						<input asp-for="RegistrationCertificate" type="file" accept=".pdf" />
+						<span asp-validation-for="RegistrationCertificate" class="text-danger"></span>
+					</div>
+					<div class="field">
+						<label asp-for="PANCardCopy">PAN Card Copy (PDF) <span class="req">*</span></label>
+						<input asp-for="PANCardCopy" type="file" accept=".pdf" />
+						<span asp-validation-for="PANCardCopy" class="text-danger"></span>
+					</div>
+					<div class="field">
+						<label asp-for="GSTCertificate">GST Certificate (optional)</label>
+						<input asp-for="GSTCertificate" type="file" accept=".pdf" />
+						<span asp-validation-for="GSTCertificate" class="text-danger"></span>
+					</div>
+					<div class="field">
+						<label asp-for="AddressProof">Address Proof (PDF) <span class="req">*</span></label>
+						<input asp-for="AddressProof" type="file" accept=".pdf" />
+						<span asp-validation-for="AddressProof" class="text-danger"></span>
+					</div>
+					<div class="field">
+						<label asp-for="CancelledCheque">Cancelled Cheque <span class="req">*</span></label>
+						<input asp-for="CancelledCheque" type="file" accept=".pdf,.jpg,.jpeg,.png" />
+						<span asp-validation-for="CancelledCheque" class="text-danger"></span>
+					</div>
+					<div class="field">
+						<label asp-for="UndertakingDocument">Undertaking (Scanned PDF) <span class="req">*</span></label>
+						<input asp-for="UndertakingDocument" type="file" accept=".pdf" />
+						<span asp-validation-for="UndertakingDocument" class="text-danger"></span>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -188,11 +276,31 @@
 
 			<div class="acc-body">
 				<div class="form-grid">
-					<div class="field"><label asp-for="AuthorizedSignatoryName">Name of Authorized Signatory <span class="req">*</span></label><input asp-for="AuthorizedSignatoryName" type="text" /></div>
-					<div class="field"><label asp-for="Designation">Designation <span class="req">*</span></label><input asp-for="Designation" type="text" /></div>
-					<div class="field"><label asp-for="AuthorizedPersonEmail">Email ID <span class="req">*</span></label><input asp-for="AuthorizedPersonEmail" type="text" /></div>
-					<div class="field"><label asp-for="AuthorizedPersonMobile">Mobile Number <span class="req">*</span></label><input asp-for="AuthorizedPersonMobile" type="text" maxlength="10" inputmode="numeric" /></div>
-					<div class="field full"><label asp-for="AuthorizedPersonIdProof">ID Proof (Aadhaar / PAN) <span class="req">*</span></label><input asp-for="AuthorizedPersonIdProof" type="file" accept=".pdf,.jpg,.jpeg,.png" /></div>
+					<div class="field">
+						<label asp-for="AuthorizedSignatoryName">Name of Authorized Signatory <span class="req">*</span></label>
+						<input asp-for="AuthorizedSignatoryName" type="text" />
+						<span asp-validation-for="AuthorizedSignatoryName" class="text-danger"></span>
+					</div>
+					<div class="field">
+						<label asp-for="Designation">Designation <span class="req">*</span></label>
+						<input asp-for="Designation" type="text" />
+						<span asp-validation-for="Designation" class="text-danger"></span>
+					</div>
+					<div class="field">
+						<label asp-for="AuthorizedPersonEmail">Email ID <span class="req">*</span></label>
+						<input asp-for="AuthorizedPersonEmail" type="text" />
+						<span asp-validation-for="AuthorizedPersonEmail" class="text-danger"></span>
+					</div>
+					<div class="field">
+						<label asp-for="AuthorizedPersonMobile">Mobile Number <span class="req">*</span></label>
+						<input asp-for="AuthorizedPersonMobile" type="text" maxlength="10" inputmode="numeric" />
+						<span asp-validation-for="AuthorizedPersonMobile" class="text-danger"></span>
+					</div>
+					<div class="field full">
+						<label asp-for="AuthorizedPersonIdProof">ID Proof (Aadhaar / PAN) <span class="req">*</span></label>
+						<input asp-for="AuthorizedPersonIdProof" type="file" accept=".pdf,.jpg,.jpeg,.png" />
+						<span asp-validation-for="AuthorizedPersonIdProof" class="text-danger"></span>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -214,8 +322,250 @@
 		</div>
 	</form>
 </div>
-@section Scripts {
+@* @section Scripts {
 	<partial name="_ValidationScriptsPartial" />
-}
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+
+			function toggleGSTNumber() {
+				const selected = document.querySelector(
+					'input[name="IsGSTAvailable"]:checked'
+				);
+
+				const gstNumberField = document.getElementById("gstNumberField");
+				const gstNumber = document.getElementById("GSTNumber");
+
+				if (!gstNumberField) {
+					return;
+				}
+
+				if (selected && selected.value === "true") {
+					gstNumberField.style.display = "";
+				} else {
+					gstNumberField.style.display = "none";
+
+					if (gstNumber) {
+						gstNumber.value = "";
+					}
+				}
+			}
+
+			document
+				.querySelectorAll('input[name="IsGSTAvailable"]')
+				.forEach(function (radio) {
+					radio.addEventListener("change", toggleGSTNumber);
+				});
+
+			// Set correct state when page initially loads
+			toggleGSTNumber();
+		});
+
+				
+		const form = document.getElementById('tpForm');
+		const MAX_PDF = 2 * 1024 * 1024;
+
+		form.addEventListener('submit', async e => {
+			e.preventDefault();
+			alert("Test");
+			if (!$(form).valid() || !checkFiles()) return;
+
+			const btn = form.querySelector('button[type=submit]');
+			btn.disabled = true;
+			try {
+				const res = await fetch(form.action, {
+					method: 'POST',
+					body: new FormData(form),
+					headers: { 'X-Requested-With': 'XMLHttpRequest' }
+				});
+
+				if (res.ok) {
+					window.location.href = (await res.json()).redirectUrl;
+				} else if (res.status === 400) {
+					showErrors((await res.json()).errors);
+				} else {
+					showErrors({ '': ['Something went wrong. Please try again.'] });
+				}
+			} catch {
+				showErrors({ '': ['Network error. Please try again.'] });
+			} finally {
+				btn.disabled = false;
+			}
+		});
+
+		// Catch size problems in the browser, before uploading anything
+		function checkFiles() {
+			let ok = true;
+			form.querySelectorAll('input[type=file]').forEach(inp => {
+				const span = form.querySelector(`[data-valmsg-for="${inp.name}"]`);
+				const f = inp.files[0];
+				const bad = f && f.name.toLowerCase().endsWith('.pdf') && f.size > MAX_PDF;
+				if (span) span.textContent = bad ? 'PDF must not exceed 2 MB.' : '';
+				if (bad) ok = false;
+			});
+			return ok;
+		}
+
+		function showErrors(errors) {
+			form.querySelectorAll('[data-valmsg-for]').forEach(s => s.textContent = '');
+			const list = form.querySelector('[data-valmsg-summary] ul');
+			if (list) list.innerHTML = '';
+
+			let first = null;
+			for (const [key, msgs] of Object.entries(errors)) {
+				const span = key && form.querySelector(`[data-valmsg-for="${key}"]`);
+				if (span) { span.textContent = msgs.join(' '); first ??= span; }
+				else if (list) {
+					msgs.forEach(m => {
+						const li = document.createElement('li');
+						li.textContent = m;
+						list.appendChild(li);
+					});
+					first ??= list;
+				}
+			}
+			first?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}
+	
+	</script>
+} *@
+
+@* <script>
+	console.log('1. script loaded');
+
+	window.addEventListener('error', e => console.log('JS ERROR:', e.message));
+
+	document.addEventListener('DOMContentLoaded', () => {
+		const tpForm = document.getElementById('tpForm');
+		console.log('2. form found:', tpForm);
+		console.log('3. jQuery:', typeof $, '| valid():', typeof $?.fn?.valid);
+
+		tpForm.addEventListener('submit', e => {
+			e.preventDefault();
+			console.log('4. submit handler fired');
+			alert('submit handler fired');
+		});
+	});
+</script> *@
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+
+		function toggleGSTNumber() {
+				const selected = document.querySelector(
+					'input[name="IsGSTAvailable"]:checked'
+				);
+
+				const gstNumberField = document.getElementById("gstNumberField");
+				const gstNumber = document.getElementById("GSTNumber");
+
+				if (!gstNumberField) {
+					return;
+				}
+
+				if (selected && selected.value === "true") {
+					gstNumberField.style.display = "";
+				} else {
+					gstNumberField.style.display = "none";
+
+					if (gstNumber) {
+						gstNumber.value = "";
+					}
+				}
+			}
+
+			document
+				.querySelectorAll('input[name="IsGSTAvailable"]')
+				.forEach(function (radio) {
+					radio.addEventListener("change", toggleGSTNumber);
+				});
+
+			// Set correct state when page initially loads
+			toggleGSTNumber();
+
+		const tpForm = document.getElementById('tpForm');
+		const MAX_PDF = 2 * 1024 * 1024;
+
+		tpForm.addEventListener('submit', async e => {
+			e.preventDefault();
+			console.log('A. submit fired');
+
+			// 1. client-side validation
+			if (typeof $ === 'undefined' || typeof $.fn.valid !== 'function') {
+				console.log('B. jquery-validate NOT loaded, skipping client validation');
+			} else if (!$(tpForm).valid()) {
+				console.log('B. client validation failed');
+				const firstBad = tpForm.querySelector('.input-validation-error');
+				firstBad?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				firstBad?.focus();
+				return;
+			}
+
+			// 2. file size check
+			if (!checkFiles()) { console.log('C. file check failed'); return; }
+
+			// 3. send
+			const btn = tpForm.querySelector('button[type=submit]');
+			btn.disabled = true;
+			try {
+				console.log('D. sending to', tpForm.action);
+				const res = await fetch(tpForm.action, {
+					method: 'POST',
+					body: new FormData(tpForm),
+					headers: { 'X-Requested-With': 'XMLHttpRequest' }
+				});
+				console.log('E. response status', res.status);
+
+				if (res.ok) {
+					window.location.href = (await res.json()).redirectUrl;
+				} else if (res.status === 400) {
+					const text = await res.text();
+					console.log('F. 400 body:', text);
+					try { showErrors(JSON.parse(text).errors); }
+					catch { showErrors({ '': ['Request was rejected (possibly anti-forgery). Reload and try again.'] }); }
+				} else {
+					showErrors({ '': ['Something went wrong. Please try again.'] });
+				}
+			} catch (err) {
+				console.log('G. fetch error', err);
+				showErrors({ '': ['Network error. Please try again.'] });
+			} finally {
+				btn.disabled = false;
+			}
+		});
+
+		function checkFiles() {
+			let ok = true;
+			tpForm.querySelectorAll('input[type=file]').forEach(inp => {
+				const span = tpForm.querySelector(`[data-valmsg-for="${inp.name}"]`);
+				const f = inp.files[0];
+				const bad = f && f.name.toLowerCase().endsWith('.pdf') && f.size > MAX_PDF;
+				if (span) span.textContent = bad ? 'PDF must not exceed 2 MB.' : '';
+				if (bad) ok = false;
+			});
+			return ok;
+		}
+
+		function showErrors(errors) {
+			tpForm.querySelectorAll('[data-valmsg-for]').forEach(s => s.textContent = '');
+			let list = tpForm.querySelector('[data-valmsg-summary] ul');
+			if (list) list.innerHTML = '';
+
+			let first = null;
+			for (const [key, msgs] of Object.entries(errors)) {
+				const span = key && tpForm.querySelector(`[data-valmsg-for="${key}"]`);
+				if (span) { span.textContent = msgs.join(' '); first ??= span; }
+				else if (list) {
+					msgs.forEach(m => {
+						const li = document.createElement('li');
+						li.textContent = m;
+						list.appendChild(li);
+					});
+					first ??= list;
+				}
+			}
+			first?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}
+	});
+</script>
 
 
