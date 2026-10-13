@@ -92,5 +92,8 @@ namespace QUIZAPP
         public DbSet<Grievance> Grievance { get; set; }
 
         public DbSet<GrievanceEmailVerification> GrievanceEmailVerification { get; set; }
+        // ------------------------- JOBROLES AND TC APPROVAL MODULE---------------------------------------
+        public DbSet<Scheme> Scheme { get; set; }
+        public DbSet<TrainingCenter> TrainingCenter { get; set; }
     }
 }

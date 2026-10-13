@@ -37,28 +37,6 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             _environment = environment;
             _emailService = emailService;
         }
-        // =====================================================
-        // for TOT?TOA Employee
-        // =====================================================
-        //public async Task<IActionResult> RegistrationList(string? status)
-        //{
-        //    var query = _context.TrainerRegistration
-        //        .AsNoTracking()
-        //        .AsQueryable();
-
-        //    if (!string.IsNullOrWhiteSpace(status))
-        //    {
-        //        query = query.Where(x => x.Status == status);
-        //    }
-
-        //    var registrations = await query
-        //        .OrderByDescending(x => x.Id)
-        //        .ToListAsync();
-
-        //    ViewBag.Status = status;
-
-        //    return View(registrations);
-        //}
         [HttpGet]
         public async Task<IActionResult> RegistrationList()
         {
@@ -119,54 +97,6 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             return View(registration);
         }
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> ApproveRegistration(int id, string remark)
-        //{
-        //    var registration = await _context.TrainerRegistration
-        //        .FirstOrDefaultAsync(x => x.Id == id);
-
-        //    if (registration == null)
-        //    {
-        //        return NotFound("Trainer registration not found.");
-        //    }
-        //    //registration.Remarks = remark.Trim();
-        //    registration.Status = "Approved";
-        //    registration.UpdatedDate = DateTime.Now;
-
-        //    await _context.SaveChangesAsync();
-
-        //    TempData["msg"] = "Trainer registration approved successfully.";
-
-        //    return RedirectToAction(nameof(RegistrationList));
-        //}
-
-
-        //// ============================================
-        //// REJECT TRAINER REGISTRATION
-        //// ============================================
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> RejectRegistration(int id, string remark)
-        //{
-        //    var registration = await _context.TrainerRegistration
-        //        .FirstOrDefaultAsync(x => x.Id == id);
-
-        //    if (registration == null)
-        //    {
-        //        return NotFound("Trainer registration not found.");
-        //    }
-        //    //registration.Remarks = remark.Trim();
-        //    registration.Status = "Rejected";
-        //    registration.UpdatedDate = DateTime.Now;
-
-        //    await _context.SaveChangesAsync();
-
-        //    TempData["msg"] = "Trainer registration rejected successfully.";
-
-        //    return RedirectToAction(nameof(RegistrationList));
-        //}
         [HttpGet]
         public async Task<IActionResult> GetTrainersByJobRole(int jobRoleId)
         {
@@ -494,51 +424,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             return Json(result);
         }
-        //    [HttpGet]
-        //    public async Task<IActionResult> CreateScreening( int batchId, int trainerId)
-        //    {
-        //        var trainerMapping = await _context.BatchMasterTrainers
-        //            .AsNoTracking()
-        //            .Include(x => x.Batch)
-        //            .Include(x => x.TrainerRegistration)
-        //            .FirstOrDefaultAsync(x =>
-        //                x.BatchId == batchId &&
-        //                x.TrainerRegistrationId == trainerId);
-
-        //        if (trainerMapping == null)
-        //            return NotFound("Trainer is not assigned to this batch.");
-
-        //        var model = new ScreeningScheduleVM
-        //        {
-        //            BatchId = batchId,
-        //            TrainerRegistrationId = trainerId
-        //        };
-
-        //        model.BatchList = new List<SelectListItem>
-        //{
-        //    new SelectListItem
-        //    {
-        //        Value = batchId.ToString(),
-        //        Text = trainerMapping.Batch?.BatchName ?? "",
-        //        Selected = true
-        //    }
-        //};
-
-        //        model.TrainerList = new List<SelectListItem>
-        //{
-        //    new SelectListItem
-        //    {
-        //        Value = trainerId.ToString(),
-        //        Text = trainerMapping.TrainerRegistration?.CandidateName
-        //               + " (" +
-        //               trainerMapping.TrainerRegistration?.RegistrationNo +
-        //               ")",
-        //        Selected = true
-        //    }
-        //};
-
-        //        return View(model);
-        //    }
+        
         [HttpGet]
         public async Task<IActionResult> CreateScreening(int trainerId)
         {
