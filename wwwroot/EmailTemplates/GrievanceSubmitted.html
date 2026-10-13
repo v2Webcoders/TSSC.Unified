@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Grievance Submitted</title>
+</head>
+
+<body style="margin:0; padding:0; background:#f5f7fa; font-family:Arial, sans-serif;">
+
+    <div style="max-width:650px; margin:30px auto; background:#ffffff; border-radius:10px; overflow:hidden;">
+
+        <div style="background:#0d6efd; padding:25px; text-align:center;">
+            <h2 style="color:#ffffff; margin:0;">
+                Grievance Submitted Successfully
+            </h2>
+        </div>
+
+        <div style="padding:30px;">
+
+            <p>Dear <strong>{{Name}}</strong>,</p>
+
+            <p>
+                Thank you for submitting your grievance to TSSC.
+                Your grievance has been successfully registered.
+            </p>
+
+            <div style="background:#f5f8fc; padding:20px; margin:25px 0; border-radius:8px;">
+
+                <p style="margin:8px 0;">
+                    <strong>Grievance Number:</strong>
+                    {{GrievanceNo}}
+                </p>
+
+                <p style="margin:8px 0;">
+                    <strong>Name:</strong>
+                    {{Name}}
+                </p>
+
+                <p style="margin:8px 0;">
+                    <strong>Email:</strong>
+                    {{Email}}
+                </p>
+
+                <p style="margin:8px 0;">
+                    <strong>Mobile Number:</strong>
+                    {{MobileNumber}}
+                </p>
+
+                <p style="margin:8px 0;">
+                    <strong>Status:</strong>
+                    {{Status}}
+                </p>
+                <p style="margin:8px 0;">
+                    <strong>Submitted On:</strong>
+                    {{CreatedDate}}
+                </p>
+
+            </div>
+
+            <p>
+                <strong>Grievance Description:</strong>
+            </p>
+
+            <div style="background:#f8f9fa; padding:15px; border-radius:6px;">
+                {{Description}}
+            </div>
+
+            <p style="margin-top:25px;">
+                Please keep your grievance number
+                <strong>{{GrievanceNo}}</strong>
+                for future reference.
+            </p>
+
+            <p>
+                Our concerned team will review your grievance and take
+                appropriate action. You may be contacted if additional
+                information is required.
+            </p>
+
+            <p style="margin-top:30px;">
+                Thank you for bringing this matter to our attention.
+            </p>
+
+            <p>
+                Regards,<br>
+                <strong>TSSC Grievance Team</strong>
+            </p>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

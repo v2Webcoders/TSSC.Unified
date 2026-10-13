@@ -1,0 +1,698 @@
+﻿
+@model TSSC.Unified.ViewModel.TrainingCenterViewModel
+
+@{
+    ViewData["Title"] = "Add Training Center";
+    Layout = "_Layout";
+}
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Add Training Center</h3>
+            <div class="nk-block-des text-soft">
+                <p>Enter training center information below.</p>
+            </div>
+        </div>
+
+        <div class="nk-block-head-content">
+            <a asp-area="TP"
+               asp-controller="TrainingCenter"
+               asp-action="SelectJobRole"
+               class="btn btn-outline-light">
+                <em class="icon ni ni-arrow-left"></em>
+                <span>Back</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="nk-block nk-block-lg">
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card card-preview">
+        <div class="card-inner">
+
+            <form asp-area="TP"
+                  asp-controller="TrainingCenter"
+                  asp-action="Create"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <input asp-for="SchemeId" type="hidden" />
+                <input asp-for="ProjectId" type="hidden" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                @* =====================================================
+                   SECTION 1: PARTNER INFORMATION
+                   ===================================================== *@
+
+                <div class="col-12 mb-4">
+                    <div class="preview-block">
+
+                        <div style="border-left:4px solid #D9622F; padding:5px 0 5px 12px;">
+                            <h5 class="mb-0 d-flex align-items-center gap-2"
+                                style="color:#1B2A4A;">
+                                <em class="ni ni-user-alt"></em>
+                                Partner Information
+                            </h5>
+                        </div>
+
+                        <div class="row gy-3 mt-1">
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="TrainingCenterName"
+                                           class="form-label">
+                                    </label>
+                                    <input asp-for="TrainingCenterName"
+                                           class="form-control"
+                                           placeholder="Enter training center name" />
+                                    <span asp-validation-for="TrainingCenterName"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="TrainingCenterCode"
+                                           class="form-label">
+                                    </label>
+                                    <input asp-for="TrainingCenterCode"
+                                           class="form-control"
+                                           placeholder="Enter training center code" />
+                                    <span asp-validation-for="TrainingCenterCode"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="TrainingCenterSPOCName"
+                                           class="form-label">
+                                    </label>
+                                    <input asp-for="TrainingCenterSPOCName"
+                                           class="form-control"
+                                           placeholder="Enter SPOC name" />
+                                    <span asp-validation-for="TrainingCenterSPOCName"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="TrainingCenterSPOCEmail"
+                                           class="form-label">
+                                    </label>
+                                    <input asp-for="TrainingCenterSPOCEmail"
+                                           class="form-control"
+                                           placeholder="Enter SPOC email"
+                                           type="email" />
+                                    <span asp-validation-for="TrainingCenterSPOCEmail"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="SPOCContactNumber"
+                                           class="form-label">
+                                    </label>
+                                    <input asp-for="SPOCContactNumber"
+                                           class="form-control"
+                                           placeholder="Enter SPOC contact number" />
+                                    <span asp-validation-for="SPOCContactNumber"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="TrainingCenterPhoneNumber"
+                                           class="form-label">
+                                    </label>
+                                    <input asp-for="TrainingCenterPhoneNumber"
+                                           class="form-control"
+                                           placeholder="Enter center phone number" />
+                                    <span asp-validation-for="TrainingCenterPhoneNumber"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                @* =====================================================
+                   SECTION 2: CENTER INFORMATION
+                   ===================================================== *@
+
+                <div class="col-12 mb-4">
+                    <div class="preview-block">
+
+                        <div style="border-left:4px solid #D9622F; padding:5px 0 5px 12px;">
+                            <h5 class="mb-0 d-flex align-items-center gap-2"
+                                style="color:#1B2A4A;">
+                                <em class="ni ni-building"></em>
+                                Center Information
+                            </h5>
+                        </div>
+
+                        <div class="row gy-3 mt-1">
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="CenterOwnershipType"
+                                           class="form-label">
+                                    </label>
+                                    <select asp-for="CenterOwnershipType"
+                                            class="form-select">
+                                        <option value="">Select ownership type</option>
+                                        <option value="Owned">Owned</option>
+                                        <option value="Franchise">Franchise</option>
+                                    </select>
+                                    <span asp-validation-for="CenterOwnershipType"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="FranchisePartnerName"
+                                           class="form-label">
+                                    </label>
+                                    <input asp-for="FranchisePartnerName"
+                                           class="form-control"
+                                           placeholder="Enter franchise partner name" />
+                                    <span asp-validation-for="FranchisePartnerName"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="CenterType"
+                                           class="form-label">
+                                    </label>
+                                    <select asp-for="CenterType"
+                                            class="form-select">
+                                        <option value="">Select center type</option>
+                                        <option value="Fixed">Fixed</option>
+                                        <option value="Mobile">Mobile</option>
+                                    </select>
+                                    <span asp-validation-for="CenterType"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="JobRoleId"
+                                           class="form-label">
+                                    </label>
+                                    <select asp-for="JobRoleId"
+                                            asp-items="Model.JobRoles"
+                                            class="form-select">
+                                        <option value="">Select job role</option>
+                                    </select>
+                                    <span asp-validation-for="JobRoleId"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="CenterFloor"
+                                           class="form-label">
+                                    </label>
+                                    <input asp-for="CenterFloor"
+                                           class="form-control"
+                                           placeholder="Enter floor" />
+                                    <span asp-validation-for="CenterFloor"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Landmark"
+                                           class="form-label">
+                                    </label>
+                                    <input asp-for="Landmark"
+                                           class="form-control"
+                                           placeholder="Enter nearby landmark" />
+                                    <span asp-validation-for="Landmark"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label asp-for="CompleteAddress"
+                                           class="form-label">
+                                    </label>
+                                    <textarea asp-for="CompleteAddress"
+                                              class="form-control"
+                                              rows="3"
+                                              placeholder="Enter complete address"></textarea>
+                                    <span asp-validation-for="CompleteAddress"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                @* =====================================================
+                   SECTION 3: TYPE OF TRAINING CONDUCTED
+                   ===================================================== *@
+
+                <div class="col-12 mb-4">
+                    <div class="preview-block">
+
+                        <div style="border-left:4px solid #D9622F; padding:5px 0 5px 12px;">
+                            <h5 class="mb-0 d-flex align-items-center gap-2"
+                                style="color:#1B2A4A;">
+                                <em class="ni ni-book-read"></em>
+                                Type of Training Conducted
+                            </h5>
+                        </div>
+
+                        <div class="row gy-3 mt-1">
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="SelfFunded"
+                                           class="form-label"></label>
+                                    <select asp-for="SelfFunded"
+                                            class="form-select">
+                                        <option value="">Select option</option>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                    <span asp-validation-for="SelfFunded"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="NSDC"
+                                           class="form-label"></label>
+                                    <select asp-for="NSDC"
+                                            class="form-select">
+                                        <option value="">Select option</option>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                    <span asp-validation-for="NSDC"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="STAR"
+                                           class="form-label"></label>
+                                    <select asp-for="STAR"
+                                            class="form-select">
+                                        <option value="">Select option</option>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                    <span asp-validation-for="STAR"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="MoRD"
+                                           class="form-label"></label>
+                                    <select asp-for="MoRD"
+                                            class="form-select">
+                                        <option value="">Select option</option>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                    <span asp-validation-for="MoRD"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="StateGovernmentSchemes"
+                                           class="form-label"></label>
+                                    <select asp-for="StateGovernmentSchemes"
+                                            class="form-select">
+                                        <option value="">Select option</option>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                    <span asp-validation-for="StateGovernmentSchemes"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="OtherCentralGovernmentSchemes"
+                                           class="form-label"></label>
+                                    <select asp-for="OtherCentralGovernmentSchemes"
+                                            class="form-select">
+                                        <option value="">Select option</option>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                    <span asp-validation-for="OtherCentralGovernmentSchemes"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                @* =====================================================
+                   SECTION 4: TRAINING & INFRASTRUCTURE INFORMATION
+                   ===================================================== *@
+
+                <div class="col-12 mb-4">
+                    <div class="preview-block">
+
+                        <div style="border-left:4px solid #D9622F; padding:5px 0 5px 12px;">
+                            <h5 class="mb-0 d-flex align-items-center gap-2"
+                                style="color:#1B2A4A;">
+                                <em class="ni ni-home"></em>
+                                Training &amp; Infrastructure Information
+                            </h5>
+                        </div>
+
+                        <div class="row gy-3 mt-1">
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="UsableAreaSqFt"
+                                           class="form-label"></label>
+                                    <input asp-for="UsableAreaSqFt"
+                                           class="form-control"
+                                           type="number"
+                                           step="any"
+                                           placeholder="Enter usable area in sq. ft." />
+                                    <span asp-validation-for="UsableAreaSqFt"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="NumberOfClassrooms"
+                                           class="form-label"></label>
+                                    <input asp-for="NumberOfClassrooms"
+                                           class="form-control"
+                                           type="number"
+                                           min="0"
+                                           placeholder="Enter number of classrooms" />
+                                    <span asp-validation-for="NumberOfClassrooms"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="NumberOfFloors"
+                                           class="form-label"></label>
+                                    <input asp-for="NumberOfFloors"
+                                           class="form-control"
+                                           type="number"
+                                           min="0"
+                                           placeholder="Enter number of floors" />
+                                    <span asp-validation-for="NumberOfFloors"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="NumberOfLabs"
+                                           class="form-label"></label>
+                                    <input asp-for="NumberOfLabs"
+                                           class="form-control"
+                                           type="number"
+                                           min="0"
+                                           placeholder="Enter number of labs" />
+                                    <span asp-validation-for="NumberOfLabs"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="CenterDescription"
+                                           class="form-label"></label>
+                                    <textarea asp-for="CenterDescription"
+                                              class="form-control"
+                                              rows="3"
+                                              placeholder="Enter center description"></textarea>
+                                    <span asp-validation-for="CenterDescription"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="EquipmentDetails"
+                                           class="form-label"></label>
+                                    <textarea asp-for="EquipmentDetails"
+                                              class="form-control"
+                                              rows="3"
+                                              placeholder="Enter equipment details"></textarea>
+                                    <span asp-validation-for="EquipmentDetails"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                @* =====================================================
+                   SECTION 5: PHOTOS & ORGANIZATION INFORMATION
+                   ===================================================== *@
+
+                <div class="col-12 mb-4">
+                    <div class="preview-block">
+
+                        <div style="border-left:4px solid #D9622F; padding:5px 0 5px 12px;">
+                            <h5 class="mb-0 d-flex align-items-center gap-2"
+                                style="color:#1B2A4A;">
+                                <em class="ni ni-camera"></em>
+                                Photos &amp; Organization Information
+                            </h5>
+                        </div>
+
+                        <div class="row gy-3 mt-1">
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="ApproachRoadPhoto"
+                                           class="form-label"></label>
+                                    <input asp-for="ApproachRoadPhoto"
+                                           type="file"
+                                           class="form-control"
+                                           accept="image/*" />
+                                    <span asp-validation-for="ApproachRoadPhoto"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="OutsideClassroomPhoto"
+                                           class="form-label"></label>
+                                    <input asp-for="OutsideClassroomPhoto"
+                                           type="file"
+                                           class="form-control"
+                                           accept="image/*" />
+                                    <span asp-validation-for="OutsideClassroomPhoto"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="InsideClassroomPhoto"
+                                           class="form-label"></label>
+                                    <input asp-for="InsideClassroomPhoto"
+                                           type="file"
+                                           class="form-control"
+                                           accept="image/*" />
+                                    <span asp-validation-for="InsideClassroomPhoto"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="LabPhoto"
+                                           class="form-label"></label>
+                                    <input asp-for="LabPhoto"
+                                           type="file"
+                                           class="form-control"
+                                           accept="image/*" />
+                                    <span asp-validation-for="LabPhoto"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="CCTVPhoto"
+                                           class="form-label"></label>
+                                    <input asp-for="CCTVPhoto"
+                                           type="file"
+                                           class="form-control"
+                                           accept="image/*" />
+                                    <span asp-validation-for="CCTVPhoto"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="OrganizationName"
+                                           class="form-label"></label>
+                                    <input asp-for="OrganizationName"
+                                           class="form-control"
+                                           placeholder="Enter organization name" />
+                                    <span asp-validation-for="OrganizationName"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="CompanySeal"
+                                           class="form-label"></label>
+                                    <input asp-for="CompanySeal"
+                                           type="file"
+                                           class="form-control"
+                                           accept="image/*,.pdf" />
+                                    <span asp-validation-for="CompanySeal"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="SigningAuthorityName"
+                                           class="form-label"></label>
+                                    <input asp-for="SigningAuthorityName"
+                                           class="form-control"
+                                           placeholder="Enter signing authority name" />
+                                    <span asp-validation-for="SigningAuthorityName"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="MobileNumber"
+                                           class="form-label"></label>
+                                    <input asp-for="MobileNumber"
+                                           class="form-control"
+                                           placeholder="Enter mobile number" />
+                                    <span asp-validation-for="MobileNumber"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="PANNumber"
+                                           class="form-label"></label>
+                                    <input asp-for="PANNumber"
+                                           class="form-control"
+                                           placeholder="Enter PAN number" />
+                                    <span asp-validation-for="PANNumber"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="EmailId"
+                                           class="form-label"></label>
+                                    <input asp-for="EmailId"
+                                           type="email"
+                                           class="form-control"
+                                           placeholder="Enter email address" />
+                                    <span asp-validation-for="EmailId"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                @* =====================================================
+                   FORM BUTTONS
+                   ===================================================== *@
+
+                <div class="col-12">
+                    <hr />
+                    <div class="d-flex flex-wrap gap-2 justify-content-end">
+
+                        <a asp-area="TP"
+                           asp-controller="TrainingCenter"
+                           asp-action="Create"
+                           class="btn btn-outline-light">
+                            Cancel
+                        </a>
+
+                        <button type="submit" class="btn btn-primary">
+                            <em class="icon ni ni-send"></em>
+                            <span>Send for Approval</span>
+                        </button>
+
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

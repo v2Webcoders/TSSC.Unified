@@ -1,0 +1,169 @@
+﻿
+@model IEnumerable<TSSC.Unified.ViewModel.TrainingCenterViewModel>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+<!-- Page Heading: same as SelectJobRole -->
+@* <div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Training Center List
+            </h3>
+        </div>
+
+        <div class="nk-block-head-content">
+            <a asp-area="TP"
+               asp-controller="TrainingCenter"
+               asp-action="SelectJobRole"
+               class="btn btn-success">
+                <em class="icon ni ni-plus"></em>
+                Add Center
+            </a>
+        </div>
+    </div>
+</div> *@
+
+<!-- Same card UI -->
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <!-- Table Heading -->
+        <div class="nk-block-head nk-block-head-sm">
+            <div class="nk-block-between">
+                <div class="nk-block-head-content">
+                    <h5 class="nk-block-title">
+                        Training Centers
+                    </h5>
+                </div>
+
+                <div class="nk-block-head-content">
+                    <span class="badge bg-primary">
+                        Total: @(Model?.Count() ?? 0)
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Same table classes as SelectJobRole -->
+        <div class="table-responsive">
+            <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+                <thead>
+                    <tr>
+                        <th>S.No.</th>
+                        <th>Center Name</th>
+                        <th>Job Role</th>
+                        <th>Scheme</th>
+                        <th>QP Hours</th>
+                        <th>Approval</th>
+                        <th>Payment</th>
+                        <th>Schedule for Inspection</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@serial</td>
+
+                                <td>@item.TrainingCenterName</td>
+
+                                <td>
+                                    @(item.JobRoleTitle ?? "-")
+                                </td>
+
+                                <td>
+                                    @(item.SchemeName ?? "-")
+                                </td>
+
+                                <td>
+                                    @(item.QPHours.HasValue
+                                                                ? item.QPHours.Value.ToString("0.##") + " Hours"
+                                                                : "-")
+                        </td>
+
+                                <td>
+                            @if (item.Status == "Approved")
+                                    {
+                                        <span class="badge bg-success">
+                                            Approved
+                                        </span>
+                                    }
+                                    else if (item.Status == "Rejected")
+                                    {
+                                        <span class="badge bg-danger">
+                                            Rejected
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">
+                                            @(item.Status ?? "Pending")
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (item.PaymentStatus == "Paid")
+                                    {
+                                        <span class="badge bg-success">Paid</span>
+                                    }
+                                    else
+                                    {
+                                        <a asp-area="TP"
+                                           asp-controller="TrainingCenter"
+                                           asp-action="Payment"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-success btn-sm">
+                                            <em class="icon ni ni-wallet"></em>
+                                            Pay Now
+                                        </a>
+                                    }
+                        </td>
+
+                        <td>
+                            @(item.InspectionDate.HasValue
+                                                        ? item.InspectionDate.Value.ToString("dd-MM-yyyy hh:mm tt")
+                                                        : "Not Scheduled")
+                        </td>
+
+                                <td>
+                                    <a asp-area="TP"
+                                       asp-controller="TrainingCenter"
+                                       asp-action="Details"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-primary btn-sm">
+                                        <em class="icon ni ni-eye"></em>
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+
+                                        serial++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                No training centers found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</div>

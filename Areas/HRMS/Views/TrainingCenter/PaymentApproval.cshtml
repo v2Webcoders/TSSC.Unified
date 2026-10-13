@@ -1,0 +1,175 @@
+﻿@model IEnumerable<TSSC.Unified.ViewModel.TrainingCenterViewModel>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Finance Payment Approval
+            </h3>
+        </div>
+    </div>
+</div>
+
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="example-alert w-100 mb-3">
+                <div class="alert alert-success alert-icon">
+                    <em class="icon ni ni-check-circle"></em>
+                    <strong>@TempData["Success"]</strong>
+                </div>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="example-alert w-100 mb-3">
+                <div class="alert alert-danger alert-icon">
+                    <em class="icon ni ni-cross-circle"></em>
+                    <strong>@TempData["Error"]</strong>
+                </div>
+            </div>
+        }
+
+        <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer dtr-inline collapsed">
+
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Training Center</th>
+                    <th>Job Role</th>
+                    <th>Scheme</th>
+                    <th>Payment Status</th>
+                    <th>Paid On</th>
+                    <th>Finance Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@serial</td>
+
+                            <td>@item.TrainingCenterName</td>
+                            <td>
+                                @(string.IsNullOrWhiteSpace(item.JobRoleTitle)
+                                                        ? "-"
+                                                        : item.JobRoleTitle)
+                                                                        </td>
+                            <td>
+                                @(string.IsNullOrWhiteSpace(item.SchemeName)
+                                                        ? "-"
+                                                        : item.SchemeName)
+                             </td>
+                            <td>
+                                <span class="badge badge-dim bg-success">
+                                    @item.PaymentStatus
+                                </span>
+                            </td>
+
+                            <td>
+                                @(item.PaymentDate?.ToString("dd-MM-yyyy") ?? "-")
+                            </td>
+
+                            <td>
+                                <span class="badge badge-dim bg-warning">
+                                    @(item.FinanceStatus ?? "Pending")
+                                </span>
+                            </td>
+
+
+
+                                            <td>
+@if (ViewBag.ActiveTab?.ToString() == "Pending")
+                                {
+                                    <form asp-action="ProcessPaymentApproval"
+                                    asp-controller="TrainingCenter"
+                                                      asp-area="HRMS"
+                                                      method="post">
+
+                                                    @Html.AntiForgeryToken()
+
+                                                    <input type="hidden"
+                                                           name="id"
+                                                           value="@item.Id" />
+
+                                                    <textarea name="financeRemark"
+                                      class="form-control mb-2"
+                                      rows="2"
+                                      placeholder="Enter your remarks"></textarea>
+
+                                                    <div class="btn-group" role="group">
+
+                                                        @* APPROVE *@
+                                                        <button type="submit"
+                                                                name="decision"
+                                                                value="Approved"
+                                                                class="btn btn-sm btn-outline-success"
+                                                                title="Approve"
+                                                                onclick="return confirm('Are you sure you want to approve this payment?');">
+
+                                                            <em class="icon ni ni-check"></em>
+                                                        </button>
+
+                                                        @* REJECT *@
+                                                        <button type="submit"
+                                                                name="decision"
+                                                                value="Rejected"
+                                                                class="btn btn-sm btn-outline-danger"
+                                                                title="Reject"
+                                                                onclick="
+                                                var r = this.form.querySelector('[name=financeRemark]').value.trim();
+                                                if (!r) {
+                                                    alert('Please enter remarks before rejecting.');
+                                                    return false;
+                                                }
+                                                return confirm('Are you sure you want to reject this payment?');
+                                            ">
+
+                                                            <em class="icon ni ni-cross"></em>
+                                                        </button>
+
+                                                    </div>
+                                                </form>}
+                                else if (item.FinanceStatus == "Approved")
+                                {
+                                    <span class="badge badge-dim bg-success">
+                                        Approved
+                                    </span>
+                                }
+                                else if (item.FinanceStatus == "Rejected")
+                                {
+                                    <span class="badge badge-dim bg-danger">
+                                        Rejected
+                                    </span>
+                                }
+                                            </td>
+
+
+                        </tr>
+
+                        serial++;
+                    }
+                }
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+
+

@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Grievance Resolved</title>
+</head>
+
+<body style="margin:0; padding:0; background:#f5f7fa; font-family:Arial,sans-serif;">
+
+    <div style="max-width:650px; margin:30px auto; background:#ffffff; border-radius:10px; overflow:hidden;">
+
+        <div style="background:#198754; padding:25px; text-align:center;">
+            <h2 style="color:#ffffff; margin:0;">
+                Grievance Resolved
+            </h2>
+        </div>
+
+        <div style="padding:30px;">
+
+            <p>Dear <strong>{{Name}}</strong>,</p>
+
+            <p>
+                We are pleased to inform you that your grievance has been
+                <strong>resolved</strong> by the TSSC Grievance Team.
+            </p>
+
+            <div style="background:#f5f8fc; padding:20px; margin:25px 0; border-radius:8px;">
+
+                <p>
+                    <strong>Grievance Number:</strong>
+                    {{GrievanceNo}}
+                </p>
+
+                <p>
+                    <strong>Status:</strong>
+                    {{Status}}
+                </p>
+
+                <p>
+                    <strong>Resolved On:</strong>
+                    {{ResolvedDate}}
+                </p>
+
+                <p>
+                    <strong>Resolved By:</strong>
+                    {{ResolvedBy}}
+                </p>
+
+            </div>
+
+            <p>
+                <strong>Team Remarks:</strong>
+            </p>
+
+            <div style="background:#f8f9fa; padding:15px; border-radius:6px;">
+                {{TeamRemarks}}
+            </div>
+
+            <p style="margin-top:25px;">
+                If a resolution report has been provided, you can access
+                it using the link below:
+            </p>
+
+            <p style="text-align:center; margin:30px 0;">
+
+                <a href="{{ReportUrl}}"
+                   style="background:#198754; color:#ffffff;
+                          padding:12px 25px; text-decoration:none;
+                          border-radius:6px; display:inline-block;">
+
+                    View Resolution Report
+
+                </a>
+
+            </p>
+
+            <p>
+                Thank you for bringing this matter to our attention.
+            </p>
+
+            <p style="margin-top:30px;">
+                Regards,<br>
+                <strong>TSSC Grievance Team</strong>
+            </p>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

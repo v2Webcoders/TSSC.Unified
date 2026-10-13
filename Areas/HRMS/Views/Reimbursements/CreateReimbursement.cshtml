@@ -408,11 +408,11 @@
                          id="addApproverButton">
 
                         <button type="button"
-                                class="btn btn-outline-primary"
-                                onclick="
+                                class="btn btn-outline-primary" onclick="addApprover()">
+                                @* onclick="
                 document.getElementById('addApproverButton').classList.add('d-none');
                 document.getElementById('approver5Container').classList.remove('d-none');
-                document.getElementById('approver6Container').classList.remove('d-none');">
+                document.getElementById('approver6Container').classList.remove('d-none');"> *@
 
                             <em class="icon ni ni-plus"></em>
 
@@ -613,11 +613,48 @@
 
 @section Scripts {
 
-    @{
-        
-    }
+        <script>
+            let approverCount = 4;
 
+            function addApprover() {
 
-   
+                // First click -> Approver 5
+                if (approverCount === 4) {
 
+                    const button = document.getElementById("addApproverButton");
+                    const approver5 = document.getElementById("approver5Container");
+
+                    approver5.classList.remove("d-none");
+
+                    // Button ko Approver 5 ke baad le jao
+                    approver5.parentNode.insertBefore(
+                        button,
+                        approver5.nextSibling
+                    );
+
+                    approverCount = 5;
+                }
+
+                // Second click -> Approver 6
+                else if (approverCount === 5) {
+
+                    const button = document.getElementById("addApproverButton");
+                    const approver6 = document.getElementById("approver6Container");
+
+                    approver6.classList.remove("d-none");
+
+                    // Button ko Approver 6 ke baad le jao
+                    approver6.parentNode.insertBefore(
+                        button,
+                        approver6.nextSibling
+                    );
+
+                    // Button hide
+                    button.classList.add("d-none");
+
+                    approverCount = 6;
+                }
+            }
+        </script>
+  
 }

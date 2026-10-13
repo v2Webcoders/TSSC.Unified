@@ -1,0 +1,244 @@
+﻿@model IEnumerable<TSSC.Unified.Models.BatchMaster>
+
+
+@{
+    ViewData["Title"] = "Assigned Batches";
+    Layout = "_Layout";
+
+    var batches = Model?.ToList() ?? new List<TSSC.Unified.Models.BatchMaster>();
+}
+
+<div class="nk-content-body">
+
+    <div class="nk-block-head nk-block-head-sm">
+        <div class="nk-block-between">
+
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title">
+                    Assigned Batches
+                </h3>
+
+                <div class="nk-block-des text-soft">
+                    <p>
+                        Certification batches assigned for assessment.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="card card-bordered">
+
+        <div class="card-inner">
+
+            <div class="table-responsive">
+
+                <table class="datatable-init-export table table-tranx table-bordered">
+
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Batch</th>
+                            <th>Job Role</th>
+                            <th>Assessment Agency</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (batches.Any())
+                        {
+                            int sno = 1;
+
+                            foreach (var batch in batches)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @sno
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            @batch.BatchName
+                                        </strong>
+
+                                        @if (!string.IsNullOrWhiteSpace(batch.BatchCode))
+                                        {
+                                            <div class="text-soft small">
+                                                @batch.BatchCode
+                                            </div>
+                                        }
+                            </td>
+
+                            <td>
+                                @(batch.JobRole?.JobRoleTitle ?? "-")
+                            </td>
+
+                            <td>
+                                @(batch.AssessmentAgency?.AgencyName ?? "-")
+                            </td>
+
+                            <td>
+                                @(batch.StartDate.HasValue
+                                                                ? batch.StartDate.Value.ToString("dd MMM yyyy")
+                                                                : "-")
+                                                                  </td>
+
+                            <td>
+                                @(batch.EndDate.HasValue
+                                                                ? batch.EndDate.Value.ToString("dd MMM yyyy")
+                                                                : "-")
+                            </td>
+
+                                                    <td>
+                                                        <span class="badge badge-dim bg-success">
+                                                            Approved
+                                                        </span>
+                                                    </td>
+
+                                    <td>
+                                        <div class="btn-group" role="group">
+
+                                            <!-- VIEW BATCH -->
+                                            <a href="/Agency/Agency/ViewBatch/@batch.Id"
+                                               class="btn btn-sm btn-outline-primary"
+                                               title="View Batch">
+
+                                                <em class="icon ni ni-eye"></em>
+                                                View Batch
+
+                                            </a>
+
+
+                                    @if (!batch.ResultUploaded)
+                                            {
+                                                <!-- UPLOAD RESULT -->
+                                                <form action="/Agency/Agency/UploadResult"
+                                                      method="post"
+                                                      enctype="multipart/form-data"
+                                                      class="d-inline">
+
+                                                    @Html.AntiForgeryToken()
+
+                                                    <input type="hidden"
+                                                           name="batchId"
+                                                           value="@batch.Id" />
+
+                                                    <input type="file"
+                                                           id="resultFile_@batch.Id"
+                                                           name="resultFile"
+                                                           accept=".xlsx,.xls"
+                                                           class="d-none"
+                                                           onchange="uploadBatchResult(this);" />
+
+                                                    <label for="resultFile_@batch.Id"
+                                                           class="btn btn-sm btn-outline-success"
+                                                           title="Upload Result">
+
+                                                        <em class="icon ni ni-upload"></em>
+                                                        Upload Result
+
+                                                    </label>
+
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <!-- RESULT UPLOADED -->
+                                                @if (!string.IsNullOrWhiteSpace(batch.ResultFilePath))
+                                                {
+                                                    <a href="@Url.Content("~/" + batch.ResultFilePath)"
+                                                       target="_blank"
+                                                       rel="noopener noreferrer"
+                                                       class="btn btn-sm btn-outline-warning"
+                                                       title="View Uploaded Result">
+
+                                                        <em class="icon ni ni-file-text"></em>
+                                                        View Result
+
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-dim bg-success">
+                                                        Result Uploaded
+                                                    </span>
+                                                }
+                                            }
+
+                                        </div>
+                                    </td>
+
+                                                </tr>
+
+                                                sno++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center text-soft py-4">
+                                    No assigned batches found.
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+@section Scripts {
+
+    <script>
+        function uploadBatchResult(input) {
+
+            if (!input.files || input.files.length === 0) {
+                return;
+            }
+
+            const file = input.files[0];
+
+            const allowedExtensions = [".xlsx", ".xls"];
+
+            const fileName = file.name.toLowerCase();
+
+            const isValid = allowedExtensions.some(function (ext) {
+                return fileName.endsWith(ext);
+            });
+
+            if (!isValid) {
+
+                alert("Please select a valid Excel file (.xlsx or .xls).");
+
+                input.value = "";
+                return;
+            }
+
+            const maxSize = 10 * 1024 * 1024;
+
+            if (file.size > maxSize) {
+
+                alert("File size must not exceed 10 MB.");
+
+                input.value = "";
+                return;
+            }
+
+            input.closest("form").submit();
+        }
+    </script>
+}

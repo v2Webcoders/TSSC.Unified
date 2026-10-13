@@ -112,9 +112,19 @@ namespace TSSC.Unified.Models
             public DateTime? PaymentDate { get; set; }
 
             public bool PaymentVerified { get; set; }
-            public bool FinanceApproved { get; set; }
+        public bool FinanceApproved { get; set; }
+        public bool RaiseReq { get; set; } = false;
+        public bool CertificateUploaded { get; set; } = false;
 
-            public DateTime? FinanceApprovedDate { get; set; }
+        public DateTime? CertificateUploadedDate { get; set; }
+
+        [StringLength(255)]
+        public string? CertificateFileName { get; set; }
+
+        [StringLength(500)]
+        public string? CertificateFilePath { get; set; }
+
+        public DateTime? FinanceApprovedDate { get; set; }
         // Child Records
         public ICollection<TrainerRegistrationQualification>
                 Qualifications
