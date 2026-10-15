@@ -123,7 +123,211 @@
 <div class="card card-bordered">
 	<div class="card-inner">
 		<div class="table-responsive">
+			
 			<table class="datatable-init-export table table-tranx table_custom table-bordered">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Progress</th>
+						<th style="min-width:150px;">Organization</th>
+						<th>Registration No.</th>
+						<th>Applicant / Signatory</th>
+						<th>Contact Details</th>
+						<th>Submitted On</th>
+						<th>Status</th>
+						<th>Regional Head</th>
+						<th>Affiliations</th>
+						<th>Finance</th>
+						<th>Vertical Head</th>
+						<th>Senior Reviewer 1</th>
+						<th>Senior Reviewer 2</th>
+						<th>CEO</th>
+						<th>Payment Status</th>
+						<th>Certificate Issuance</th>
+						<th class="text-end">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					@{
+						var count = 1;
+					}
+
+					@foreach (var item in Model)
+					{
+						var approvalStatuses = new[]
+						{
+					item.Regional_Head_Status,
+					item.Affiliations_Status,
+					item.Finance_Status,
+					item.Vertical_Head_Status,
+					item.SeniorReviewer1_Status,
+					item.SeniorReviewer2_Status,
+					item.CEO_Status,
+					item.PaymentProcess_Status,
+					item.CertificateIssuance_Status
+					};
+
+						<tr>
+							<td>@count</td>
+							<td>
+								<div class="approval-progress">
+									<div class="approval-line"></div>
+
+									<!-- Regional Head -->
+									<div class="approval-step">
+										<div class="approval-circle @(item.Regional_Head_Status == "Approved" ? "approved" : item.Regional_Head_Status == "Rejected" ? "rejected" : "pending")">
+											@(item.Regional_Head_Status == "Approved" ? "✓" : item.Regional_Head_Status == "Rejected" ? "✕" : "•")
+										</div>
+										<small>RH</small>
+									</div>
+
+									<!-- Affiliations -->
+									<div class="approval-step">
+										<div class="approval-circle @(item.Affiliations_Status == "Approved" ? "approved" : item.Affiliations_Status == "Rejected" ? "rejected" : "pending")">
+											@(item.Affiliations_Status == "Approved" ? "✓" : item.Affiliations_Status == "Rejected" ? "✕" : "•")
+										</div>
+										<small>AFF</small>
+									</div>
+
+									<!-- Finance -->
+									<div class="approval-step">
+										<div class="approval-circle @(item.Finance_Status == "Approved" ? "approved" : item.Finance_Status == "Rejected" ? "rejected" : "pending")">
+											@(item.Finance_Status == "Approved" ? "✓" : item.Finance_Status == "Rejected" ? "✕" : "•")
+										</div>
+										<small>FN</small>
+									</div>
+
+									<!-- Vertical Head -->
+									<div class="approval-step">
+										<div class="approval-circle @(item.Vertical_Head_Status == "Approved" ? "approved" : item.Vertical_Head_Status == "Rejected" ? "rejected" : "pending")">
+											@(item.Vertical_Head_Status == "Approved" ? "✓" : item.Vertical_Head_Status == "Rejected" ? "✕" : "•")
+										</div>
+										<small>VH</small>
+									</div>
+
+									<!-- Senior Reviewer 1 -->
+									<div class="approval-step">
+										<div class="approval-circle @(item.SeniorReviewer1_Status == "Approved" ? "approved" : item.SeniorReviewer1_Status == "Rejected" ? "rejected" : "pending")">
+											@(item.SeniorReviewer1_Status == "Approved" ? "✓" : item.SeniorReviewer1_Status == "Rejected" ? "✕" : "•")
+										</div>
+										<small>SR1</small>
+									</div>
+
+									<!-- Senior Reviewer 2 -->
+									<div class="approval-step">
+										<div class="approval-circle @(item.SeniorReviewer2_Status == "Approved" ? "approved" : item.SeniorReviewer2_Status == "Rejected" ? "rejected" : "pending")">
+											@(item.SeniorReviewer2_Status == "Approved" ? "✓" : item.SeniorReviewer2_Status == "Rejected" ? "✕" : "•")
+										</div>
+										<small>SR2</small>
+									</div>
+
+									<!-- CEO -->
+									<div class="approval-step">
+										<div class="approval-circle @(item.CEO_Status == "Approved" ? "approved" : item.CEO_Status == "Rejected" ? "rejected" : "pending")">
+											@(item.CEO_Status == "Approved" ? "✓" : item.CEO_Status == "Rejected" ? "✕" : "•")
+										</div>
+										<small>CEO</small>
+									</div>
+
+									<!-- Payment Process -->
+									<div class="approval-step">
+										<div class="approval-circle @(item.PaymentProcess_Status == "Approved" ? "approved" : item.PaymentProcess_Status == "Rejected" ? "rejected" : "pending")">
+											@(item.PaymentProcess_Status == "Approved" ? "✓" : item.PaymentProcess_Status == "Rejected" ? "✕" : "•")
+										</div>
+										<small>PAY</small>
+									</div>
+
+									
+
+									<!-- Certificate Issuance -->
+									<div class="approval-step">
+										<div class="approval-circle @(item.CertificateIssuance_Status == "Approved" ? "approved" : item.CertificateIssuance_Status == "Rejected" ? "rejected" : "pending")">
+											@(item.CertificateIssuance_Status == "Approved" ? "✓" : item.CertificateIssuance_Status == "Rejected" ? "✕" : "•")
+										</div>
+										<small>CERT</small>
+									</div>
+								</div>
+							</td>
+					
+
+							<td>
+								<strong>@item.OrganizationName</strong><br />
+								<small class="text-soft">@item.OrganizationType</small>
+							</td>
+
+							<td>@item.RegistrationNumber</td>
+
+							<td style="min-width:120px;">
+								@item.AuthorizedSignatoryName<br />
+								<small class="text-soft">@item.Designation</small>
+							</td>
+
+							<td>
+								@item.Email<br />
+								<small class="text-soft">@item.MobileNumber</small>
+							</td>
+
+							<td>@item.CreatedOn.ToString("dd MMM yyyy")</td>
+
+							<td>
+								@if (item.Status == "Approved")
+								{
+									<span class="badge bg-success">Approved</span>
+								}
+								else if (item.Status == "Rejected")
+								{
+									<span class="badge bg-danger">Rejected</span>
+								}
+								else if (item.Status == "Under Review")
+								{
+									<span class="badge bg-info">Under Review</span>
+								}
+								else if (item.Status == "Submitted")
+								{
+									<span class="badge bg-warning text-dark">Submitted</span>
+								}
+								else
+								{
+									<span class="badge bg-secondary">@item.Status</span>
+								}
+							</td>
+
+							@foreach (var status in approvalStatuses)
+							{
+								<td>
+									@if (status == "Approved")
+									{
+										<span class="badge bg-success">Approved</span>
+									}
+									else if (status == "Rejected")
+									{
+										<span class="badge bg-danger">Rejected</span>
+									}
+									else
+									{
+										<span class="badge bg-warning text-dark">Pending</span>
+									}
+								</td>
+							}
+
+							<td class="text-end">
+								<a asp-area="Admin"
+								   asp-controller="TPRegistration"
+								   asp-action="Details"
+								   asp-route-id="@item.Id"
+								   class="btn btn-sm btn-primary">
+									<em class="icon ni ni-eye"></em> View
+								</a>
+							</td>
+						</tr>
+
+						count++;
+					}
+				</tbody>
+			</table>
+			
+	
+			@* <table class="datatable-init-export table table-tranx table_custom table-bordered">
 
 				<thead>
 					<tr>
@@ -419,7 +623,7 @@
 
 				</tbody>
 
-			</table>
+			</table> *@
 		</div>
 	</div>
 </div>

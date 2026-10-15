@@ -110,9 +110,14 @@
 
 
 @if (Model.Regional_Head_Status == "Rejected"
-		|| Model.Vertical_Head_Status == "Rejected"
-		|| Model.Finance_Status == "Rejected"
-		|| Model.CEO_Status == "Rejected")
+			|| Model.Affiliations_Status == "Rejected"
+			|| Model.Finance_Status == "Rejected"
+			|| Model.Vertical_Head_Status == "Rejected"
+			|| Model.SeniorReviewer1_Status == "Rejected"
+			|| Model.SeniorReviewer2_Status == "Rejected"
+			|| Model.CEO_Status == "Rejected"
+			|| Model.PaymentProcess_Status == "Rejected"
+			|| Model.CertificateIssuance_Status == "Rejected")
 {
 	<div class="card border border-danger-dim border-1 mt-4">
 

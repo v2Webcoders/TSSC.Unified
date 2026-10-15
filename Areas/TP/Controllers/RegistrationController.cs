@@ -23,6 +23,7 @@ using iText.Kernel.Colors;
 using iText.Kernel.Font;
 using iText.Kernel.Pdf;
 using iText.Layout.Element;
+using System.Globalization;
 
 namespace TSSC.Unified.Areas.TP.Controllers
 {
@@ -79,6 +80,24 @@ namespace TSSC.Unified.Areas.TP.Controllers
         [RequestFormLimits(MultipartBodyLengthLimit = 104857600)]
         public async Task<IActionResult> Create(TPRegistrationVM model)
         {
+            var rawDate = Request.Form[nameof(model.DateOfIncorporation)].ToString();
+
+            if (!DateTime.TryParseExact(
+                    rawDate,
+                    "dd/MM/yyyy",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var incorporationDate))
+            {
+                ModelState.AddModelError(
+                    nameof(model.DateOfIncorporation),
+                    "Enter a valid date in DD/MM/YYYY format.");
+            }
+            else
+            {
+                model.DateOfIncorporation = incorporationDate;
+            }
+
             if (!ModelState.IsValid)
                 return InvalidResult(model);
 
@@ -689,10 +708,15 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 return NotFound();
 
             var canEdit =
-                application.Regional_Head_Status == "Rejected" ||
-                application.Vertical_Head_Status == "Rejected" ||
-                application.Finance_Status == "Rejected" ||
-                application.CEO_Status == "Rejected";
+            application.Regional_Head_Status == "Rejected" ||
+            application.Affiliations_Status == "Rejected" ||
+            application.Finance_Status == "Rejected" ||
+            application.Vertical_Head_Status == "Rejected" ||
+            application.SeniorReviewer1_Status == "Rejected" ||
+            application.SeniorReviewer2_Status == "Rejected" ||
+            application.CEO_Status == "Rejected" ||
+            application.PaymentProcess_Status == "Rejected" ||
+            application.CertificateIssuance_Status == "Rejected";
 
             if (!canEdit)
                 return Forbid();
@@ -700,12 +724,13 @@ namespace TSSC.Unified.Areas.TP.Controllers
             var model = new TPRegistrationEditVM
             {
                 Id = application.Id,
-
+                MembershipType = application.MembershipType,
                 OrganizationName = application.OrganizationName,
                 OrganizationType = application.OrganizationType,
                 RegistrationNumber = application.RegistrationNumber,
                 DateOfIncorporation = application.DateOfIncorporation,
                 PANNumber = application.PANNumber,
+                IsGSTAvailable = application.IsGSTAvailable,
                 GSTNumber = application.GSTNumber,
 
                 SectorExperience = application.SectorExperience,
@@ -770,10 +795,15 @@ namespace TSSC.Unified.Areas.TP.Controllers
             // =====================================================
 
             var canEdit =
-                application.Regional_Head_Status == "Rejected" ||
-                application.Vertical_Head_Status == "Rejected" ||
-                application.Finance_Status == "Rejected" ||
-                application.CEO_Status == "Rejected";
+            application.Regional_Head_Status == "Rejected" ||
+            application.Affiliations_Status == "Rejected" ||
+            application.Finance_Status == "Rejected" ||
+            application.Vertical_Head_Status == "Rejected" ||
+            application.SeniorReviewer1_Status == "Rejected" ||
+            application.SeniorReviewer2_Status == "Rejected" ||
+            application.CEO_Status == "Rejected" ||
+            application.PaymentProcess_Status == "Rejected" ||
+            application.CertificateIssuance_Status == "Rejected";
 
             if (!canEdit)
                 return Forbid();
@@ -784,6 +814,20 @@ namespace TSSC.Unified.Areas.TP.Controllers
 
             if (!ModelState.IsValid)
             {
+                ViewBag.Documents = await _context.TPRegistrationDocuments
+                    .Where(x => x.TPRegistrationId == application.Id)
+                    .ToListAsync();
+
+                return View(model);
+            }
+
+
+            if (!model.DateOfIncorporation.HasValue)
+            {
+                ModelState.AddModelError(
+                    nameof(model.DateOfIncorporation),
+                    "Please enter a valid date of incorporation.");
+
                 ViewBag.Documents = await _context.TPRegistrationDocuments
                     .Where(x => x.TPRegistrationId == application.Id)
                     .ToListAsync();
@@ -1057,30 +1101,116 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 // RESET APPROVAL WORKFLOW
                 // =================================================
 
-                application.Regional_Head_Status = "Pending";
-                application.Regional_Head_Remarks = null;
-                application.Regional_Head_ApprovedBy = null;
-                application.Regional_Head_Date = null;
+                // =====================================================
+                // RESET ALL APPROVAL WORKFLOW STAGES
+                // =====================================================
 
-                application.Vertical_Head_Status = "Pending";
-                application.Vertical_Head_Remarks = null;
-                application.Vertical_Head_ApprovedBy = null;
-                application.Vertical_Head_Date = null;
+                // =====================================================
+                // RESET CURRENT STAGE AND ALL FOLLOWING STAGES
+                // =====================================================
 
-                application.Finance_Status = "Pending";
-                application.Finance_Remarks = null;
-                application.Finance_ApprovedBy = null;
-                application.Finance_Date = null;
+                switch (application.CurrentStage?.Trim().ToUpperInvariant())
+                {
+                    case "REGIONAL":
+                        application.Regional_Head_Status = "Pending";
+                        application.Regional_Head_Remarks = null;
+                        application.Regional_Head_ApprovedBy = null;
+                        application.Regional_Head_Date = null;
 
-                application.CEO_Status = "Pending";
-                application.CEO_Remarks = null;
-                application.CEO_ApprovedBy = null;
-                application.CEO_Date = null;
+                        goto case "AFFILIATIONS";
+
+                    case "AFFILIATIONS":
+
+                        application.Affiliations_Status = "Pending";
+                        application.Affiliations_Remarks = null;
+                        application.Affiliations_ApprovedBy = null;
+                        application.Affiliations_Date = null;
+
+                        goto case "FINANCE";
+
+                    case "FINANCE":
+
+                        application.Finance_Status = "Pending";
+                        application.Finance_Remarks = null;
+                        application.Finance_ApprovedBy = null;
+                        application.Finance_Date = null;
+
+                        goto case "VERTICAL_HEAD";
+
+                    case "VERTICAL_HEAD":
+
+                        application.Vertical_Head_Status = "Pending";
+                        application.Vertical_Head_Remarks = null;
+                        application.Vertical_Head_ApprovedBy = null;
+                        application.Vertical_Head_Date = null;
+
+                        goto case "SENIOR_REVIEWER1";
+
+                    case "SENIOR_REVIEWER1":
+
+                        application.SeniorReviewer1_Status = "Pending";
+                        application.SeniorReviewer1_Remarks = null;
+                        application.SeniorReviewer1_ApprovedBy = null;
+                        application.SeniorReviewer1_Date = null;
+
+                        goto case "SENIOR_REVIEWER2";
+
+                    case "SENIOR_REVIEWER2":
+
+                        application.SeniorReviewer2_Status = "Pending";
+                        application.SeniorReviewer2_Remarks = null;
+                        application.SeniorReviewer2_ApprovedBy = null;
+                        application.SeniorReviewer2_Date = null;
+
+                        goto case "CEO";
+
+                    case "CEO":
+
+                        application.CEO_Status = "Pending";
+                        application.CEO_Remarks = null;
+                        application.CEO_ApprovedBy = null;
+                        application.CEO_Date = null;
+
+                        goto case "PAYMENT_PROCESS";
+
+                    case "PAYMENT_PROCESS":
+
+                        application.PaymentProcess_Status = "Pending";
+                        application.PaymentProcess_Remarks = null;
+                        application.PaymentProcess_ApprovedBy = null;
+                        application.PaymentProcess_Date = null;
+
+                        goto case "CERTIFICATE_ISSUANCE";
+
+                    case "CERTIFICATE_ISSUANCE":
+
+                        application.CertificateIssuance_Status = "Pending";
+                        application.CertificateIssuance_Remarks = null;
+                        application.CertificateIssuance_ApprovedBy = null;
+                        application.CertificateIssuance_Date = null;
+
+                        break;
+
+                    default:
+
+                        ModelState.AddModelError(
+                            "",
+                            $"Unknown current stage: {application.CurrentStage}");
+
+                        ViewBag.Documents = await _context.TPRegistrationDocuments
+                            .Where(x => x.TPRegistrationId == application.Id)
+                            .ToListAsync();
+
+                        return View(model);
+                }
+
+                // =====================================================
+                // RESET OVERALL APPLICATION STATUS
+                // =====================================================
 
                 application.Status = "Submitted";
                 application.OverallApprovalStatus = "Pending";
                 application.UpdatedOn = DateTime.UtcNow;
-
                 // =================================================
                 // REPLACE DOCUMENTS
                 // =================================================

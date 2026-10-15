@@ -59,6 +59,13 @@
 
 <div class="card card-bordered">
     <div class="card-inner">
+        <p class="mb-3 small">
+            <span class="text-primary fw-semibold">Senior Reviewer 1:</span>
+            Sumit Munjal
+            <span class="text-soft mx-2">|</span>
+            <span class="text-primary fw-semibold">Senior Reviewer 2:</span>
+            Praveen Sirohi
+        </p>
         <div class="table-responsive">
             <div class="table-responsive">
 
@@ -98,54 +105,35 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-
                                 <!-- # -->
-                                <td>
-                                    @count
-                                </td>
-
+                                <td>@count</td>
 
                                 <!-- Organization -->
                                 <td>
                                     <strong>@item.OrganizationName</strong>
                                     <br />
-                                    <small class="text-soft">
-                                        @item.OrganizationType
-                                    </small>
+                                    <small class="text-soft">@item.OrganizationType</small>
                                 </td>
-
 
                                 <!-- Registration Number -->
-                                <td>
-                                    @item.RegistrationNumber
-                                </td>
-
+                                <td>@item.RegistrationNumber</td>
 
                                 <!-- Applicant / Signatory -->
                                 <td>
                                     @item.AuthorizedSignatoryName
                                     <br />
-                                    <small class="text-soft">
-                                        @item.Designation
-                                    </small>
+                                    <small class="text-soft">@item.Designation</small>
                                 </td>
-
 
                                 <!-- Contact -->
                                 <td>
                                     @item.Email
                                     <br />
-                                    <small class="text-soft">
-                                        @item.MobileNumber
-                                    </small>
+                                    <small class="text-soft">@item.MobileNumber</small>
                                 </td>
-
 
                                 <!-- Submitted On -->
-                                <td>
-                                    @item.CreatedOn.ToString("dd MMM yyyy")
-                                </td>
-
+                                <td>@item.CreatedOn.ToString("dd MMM yyyy")</td>
 
                                 <!-- Regional -->
                                 <td>
@@ -161,8 +149,15 @@
                                     {
                                         <span class="badge bg-warning">Pending</span>
                                     }
-                                </td>
 
+                                    @if (item.Regional_Head_Date.HasValue)
+                                    {
+                                        <br />
+                                        <small class="text-soft">
+                                            @item.Regional_Head_Date.Value.ToString("dd MMM yyyy")
+                                        </small>
+                                    }
+                                </td>
 
                                 <!-- Affiliations -->
                                 <td>
@@ -178,8 +173,15 @@
                                     {
                                         <span class="badge bg-warning">Pending</span>
                                     }
-                                </td>
 
+                                    @if (item.Affiliations_Date.HasValue)
+                                    {
+                                        <br />
+                                        <small class="text-soft">
+                                            @item.Affiliations_Date.Value.ToString("dd MMM yyyy")
+                                        </small>
+                                    }
+                                </td>
 
                                 <!-- Finance -->
                                 <td>
@@ -195,8 +197,15 @@
                                     {
                                         <span class="badge bg-warning">Pending</span>
                                     }
-                                </td>
 
+                                    @if (item.Finance_Date.HasValue)
+                                    {
+                                        <br />
+                                        <small class="text-soft">
+                                            @item.Finance_Date.Value.ToString("dd MMM yyyy")
+                                        </small>
+                                    }
+                                </td>
 
                                 <!-- Vertical Head -->
                                 <td>
@@ -212,8 +221,15 @@
                                     {
                                         <span class="badge bg-warning">Pending</span>
                                     }
-                                </td>
 
+                                    @if (item.Vertical_Head_Date.HasValue)
+                                    {
+                                        <br />
+                                        <small class="text-soft">
+                                            @item.Vertical_Head_Date.Value.ToString("dd MMM yyyy")
+                                        </small>
+                                    }
+                                </td>
 
                                 <!-- Senior Reviewer 1 -->
                                 <td>
@@ -229,8 +245,15 @@
                                     {
                                         <span class="badge bg-warning">Pending</span>
                                     }
-                                </td>
 
+                                    @if (item.SeniorReviewer1_Date.HasValue)
+                                    {
+                                        <br />
+                                        <small class="text-soft">
+                                            @item.SeniorReviewer1_Date.Value.ToString("dd MMM yyyy")
+                                        </small>
+                                    }
+                                </td>
 
                                 <!-- Senior Reviewer 2 -->
                                 <td>
@@ -246,8 +269,15 @@
                                     {
                                         <span class="badge bg-warning">Pending</span>
                                     }
-                                </td>
 
+                                    @if (item.SeniorReviewer2_Date.HasValue)
+                                    {
+                                        <br />
+                                        <small class="text-soft">
+                                            @item.SeniorReviewer2_Date.Value.ToString("dd MMM yyyy")
+                                        </small>
+                                    }
+                                </td>
 
                                 <!-- CEO -->
                                 <td>
@@ -263,8 +293,15 @@
                                     {
                                         <span class="badge bg-warning">Pending</span>
                                     }
-                                </td>
 
+                                    @if (item.CEO_Date.HasValue)
+                                    {
+                                        <br />
+                                        <small class="text-soft">
+                                            @item.CEO_Date.Value.ToString("dd MMM yyyy")
+                                        </small>
+                                    }
+                                </td>
 
                                 <!-- Payment Process -->
                                 <td>
@@ -280,25 +317,40 @@
                                     {
                                         <span class="badge bg-warning">Pending</span>
                                     }
+
+                                    @if (item.PaymentProcess_Date.HasValue)
+                                    {
+                                        <br />
+                                        <small class="text-soft">
+                                            @item.PaymentProcess_Date.Value.ToString("dd MMM yyyy")
+                                        </small>
+                                    }
                                 </td>
 
-
                                 @* <!-- Finance Certificate -->
-                                <td>
-                                    @if (item.FinanceCertificate_Status == "Approved")
-                                    {
-                                        <span class="badge bg-success">Approved</span>
-                                    }
-                                    else if (item.FinanceCertificate_Status == "Rejected")
-                                    {
-                                        <span class="badge bg-danger">Rejected</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-warning">Pending</span>
-                                    }
-                                </td> *@
+        <td>
+            @if (item.FinanceCertificate_Status == "Approved")
+            {
+                <span class="badge bg-success">Approved</span>
+            }
+            else if (item.FinanceCertificate_Status == "Rejected")
+            {
+                <span class="badge bg-danger">Rejected</span>
+            }
+            else
+            {
+                <span class="badge bg-warning">Pending</span>
+            }
 
+            @if (item.FinanceCertificate_Date.HasValue)
+            {
+                <br />
+                <small class="text-soft">
+                    @item.FinanceCertificate_Date.Value.ToString("dd MMM yyyy")
+                </small>
+            }
+        </td>
+        *@
 
                                 <!-- Certificate Issuance -->
                                 <td>
@@ -314,49 +366,43 @@
                                     {
                                         <span class="badge bg-warning">Pending</span>
                                     }
-                                </td>
 
+                                    @if (item.CertificateIssuance_Date.HasValue)
+                                    {
+                                        <br />
+                                        <small class="text-soft">
+                                            @item.CertificateIssuance_Date.Value.ToString("dd MMM yyyy")
+                                        </small>
+                                    }
+                                </td>
 
                                 <!-- Current Stage -->
                                 <td>
-
                                     @if (!string.IsNullOrEmpty(item.CurrentStage))
                                     {
-                                        <span class="badge bg-primary">
-                                            @item.CurrentStage
-                                        </span>
+                                        <span class="badge bg-primary">@item.CurrentStage</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-light text-dark">
-                                            -
-                                        </span>
+                                        <span class="badge bg-light text-dark">-</span>
                                     }
-
                                 </td>
-
 
                                 <!-- Action -->
                                 <td class="text-end">
-
                                     <a asp-area="HRMS"
                                        asp-controller="TPRegistration"
                                        asp-action="Details"
                                        asp-route-id="@item.Id"
                                        class="btn btn-sm btn-primary">
-
                                         <em class="icon ni ni-eye"></em>
                                         View
-
                                     </a>
-
                                 </td>
-
                             </tr>
 
                             count++;
                         }
-
                     </tbody>
 
                 </table>

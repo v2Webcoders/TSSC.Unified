@@ -71,7 +71,14 @@
             <div class="acc-body">
 
                 <div class="form-grid">
-
+                    <div class="field">
+                        <label asp-for="MembershipType">Membership Type</label>
+                        <div class="form-control bg-light">
+                            @(string.IsNullOrWhiteSpace(Model.MembershipType)
+                                ? "N/A"
+                                : Model.MembershipType)
+                        </div>
+                    </div>
                     <div class="field">
                         <label asp-for="OrganizationName">
                             Organization Name <span class="req">*</span>
@@ -128,7 +135,10 @@
 
                         <input asp-for="DateOfIncorporation"
                                type="text"
-                               placeholder="DD/MM/YYYY" />
+                               value="@Model.DateOfIncorporation?.ToString("dd-MM-yyyy")"
+                               placeholder="DD-MM-YYYY"
+                               maxlength="10"
+                               class="form-control" />
 
                         <span asp-validation-for="DateOfIncorporation"
                               class="text-danger"></span>
@@ -148,9 +158,52 @@
                         <span asp-validation-for="PANNumber"
                               class="text-danger"></span>
                     </div>
-
-
+                    
                     <div class="field">
+                        <div class="d-flex align-items-center gap-4 flex-wrap">
+
+                            <!-- GST Available -->
+                            <div>
+                                <label class="mb-0">GST Available</label>
+
+                                <div class="d-flex gap-3">
+                                    <label class="mb-0">
+                                        <input type="radio"
+                                               asp-for="IsGSTAvailable"
+                                               value="true" />
+                                        Yes
+                                    </label>
+
+                                    <label class="mb-0">
+                                        <input type="radio"
+                                               asp-for="IsGSTAvailable"
+                                               value="false" />
+                                        No
+                                    </label>
+                                </div>
+
+                                <span asp-validation-for="IsGSTAvailable"
+                                      class="text-danger"></span>
+                            </div>
+
+                            <!-- GST Number -->
+                            <div id="gstNumberField" style="min-width:250px;">
+                                <label asp-for="GSTNumber">GST Number</label>
+
+                                <input asp-for="GSTNumber"
+                                       type="text"
+                                       maxlength="15"
+                                       class="form-control" />
+
+                                <span asp-validation-for="GSTNumber"
+                                      class="text-danger"></span>
+                            </div>
+
+                        </div>
+                    </div>
+                   
+
+                    @* <div class="field">
                         <label asp-for="GSTNumber">
                             GST Number (optional)
                         </label>
@@ -161,7 +214,7 @@
 
                         <span asp-validation-for="GSTNumber"
                               class="text-danger"></span>
-                    </div>
+                    </div> *@
 
                 </div>
 
@@ -1370,6 +1423,47 @@
 
 @section Scripts {
 
-    <partial name="_ValidationScriptsPartial" />
+   @*  <partial name="_ValidationScriptsPartial" /> *@
+
+  
+           <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            function toggleGSTNumber() {
+                const selected = document.querySelector(
+                    'input[name="IsGSTAvailable"]:checked'
+                );
+
+                const gstNumberField = document.getElementById("gstNumberField");
+                const gstNumber = document.getElementById("GSTNumber");
+
+                if (!gstNumberField) {
+                    return;
+                }
+
+                if (selected && selected.value === "true") {
+                    gstNumberField.style.display = "";
+                } else {
+                    gstNumberField.style.display = "none";
+
+                    if (gstNumber) {
+                        gstNumber.value = "";
+                    }
+                }
+            }
+
+            // Listen for Yes/No changes
+            document
+                .querySelectorAll('input[name="IsGSTAvailable"]')
+                .forEach(function (radio) {
+                    radio.addEventListener("change", toggleGSTNumber);
+                });
+
+            // Set initial state on page load
+            toggleGSTNumber();
+
+        });
+    </script>
+
 
 }

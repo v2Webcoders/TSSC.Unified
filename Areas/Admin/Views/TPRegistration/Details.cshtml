@@ -278,37 +278,25 @@
             Approval Status
         </h5>
 
-        <!-- ================= REGIONAL HEAD ================= -->
+        @* ================= 1. REGIONAL HEAD ================= *@
         <div class="border-bottom pb-4 mb-4">
-
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <div>
-                    <h6 class="mb-1">Regional Head Approval</h6>
-                    <span class="text-soft small">
-                        Regional review of the application
-                    </span>
+                    <h6 class="mb-1">1. Regional Head Approval</h6>
+                    <span class="text-soft small">Regional review of the application</span>
                 </div>
 
                 @if (Model.Regional_Head_Status == "Approved")
                 {
-                    <span class="badge bg-success">
-                        <em class="icon ni ni-check me-1"></em>
-                        Approved
-                    </span>
+                    <span class="badge bg-success"><em class="icon ni ni-check me-1"></em> Approved</span>
                 }
                 else if (Model.Regional_Head_Status == "Rejected")
                 {
-                    <span class="badge bg-danger">
-                        <em class="icon ni ni-cross me-1"></em>
-                        Rejected
-                    </span>
+                    <span class="badge bg-danger"><em class="icon ni ni-cross me-1"></em> Rejected</span>
                 }
                 else
                 {
-                    <span class="badge bg-warning text-dark">
-                        <em class="icon ni ni-clock me-1"></em>
-                        Pending
-                    </span>
+                    <span class="badge bg-warning text-dark"><em class="icon ni ni-clock me-1"></em> Pending</span>
                 }
             </div>
 
@@ -323,120 +311,82 @@
             @if (Model.Regional_Head_Date.HasValue)
             {
                 <div class="row g-3 mt-1">
-
                     <div class="col-md-6">
-                        <small class="text-soft d-block">Approved / Rejected By</small>
+                        <small class="text-soft d-block">Reviewed By</small>
                         <span>@Model.Regional_Head_ApprovedBy</span>
                     </div>
-
                     <div class="col-md-6">
                         <small class="text-soft d-block">Date</small>
-                        <span>
-                            @Model.Regional_Head_Date?.ToString("dd MMM yyyy, hh:mm tt")
-                        </span>
+                        <span>@Model.Regional_Head_Date.Value.ToString("dd MMM yyyy, hh:mm tt")</span>
                     </div>
-
                 </div>
             }
-
         </div>
 
-
-        <!-- ================= VERTICAL HEAD ================= -->
+        @* ================= 2. AFFILIATIONS ================= *@
         <div class="border-bottom pb-4 mb-4">
-
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <div>
-                    <h6 class="mb-1">Vertical Head Approval</h6>
-                    <span class="text-soft small">
-                        Vertical review of the application
-                    </span>
+                    <h6 class="mb-1">2. Affiliations Approval</h6>
+                    <span class="text-soft small">Affiliation document verification</span>
                 </div>
 
-                @if (Model.Vertical_Head_Status == "Approved")
+                @if (Model.Affiliations_Status == "Approved")
                 {
-                    <span class="badge bg-success">
-                        <em class="icon ni ni-check me-1"></em>
-                        Approved
-                    </span>
+                    <span class="badge bg-success"><em class="icon ni ni-check me-1"></em> Approved</span>
                 }
-                else if (Model.Vertical_Head_Status == "Rejected")
+                else if (Model.Affiliations_Status == "Rejected")
                 {
-                    <span class="badge bg-danger">
-                        <em class="icon ni ni-cross me-1"></em>
-                        Rejected
-                    </span>
+                    <span class="badge bg-danger"><em class="icon ni ni-cross me-1"></em> Rejected</span>
                 }
                 else
                 {
-                    <span class="badge bg-warning text-dark">
-                        <em class="icon ni ni-clock me-1"></em>
-                        Pending
-                    </span>
+                    <span class="badge bg-warning text-dark"><em class="icon ni ni-clock me-1"></em> Pending</span>
                 }
             </div>
 
-            @if (!string.IsNullOrWhiteSpace(Model.Vertical_Head_Remarks))
+            @if (!string.IsNullOrWhiteSpace(Model.Affiliations_Remarks))
             {
                 <div class="bg-light rounded p-3 mt-3">
                     <small class="text-soft d-block mb-1">Remarks</small>
-                    <span>@Model.Vertical_Head_Remarks</span>
+                    <span>@Model.Affiliations_Remarks</span>
                 </div>
             }
 
-            @if (Model.Vertical_Head_Date.HasValue)
+            @if (Model.Affiliations_Date.HasValue)
             {
                 <div class="row g-3 mt-1">
-
                     <div class="col-md-6">
-                        <small class="text-soft d-block">Approved / Rejected By</small>
-                        <span>@Model.Vertical_Head_ApprovedBy</span>
+                        <small class="text-soft d-block">Reviewed By</small>
+                        <span>@Model.Affiliations_ApprovedBy</span>
                     </div>
-
                     <div class="col-md-6">
                         <small class="text-soft d-block">Date</small>
-                        <span>
-                            @Model.Vertical_Head_Date?.ToString("dd MMM yyyy, hh:mm tt")
-                        </span>
+                        <span>@Model.Affiliations_Date.Value.ToString("dd MMM yyyy, hh:mm tt")</span>
                     </div>
-
                 </div>
             }
-
         </div>
 
-
-        <!-- ================= FINANCE ================= -->
+        @* ================= 3. FINANCE ================= *@
         <div class="border-bottom pb-4 mb-4">
-
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <div>
-                    <h6 class="mb-1">Finance Approval</h6>
-                    <span class="text-soft small">
-                        Financial review of the application
-                    </span>
+                    <h6 class="mb-1">3. Finance Approval</h6>
+                    <span class="text-soft small">Financial review of the application</span>
                 </div>
 
                 @if (Model.Finance_Status == "Approved")
                 {
-                    <span class="badge bg-success">
-                        <em class="icon ni ni-check me-1"></em>
-                        Approved
-                    </span>
+                    <span class="badge bg-success"><em class="icon ni ni-check me-1"></em> Approved</span>
                 }
                 else if (Model.Finance_Status == "Rejected")
                 {
-                    <span class="badge bg-danger">
-                        <em class="icon ni ni-cross me-1"></em>
-                        Rejected
-                    </span>
+                    <span class="badge bg-danger"><em class="icon ni ni-cross me-1"></em> Rejected</span>
                 }
                 else
                 {
-                    <span class="badge bg-warning text-dark">
-                        <em class="icon ni ni-clock me-1"></em>
-                        Pending
-                    </span>
+                    <span class="badge bg-warning text-dark"><em class="icon ni ni-clock me-1"></em> Pending</span>
                 }
             </div>
 
@@ -451,56 +401,172 @@
             @if (Model.Finance_Date.HasValue)
             {
                 <div class="row g-3 mt-1">
-
                     <div class="col-md-6">
-                        <small class="text-soft d-block">Approved / Rejected By</small>
+                        <small class="text-soft d-block">Reviewed By</small>
                         <span>@Model.Finance_ApprovedBy</span>
                     </div>
-
                     <div class="col-md-6">
                         <small class="text-soft d-block">Date</small>
-                        <span>
-                            @Model.Finance_Date?.ToString("dd MMM yyyy, hh:mm tt")
-                        </span>
+                        <span>@Model.Finance_Date.Value.ToString("dd MMM yyyy, hh:mm tt")</span>
                     </div>
+                </div>
+            }
+        </div>
 
+        @* ================= 4. VERTICAL HEAD ================= *@
+        <div class="border-bottom pb-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <h6 class="mb-1">4. Vertical Head Approval</h6>
+                    <span class="text-soft small">Vertical review of the application</span>
+                </div>
+
+                @if (Model.Vertical_Head_Status == "Approved")
+                {
+                    <span class="badge bg-success"><em class="icon ni ni-check me-1"></em> Approved</span>
+                }
+                else if (Model.Vertical_Head_Status == "Rejected")
+                {
+                    <span class="badge bg-danger"><em class="icon ni ni-cross me-1"></em> Rejected</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark"><em class="icon ni ni-clock me-1"></em> Pending</span>
+                }
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Vertical_Head_Remarks))
+            {
+                <div class="bg-light rounded p-3 mt-3">
+                    <small class="text-soft d-block mb-1">Remarks</small>
+                    <span>@Model.Vertical_Head_Remarks</span>
                 </div>
             }
 
+            @if (Model.Vertical_Head_Date.HasValue)
+            {
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <small class="text-soft d-block">Reviewed By</small>
+                        <span>@Model.Vertical_Head_ApprovedBy</span>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-soft d-block">Date</small>
+                        <span>@Model.Vertical_Head_Date.Value.ToString("dd MMM yyyy, hh:mm tt")</span>
+                    </div>
+                </div>
+            }
         </div>
 
-
-        <!-- ================= CEO ================= -->
-        <div>
-
+        @* ================= 5. SENIOR REVIEWER 1 ================= *@
+        <div class="border-bottom pb-4 mb-4">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <div>
-                    <h6 class="mb-1">CEO Approval</h6>
-                    <span class="text-soft small">
-                        Final approval of the application
-                    </span>
+                    <h6 class="mb-1">5. Senior Reviewer 1</h6>
+                    <span class="text-soft small">Review by Sumit Munjal</span>
+                </div>
+
+                @if (Model.SeniorReviewer1_Status == "Approved")
+                {
+                    <span class="badge bg-success"><em class="icon ni ni-check me-1"></em> Approved</span>
+                }
+                else if (Model.SeniorReviewer1_Status == "Rejected")
+                {
+                    <span class="badge bg-danger"><em class="icon ni ni-cross me-1"></em> Rejected</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark"><em class="icon ni ni-clock me-1"></em> Pending</span>
+                }
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.SeniorReviewer1_Remarks))
+            {
+                <div class="bg-light rounded p-3 mt-3">
+                    <small class="text-soft d-block mb-1">Remarks</small>
+                    <span>@Model.SeniorReviewer1_Remarks</span>
+                </div>
+            }
+
+            @if (Model.SeniorReviewer1_Date.HasValue)
+            {
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <small class="text-soft d-block">Reviewed By</small>
+                        <span>@Model.SeniorReviewer1_ApprovedBy</span>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-soft d-block">Date</small>
+                        <span>@Model.SeniorReviewer1_Date.Value.ToString("dd MMM yyyy, hh:mm tt")</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @* ================= 6. SENIOR REVIEWER 2 ================= *@
+        <div class="border-bottom pb-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <h6 class="mb-1">6. Senior Reviewer 2</h6>
+                    <span class="text-soft small">Review by Praveen Sirohi</span>
+                </div>
+
+                @if (Model.SeniorReviewer2_Status == "Approved")
+                {
+                    <span class="badge bg-success"><em class="icon ni ni-check me-1"></em> Approved</span>
+                }
+                else if (Model.SeniorReviewer2_Status == "Rejected")
+                {
+                    <span class="badge bg-danger"><em class="icon ni ni-cross me-1"></em> Rejected</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark"><em class="icon ni ni-clock me-1"></em> Pending</span>
+                }
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.SeniorReviewer2_Remarks))
+            {
+                <div class="bg-light rounded p-3 mt-3">
+                    <small class="text-soft d-block mb-1">Remarks</small>
+                    <span>@Model.SeniorReviewer2_Remarks</span>
+                </div>
+            }
+
+            @if (Model.SeniorReviewer2_Date.HasValue)
+            {
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <small class="text-soft d-block">Reviewed By</small>
+                        <span>@Model.SeniorReviewer2_ApprovedBy</span>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-soft d-block">Date</small>
+                        <span>@Model.SeniorReviewer2_Date.Value.ToString("dd MMM yyyy, hh:mm tt")</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @* ================= 7. CEO ================= *@
+        <div class="border-bottom pb-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <h6 class="mb-1">7. CEO Approval</h6>
+                    <span class="text-soft small">Final management approval</span>
                 </div>
 
                 @if (Model.CEO_Status == "Approved")
                 {
-                    <span class="badge bg-success">
-                        <em class="icon ni ni-check me-1"></em>
-                        Approved
-                    </span>
+                    <span class="badge bg-success"><em class="icon ni ni-check me-1"></em> Approved</span>
                 }
                 else if (Model.CEO_Status == "Rejected")
                 {
-                    <span class="badge bg-danger">
-                        <em class="icon ni ni-cross me-1"></em>
-                        Rejected
-                    </span>
+                    <span class="badge bg-danger"><em class="icon ni ni-cross me-1"></em> Rejected</span>
                 }
                 else
                 {
-                    <span class="badge bg-warning text-dark">
-                        <em class="icon ni ni-clock me-1"></em>
-                        Pending
-                    </span>
+                    <span class="badge bg-warning text-dark"><em class="icon ni ni-clock me-1"></em> Pending</span>
                 }
             </div>
 
@@ -515,22 +581,106 @@
             @if (Model.CEO_Date.HasValue)
             {
                 <div class="row g-3 mt-1">
-
                     <div class="col-md-6">
-                        <small class="text-soft d-block">Approved / Rejected By</small>
+                        <small class="text-soft d-block">Reviewed By</small>
                         <span>@Model.CEO_ApprovedBy</span>
                     </div>
-
                     <div class="col-md-6">
                         <small class="text-soft d-block">Date</small>
-                        <span>
-                            @Model.CEO_Date?.ToString("dd MMM yyyy, hh:mm tt")
-                        </span>
+                        <span>@Model.CEO_Date.Value.ToString("dd MMM yyyy, hh:mm tt")</span>
                     </div>
+                </div>
+            }
+        </div>
 
+        @* ================= 8. PAYMENT PROCESS ================= *@
+        <div class="border-bottom pb-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <h6 class="mb-1">8. Payment Process</h6>
+                    <span class="text-soft small">Payment processing</span>
+                </div>
+
+                @if (Model.PaymentProcess_Status == "Approved")
+                {
+                    <span class="badge bg-success"><em class="icon ni ni-check me-1"></em> Approved</span>
+                }
+                else if (Model.PaymentProcess_Status == "Rejected")
+                {
+                    <span class="badge bg-danger"><em class="icon ni ni-cross me-1"></em> Rejected</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark"><em class="icon ni ni-clock me-1"></em> Pending</span>
+                }
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.PaymentProcess_Remarks))
+            {
+                <div class="bg-light rounded p-3 mt-3">
+                    <small class="text-soft d-block mb-1">Remarks</small>
+                    <span>@Model.PaymentProcess_Remarks</span>
                 </div>
             }
 
+            @if (Model.PaymentProcess_Date.HasValue)
+            {
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <small class="text-soft d-block">Processed By</small>
+                        <span>@Model.PaymentProcess_ApprovedBy</span>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-soft d-block">Date</small>
+                        <span>@Model.PaymentProcess_Date.Value.ToString("dd MMM yyyy, hh:mm tt")</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @* ================= 10. CERTIFICATE ISSUANCE ================= *@
+        <div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <h6 class="mb-1">10. Certificate Issuance</h6>
+                    <span class="text-soft small">Final certificate issuance</span>
+                </div>
+
+                @if (Model.CertificateIssuance_Status == "Approved")
+                {
+                    <span class="badge bg-success"><em class="icon ni ni-check me-1"></em> Approved</span>
+                }
+                else if (Model.CertificateIssuance_Status == "Rejected")
+                {
+                    <span class="badge bg-danger"><em class="icon ni ni-cross me-1"></em> Rejected</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark"><em class="icon ni ni-clock me-1"></em> Pending</span>
+                }
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.CertificateIssuance_Remarks))
+            {
+                <div class="bg-light rounded p-3 mt-3">
+                    <small class="text-soft d-block mb-1">Remarks</small>
+                    <span>@Model.CertificateIssuance_Remarks</span>
+                </div>
+            }
+
+            @if (Model.CertificateIssuance_Date.HasValue)
+            {
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <small class="text-soft d-block">Issued / Reviewed By</small>
+                        <span>@Model.CertificateIssuance_ApprovedBy</span>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-soft d-block">Date</small>
+                        <span>@Model.CertificateIssuance_Date.Value.ToString("dd MMM yyyy, hh:mm tt")</span>
+                    </div>
+                </div>
+            }
         </div>
 
     </div>

@@ -147,6 +147,8 @@ namespace TSSC.Unified.ViewModel
         [Display(Name = "Organization Name")]
         public string OrganizationName { get; set; } = string.Empty;
 
+        public string? MembershipType { get; set; }
+
         [Required]
         [Display(Name = "Type of Organization")]
         public string OrganizationType { get; set; } = string.Empty;
@@ -166,10 +168,15 @@ namespace TSSC.Unified.ViewModel
             ErrorMessage = "Enter a valid PAN number.")]
         public string PANNumber { get; set; } = string.Empty;
 
+
+        [Display(Name = "GST Available")]
+        public bool IsGSTAvailable { get; set; }
+
         [RegularExpression(
             @"^$|^[0-9A-Z]{15}$",
             ErrorMessage = "GST Number must be 15 characters.")]
         public string? GSTNumber { get; set; }
+
 
 
         // =====================================================
@@ -182,9 +189,12 @@ namespace TSSC.Unified.ViewModel
         [Required, Range(0, 100)]
         public int? YearsOfExperience { get; set; }
 
+        [Required(ErrorMessage = "Please enter previous projects.")]
         public string? PreviousProjects { get; set; }
 
-        [Range(0, int.MaxValue)]
+        [Required(ErrorMessage = "Please enter the number of training centers.")]
+        [Range(0, int.MaxValue,
+        ErrorMessage = "Training centers count cannot be negative.")]
         public int? TrainingCentersCount { get; set; }
 
         [Required, Range(0, int.MaxValue)]

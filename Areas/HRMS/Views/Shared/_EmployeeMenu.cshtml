@@ -684,6 +684,122 @@
 
 	</li>
 
+	@if (isCEO)
+	{
+	<li class="nk-menu-heading">
+	<div class="nk-menu-heading-content">
+	<span class="nk-menu-heading-text">
+	<em class="icon ni ni-user-check"></em>
+					CEO Reimbursements
+	</span>
+	</div>
+	</li>
+
+		<li class="nk-menu-item has-sub">
+
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+	<span class="nk-menu-icon">
+	<em class="icon ni ni-wallet"></em>
+	</span>
+	<span class="nk-menu-text">Reimbursements</span>
+	</a>
+
+			<ul class="nk-menu-sub">
+
+				<!-- Pending -->
+	<li class="nk-menu-item">
+	<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="CEOReimbursement"
+					   asp-route-status="Pending"
+					   class="nk-menu-link">
+	<span class="nk-menu-text">Reimbursement Request</span>
+	</a>
+	</li>
+
+				<!-- Approved -->
+	<li class="nk-menu-item">
+	<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="CEOReimbursement"
+					   asp-route-status="CEO Approved"
+					   class="nk-menu-link">
+	<span class="nk-menu-text">Approved Reimbursement</span>
+	</a>
+	</li>
+
+				<!-- Rejected -->
+	<li class="nk-menu-item">
+	<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="CEOReimbursement"
+					   asp-route-status="CEO Rejected"
+					   class="nk-menu-link">
+	<span class="nk-menu-text">Rejected Reimbursement</span>
+	</a>
+	</li>
+
+			</ul>
+	</li>
+	}
+
+	@if (isFinanceHead)
+	{
+	<li class="nk-menu-heading">
+	<div class="nk-menu-heading-content">
+	<span class="nk-menu-heading-text">
+	<em class="icon ni ni-user-check"></em>
+					Finance Head Reimbursements
+	</span>
+	</div>
+	</li>
+	<li class="nk-menu-item has-sub">
+
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+	<span class="nk-menu-icon">
+	<em class="icon ni ni-wallet"></em>
+	</span>
+	<span class="nk-menu-text">Reimbursements</span>
+	</a>
+
+			<ul class="nk-menu-sub">
+
+				<!-- Pending -->
+	<li class="nk-menu-item">
+	<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="FinanceHeadReimbursement"
+					   asp-route-status="Pending"
+					   class="nk-menu-link">
+	<span class="nk-menu-text">Reimbursement Request</span>
+	</a>
+	</li>
+
+				<!-- Approved -->
+	<li class="nk-menu-item">
+	<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="FinanceHeadReimbursement"
+					   asp-route-status="Approved"
+					   class="nk-menu-link">
+	<span class="nk-menu-text">Approved Reimbursement</span>
+	</a>
+	</li>
+
+				<!-- Rejected -->
+	<li class="nk-menu-item">
+	<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="FinanceHeadReimbursement"
+					   asp-route-status="Finance Head Rejected"
+					   class="nk-menu-link">
+	<span class="nk-menu-text">Rejected Reimbursement</span>
+	</a>
+	</li>
+
+			</ul>
+	</li>
+	}
 
 	<!-- TOT/TOA - ONLY -->
 	<!-- ===================================================== -->
@@ -1111,6 +1227,55 @@
 
 		</li>
 
+		<!-- Reimbursement Management -->
+
+		<li class="nk-menu-item has-sub">
+
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-wallet"></em>
+				</span>
+
+				<span class="nk-menu-text">Reimbursements</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<!-- Pending Request -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="HRReimbursement"
+					   asp-route-status="Pending"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Reimbursement Request</span>
+					</a>
+				</li>
+
+				<!-- Approved -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="HRReimbursement"
+					   asp-route-status="HR Approved"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Approved Reimbursement</span>
+					</a>
+				</li>
+
+				<!-- Rejected -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="HRReimbursement"
+					   asp-route-status="HR Rejected"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Rejected Reimbursement</span>
+					</a>
+				</li>
+
+			</ul>
+		</li>
 
 		<!-- HR Policies -->
 
@@ -1293,15 +1458,13 @@
 	}
 
 
-
-
 	<!-- MANAGER - REPORTING MANAGER ONLY -->
 	<!-- ===================================================== -->
-	@if (isReportingManager || showReimbursementApproverMenu || isFinanceEmployee || isHR || isFinanceHead || isCEO)
+	@if (isReportingManager || showReimbursementApproverMenu || isFinanceEmployee || isHR || isFinanceHead || isCEO || User.IsInRole("GrievanceTeam"))
 	{
 		<li class="nk-menu-heading">
 			<div class="nk-menu-heading-content">
-				<span class="nk-menu-heading-text">MANAGEMENT</span>
+				<span class="nk-menu-heading-text">TEAM MANAGEMENT</span>
 			</div>
 		</li>
 
@@ -1673,6 +1836,92 @@
 		}
 
 
+		@if (User.IsInRole("GrievanceTeam"))
+		{
+			<li class="nk-menu-item has-sub">
+
+				<a href="#"
+				   class="nk-menu-link nk-menu-toggle">
+
+					<span class="nk-menu-icon">
+						<em class="icon ni ni-alert-circle"></em>
+					</span>
+
+					<span class="nk-menu-text">
+						Grievance Management
+					</span>
+
+				</a>
+
+				<ul class="nk-menu-sub">
+
+					<!-- All Grievances -->
+
+					<li class="nk-menu-item">
+
+						<a href="/HRMS/Grievance/GrievanceList"
+						   class="nk-menu-link">
+
+							<span class="nk-menu-text">
+								All Grievances
+							</span>
+
+						</a>
+
+					</li>
+
+
+					<!-- Pending Grievances -->
+
+					<li class="nk-menu-item">
+
+						<a href="/HRMS/Grievance/PendingGrievance"
+						   class="nk-menu-link">
+
+							<span class="nk-menu-text">
+								Pending Grievances
+							</span>
+
+						</a>
+
+					</li>
+
+
+					<!-- In Progress -->
+
+					<li class="nk-menu-item">
+
+						<a href="/HRMS/Grievance/InProgressGrievance"
+						   class="nk-menu-link">
+
+							<span class="nk-menu-text">
+								In Progress
+							</span>
+
+						</a>
+
+					</li>
+
+
+					<!-- Resolved -->
+
+					<li class="nk-menu-item">
+
+						<a href="/HRMS/Grievance/ResolvedGrievance"
+						   class="nk-menu-link">
+
+							<span class="nk-menu-text">
+								Resolved Grievances
+							</span>
+
+						</a>
+
+					</li>
+
+				</ul>
+
+			</li>
+		}
 	}
 
 	<!-- COMMON RESOURCES - EVERY EMPLOYEE -->

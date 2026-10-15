@@ -5,7 +5,25 @@
 	Layout = "~/Views/Shared/_RegistrationLayout.cshtml";
 	ViewData["Title"] = "TP Registration";
 }
+<style>
+	.submit-spinner {
+		width: 20px;
+		height: 20px;
+		border: 3px solid #ddd;
+		border-top-color: #D9622F;
+		border-radius: 50%;
+		animation: spin 0.7s linear infinite;
+	}
 
+	@@keyframes spin {
+		to
+
+	{
+		transform: rotate(360deg);
+	}
+
+	}
+</style>
 <div class="reg-hero">
 	<h1 id="formTitle">Training Partner Registration</h1>
 	<p>Fill in your organisation, contact and financial details across the sections below.</p>
@@ -313,13 +331,22 @@
 			<span asp-validation-for="DeclarationAccepted" class="text-danger"></span>
 		</div>
 
-		<div class="form-actions" style="justify-content: flex-end;">
+		@* <div class="form-actions" style="justify-content: flex-end;">
 			<button type="submit"
 					class="btn-primary"
 					style="width: auto; flex: 0 0 auto; padding: 13px 28px;">
 				Submit Registration
 			</button>
+		</div> *@
+		
+		<div class="form-actions" style="justify-content: flex-end; align-items: center; gap: 10px;">
+			<button type="submit" id="submitBtn" class="btn-primary"
+					style="width: auto; flex: 0 0 auto; padding: 13px 28px;">
+				Submit Registration
+			</button>
+			<span id="submitSpinner" class="submit-spinner" style="display:none;"></span>
 		</div>
+		
 	</form>
 </div>
 @* @section Scripts {
@@ -487,6 +514,12 @@
 
 		tpForm.addEventListener('submit', async e => {
 			e.preventDefault();
+
+		const btn = document.getElementById('submitBtn');
+		const btnText = document.getElementById('submitBtnText');
+		const spinner = document.getElementById('submitSpinner');
+
+	if (btn.disabled) return;
 			console.log('A. submit fired');
 
 			// 1. client-side validation
@@ -503,34 +536,78 @@
 			// 2. file size check
 			if (!checkFiles()) { console.log('C. file check failed'); return; }
 
-			// 3. send
-			const btn = tpForm.querySelector('button[type=submit]');
-			btn.disabled = true;
-			try {
-				console.log('D. sending to', tpForm.action);
-				const res = await fetch(tpForm.action, {
-					method: 'POST',
-					body: new FormData(tpForm),
-					headers: { 'X-Requested-With': 'XMLHttpRequest' }
-				});
-				console.log('E. response status', res.status);
+				// 3. Show processing state and send
+	btn.disabled = true;
+	//btnText.textContent = 'Submitting Registration...';
+	spinner.style.display = 'inline-block';
 
-				if (res.ok) {
-					window.location.href = (await res.json()).redirectUrl;
-				} else if (res.status === 400) {
-					const text = await res.text();
-					console.log('F. 400 body:', text);
-					try { showErrors(JSON.parse(text).errors); }
-					catch { showErrors({ '': ['Request was rejected (possibly anti-forgery). Reload and try again.'] }); }
-				} else {
-					showErrors({ '': ['Something went wrong. Please try again.'] });
-				}
-			} catch (err) {
-				console.log('G. fetch error', err);
-				showErrors({ '': ['Network error. Please try again.'] });
-			} finally {
-				btn.disabled = false;
+	try {
+		const res = await fetch(tpForm.action, {
+			method: 'POST',
+			body: new FormData(tpForm),
+			headers: {
+				'X-Requested-With': 'XMLHttpRequest'
 			}
+		});
+
+		if (res.ok) {
+			const data = await res.json();
+			window.location.href = data.redirectUrl;
+			return;
+		} else if (res.status === 400) {
+			const text = await res.text();
+
+			try {
+				showErrors(JSON.parse(text).errors);
+			} catch {
+				showErrors({
+					'': ['Request was rejected. Please reload and try again.']
+				});
+			}
+		} else {
+			showErrors({
+				'': ['Something went wrong. Please try again.']
+			});
+		}
+	} catch (err) {
+		console.error('Registration submission failed:', err);
+
+		showErrors({
+			'': ['Network error. Please check your connection and try again.']
+		});
+		} finally {
+		btn.disabled = false;
+		spinner.style.display = 'none';
+	}
+
+			// // 3. send
+			// const btn = tpForm.querySelector('button[type=submit]');
+			// btn.disabled = true;
+			// try {
+			// 	console.log('D. sending to', tpForm.action);
+			// 	const res = await fetch(tpForm.action, {
+			// 		method: 'POST',
+			// 		body: new FormData(tpForm),
+			// 		headers: { 'X-Requested-With': 'XMLHttpRequest' }
+			// 	});
+			// 	console.log('E. response status', res.status);
+
+			// 	if (res.ok) {
+			// 		window.location.href = (await res.json()).redirectUrl;
+			// 	} else if (res.status === 400) {
+			// 		const text = await res.text();
+			// 		console.log('F. 400 body:', text);
+			// 		try { showErrors(JSON.parse(text).errors); }
+			// 		catch { showErrors({ '': ['Request was rejected (possibly anti-forgery). Reload and try again.'] }); }
+			// 	} else {
+			// 		showErrors({ '': ['Something went wrong. Please try again.'] });
+			// 	}
+			// } catch (err) {
+			// 	console.log('G. fetch error', err);
+			// 	showErrors({ '': ['Network error. Please try again.'] });
+			// } finally {
+			// 	btn.disabled = false;
+			// }
 		});
 
 		function checkFiles() {
