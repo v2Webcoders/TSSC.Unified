@@ -27,57 +27,6 @@
 		Context.Employee.Any(
 			x => x.ReportingManagerId == employee.EmployeeId);
 
-
-	// =====================================
-	// PENDING LEAVE REQUEST COUNT
-	// =====================================
-	// int pendingLeaveCount = 0;
-	// int pendingRegularizationCount = 0;
-	// int pendingODCount = 0;
-	// if (employee != null)
-	// {
-	// 	var employeeId = employee.EmployeeId;
-
-	// 	if (isHR)
-	// 	{
-	// 		pendingLeaveCount = Context.LeaveRequest
-	// 			.Count(x => x.Status == "Pending");
-	// 		pendingRegularizationCount = Context.AttendanceRegularization
-	// 	.Count(x => x.Status == "Pending");
-	// 		pendingODCount = Context.ODRequest
-	// 					.Count(x => x.Status == "Pending");
-	// 	}
-	// 	else if (isReportingManager)
-	// 	{
-	// 		pendingLeaveCount = Context.LeaveRequest
-	// 			.Count(x =>
-	// 				x.Status == "Pending" &&
-	// 				Context.Employee.Any(emp =>
-	// 					emp.EmployeeId == x.EmployeeId &&
-	// 					emp.ReportingManagerId == employeeId
-	// 				));
-	// 		// Reporting Manager sees only their reportees' pending requests
-	// 		pendingRegularizationCount = Context.AttendanceRegularization
-	// 			.Count(x =>
-	// 				x.Status == "Pending" &&
-	// 				Context.Employee.Any(emp =>
-	// 					emp.EmployeeId == x.EmployeeId &&
-	// 					emp.ReportingManagerId == employeeId
-	// 				));
-	// 		pendingODCount = Context.ODRequest
-	// .Count(x =>
-	// 	x.Status == "Pending" &&
-	// 	Context.Employee.Any(emp =>
-	// 		emp.EmployeeId == x.EmployeeId &&
-	// 		emp.ReportingManagerId == employeeId
-	// 	));
-	// 	}
-	// }
-
-
-
-
-
 	var isFinanceEmployee = currentUser != null
 	&& employee != null
 	&& employee.DepartmentId == 25 && employee.DesignationId != 50;
@@ -652,6 +601,123 @@
 	</li>
 
 
+	@if (isCEO)
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					
+					CEO APPROVALS
+				</span>
+			</div>
+		</li>
+
+		<li class="nk-menu-item has-sub">
+
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-wallet"></em>
+				</span>
+				<span class="nk-menu-text">Reimbursements</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<!-- Pending -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="CEOReimbursement"
+					   asp-route-status="Pending"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Reimbursement Request</span>
+					</a>
+				</li>
+
+				<!-- Approved -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="CEOReimbursement"
+					   asp-route-status="CEO Approved"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Approved Reimbursement</span>
+					</a>
+				</li>
+
+				<!-- Rejected -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="CEOReimbursement"
+					   asp-route-status="CEO Rejected"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Rejected Reimbursement</span>
+					</a>
+				</li>
+
+			</ul>
+		</li>
+	}
+
+	@if (isFinanceHead)
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					FINANCE HEAD APPROVALS
+				</span>
+			</div>
+		</li>
+		<li class="nk-menu-item has-sub">
+
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-wallet"></em>
+				</span>
+				<span class="nk-menu-text">Reimbursements</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<!-- Pending -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="FinanceHeadReimbursement"
+					   asp-route-status="Pending"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Reimbursement Request</span>
+					</a>
+				</li>
+
+				<!-- Approved -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="FinanceHeadReimbursement"
+					   asp-route-status="Approved"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Approved Reimbursement</span>
+					</a>
+				</li>
+
+				<!-- Rejected -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="FinanceHeadReimbursement"
+					   asp-route-status="Finance Head Rejected"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Rejected Reimbursement</span>
+					</a>
+				</li>
+
+			</ul>
+		</li>
+	}
+
+
 	<!-- ===================================================== -->
 	<!-- HR MANAGEMENT - HR ONLY -->
 	<!-- ===================================================== -->
@@ -901,6 +967,55 @@
 
 		</li>
 
+		<!-- Reimbursement Management -->
+
+		<li class="nk-menu-item has-sub">
+
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-check-circle-cut"></em>
+				</span>
+
+				<span class="nk-menu-text">Reimbursements</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<!-- Pending Request -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="HRReimbursement"
+					   asp-route-status="Pending"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Reimbursement Request</span>
+					</a>
+				</li>
+
+				<!-- Approved -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="HRReimbursement"
+					   asp-route-status="HR Approved"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Approved Reimbursement</span>
+					</a>
+				</li>
+
+				<!-- Rejected -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="HRReimbursement"
+					   asp-route-status="HR Rejected"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Rejected Reimbursement</span>
+					</a>
+				</li>
+
+			</ul>
+		</li>
 
 		<!-- HR Policies -->
 
@@ -1309,7 +1424,7 @@
 						   class="nk-menu-link">
 
 							<span class="nk-menu-text">
-								Reimbursement Request
+								Reimbursement Request 
 							</span>
 							<partial name="_MenuBadge" model="counts.ReimbursementRequests" />
 						</a>
