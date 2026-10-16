@@ -619,16 +619,26 @@
                             <div class="employee-left">
                                 <div class="avatar">
                                     @{
-                                        var names = Model.EmployeeName?.Split(' ') ?? new string[] { };
+                                        var names = Model.EmployeeName?
+                                        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                                        ?? Array.Empty<string>();
+
                                         var initials = string.Empty;
 
                                         if (names.Length >= 2)
                                         {
-                                            initials = (names[0][0].ToString() + names[1][0].ToString()).ToUpper();
+                                            initials = (
+                                            names[0][0].ToString() +
+                                            names[^1][0].ToString()
+                                            ).ToUpperInvariant();
                                         }
-                                        else if (names.Length == 1 && names[0].Length > 0)
+                                        else if (names.Length == 1)
                                         {
-                                            initials = names[0][0].ToString().ToUpper();
+                                            initials = names[0][0].ToString().ToUpperInvariant();
+                                        }
+                                        else
+                                        {
+                                            initials = "?";
                                         }
                                     }
                                     @initials

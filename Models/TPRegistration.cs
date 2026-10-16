@@ -61,8 +61,33 @@ namespace TSSC.Unified.Models
         [StringLength(150)]
         public string? AlternateContactPerson { get; set; }
 
-        [Required]
-        public string AnnualTurnoverLast3Years { get; set; } = string.Empty;
+        //[Required]
+        //public string AnnualTurnoverLast3Years { get; set; } = string.Empty;
+        // =====================================================
+        // ANNUAL TURNOVER - LAST 3 FINANCIAL YEARS
+        // =====================================================
+
+        // =====================================================
+        // ANNUAL TURNOVER - LAST 3 FINANCIAL YEARS
+        // =====================================================
+
+        [StringLength(7)]
+        public string? AnnualTurnoverFY1 { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? AnnualTurnoverYear1 { get; set; }
+
+        [StringLength(7)]
+        public string? AnnualTurnoverFY2 { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? AnnualTurnoverYear2 { get; set; }
+
+        [StringLength(7)]
+        public string? AnnualTurnoverFY3 { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? AnnualTurnoverYear3 { get; set; }
 
         [Required, StringLength(50)]
         public string BankAccountNumber { get; set; } = string.Empty;

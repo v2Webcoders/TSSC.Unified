@@ -24,6 +24,7 @@ using iText.Kernel.Font;
 using iText.Kernel.Pdf;
 using iText.Layout.Element;
 using System.Globalization;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace TSSC.Unified.Areas.TP.Controllers
 {
@@ -72,6 +73,8 @@ namespace TSSC.Unified.Areas.TP.Controllers
             {
                 MembershipType = membershipType
             };
+
+            LoadFinancialYears();
 
             return View(model);
         }
@@ -198,7 +201,15 @@ namespace TSSC.Unified.Areas.TP.Controllers
                     MobileNumber = model.MobileNumber,
                     AlternateContactPerson = model.AlternateContactPerson,
 
-                    AnnualTurnoverLast3Years = model.AnnualTurnoverLast3Years,
+                    //AnnualTurnoverLast3Years = model.AnnualTurnoverLast3Years,
+                    AnnualTurnoverFY1 = model.AnnualTurnoverFY1,
+                    AnnualTurnoverYear1 = model.AnnualTurnoverYear1,
+
+                    AnnualTurnoverFY2 = model.AnnualTurnoverFY2,
+                    AnnualTurnoverYear2 = model.AnnualTurnoverYear2,
+
+                    AnnualTurnoverFY3 = model.AnnualTurnoverFY3,
+                    AnnualTurnoverYear3 = model.AnnualTurnoverYear3,
                     BankAccountNumber = model.BankAccountNumber,
                     IFSCCode = model.IFSCCode,
                     BankName = model.BankName,
@@ -748,7 +759,18 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 MobileNumber = application.MobileNumber,
                 AlternateContactPerson = application.AlternateContactPerson,
 
-                AnnualTurnoverLast3Years = application.AnnualTurnoverLast3Years,
+                //AnnualTurnoverLast3Years = application.AnnualTurnoverLast3Years,
+                
+                // Annual Turnover - Last 3 Financial Years
+                AnnualTurnoverFY1 = application.AnnualTurnoverFY1,
+                AnnualTurnoverYear1 = application.AnnualTurnoverYear1,
+
+                AnnualTurnoverFY2 = application.AnnualTurnoverFY2,
+                AnnualTurnoverYear2 = application.AnnualTurnoverYear2,
+
+                AnnualTurnoverFY3 = application.AnnualTurnoverFY3,
+                AnnualTurnoverYear3 = application.AnnualTurnoverYear3,
+
                 BankAccountNumber = application.BankAccountNumber,
                 IFSCCode = application.IFSCCode,
                 BankName = application.BankName,
@@ -760,7 +782,7 @@ namespace TSSC.Unified.Areas.TP.Controllers
 
                 DeclarationAccepted = application.DeclarationAccepted
             };
-
+            LoadFinancialYears();
             ViewBag.Documents = await _context.TPRegistrationDocuments
                 .Where(x => x.TPRegistrationId == application.Id)
                 .ToListAsync();
@@ -1062,12 +1084,21 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 application.AlternateContactPerson =
                     model.AlternateContactPerson;
 
+                //application.AnnualTurnoverLast3Years =
+                //    model.AnnualTurnoverLast3Years;
+
                 // =================================================
                 // UPDATE FINANCIAL DETAILS
                 // =================================================
 
-                application.AnnualTurnoverLast3Years =
-                    model.AnnualTurnoverLast3Years;
+                application.AnnualTurnoverFY1 = model.AnnualTurnoverFY1;
+                application.AnnualTurnoverYear1 = model.AnnualTurnoverYear1;
+
+                application.AnnualTurnoverFY2 = model.AnnualTurnoverFY2;
+                application.AnnualTurnoverYear2 = model.AnnualTurnoverYear2;
+
+                application.AnnualTurnoverFY3 = model.AnnualTurnoverFY3;
+                application.AnnualTurnoverYear3 = model.AnnualTurnoverYear3;
 
                 application.BankAccountNumber =
                     model.BankAccountNumber;
@@ -2112,6 +2143,31 @@ namespace TSSC.Unified.Areas.TP.Controllers
 
                 return outputStream.ToArray();
             }
+        }
+
+        private void LoadFinancialYears()
+        {
+            var today = DateTime.Today;
+
+            int currentFYStart = today.Month >= 4
+                ? today.Year
+                : today.Year - 1;
+
+            // Latest completed financial year
+            int latestCompletedFYStart = currentFYStart - 1;
+
+            ViewBag.FinancialYears = Enumerable.Range(0, 3)
+                .Select(i =>
+                {
+                    int startYear = latestCompletedFYStart - i;
+
+                    return new SelectListItem
+                    {
+                        Value = $"{startYear}-{(startYear + 1) % 100:D2}",
+                        Text = $"FY {startYear}-{(startYear + 1) % 100:D2}"
+                    };
+                })
+                .ToList();
         }
     }
 }

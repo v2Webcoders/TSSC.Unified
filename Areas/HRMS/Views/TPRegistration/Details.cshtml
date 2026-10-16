@@ -210,9 +210,37 @@
 				</div>
 			}
 
-			<div class="col-12">
+			@* <div class="col-12">
 				<span class="sub-text">Annual Turnover (Last 3 Years)</span>
 				<p><strong>@Model.AnnualTurnoverLast3Years</strong></p>
+			</div> *@
+			<div class="col-12">
+				<span class="sub-text">Annual Turnover (Last 3 Financial Years)</span>
+
+				<div class="table-responsive mt-2">
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th style="color: #1B2A4A !important;">Financial Year</th>
+								<th style="color: #1B2A4A !important;">Annual Turnover (₹)</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>@Model.AnnualTurnoverFY1</td>
+								<td>@Model.AnnualTurnoverYear1?.ToString("N2")</td>
+							</tr>
+							<tr>
+								<td>@Model.AnnualTurnoverFY2</td>
+								<td>@Model.AnnualTurnoverYear2?.ToString("N2")</td>
+							</tr>
+							<tr>
+								<td>@Model.AnnualTurnoverFY3</td>
+								<td>@Model.AnnualTurnoverYear3?.ToString("N2")</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 	</div>

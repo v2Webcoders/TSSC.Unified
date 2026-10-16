@@ -79,8 +79,31 @@ namespace TSSC.Unified.ViewModel
         public string? AlternateContactPerson { get; set; }
 
         // Financial Details
+        //[Required]
+        //public string AnnualTurnoverLast3Years { get; set; } = string.Empty;
         [Required]
-        public string AnnualTurnoverLast3Years { get; set; } = string.Empty;
+        [Display(Name = "Financial Year 1")]
+        public string AnnualTurnoverFY1 { get; set; } = string.Empty;
+
+        [Required]
+        [Range(0, double.MaxValue)]
+        public decimal AnnualTurnoverYear1 { get; set; }
+
+        [Required]
+        [Display(Name = "Financial Year 2")]
+        public string AnnualTurnoverFY2 { get; set; } = string.Empty;
+
+        [Required]
+        [Range(0, double.MaxValue)]
+        public decimal AnnualTurnoverYear2 { get; set; }
+
+        [Required]
+        [Display(Name = "Financial Year 3")]
+        public string AnnualTurnoverFY3 { get; set; } = string.Empty;
+
+        [Required]
+        [Range(0, double.MaxValue)]
+        public decimal AnnualTurnoverYear3 { get; set; }
 
         [Required]
         public string BankAccountNumber { get; set; } = string.Empty;
@@ -133,6 +156,8 @@ namespace TSSC.Unified.ViewModel
         [Range(typeof(bool), "true", "true",
             ErrorMessage = "You must accept the declaration before submitting.")]
         public bool DeclarationAccepted { get; set; }
+
+        
     }
 
     public class TPRegistrationEditVM
@@ -240,8 +265,31 @@ namespace TSSC.Unified.ViewModel
         // FINANCIAL DETAILS
         // =====================================================
 
+        //[Required]
+        //public string AnnualTurnoverLast3Years { get; set; } = string.Empty;
         [Required]
-        public string AnnualTurnoverLast3Years { get; set; } = string.Empty;
+        [Display(Name = "Financial Year 1")]
+        public string? AnnualTurnoverFY1 { get; set; } = string.Empty;
+
+        [Required]
+        [Range(0, double.MaxValue)]
+        public decimal? AnnualTurnoverYear1 { get; set; }
+
+        [Required]
+        [Display(Name = "Financial Year 2")]
+        public string? AnnualTurnoverFY2 { get; set; } = string.Empty;
+
+        [Required]
+        [Range(0, double.MaxValue)]
+        public decimal? AnnualTurnoverYear2 { get; set; }
+
+        [Required]
+        [Display(Name = "Financial Year 3")]
+        public string? AnnualTurnoverFY3 { get; set; } = string.Empty;
+
+        [Required]
+        [Range(0, double.MaxValue)]
+        public decimal? AnnualTurnoverYear3 { get; set; }
 
         [Required]
         public string BankAccountNumber { get; set; } = string.Empty;
@@ -307,5 +355,71 @@ namespace TSSC.Unified.ViewModel
             "true",
             ErrorMessage = "You must accept the declaration before submitting.")]
         public bool DeclarationAccepted { get; set; }
+    }
+
+    public class TPRegistrationListVM
+    {
+        public int Id { get; set; }
+
+        // Organization
+        public string? OrganizationName { get; set; }
+        public string? OrganizationType { get; set; }
+        public string? RegistrationNumber { get; set; }
+
+        // Applicant / Signatory
+        public string? AuthorizedSignatoryName { get; set; }
+        public string? Designation { get; set; }
+
+        // Contact
+        public string? Email { get; set; }
+        public string? MobileNumber { get; set; }
+
+        public string? Status { get; set; }
+
+        // Submission
+        public DateTime CreatedOn { get; set; }
+
+        // Regional Approval
+        public string? Regional_Head_Status { get; set; }
+        public DateTime? Regional_Head_Date { get; set; }
+
+        // Affiliations
+        public string? Affiliations_Status { get; set; }
+        public DateTime? Affiliations_Date { get; set; }
+
+        // Finance
+        public string? Finance_Status { get; set; }
+        public DateTime? Finance_Date { get; set; }
+
+        // Vertical Head
+        public string? Vertical_Head_Status { get; set; }
+        public DateTime? Vertical_Head_Date { get; set; }
+
+        // Senior Reviewer 1
+        public string? SeniorReviewer1_Status { get; set; }
+        public DateTime? SeniorReviewer1_Date { get; set; }
+
+        // Senior Reviewer 2
+        public string? SeniorReviewer2_Status { get; set; }
+        public DateTime? SeniorReviewer2_Date { get; set; }
+
+        // CEO
+        public string? CEO_Status { get; set; }
+        public DateTime? CEO_Date { get; set; }
+
+        // Payment Process
+        public string? PaymentProcess_Status { get; set; }
+        public DateTime? PaymentProcess_Date { get; set; }
+
+        // Finance Certificate
+        public string? FinanceCertificate_Status { get; set; }
+        public DateTime? FinanceCertificate_Date { get; set; }
+
+        // Certificate Issuance
+        public string? CertificateIssuance_Status { get; set; }
+        public DateTime? CertificateIssuance_Date { get; set; }
+
+        // Workflow
+        public string? CurrentStage { get; set; }
     }
 }
