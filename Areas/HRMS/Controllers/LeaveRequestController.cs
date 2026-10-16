@@ -315,8 +315,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             ViewBag.EmployeeId = employee.EmployeeId;
             var leaveRequests = await _context.LeaveRequest
                 .Include(x => x.LeaveType)
-                .Where(x => x.EmployeeId == employee.EmployeeId
-                         || x.ApproverId == employee.EmployeeId)
+                .Where(x => x.EmployeeId == employee.EmployeeId)
                 .OrderByDescending(x => x.CreatedDate)
                 .ToListAsync();
 
