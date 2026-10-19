@@ -446,12 +446,72 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                     Status = x.Status,
 
-                    CreatedOn = x.CreatedOn
+                    CreatedOn = x.CreatedOn,
+                    FinanceStatus = x.FinanceStatus,
+                    HRStatus = x.HRStatus,
+                    FinanceHeadStatus = x.FinanceHeadStatus,
+                    CEOStatus = x.CEOStatus
                 })
                 .ToListAsync();
 
             return View(model);
         }
+        //[HttpGet]
+        //public async Task<IActionResult> MyReimbursement()
+        //{
+        //    var currentUser = await _userManager.GetUserAsync(User);
+
+        //    if (currentUser == null)
+        //    {
+        //        return RedirectToAction("Login", "Account");
+        //    }
+
+        //    var employee = await _context.Employee
+        //        .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
+
+        //    if (employee == null)
+        //    {
+        //        return View(new MyReimbursementVM
+        //        {
+        //            ReimbursementList = new List<ReimbursementVM>()
+        //        });
+        //    }
+
+        //    var model = new MyReimbursementVM();
+
+        //    model.ReimbursementList = await _context.Reimbursement
+        //        .Where(x =>
+        //            x.EmployeeId == employee.EmployeeId &&
+        //            x.IsActive)
+        //        .OrderByDescending(x => x.CreatedOn)
+        //        .Select(x => new ReimbursementVM
+        //        {
+        //            ReimbursementId = x.ReimbursementId,
+
+        //            EmployeeId = x.EmployeeId,
+
+        //            ExpenseCategory = x.ExpenseCategory,
+
+        //            ExpenseAmount = x.ExpenseAmount,
+
+        //            ExpenseDate = x.ExpenseDate,
+
+        //            PaymentMode = x.PaymentMode,
+
+        //            Purpose = x.Purpose,
+
+        //            SupportingDocument = x.SupportingDocument,
+
+        //            InvoiceBill = x.InvoiceBill,
+
+        //            Status = x.Status,
+
+        //            CreatedOn = x.CreatedOn
+        //        })
+        //        .ToListAsync();
+
+        //    return View(model);
+        //}
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -1154,6 +1214,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     ManagerApprovedOn = x.ManagerApprovedOn,
 
                     CreatedOn = x.CreatedOn
+                    
                 })
                 .ToListAsync();
 

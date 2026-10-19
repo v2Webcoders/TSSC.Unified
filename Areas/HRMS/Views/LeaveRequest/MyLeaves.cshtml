@@ -44,7 +44,24 @@
 </div>
 
 <div class="nk-block nk-block-lg">
+    @if (TempData["LeaveSuccess"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <em class="icon ni ni-check-circle"></em>
+            @TempData["LeaveSuccess"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["DeleteSuccess"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <em class="icon ni ni-check-circle"></em>
+            @TempData["DeleteSuccess"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
     <div class="card card-preview">
+        
 
         <div class="card-inner">
 

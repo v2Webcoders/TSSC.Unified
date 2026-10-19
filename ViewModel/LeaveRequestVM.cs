@@ -18,7 +18,7 @@ namespace TSSC.Unified.ViewModel
 
         // Leave Details
 
-        [Required(ErrorMessage = "Please select leave type")]
+        [Range(1, int.MaxValue, ErrorMessage = "Please select leave type")]
         public int LeaveTypeId { get; set; }
 
         [Required(ErrorMessage = "Please select leave duration")]

@@ -1,0 +1,68 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Generated Certificates";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Generated Certificates</h3>
+            <div class="nk-block-des text-soft">
+                <p>Select a certificate type to view its generated certificates.</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="nk-block">
+    <div class="row g-gs">
+
+        <!-- Membership -->
+        <div class="col-md-6 col-xl-4">
+            <div class="card card-bordered h-100">
+                <div class="card-inner">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="d-inline-flex justify-content-center align-items-center me-3"
+                              style="width: 48px; height: 48px;">
+                            <i class="fas fa-id-card text-primary" style="font-size: 1.5rem;"></i>
+                        </span>
+                        <h5 class="mb-0">Membership Certificates</h5>
+                    </div>
+                    <p class="text-soft">Certificates generated in bulk for membership.</p>
+                    <a asp-area="Admin" asp-controller="Certificate" asp-action="CertificateHistory"
+                       class="btn btn-primary btn-sm d-inline-flex align-items-center">
+                        View Certificates
+                        <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course -->
+        <div class="col-md-6 col-xl-4">
+            <div class="card card-bordered h-100">
+                <div class="card-inner">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="d-inline-flex justify-content-center align-items-center me-3"
+                              style="width: 48px; height: 48px;">
+                            <i class="fas fa-graduation-cap fa-2x text-success"></i>
+                        </span>
+                        <h5 class="mb-0">Course Certificates</h5>
+                    </div>
+                    <p class="text-soft">Certificates issued after completing courses.</p>
+                    <a asp-area="Admin" asp-controller="Certificate" asp-action="AssessmentCertificateHistory"
+                       class="btn btn-success btn-sm d-inline-flex align-items-center">
+                        View Certificates
+                        <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Future type: copy a card block and change title, icon, description and action -->
+
+    </div>
+</div>
+
+

@@ -34,49 +34,6 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             _environment = environment;
         }
 
-        //public async Task<IActionResult> Create()
-        //{
-        //    var applicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-
-        //    var employee = await _context.Employee
-        //        .Include(x => x.Department)
-        //        .FirstOrDefaultAsync(x => x.ApplicationUserId == applicationUserId);
-
-
-        //    if (employee == null)
-        //    {
-        //        return NotFound("Employee record not found."+ applicationUserId.ToString());
-        //    }
-
-
-        //    var model = new LeaveRequestVM
-        //    {
-        //        EmployeeId = employee.EmployeeId,
-
-        //        EmployeeName = employee.Prefix + " " +
-        //                       employee.FirstName + " " +
-        //                       employee.LastName,
-
-        //        DepartmentName = employee.Department != null
-        //                         ? employee.Department.DepartmentName
-        //                         : "",
-
-        //        FromDate = DateTime.Today,
-
-        //        ToDate = DateTime.Today,
-
-        //        Status = "Pending"
-        //    };
-
-        //    // Leave Type Dropdown
-        //    ViewBag.LeaveTypes = await _context.LeaveType
-        //        .Where(x => x.IsActive)
-        //        .OrderBy(x => x.LeaveTypeName)
-        //        .ToListAsync();
-        //    return View(model);
-        //}
-
         public async Task<IActionResult> Create(int? id)
         {
             var applicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -275,9 +232,9 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = model.LeaveRequestId == 0
-                ? "Leave request submitted successfully."
-                : "Leave request updated successfully.";
+            TempData["LeaveSuccess"] = model.LeaveRequestId == 0
+            ? "Leave request submitted successfully and sent to your reporting manager for approval."
+            : "Leave request updated successfully.";
 
             return RedirectToAction(nameof(MyLeaves));
         }
@@ -559,9 +516,9 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             _context.LeaveRequest.Remove(leaveRequest);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Leave request deleted successfully.";
+            TempData["DeleteSuccess"] = "Leave request deleted successfully.";
 
-            return RedirectToAction(nameof(ManageLeaves));
+            return RedirectToAction(nameof(MyLeaves));
         }
 
         [Authorize]

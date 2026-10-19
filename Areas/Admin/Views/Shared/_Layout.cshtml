@@ -23,9 +23,10 @@
 	<!-- Page Title  -->
 	<title>Dashboard | TSSC Unified Portal</title>
 	<!-- StyleSheets  -->
-	<link rel="stylesheet" href="/assets/css/dashlite.css?ver=3.4.0">
-	<link id="skin-default" rel="stylesheet" href="/assets/css/theme.css?ver=3.4.0">
-	<link rel="stylesheet" href="/assets/css/style.css">
+	<link rel="stylesheet" href="/assetsAd/css/dashlite.css?ver=3.4.0">
+	<link id="skin-default" rel="stylesheet" href="/assetsAd/css/theme.css?ver=3.4.0">
+	<link rel="stylesheet" href="/assetsAd/css/style.css">
+	<link href="~/assetsAd/css/customadmin.css" rel="stylesheet" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     @RenderSection("Styles", required: false)
 
@@ -51,8 +52,10 @@
                         <div class="nk-sidebar-menu" data-simplebar>
                             <ul class="nk-menu">
                                 <li class="nk-menu-heading">
-                                    <h6 class="overline-title">Main</h6>
-                                </li><!-- .nk-menu-heading -->
+                                    <div class="nk-menu-heading-content">
+                                        <span class="nk-menu-heading-text">MAIN</span>
+                                    </div>
+                                </li>
 
                                 <li class="nk-menu-item">
                                     <a href="/Admin/Home/Index" class="nk-menu-link">
@@ -63,11 +66,13 @@
                                     </a>
                                 </li>
                                 <li class="nk-menu-heading">
-                                    <h6 class="overline-title">HR &amp; Operations</h6>
-                                </li><!-- .nk-menu-heading -->
+                                    <div class="nk-menu-heading-content">
+                                        <span class="nk-menu-heading-text">HR &amp; Operations</span>
+                                    </div>
+                                </li>
 
                                 <li class="nk-menu-item has-sub">
-                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
+                                    <a href="#" class="nk-menu-link nk-menu-toggle">
                                         <span class="nk-menu-icon">
                                             <i class="fas fa-users"></i>
                                         </span>
@@ -75,48 +80,23 @@
                                     </a>
                                     <ul class="nk-menu-sub">
                                         <li class="nk-menu-item">
-                                            <a href="/Admin/Dealer/Index" class="nk-menu-link">
-                                                <span class="nk-menu-text">Employee Dashboard</span>
-                                            </a>
-                                        </li>
-                                        <li class="nk-menu-item">
-                                            <a href="/Hr/Attendance" class="nk-menu-link">
-                                                <span class="nk-menu-text">Mark Attendance</span>
-                                            </a>
-                                        </li>
-                                        <li class="nk-menu-item">
-                                            <a href="/Hr/RegularizationRequest" class="nk-menu-link">
-                                                <span class="nk-menu-text">Attendance Regularization</span>
-                                            </a>
-                                        </li>
-                                        <li class="nk-menu-item">
-                                            <a href="/Hr/LeaveRequest" class="nk-menu-link">
-                                                <span class="nk-menu-text">Leave Request</span>
-                                            </a>
-                                        </li>
-                                        <li class="nk-menu-item">
-                                            <a href="/Hr/OdRequest" class="nk-menu-link">
-                                                <span class="nk-menu-text">OD Request</span>
-                                            </a>
-                                        </li>
-                                        <li class="nk-menu-item">
-                                            <a href="/Hr/Policies" class="nk-menu-link">
-                                                <span class="nk-menu-text">HR Policy Documents</span>
-                                            </a>
-                                        </li>
-                                        <li class="nk-menu-item">
                                             <a href="/Hr/ManagerDashboard" class="nk-menu-link">
-                                                <span class="nk-menu-text">RM / HR Dashboard</span>
+                                                <span class="nk-menu-text">HR Dashboard</span>
                                             </a>
                                         </li>
                                         <li class="nk-menu-item">
-                                            <a href="/Hr/Approvals" class="nk-menu-link">
-                                                <span class="nk-menu-text">Regularization / Leave / OD Approval</span>
+                                            <a href="/Hr/Employees" class="nk-menu-link">
+                                                <span class="nk-menu-text">Employee Management</span>
                                             </a>
                                         </li>
                                         <li class="nk-menu-item">
                                             <a href="/Hr/ViewAttendance" class="nk-menu-link">
                                                 <span class="nk-menu-text">View Attendance</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Hr/Approvals" class="nk-menu-link">
+                                                <span class="nk-menu-text">Regularization / Leave / OD Approval</span>
                                             </a>
                                         </li>
                                         <li class="nk-menu-item">
@@ -130,18 +110,25 @@
                                             </a>
                                         </li>
                                         <li class="nk-menu-item">
-                                            <a href="/Hr/Employees" class="nk-menu-link">
-                                                <span class="nk-menu-text">Employee Management</span>
-                                            </a>
-                                        </li>
-                                        <li class="nk-menu-item">
-                                            <a href="/Hr/CreatePolicy" class="nk-menu-link">
-                                                <span class="nk-menu-text">Create Policy</span>
-                                            </a>
-                                        </li>
-                                        <li class="nk-menu-item">
                                             <a href="/Hr/HolidayCalendar" class="nk-menu-link">
                                                 <span class="nk-menu-text">Holiday Marking</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Hr/Policies" class="nk-menu-link">
+                                                <span class="nk-menu-text">HR Policies</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <!-- TODO: replace with your Leave Types route -->
+                                            <a href="/Hr/LeaveTypes" class="nk-menu-link">
+                                                <span class="nk-menu-text">Leave Types &amp; Quota</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <!-- TODO: replace with your HR Reports route -->
+                                            <a href="/Hr/Reports" class="nk-menu-link">
+                                                <span class="nk-menu-text">HR Reports</span>
                                             </a>
                                         </li>
                                     </ul>
@@ -209,8 +196,11 @@
                                     </ul>
                                 </li>
                                 <li class="nk-menu-heading">
-                                    <h6 class="overline-title">Affiliation &amp; Standards</h6>
-                                </li><!-- .nk-menu-heading -->
+                                    <div class="nk-menu-heading-content">
+                                        <span class="nk-menu-heading-text">Affiliation &amp; Standards</span>
+                                    </div>
+                                </li>
+                              
 
                                 <li class="nk-menu-item has-sub">
                                     <a href="html#" class="nk-menu-link nk-menu-toggle">
@@ -287,8 +277,10 @@
                                 </li>
 
                                 <li class="nk-menu-heading">
-                                    <h6 class="overline-title">Training &amp; Certification</h6>
-                                </li><!-- .nk-menu-heading -->
+                                    <div class="nk-menu-heading-content">
+                                        <span class="nk-menu-heading-text">Training &amp; Certification</span>
+                                    </div>
+                                </li>
 
                                 <li class="nk-menu-item has-sub">
                                     <a href="html#" class="nk-menu-link nk-menu-toggle">
@@ -399,19 +391,36 @@
                                         <span class="nk-menu-icon">
                                             <i class="fas fa-certificate"></i>
                                         </span>
-                                        <span class="nk-menu-text">Certificate Genaration</span>
+                                        <span class="nk-menu-text">Certificate Generation</span>
                                     </a>
                                     <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            
+                                            <a href="/Admin/Image/Index" class="nk-menu-link">
+                                                <span class="nk-menu-text">Photo Library</span>
+                                            </a>
+                                        </li>
+
                                         <li class="nk-menu-item">
                                             <a href="/Admin/Certificate/Index" class="nk-menu-link">
                                                 <span class="nk-menu-text">Bulk Certificate Creation</span>
                                             </a>
                                         </li>
                                         <li class="nk-menu-item">
+                                            <a asp-area="Admin" asp-controller="Certificate" asp-action="CertificateTypes" class="nk-menu-link">
+                                                <span class="nk-menu-text">Generated Certificates</span>
+                                            </a>
+                                        </li>
+                                        @* <li class="nk-menu-item">
                                             <a href="/Admin/Certificate/CertificateHistory" class="nk-menu-link">
                                                 <span class="nk-menu-text">Generated Certificates</span>
                                             </a>
                                         </li>
+                                        <li class="nk-menu-item">
+                                            <a href="/Admin/Certificate/AssessmentCertificateHistory" class="nk-menu-link">
+                                                <span class="nk-menu-text">Assessment Certificates</span>
+                                            </a>
+                                        </li> *@
                                     </ul>
                                 </li>
                                @*  <li class="nk-menu-item has-sub">
@@ -440,11 +449,13 @@
                                     </ul>
                                 </li> *@
 
-                                
+
 
                                 <li class="nk-menu-heading">
-                                    <h6 class="overline-title">Procurement &amp; Projects</h6>
-                                </li><!-- .nk-menu-heading -->
+                                    <div class="nk-menu-heading-content">
+                                        <span class="nk-menu-heading-text">Procurement &amp; Projects</span>
+                                    </div>
+                                </li>
 
                                 <li class="nk-menu-item has-sub">
                                     <a href="html#" class="nk-menu-link nk-menu-toggle">
@@ -585,8 +596,10 @@
                                 </li>
 
                                 <li class="nk-menu-heading">
-                                    <h6 class="overline-title">General</h6>
-                                </li><!-- .nk-menu-heading -->
+                                    <div class="nk-menu-heading-content">
+                                        <span class="nk-menu-heading-text">General</span>
+                                    </div>
+                                </li>
 
                                 <li class="nk-menu-item has-sub">
                                     <a href="html#" class="nk-menu-link nk-menu-toggle">
@@ -675,8 +688,10 @@
                                 </li>
 
                                 <li class="nk-menu-heading">
-                                    <h6 class="overline-title">System</h6>
-                                </li><!-- .nk-menu-heading -->
+                                    <div class="nk-menu-heading-content">
+                                        <span class="nk-menu-heading-text">System</span>
+                                    </div>
+                                </li>
 
                                 <li class="nk-menu-item has-sub">
                                     <a href="html#" class="nk-menu-link nk-menu-toggle">
@@ -709,119 +724,7 @@
                                     </ul>
                                 </li>
                             </ul>
-                           @*  <ul class="nk-menu">
-                                <li class="nk-menu-heading">
-
-                                </li><!-- .nk-menu-heading -->
-                                <li class="nk-menu-item has-sub">
-                                    <a href="html#" class="nk-menu-link ">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-th-large"></i>
-                                        </span>
-                                        <span class="nk-menu-text">Dashboard  </span>
-                                    </a>
-
-                                </li>
-                                <li class="nk-menu-item has-sub">
-                                    <a href="html#" class="nk-menu-link nk-menu-toggle">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-user-graduate"></i>
-                                        </span>
-                                        <span class="nk-menu-text">Students</span>
-                                    </a>
-                                    <ul class="nk-menu-sub">
-                                        <li class="nk-menu-item ">
-                                            <a href="javascript:void(0);" class="nk-menu-link ">
-                                                <span class="nk-menu-text">Students1</span>
-                                            </a>
-                                        </li>
-                                        <li class="nk-menu-item ">
-                                            <a href="javascript:void(0);" class="nk-menu-link ">
-                                                <span class="nk-menu-text">Students2</span>
-                                            </a>
-                                        </li>
-                                        <li class="nk-menu-item has-sub">
-                                            <a href="javascript:void(0);" class="nk-menu-link ">
-                                                <span class="nk-menu-text">Students3</span>
-                                            </a>
-
-                                        </li>
-
-                                    </ul>
-                                </li>
-                                <li class="nk-menu-item has-sub">
-                                    <a href="html#" class="nk-menu-link ">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-chalkboard-teacher"></i>
-                                        </span>
-                                        <span class="nk-menu-text">Training</span>
-                                    </a>
-
-                                </li>
-
-                                <li class="nk-menu-item has-sub">
-                                    <a href="html#" class="nk-menu-link ">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-tasks"></i>
-                                        </span>
-                                        <span class="nk-menu-text">Assessments</span>
-                                    </a>
-
-                                </li>
-
-
-                                <li class="nk-menu-item has-sub">
-                                    <a href="html#" class="nk-menu-link ">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-certificate"></i>
-                                        </span>
-                                        <span class="nk-menu-text">Certification</span>
-                                    </a>
-
-                                </li>
-
-
-
-                                <li class="nk-menu-item has-sub">
-                                    <a href="html#" class="nk-menu-link ">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-file-alt"></i>
-                                        </span>
-                                        <span class="nk-menu-text">Reports</span>
-                                    </a>
-
-                                </li>
-
-
-
-                                <li class="nk-menu-item has-sub">
-                                    <a href="html#" class="nk-menu-link ">
-                                        <span class="nk-menu-icon">
-                                            <i class="fas fa-cog"></i>
-                                        </span>
-                                        <span class="nk-menu-text">Settings</span>
-                                    </a>
-
-                                </li>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                            </ul> *@
+                           
                         </div><!-- .nk-sidebar-menu -->
                     </div><!-- .nk-sidebar-content -->
                 </div><!-- .nk-sidebar-element -->
@@ -970,7 +873,7 @@
                 <div class="nk-content">
                     <div class="container-fluid">
                         <div class="nk-content-inner">
-                            <div class="nk-content-body">
+                            <div class="nk-content-body mt-5">
                                 @RenderBody()
                             </div>
                         </div>
@@ -1115,10 +1018,10 @@
         </div><!-- .modla-dialog -->
     </div><!-- .modal -->
     <!-- JavaScript -->
-    <script src="~/assets/js/bundle.js?ver=3.4.0"></script>
-    <script src="~/assets/js/scripts.js?ver=3.4.0"></script>
-    <script src="~/assets/js/charts/gd-default.js?ver=3.4.0"></script>
-    <script src="~/assets/js/charts/tssc-dashboard.js?ver=1.0.0"></script>
+    <script src="~/assetsAd/js/bundle.js?ver=3.4.0"></script>
+    <script src="~/assetsAd/js/scripts.js?ver=3.4.0"></script>
+    <script src="~/assetsAd/js/charts/gd-default.js?ver=3.4.0"></script>
+    <script src="~/assetsAd/js/charts/tssc-dashboard.js?ver=1.0.0"></script>
 
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
