@@ -63,7 +63,7 @@
 
                     <div class="col-md-4">
                         <label class="form-label">
-                            Received Item <span class="text-danger">*</span>
+                            Sent Item <span class="text-danger">*</span>
                         </label>
                         <input asp-for="ItemName" class="form-control" />
                         <span asp-validation-for="ItemName" class="text-danger"></span>
@@ -91,18 +91,18 @@
                         <input asp-for="DocketNo" class="form-control" />
                     </div>
 
-                    <div class="col-md-4">
+                   @*  <div class="col-md-4">
                         <label class="form-label">Send By</label>
                         <select asp-for="SentBy"
                                 asp-items="Model.EmployeeList"
                                 class="form-select">
                             <option value="">Select Employee</option>
                         </select>
-                    </div>
+                    </div> *@
 
 
                     <div class="col-md-4">
-                        <label class="form-label">Handover To</label>
+                        <label class="form-label">Sent By</label>
                       @*   <input asp-for="Handover" class="form-control" /> *@
                         <select asp-for="Handover"
                                 asp-items="Model.EmployeeList"
@@ -111,12 +111,12 @@
                         </select>
                     </div>
 
-                    <div class="col-md-4">
+                    @* <div class="col-md-4">
                         <label class="form-label">Handover Date</label>
                         <input asp-for="HandoverDate"
                                type="date"
                                class="form-control" />
-                    </div>
+                    </div> *@
 
                     <div class="col-md-4">
                         <label class="form-label">Attachment</label>
