@@ -691,12 +691,22 @@
 					</a>
 				</li>
 
-				<!-- Approved -->
+				@* <!-- Approved -->
 				<li class="nk-menu-item">
 					<a asp-area="HRMS"
 					   asp-controller="Reimbursement"
 					   asp-action="FinanceHeadReimbursement"
 					   asp-route-status="Approved"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Approved Reimbursement</span>
+					</a>
+				</li> *@
+				<!-- Approved -->
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="Reimbursement"
+					   asp-action="FinanceHeadReimbursement"
+					   asp-route-status="Finance Head Approved"
 					   class="nk-menu-link">
 						<span class="nk-menu-text">Approved Reimbursement</span>
 					</a>

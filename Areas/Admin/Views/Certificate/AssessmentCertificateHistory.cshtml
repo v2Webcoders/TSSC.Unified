@@ -1,5 +1,5 @@
 ﻿@model IEnumerable<TSSC.Unified.Models.CertificateGenerationAssessmentDetail>
-
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Course Certificate History";
@@ -14,6 +14,14 @@
             <div class="nk-block-des text-soft">
                 <p>View generated course certificates.</p>
             </div>
+        </div>
+        <div class="nk-block-head-content">
+            <a asp-area="Admin" asp-controller="Certificate" asp-action="CertificateTypes"
+               class="btn btn-primary d-none d-md-inline-flex align-items-center">
+                <i class="fas fa-folder-open me-2"></i>
+                <span>Generated Certificates</span>
+                <i class="fas fa-arrow-right ms-2"></i>
+            </a>
         </div>
     </div>
 </div>

@@ -2742,18 +2742,10 @@ namespace TSSC.Unified.Areas.Admin.Controllers
 
             return View(history);
         }
-        //[HttpGet]
-        //public async Task<IActionResult> AssessmentCertificateHistory()
-        //{
-        //    var history = await _context.CertificateGenerationAssessmentDetail
-        //        .Include(x => x.CertificateGeneration)
-        //            .ThenInclude(x => x.State)
-        //        .Where(x => x.IsActive)
-        //        .OrderByDescending(x => x.GeneratedDate)
-        //        .ToListAsync();
-
-        //    return View(history);
-        //}
+        public IActionResult CertificateTypes()
+        {
+            return View();   // Views/Certificate/CertificateTypes.cshtml
+        }
     }
 
 
