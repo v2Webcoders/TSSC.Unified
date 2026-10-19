@@ -98,5 +98,10 @@ namespace QUIZAPP
         // ------------------------- JOBROLES AND TC APPROVAL MODULE---------------------------------------
         public DbSet<Scheme> Scheme { get; set; }
         public DbSet<TrainingCenter> TrainingCenter { get; set; }
+
+        public DbSet<Batch> Batches { get; set; }
+           
+        public DbSet<BatchCandidate> BatchCandidates { get; set; }
+           
     }
 }
