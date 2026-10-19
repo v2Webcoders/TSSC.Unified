@@ -39,61 +39,61 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             {
                 new SelectListItem
                 {
-                    Text = "Travel",
-                    Value = "Travel"
+                    Text = "Internal",
+                    Value = "Internal"
                 },
 
                 new SelectListItem
                 {
-                    Text = "Medical",
-                    Value = "Medical"
+                    Text = "External",
+                    Value = "External"
                 },
 
-                new SelectListItem
-                {
-                    Text = "Office Expense",
-                    Value = "Office Expense"
-                },
+                //new SelectListItem
+                //{
+                //    Text = "Office Expense",
+                //    Value = "Office Expense"
+                //},
 
-                new SelectListItem
-                {
-                    Text = "Other",
-                    Value = "Other"
-                }
+                //new SelectListItem
+                //{
+                //    Text = "Other",
+                //    Value = "Other"
+                //}
             };
 
 
-            model.ExpenseCategoryList = new List<SelectListItem>
-            {
-                new SelectListItem
-                {
-                    Text = "Food",
-                    Value = "Food"
-                },
+            //model.ExpenseCategoryList = new List<SelectListItem>
+            //{
+            //    new SelectListItem
+            //    {
+            //        Text = "Food",
+            //        Value = "Food"
+            //    },
 
-                new SelectListItem
-                {
-                    Text = "Hotel",
-                    Value = "Hotel"
-                },
+            //    new SelectListItem
+            //    {
+            //        Text = "Hotel",
+            //        Value = "Hotel"
+            //    },
 
-                new SelectListItem
-                {
-                    Text = "Transport",
-                    Value = "Transport"
-                },
+            //    new SelectListItem
+            //    {
+            //        Text = "Transport",
+            //        Value = "Transport"
+            //    },
 
-                new SelectListItem
-                {
-                    Text = "Fuel",
-                    Value = "Fuel"
-                },
-                new SelectListItem
-                {
-                    Text = "Miscellaneous",
-                    Value = "Miscellaneous"
-                }
-            };
+            //    new SelectListItem
+            //    {
+            //        Text = "Fuel",
+            //        Value = "Fuel"
+            //    },
+            //    new SelectListItem
+            //    {
+            //        Text = "Miscellaneous",
+            //        Value = "Miscellaneous"
+            //    }
+            //};
 
 
             model.PaymentModeList = new List<SelectListItem>

@@ -84,7 +84,10 @@ namespace TSSC.Unified.ViewModel
         public DateTime? FinanceApprovedDate { get; set; }
         public string? FinanceStatus { get; set; }
         public DateTime? InspectionDate { get; set; }
-
+        public string? InspectionStatus { get; set; }
+        public DateTime? InspectionCreatedDate { get; set; }
+        public string? InspectionLink { get; set; }
+        public string? InspectionMode { get; set; }
         public List<SelectListItem> JobRoles { get; set; } = new();
         public decimal? QPHours { get; set; }
         public int? SchemeId { get; set; }

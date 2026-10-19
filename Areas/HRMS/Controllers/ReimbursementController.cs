@@ -446,7 +446,12 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                     Status = x.Status,
 
-                    CreatedOn = x.CreatedOn
+                    CreatedOn = x.CreatedOn,
+                    FinanceStatus = x.FinanceStatus,
+                    HRStatus = x.HRStatus,
+                    FinanceHeadStatus = x.FinanceHeadStatus,
+                    CEOStatus = x.CEOStatus,
+                    PaymentStatus=x.PaymentStatus
                 })
                 .ToListAsync();
 
@@ -545,6 +550,11 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 {
                     ReimbursementId = x.ReimbursementId,
                     EmployeeId = x.EmployeeId,
+                    EmployeeName = _context.Employee
+            .Where(e => e.EmployeeId == x.EmployeeId)
+            .Select(e => e.FirstName)
+            .FirstOrDefault(),
+                    OfficialEmail = manager.OfficialEmail,
                     //RequestType = x.RequestType,
                     ExpenseCategory = x.ExpenseCategory,
                     ExpenseAmount = x.ExpenseAmount,
@@ -559,7 +569,12 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     ReportingManagerId = x.ReportingManagerId,
                     ManagerRemarks = x.ManagerRemarks,
                     ManagerApprovedOn = x.ManagerApprovedOn,
-                    CreatedOn = x.CreatedOn
+                    CreatedOn = x.CreatedOn,
+                    FinanceStatus = x.FinanceStatus,
+                    HRStatus = x.HRStatus,
+                    FinanceHeadStatus = x.FinanceHeadStatus,
+                    CEOStatus = x.CEOStatus,
+                    PaymentStatus = x.PaymentStatus
                 })
                 .ToListAsync();
 
@@ -691,7 +706,11 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 {
                     ReimbursementId = x.ReimbursementId,
                     EmployeeId = x.EmployeeId,
-                  //  RequestType = x.RequestType,
+                    EmployeeName = _context.Employee
+            .Where(e => e.EmployeeId == x.EmployeeId)
+            .Select(e => e.FirstName)
+            .FirstOrDefault(),
+                    //  RequestType = x.RequestType,
                     ExpenseCategory = x.ExpenseCategory,
                     ExpenseAmount = x.ExpenseAmount,
                     ExpenseDate = x.ExpenseDate,
@@ -706,7 +725,11 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     ReportingManagerId = x.ReportingManagerId,
                     ManagerRemarks = x.ManagerRemarks,
                     ManagerApprovedOn = x.ManagerApprovedOn,
-                    CreatedOn = x.CreatedOn
+                    CreatedOn = x.CreatedOn,
+                    HRStatus = x.HRStatus,
+                    FinanceHeadStatus = x.FinanceHeadStatus,
+                    CEOStatus = x.CEOStatus,
+                    PaymentStatus= x.PaymentStatus
                 })
                 .ToListAsync();
             ViewBag.Status = status;
@@ -818,6 +841,35 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             return RedirectToAction("FinanceReimbursement");
         }
 
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdatePaymentStatus(
+            int id, string paymentStatus)
+        {
+            var reimbursement = await _context.Reimbursement
+                .FirstOrDefaultAsync(x => x.ReimbursementId == id);
+
+            if (reimbursement == null)
+                return NotFound();
+
+            if (paymentStatus != "Pending" &&
+                paymentStatus != "In Progress" &&
+                paymentStatus != "Completed")
+            {
+                return BadRequest("Invalid payment status.");
+            }
+
+            reimbursement.PaymentStatus = paymentStatus;
+
+            await _context.SaveChangesAsync();
+
+            TempData["msg"] = "Payment status updated successfully.";
+
+            return Redirect("/HRMS/Reimbursement/FinanceReimbursement?status=Finance%20Approved");
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> HRReimbursement(string status = "Pending")
         {
@@ -838,7 +890,10 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 {
                     ReimbursementId = x.ReimbursementId,
                     EmployeeId = x.EmployeeId,
-
+                    EmployeeName = _context.Employee
+            .Where(e => e.EmployeeId == x.EmployeeId)
+            .Select(e => e.FirstName)
+            .FirstOrDefault(),
                     ExpenseCategory = x.ExpenseCategory,
                     ExpenseAmount = x.ExpenseAmount,
                     ExpenseDate = x.ExpenseDate,
@@ -856,7 +911,12 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     ManagerRemarks = x.ManagerRemarks,
                     ManagerApprovedOn = x.ManagerApprovedOn,
 
-                    CreatedOn = x.CreatedOn
+                    CreatedOn = x.CreatedOn,
+                  
+                    FinanceHeadStatus = x.FinanceHeadStatus,
+                    CEOStatus = x.CEOStatus,
+                    PaymentStatus = x.PaymentStatus
+
                 })
                 .ToListAsync();
 
@@ -1000,7 +1060,9 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                     ManagerRemarks = x.ManagerRemarks,
                     ManagerApprovedOn = x.ManagerApprovedOn,
-                    CreatedOn = x.CreatedOn
+                    CreatedOn = x.CreatedOn,
+                    CEOStatus = x.CEOStatus,
+                    PaymentStatus = x.PaymentStatus
                 })
                 .ToListAsync();
 
@@ -1131,7 +1193,10 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 {
                     ReimbursementId = x.ReimbursementId,
                     EmployeeId = x.EmployeeId,
-
+                    EmployeeName = _context.Employee
+            .Where(e => e.EmployeeId == x.EmployeeId)
+            .Select(e => e.FirstName)
+            .FirstOrDefault(),
                     ExpenseCategory = x.ExpenseCategory,
                     ExpenseAmount = x.ExpenseAmount,
                     ExpenseDate = x.ExpenseDate,
@@ -1153,7 +1218,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     ManagerRemarks = x.ManagerRemarks,
                     ManagerApprovedOn = x.ManagerApprovedOn,
 
-                    CreatedOn = x.CreatedOn
+                    CreatedOn = x.CreatedOn,
+                    PaymentStatus = x.PaymentStatus
                 })
                 .ToListAsync();
 

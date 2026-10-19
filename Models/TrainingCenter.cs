@@ -73,6 +73,10 @@ namespace TSSC.Unified.Models
         public DateTime? FinanceApprovedDate { get; set; }
         public string? FinanceStatus { get; set; } = "Pending";
         public DateTime? InspectionDate { get; set; }
+        public string? InspectionStatus { get; set; } = "Pending";
+        public DateTime? InspectionCreatedDate { get; set; }
+        public string? InspectionLink { get; set; }
 
+        public string? InspectionMode { get; set; }
     }
 }
