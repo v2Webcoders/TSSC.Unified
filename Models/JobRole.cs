@@ -54,7 +54,7 @@ namespace TSSC.Unified.Models
 
         public bool IsActive { get; set; } = true;
 
-        public bool ReOpen { get; set; } = false;
+        public bool? ReOpen { get; set; } = false;
         // Navigation Property
         public virtual ICollection<JobRoleDocument> Documents { get; set; }
             = new List<JobRoleDocument>();

@@ -1,5 +1,294 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Assessment Agency Dashboard";
+    Layout = "_Layout";
 }
+
+<div class="container-fluid py-4">
+
+    <!-- Heading -->
+    <div class="mb-4">
+        <h2 class="fw-bold text-primary">
+            Assigned Batches
+        </h2>
+
+        <p class="text-muted fs-5 mb-0">
+            Certification batches assigned to SkillCert Assessment Agency.
+        </p>
+    </div>
+
+
+    <!-- Statistics -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card card-bordered shadow-sm h-100">
+                <div class="card-inner">
+
+                    <span class="badge bg-warning text-dark mb-3">
+                        Upcoming
+                    </span>
+
+                    <h1 class="fw-bold text-primary mb-2">
+                        1
+                    </h1>
+
+                    <p class="mb-0 text-muted">
+                        Batches scheduled
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card card-bordered shadow-sm h-100">
+                <div class="card-inner">
+
+                    <span class="badge bg-primary mb-3">
+                        Batches
+                    </span>
+
+                    <h1 class="fw-bold text-primary mb-2">
+                        3
+                    </h1>
+
+                    <p class="mb-0 text-muted">
+                        To be assessed
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card card-bordered shadow-sm h-100">
+                <div class="card-inner">
+
+                    <span class="badge bg-success mb-3">
+                        Completed
+                    </span>
+
+                    <h1 class="fw-bold text-primary mb-2">
+                        42
+                    </h1>
+
+                    <p class="mb-0 text-muted">
+                        Assessments this year
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card card-bordered shadow-sm h-100">
+                <div class="card-inner">
+
+                    <span class="badge bg-success mb-3">
+                        Pass Rate
+                    </span>
+
+                    <h1 class="fw-bold text-primary mb-2">
+                        91%
+                    </h1>
+
+                    <p class="mb-0 text-muted">
+                        Overall
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Assigned Batches -->
+    <div class="card card-bordered shadow-sm">
+
+        <div class="card-inner">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <h4 class="mb-0 text-primary fw-bold">
+                    Assigned Batches
+                </h4>
+
+                <span class="badge bg-primary">
+                    Assigned — 15 Aug 2026
+                </span>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>BATCH</th>
+                            <th>JOB ROLE</th>
+                            <th>START DATE</th>
+                            <th>END DATE</th>
+                            <th>STATUS</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <!-- Batch 9 -->
+                        <tr>
+                            <td>
+                                <strong>Batch 9</strong>
+                            </td>
+
+                            <td>
+                                Customer Service Executive
+                            </td>
+
+                            <td>
+                                29 Sep 2026
+                            </td>
+
+                            <td>
+                                30 Sep 2026
+                            </td>
+
+                            <td>
+                                <span class="badge bg-success">
+                                    Approved
+                                </span>
+                            </td>
+                        </tr>
+
+
+                        <!-- Batch 8 -->
+                        <tr>
+                            <td>
+                                <strong>Batch 8</strong>
+                            </td>
+
+                            <td>
+                                Field Technician
+                            </td>
+
+                            <td>
+                                27 Sep 2026
+                            </td>
+
+                            <td>
+                                28 Sep 2026
+                            </td>
+
+                            <td>
+                                <span class="badge bg-success">
+                                    Approved
+                                </span>
+                            </td>
+                        </tr>
+
+
+                        <!-- Batch 7 -->
+                        <tr>
+                            <td>
+                                <strong>Batch 7</strong>
+                            </td>
+
+                            <td>
+                                Sales Executive
+                            </td>
+
+                            <td>
+                                25 Sep 2026
+                            </td>
+
+                            <td>
+                                26 Sep 2026
+                            </td>
+
+                            <td>
+                                <span class="badge bg-success">
+                                    Approved
+                                </span>
+                            </td>
+                        </tr>
+
+
+                        <!-- Batch 6 -->
+                        <tr>
+                            <td>
+                                <strong>Batch 6</strong>
+                            </td>
+
+                            <td>
+                                Network Technician
+                            </td>
+
+                            <td>
+                                22 Sep 2026
+                            </td>
+
+                            <td>
+                                23 Sep 2026
+                            </td>
+
+                            <td>
+                                <span class="badge bg-success">
+                                    Approved
+                                </span>
+                            </td>
+                        </tr>
+
+
+                        <!-- Batch 5 -->
+                        <tr>
+                            <td>
+                                <strong>Batch 5</strong>
+                            </td>
+
+                            <td>
+                                IT Support Executive
+                            </td>
+
+                            <td>
+                                20 Sep 2026
+                            </td>
+
+                            <td>
+                                21 Sep 2026
+                            </td>
+
+                            <td>
+                                <span class="badge bg-secondary">
+                                    Completed
+                                </span>
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="mt-4">
+
+                <button type="button"
+                        class="btn btn-primary">
+                    Start Assessment →
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

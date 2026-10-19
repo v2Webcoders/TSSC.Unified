@@ -64,5 +64,19 @@ namespace TSSC.Unified.Models
 
         public DateTime? VerticalHeadApprovedDate { get; set; }
         public bool EmailSent { get; set; } = false;
+        public bool AgencySent { get; set; } = false;
+        public DateTime? AgencySentDate { get; set; }
+        public bool ResultUploaded { get; set; } = false;
+
+        public DateTime? ResultUploadedDate { get; set; }
+
+        [StringLength(255)]
+        public string? ResultFileName { get; set; }
+
+        [StringLength(500)]
+        public string? ResultFilePath { get; set; }
+        public virtual ICollection<BatchMasterTrainer> BatchMasterTrainers
+        { get; set; } = new List<BatchMasterTrainer>();
+
     }
 }

@@ -1,0 +1,310 @@
+﻿@model IEnumerable<TSSC.Unified.Models.BatchMasterTrainer>
+
+@{
+    ViewData["Title"] = "Batch Details";
+    Layout = "_Layout";
+
+    var batch = ViewBag.Batch as TSSC.Unified.Models.BatchMaster;
+    var trainers = Model?.ToList()
+        ?? new List<TSSC.Unified.Models.BatchMasterTrainer>();
+}
+
+<div class="nk-content-body">
+
+    <div class="nk-block-head nk-block-head-sm">
+        <div class="nk-block-between">
+
+            <div class="nk-block-head-content">
+
+                <h3 class="nk-block-title page-title">
+                    Batch Details
+                </h3>
+
+                <div class="nk-block-des text-soft">
+                    <p>
+                        Trainers assigned to this batch.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="nk-block-tools">
+
+                <a href="/Agency/Agency/AssignedBatches"
+                   class="btn btn-outline-primary">
+
+                    <em class="icon ni ni-arrow-left"></em>
+                    Back
+
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Batch Details -->
+    <div class="card card-bordered mb-4">
+
+        <div class="card-inner">
+
+            <div class="row gy-3">
+
+                <div class="col-md-3">
+                    <div class="text-soft small">
+                        Batch Name
+                    </div>
+
+                    <div class="fw-bold">
+                        @(batch?.BatchName ?? "-")
+                    </div>
+                </div>
+
+
+                <div class="col-md-3">
+                    <div class="text-soft small">
+                        Batch Code
+                    </div>
+
+                    <div class="fw-bold">
+                        @(string.IsNullOrWhiteSpace(batch?.BatchCode)
+                                                ? "-"
+                                                : batch.BatchCode)
+                    </div>
+                </div>
+
+
+                <div class="col-md-3">
+                    <div class="text-soft small">
+                        Job Role
+                    </div>
+
+                    <div class="fw-bold">
+                        @(batch?.JobRole?.JobRoleTitle ?? "-")
+                    </div>
+                </div>
+
+
+                <div class="col-md-3">
+                    <div class="text-soft small">
+                        Assessment Agency
+                    </div>
+
+                    <div class="fw-bold">
+                        @(batch?.AssessmentAgency?.AgencyName ?? "-")
+                    </div>
+                </div>
+
+
+                <div class="col-md-3">
+                    <div class="text-soft small">
+                        Start Date
+                    </div>
+
+                    <div class="fw-bold">
+                        @(batch?.StartDate?.ToString("dd MMM yyyy") ?? "-")
+                    </div>
+                </div>
+
+
+                <div class="col-md-3">
+                    <div class="text-soft small">
+                        End Date
+                    </div>
+
+                    <div class="fw-bold">
+                        @(batch?.EndDate?.ToString("dd MMM yyyy") ?? "-")
+                    </div>
+                </div>
+
+
+                <div class="col-md-3">
+                    <div class="text-soft small">
+                        Status
+                    </div>
+
+                    <span class="badge badge-dim bg-success">
+                        @(batch?.AgencyApprovalStatus ?? "-")
+                    </span>
+                </div>
+
+
+                <div class="col-md-3">
+                    <div class="text-soft small">
+                        Total Trainers
+                    </div>
+
+                    <div class="fw-bold">
+                        @trainers.Count
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Trainer List -->
+    <div class="card card-bordered">
+
+        <div class="card-inner">
+
+            <div class="nk-block-head nk-block-head-sm">
+
+                <div class="nk-block-between">
+
+                    <div class="nk-block-head-content">
+
+                        <h5 class="title">
+                            Assigned Trainers
+                        </h5>
+
+                        <div class="nk-block-des text-soft">
+                            <p>
+                                Trainers mapped to this batch.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="nk-block-tools">
+
+                        <span class="badge badge-dim bg-primary">
+                            @trainers.Count Trainers
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="datatable-init-export table table-tranx table-bordered">
+
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Registration No</th>
+                            <th>Trainer Name</th>
+                            <th>Email</th>
+                            <th>Mobile</th>
+                            <th>Payment</th>
+                            <th>Payment Date</th>
+                            <th>Finance</th>
+                           @*  <th>Action</th> *@
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+
+                        @if (trainers.Any())
+                        {
+                            int sno = 1;
+
+                            foreach (var item in trainers)
+                            {
+                                var trainer = item.TrainerRegistration;
+
+                                <tr>
+
+                                    <td>
+                                        @sno
+                                    </td>
+
+                                    <td>
+                                        @(trainer?.RegistrationNo ?? "-")
+                                    </td>
+
+                                    <td>
+                                        @(trainer?.CandidateName ?? "-")
+                                    </td>
+
+                                    <td>
+                                        @(trainer?.Email ?? "-")
+                                    </td>
+
+                                    <td>
+                                        @(trainer?.Mobile ?? "-")
+                                    </td>
+
+                                    <td>
+                                        @if (trainer?.PaymentVerified == true)
+                                        {
+                                            <span class="badge badge-dim bg-success">
+                                                Verified
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-dim bg-warning">
+                                                Pending
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @(trainer?.PaymentDate?.ToString("dd-MM-yyyy") ?? "-")
+                                    </td>
+                                    <td>
+                                        @if (trainer?.FinanceApproved == true)
+                                        {
+                                            <span class="badge badge-dim bg-success">
+                                                Approved
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-dim bg-warning">
+                                                Pending
+                                            </span>
+                                        }
+                                    </td>
+
+                                    @* <td>
+
+                                        <a href="#"
+                                           class="btn btn-sm btn-outline-primary">
+
+                                            <em class="icon ni ni-upload"></em>
+                                            Upload Result
+
+                                        </a>
+
+                                    </td> *@
+
+                                </tr>
+
+                                sno++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+
+                                <td colspan="8"
+                                    class="text-center text-soft py-5">
+
+                                    No trainers assigned to this batch.
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -52,5 +52,6 @@ namespace TSSC.Unified.ViewModel
         public string? AttachmentByEmployee { get; set; }
         public bool IsClosed { get; set; }
         public bool ReopenTask { get; set; }
+        public bool? emailSent { get; set; }
     }
 }

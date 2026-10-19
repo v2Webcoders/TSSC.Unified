@@ -414,7 +414,23 @@
 		</a>
 
 	</li>
+	@if (hasHandoverLetter)
+	{
+		<li class="nk-menu-item">
 
+			<a href="/HRMS/Letter/EmployeeLetters"
+			   class="nk-menu-link">
+
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-mail"></em>
+				</span>
+				<span class="nk-menu-text">
+					My Letters
+				</span>
+
+			</a>
+		</li>
+	}
 
 	@if (!isCEO)
 	{
@@ -585,7 +601,7 @@
 
 		</li>
 	}
-	
+
 	<!-- My Profile -->
 
 	<li class="nk-menu-item">
@@ -606,7 +622,7 @@
 		<li class="nk-menu-heading">
 			<div class="nk-menu-heading-content">
 				<span class="nk-menu-heading-text">
-					
+
 					CEO APPROVALS
 				</span>
 			</div>
@@ -1132,7 +1148,7 @@
 			</div>
 		</li>
 
-		
+
 
 		if (!isHR)
 		{
@@ -1434,7 +1450,7 @@
 						   class="nk-menu-link">
 
 							<span class="nk-menu-text">
-								Reimbursement Request 
+								Reimbursement Request
 							</span>
 							<partial name="_MenuBadge" model="counts.ReimbursementRequests" />
 						</a>

@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
+using QUIZAPP;
 using QUIZAPP.Models;
+using QUIZAPP.Services;
 using TSSC.Unified.Models;
 using TSSC.Unified.ViewModel;
-using QUIZAPP;
 
 namespace TSSC.Unified.Areas.HRMS.Controllers
 {
@@ -17,11 +18,14 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
         private readonly AppdbContext _context;
         private readonly UserManager<AppUser> _userManager;
         private readonly IWebHostEnvironment _environment;
-        public TaskController(AppdbContext context, UserManager<AppUser> userManager, IWebHostEnvironment environment)
+        private readonly EmailService _emailService;
+
+        public TaskController(AppdbContext context, UserManager<AppUser> userManager, IWebHostEnvironment environment, EmailService emailService)
         {
             _context = context;
             _userManager = userManager;
             _environment = environment;
+            _emailService = emailService;
         }
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -108,9 +112,102 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             _context.Tasks.Add(task);
 
             await _context.SaveChangesAsync();
+            // ==============================
+            // NEW: TASK ASSIGNMENT EMAIL
+            // ==============================
 
-            TempData["msg"] = "Task Assigned Successfully.";
+            bool emailSent = false;
 
+            try
+            {
+                // Fetch assigned employee
+                var assignedEmployee = await _context.Employee
+                    .FirstOrDefaultAsync(
+                        x => x.EmployeeId == task.AssignedTo);
+
+                if (assignedEmployee != null &&
+                    !string.IsNullOrWhiteSpace(assignedEmployee.ApplicationUserId))
+                {
+                    // Fetch employee Identity account
+                    var assignedToUser = await _userManager.FindByIdAsync(
+                        assignedEmployee.ApplicationUserId);
+
+                    if (assignedToUser != null &&
+                        !string.IsNullOrWhiteSpace(assignedToUser.Email))
+                    {
+                        string templatePath = Path.Combine(
+                            _environment.WebRootPath,
+                            "EmailTemplates",
+                            "TaskAssigned.html");
+
+                        if (System.IO.File.Exists(templatePath))
+                        {
+                            string baseUrl =
+                                $"{Request.Scheme}://{Request.Host}";
+
+                            // Dynamic email values
+                            var replacements = new Dictionary<string, string>
+                            {
+                                ["BaseUrl"] = baseUrl,
+
+                                ["EmployeeName"] =
+                                    assignedEmployee.FirstName ?? "Employee",
+
+                                ["TaskTitle"] =
+                                    task.TaskName ?? string.Empty,
+
+                                ["TaskDescription"] =
+                                    task.TaskDescription ?? string.Empty,
+
+                                ["AssignedBy"] =
+                                    emp.FirstName ?? "Assigning Officer",
+
+                                ["AssignedDate"] =
+                                    task.CreatedOn == null
+                                        ? string.Empty
+                                        : Convert.ToDateTime(task.CreatedOn)
+                                            .ToString("dd-MM-yyyy"),
+
+                                ["DueDate"] =
+                                    task.Deadline == null
+                                        ? string.Empty
+                                        : Convert.ToDateTime(task.Deadline)
+                                            .ToString("dd-MM-yyyy")
+                            };
+
+                            string subject =
+                                "New Task Assigned - TSSC Task Management";
+
+                            string result = await _emailService.SendEmailAsync(
+                                assignedToUser.Email.Trim(),
+                                subject,
+                                templatePath,
+                                replacements);
+
+                            if (string.Equals(
+                                result?.Trim(),
+                                "True",
+                                StringComparison.OrdinalIgnoreCase))
+                            {
+                                emailSent = true;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    $"Task assignment email failed: {ex.Message}");
+            }
+            task.emailSent = emailSent;
+
+            await _context.SaveChangesAsync();
+
+            TempData["msg"] = emailSent
+                ? "Task Assigned Successfully. Email sent to employee."
+                : "Task Assigned Successfully, but email could not be sent.";
+          
             return RedirectToAction(nameof(TaskList));
         }
         [HttpGet]
