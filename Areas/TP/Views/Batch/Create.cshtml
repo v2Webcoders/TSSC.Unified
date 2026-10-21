@@ -1,136 +1,245 @@
 ﻿@using TSSC.Unified.ViewModel
-@model DepartmentVM
+@model BatchVM
 
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
     Layout = "_Layout";
-
-    bool isEdit = Model.DepartmentId > 0;
-
-    ViewData["Title"] = isEdit
-        ? "Edit Department"
-        : "Add Department";
+    ViewData["Title"] = "Create Batch";
 }
 
 <div class="nk-block-head">
     <div class="nk-block-between">
-
         <div class="nk-block-head-content">
-
-            <h3 class="nk-block-title page-title">
-                @(isEdit ? "Edit Department" : "Add Department")
-            </h3>
-
+            <h3 class="nk-block-title page-title">Create Batch</h3>
+            <div class="nk-block-des text-soft">
+                <p>Create a batch by selecting the scheme, project, center, job role, and trainer.</p>
+            </div>
         </div>
 
         <div class="nk-block-head-content">
-
             <a asp-action="Index"
-               asp-controller="Department"
-               asp-area="HRMS"
+               asp-controller="Batch"
+               asp-area="TP"
                class="btn btn-primary">
-
                 <em class="icon ni ni-list"></em>
-
-                <span>Departments</span>
-
+                <span>Batch List</span>
             </a>
-
         </div>
-
     </div>
 </div>
 
-
 <div class="card card-bordered">
-
     <div class="card-inner">
-
         <form asp-action="Create"
-              asp-controller="Department"
-              asp-area="HRMS"
-              method="post">
+              asp-controller="Batch"
+              asp-area="TP"
+              method="post"
+              enctype="multipart/form-data">
 
             @Html.AntiForgeryToken()
-
-            <input asp-for="DepartmentId"
-                   type="hidden" />
 
             <div asp-validation-summary="ModelOnly"
                  class="alert alert-danger"></div>
 
-
             <div class="row g-4">
 
-                <!-- Department Name -->
                 <div class="col-md-6">
+                    <label asp-for="BatchId" class="form-label">
+                        Batch ID <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="BatchId"
+                           class="form-control"
+                           placeholder="Enter unique Batch ID" />
+                    <span asp-validation-for="BatchId"
+                          class="text-danger"></span>
+                </div>
 
-                    <label class="form-label">
-                        Department Name
+                <div class="col-md-6">
+                    <label asp-for="SchemeId" class="form-label">
+                        Scheme <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="SchemeId"
+                            asp-items="Model.Schemes"
+                            class="form-select"
+                            id="SchemeId">
+                        <option value="">-- Select Scheme --</option>
+                    </select>
+                    <span asp-validation-for="SchemeId"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ProjectId" class="form-label">
+                        Project Name <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="ProjectId"
+                            asp-items="Model.Projects"
+                            class="form-select"
+                            id="ProjectId">
+                        <option value="">-- Select Project --</option>
+                    </select>
+                    <span asp-validation-for="ProjectId"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="JobRoleId" class="form-label">
+                        Job Role <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="JobRoleId"
+                            asp-items="Model.JobRoles"
+                            class="form-select"
+                            id="JobRoleId">
+                        <option value="">-- Select Job Role --</option>
+                    </select>
+                    <span asp-validation-for="JobRoleId"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="TrainingCenterId" class="form-label">
+                        Training Center <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="TrainingCenterId"
+                            asp-items="Model.Centers"
+                            class="form-select"
+                            id="TrainingCenterId">
+                        <option value="">-- Select Training Center --</option>
+                    </select>
+                    <span asp-validation-for="TrainingCenterId"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="TrainerRegistrationId" class="form-label">
+                        Trainer <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="TrainerRegistrationId"
+                            asp-items="Model.Trainers"
+                            class="form-select">
+                        <option value="">-- Select Trainer --</option>
+                    </select>
+                    <span asp-validation-for="TrainerRegistrationId"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="StartDate" class="form-label">
+                        Start Date <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="StartDate"
+                           type="date"
+                           class="form-control" />
+                    <span asp-validation-for="StartDate"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="EndDate" class="form-label">
+                        End Date <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="EndDate"
+                           type="date"
+                           class="form-control" />
+                    <span asp-validation-for="EndDate"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-12">
+                    <label asp-for="CandidateFile" class="form-label">
+                        Upload Candidates (Excel)
                         <span class="text-danger">*</span>
                     </label>
 
-                    <input asp-for="DepartmentName"
+                    <input asp-for="CandidateFile"
+                           type="file"
                            class="form-control"
-                           placeholder="Enter department name" />
+                           accept=".xlsx" />
 
-                    <span asp-validation-for="DepartmentName"
-                          class="text-danger"></span>
-
-                </div>
-
-
-                <!-- Status -->
-                <div class="col-md-6">
-
-                    <label class="form-label">
-                        Status
-                    </label>
-
-                    <select asp-for="IsActive"
-                            class="form-select">
-
-                        <option value="true">
-                            Active
-                        </option>
-
-                        <option value="false">
-                            Inactive
-                        </option>
-
-                    </select>
-
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <button type="submit"
-                                class="btn btn-primary">
-
-                            <em class="icon ni ni-save"></em>
-
-                            @(isEdit
-                                ?  " Update Department"
-                                :  " Save Department")
-
-                        </button>
+                    <div class="form-note">
+                        Upload an .xlsx file (maximum 5 MB).
+                        Required columns: CandidateName and MobileNumber.
+                        Email is optional.
                     </div>
+
+                    <span asp-validation-for="CandidateFile"
+                          class="text-danger"></span>
                 </div>
+
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary">
+                        <em class="icon ni ni-save"></em>
+                        Create Batch
+                    </button>
+
+                    <a asp-action="Index"
+                       asp-controller="Batch"
+                       asp-area="TP"
+                       class="btn btn-outline-light">
+                        Cancel
+                    </a>
+                </div>
+
             </div>
-
-
-           
-            
         </form>
-
     </div>
-
 </div>
-
 
 @section Scripts {
     @{
-        await Html.RenderPartialAsync(
-            "_ValidationScriptsPartial");
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        $(function () {
+            const scheme = $("#SchemeId");
+            const project = $("#ProjectId");
+            const jobRole = $("#JobRoleId");
+            const center = $("#TrainingCenterId");
+
+            function loadCenters() {
+                const schemeId = scheme.val();
+                const projectId = project.val();
+                const jobRoleId = jobRole.val();
+
+                center.empty().append(
+                    $("<option>", {
+                        value: "",
+                        text: "-- Select Training Center --"
+                    })
+                );
+
+                if (!schemeId || !projectId || !jobRoleId) {
+                    return;
+                }
+
+                $.getJSON(
+                    '@Url.Action("GetCenters", "Batch", new { area = "TP" })',
+                    {
+                        schemeId: schemeId,
+                        projectId: projectId,
+                        jobRoleId: jobRoleId
+                    }
+                )
+                .done(function (data) {
+                    $.each(data, function (_, item) {
+                        center.append(
+                            $("<option>", {
+                                value: item.value,
+                                text: item.text
+                            })
+                        );
+                    });
+                })
+                .fail(function () {
+                    console.error("Unable to load training centers.");
+                });
+            }
+
+            scheme.on("change", loadCenters);
+            project.on("change", loadCenters);
+            jobRole.on("change", loadCenters);
+        });
+    </script>
 }

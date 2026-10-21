@@ -9,20 +9,20 @@ namespace TSSC.Unified.Models
         [Required, StringLength(50)]
         public string BatchId { get; set; } = string.Empty;
 
-        [Required, StringLength(150)]
-        public string Scheme { get; set; } = string.Empty;
+        [Required]
+        public int SchemeId { get; set; }
 
-        [Required, StringLength(200)]
-        public string ProjectName { get; set; } = string.Empty;
+        [Required]
+        public int ProjectId { get; set; }
 
-        [Required, StringLength(200)]
-        public string Center { get; set; } = string.Empty;
+        [Required]
+        public int TrainingCenterId { get; set; }
 
-        [Required, StringLength(200)]
-        public string JobRole { get; set; } = string.Empty;
+        [Required]
+        public int JobRoleId { get; set; }
 
-        [Required, StringLength(150)]
-        public string Trainer { get; set; } = string.Empty;
+        [Required]
+        public int TrainerRegistrationId { get; set; }
 
         [Required, DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
@@ -30,8 +30,7 @@ namespace TSSC.Unified.Models
         [Required, DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 
-        // Identity user ID of the Training Partner who owns this batch.
-        [Required]
+        [Required, StringLength(450)]
         public string TPUserId { get; set; } = string.Empty;
 
         [Required, StringLength(30)]
