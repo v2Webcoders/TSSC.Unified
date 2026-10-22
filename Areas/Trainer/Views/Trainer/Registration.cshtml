@@ -378,7 +378,7 @@
 
                     <!-- CITY -->
 
-                    <div class="field">
+                   @*  <div class="field">
 
                         <label asp-for="CityId">
                             City
@@ -399,8 +399,18 @@
                               class="text-danger">
                         </span>
 
-                    </div>
+                    </div> *@
+                    <div class="field">
+    <label asp-for="City" class="form-label">City</label>
 
+    <input asp-for="City"
+           type="text"
+           class="form-control"
+           placeholder="Enter City" />
+
+    <span asp-validation-for="City"
+          class="text-danger"></span>
+</div>
 
                     <!-- PINCODE -->
 
@@ -1115,7 +1125,8 @@
                         <input asp-for="AadhaarFile"
                                type="file"
                                class="pdf-file"
-                               accept=".pdf,application/pdf" />
+                               accept=".pdf,application/pdf" 
+                               required/>
 
                         <span asp-validation-for="AadhaarFile"
                               class="text-danger">
@@ -1136,7 +1147,8 @@
                         <input asp-for="PanCardFile"
                                type="file"
                                class="pdf-file"
-                               accept=".pdf,application/pdf" />
+                               accept=".pdf,application/pdf"
+                               required/>
 
                         <span asp-validation-for="PanCardFile"
                               class="text-danger">
@@ -3031,6 +3043,169 @@
 
         });
 
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("trainerForm");
+
+            if (!form) return;
+
+            let isSubmitting = false;
+
+            function showErrors(errors) {
+                const summaries = document.querySelectorAll(
+                    '[data-valmsg-summary="true"]'
+                );
+
+                const errorList =
+                    Array.isArray(errors) && errors.length
+                        ? errors
+                        : [{
+                            field: "",
+                            message: "Please check the form and try again."
+                        }];
+
+                summaries.forEach(function (summary) {
+                    const ul = document.createElement("ul");
+
+                    errorList.forEach(function (error) {
+                        const li = document.createElement("li");
+                        li.textContent = error.message || "Invalid value.";
+                        ul.appendChild(li);
+                    });
+
+                    summary.replaceChildren(ul);
+                    summary.classList.remove("validation-summary-valid");
+                    summary.classList.add("validation-summary-errors");
+                });
+
+                errorList.forEach(function (error) {
+                    if (!error.field) return;
+
+                    const field = form.elements.namedItem(error.field);
+
+                    if (field && field.classList) {
+                        field.classList.add("input-validation-error");
+                        field.closest(".accordion")?.classList.add("open");
+                    }
+
+                    form.querySelectorAll("[data-valmsg-for]").forEach(
+                        function (span) {
+                            if (span.getAttribute("data-valmsg-for") === error.field) {
+                                span.textContent = error.message || "";
+                                span.classList.add("field-validation-error");
+                            }
+                        }
+                    );
+                });
+
+                const invalidField = form.querySelector(
+                    ".input-validation-error"
+                );
+
+                if (invalidField) {
+                    invalidField.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+                }
+            }
+
+            // Capture the form submit before normal browser submission.
+            form.addEventListener("submit", async function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (isSubmitting) return;
+
+                // Client-side validation
+                if (
+                    window.jQuery &&
+                    typeof window.jQuery.fn.valid === "function"
+                ) {
+                    const $form = window.jQuery(form);
+                    const validator = $form.data("validator");
+
+                    if (validator) {
+                        validator.settings.ignore = [];
+                    }
+
+                    if (!$form.valid()) {
+                        const invalidField = form.querySelector(
+                            ".input-validation-error"
+                        );
+
+                        if (invalidField) {
+                            invalidField.closest(".accordion")
+                                ?.classList.add("open");
+
+                            invalidField.focus({ preventScroll: true });
+                            invalidField.scrollIntoView({
+                                behavior: "smooth",
+                                block: "center"
+                            });
+                        }
+
+                        return;
+                    }
+                } else if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                isSubmitting = true;
+
+                const button = form.querySelector('button[type="submit"]');
+
+                if (button) button.disabled = true;
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: "POST",
+                        body: new FormData(form),
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest",
+                            "Accept": "application/json"
+                        }
+                    });
+
+                    const contentType =
+                        response.headers.get("content-type") || "";
+
+                    if (!contentType.includes("application/json")) {
+                        throw new Error(
+                            "Server returned HTML instead of JSON. Check the POST controller."
+                        );
+                    }
+
+                    const result = await response.json();
+
+                    if (
+                        response.ok &&
+                        result.success &&
+                        result.redirectUrl
+                    ) {
+                        window.location.assign(result.redirectUrl);
+                        return;
+                    }
+
+                    showErrors(result.errors || []);
+                } catch (error) {
+                    console.error("Registration submission error:", error);
+
+                    showErrors([{
+                        field: "",
+                        message:
+                            "Could not submit the form. Your selected documents should remain in place. Please try again."
+                    }]);
+                } finally {
+                    isSubmitting = false;
+
+                    if (button) button.disabled = false;
+                }
+            }, true);
+        });
     </script>
 
 }

@@ -62,9 +62,9 @@ namespace TSSC.Unified.ViewModel
         public List<SelectListItem> DistrictList { get; set; }
         = new List<SelectListItem>();
         [Required(ErrorMessage = "Please select City.")]
-        public int? CityId { get; set; }
-        public List<SelectListItem> CityList { get; set; }
-        = new List<SelectListItem>();
+        public string? City{ get; set; }
+        //public List<SelectListItem> CityList { get; set; }
+        //= new List<SelectListItem>();
         [Required(ErrorMessage = "Pincode is required.")]
         [RegularExpression(
             @"^\d{6}$",

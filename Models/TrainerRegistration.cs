@@ -45,7 +45,7 @@ namespace TSSC.Unified.Models
 
             public int? DistrictId { get; set; }
 
-            public int? CityId { get; set; }
+            public string? City { get; set; }
 
             [MaxLength(10)]
             public string? Pincode { get; set; }
