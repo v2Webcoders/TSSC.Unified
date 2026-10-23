@@ -125,6 +125,7 @@ namespace TSSC.Unified.Models
         public string? CertificateFilePath { get; set; }
 
         public DateTime? FinanceApprovedDate { get; set; }
+        public string? FinanceReferenceNo { get; set; }
         // Child Records
         public ICollection<TrainerRegistrationQualification>
                 Qualifications

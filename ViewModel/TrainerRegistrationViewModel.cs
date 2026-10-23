@@ -33,6 +33,7 @@ namespace TSSC.Unified.ViewModel
         public bool FinanceApproved { get; set; }
 
         public DateTime? FinanceApprovedDate { get; set; }
+        public string? FinanceReferenceNo { get; set; }
         public List<SelectListItem> JobRoleList { get; set; }
             = new List<SelectListItem>();
 
