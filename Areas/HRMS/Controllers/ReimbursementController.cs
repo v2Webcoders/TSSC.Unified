@@ -1274,12 +1274,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                     ManagerRemarks = x.ManagerRemarks,
                     ManagerApprovedOn = x.ManagerApprovedOn,
-
-
                     CreatedOn = x.CreatedOn
-                    
-
-
                 })
                 .ToListAsync();
 
