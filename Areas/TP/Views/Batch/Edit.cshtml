@@ -1,0 +1,173 @@
+﻿@using TSSC.Unified.ViewModel
+@model EditBatchVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Edit Batch";
+    Layout = "_Layout";
+}
+
+<div class="nk-content">
+    <div class="container-fluid">
+
+        <div class="nk-block-head nk-block-head-sm">
+            <div class="nk-block-between">
+                <div class="nk-block-head-content">
+                    <h3 class="nk-block-title page-title">Edit Batch</h3>
+                    <div class="nk-block-des text-soft">
+                        <p>Update batch details below.</p>
+                    </div>
+                </div>
+
+                <div class="nk-block-head-content">
+                    <a asp-action="Index"
+                       class="btn btn-outline-light">
+                        <em class="icon ni ni-arrow-left"></em>
+                        <span>Back to Batches</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="nk-block">
+            <div class="card card-bordered">
+                <div class="card-inner">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" asp-for="Id" />
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger"></div>
+
+                        <div class="row g-4">
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="BatchId" class="form-label"></label>
+                                    <input asp-for="BatchId" class="form-control" />
+                                    <span asp-validation-for="BatchId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="SchemeId" class="form-label"></label>
+                                    <select asp-for="SchemeId" asp-items="Model.Schemes" class="form-select">
+                                        <option value="">Select Scheme</option>
+                                    </select>
+                                    <span asp-validation-for="SchemeId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="ProjectId" class="form-label"></label>
+                                    <select asp-for="ProjectId" asp-items="Model.Projects" class="form-select">
+                                        <option value="">Select Project</option>
+                                    </select>
+                                    <span asp-validation-for="ProjectId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="TrainingCenterId" class="form-label"></label>
+                                    <select asp-for="TrainingCenterId"
+                                            asp-items="Model.TrainingCenters" class="form-select">
+                                        <option value="">Select Training Center</option>
+                                    </select>
+                                    <span asp-validation-for="TrainingCenterId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="JobRoleId" class="form-label"></label>
+                                    <select asp-for="JobRoleId" asp-items="Model.JobRoles" class="form-select">
+                                        <option value="">Select Job Role</option>
+                                    </select>
+                                    <span asp-validation-for="JobRoleId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="TrainerRegistrationId" class="form-label"></label>
+                                    <select asp-for="TrainerRegistrationId"
+                                            asp-items="Model.Trainers" class="form-select">
+                                        <option value="">Select Trainer</option>
+                                    </select>
+                                    <span asp-validation-for="TrainerRegistrationId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="StartDate" class="form-label"></label>
+                                    <input asp-for="StartDate" type="date"
+                                           asp-format="{0:yyyy-MM-dd}" class="form-control" />
+                                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="EndDate" class="form-label"></label>
+                                    <input asp-for="EndDate" type="date"
+                                           asp-format="{0:yyyy-MM-dd}" class="form-control" />
+                                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label asp-for="CandidateFile" class="form-label"></label>
+
+                                    <input asp-for="CandidateFile"
+                                           type="file"
+                                           class="form-control"
+                                           accept=".xlsx" />
+
+                                    <span asp-validation-for="CandidateFile"
+                                          class="text-danger"></span>
+
+                                    <div class="form-note">
+                                        Optional. Upload an Excel (.xlsx) file, maximum 5 MB,
+                                        to replace the candidate list for this batch.
+                                        Candidates missing from the file will be unenrolled
+                                        from this batch only.
+                                    </div>
+                                    <div class="mt-2">
+                                        <a asp-controller="Batch"
+                                           asp-action="DownloadCandidateSample"
+                                           class="link-primary">
+                                            <em class="icon ni ni-download"></em>
+                                            Download Sample Excel Format
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">
+                                        <em class="icon ni ni-save"></em>
+                                        Update Batch
+                                    </button>
+
+                                    <a asp-action="Index" class="btn btn-light">Cancel</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

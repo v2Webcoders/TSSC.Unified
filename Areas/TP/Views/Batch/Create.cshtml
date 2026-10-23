@@ -162,7 +162,14 @@
                         Required columns: CandidateName and MobileNumber.
                         Email is optional.
                     </div>
-
+                    <div class="mt-2">
+                        <a asp-controller="Batch"
+                           asp-action="DownloadCandidateSample"
+                           class="link-primary">
+                            <em class="icon ni ni-download"></em>
+                            Download Sample Excel Format
+                        </a>
+                    </div>
                     <span asp-validation-for="CandidateFile"
                           class="text-danger"></span>
                 </div>

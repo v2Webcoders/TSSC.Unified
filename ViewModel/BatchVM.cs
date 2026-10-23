@@ -58,4 +58,29 @@ namespace TSSC.Unified.ViewModel
         }
     }
 
+    public class BatchIndexVM
+    {
+        public int Id { get; set; }
+
+        public string BatchId { get; set; } = string.Empty;
+
+        public DateTime StartDate { get; set; }
+
+        public DateTime EndDate { get; set; }
+
+        public string Status { get; set; } = string.Empty;
+
+        public DateTime CreatedOn { get; set; }
+
+        public int CandidateCount { get; set; }
+
+        public string? SchemeName { get; set; }
+
+        public string? CenterName { get; set; }
+
+        public string? JobRoleName { get; set; }
+        public string? TrainerName { get; set; }
+        public string? ProjectName { get; set; }
+    }
+
 }

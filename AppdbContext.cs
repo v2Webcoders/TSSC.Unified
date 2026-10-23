@@ -100,8 +100,8 @@ namespace QUIZAPP
         public DbSet<TrainingCenter> TrainingCenter { get; set; }
 
         public DbSet<Batch> Batches { get; set; }
-           
+        public DbSet<Candidate> Candidates { get; set; }
         public DbSet<BatchCandidate> BatchCandidates { get; set; }
-           
+        public DbSet<Project> Project { get; set; }
     }
 }
