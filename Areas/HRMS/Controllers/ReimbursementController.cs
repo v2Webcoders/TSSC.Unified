@@ -1275,13 +1275,11 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     ManagerRemarks = x.ManagerRemarks,
                     ManagerApprovedOn = x.ManagerApprovedOn,
 
-<<<<<<< HEAD
+
                     CreatedOn = x.CreatedOn
                     
-=======
-                    CreatedOn = x.CreatedOn,
-                    PaymentStatus = x.PaymentStatus
->>>>>>> origin/laxmi
+
+
                 })
                 .ToListAsync();
 
