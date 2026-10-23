@@ -146,6 +146,8 @@ namespace TSSC.Unified.ViewModel
         public DateTime CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
         public bool IsActive { get; set; }
+        public string? OfficialEmail { get; set; }
+        public string PaymentStatus { get; set; } = "Pending";
 
         // DropdownsctListItem> RequestTypeList { get; set; }
         public List<SelectListItem> ExpenseCategoryList { get; set; }

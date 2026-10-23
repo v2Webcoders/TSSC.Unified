@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.InkML;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -58,10 +59,92 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     x => x.TrainerRegistrationId,
                     x => x);
 
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            var employee = currentUser != null
+                ? await _context.Employee.FirstOrDefaultAsync(
+                    x => x.ApplicationUserId == currentUser.Id)
+                : null;
+
+            bool isReportingManager = employee != null &&
+                await _context.Employee.AnyAsync(
+                    x => x.ReportingManagerId == employee.EmployeeId);
+
+            // IMPORTANT: Pass manager status to the View
+            ViewBag.IsReportingManager = isReportingManager;
+
+            if (isReportingManager)
+            {
+                var requestedTrainerIds = latestScreenings
+                    .Where(x =>
+                        x.ResultRequested &&
+                        string.Equals(
+                            x.Status,
+                            "Scheduled",
+                            StringComparison.OrdinalIgnoreCase))
+                    .Select(x => x.TrainerRegistrationId)
+                    .ToHashSet();
+
+                registrations = registrations
+                    .Where(x => requestedTrainerIds.Contains(x.Id))
+                    .ToList();
+            }
+
             ViewBag.LatestScreenings = screeningDictionary;
 
             return View(registrations);
         }
+        //[HttpGet]
+        //public async Task<IActionResult> RegistrationList()
+        //{
+        //    var registrations = await _context.TrainerRegistration
+        //        .AsNoTracking()
+        //        .OrderByDescending(x => x.Id)
+        //        .ToListAsync();
+
+        //    var latestScreenings = await _context.ScreeningSchedule
+        //        .AsNoTracking()
+        //        .GroupBy(x => x.TrainerRegistrationId)
+        //        .Select(g => g
+        //            .OrderByDescending(x => x.Id)
+        //            .First())
+        //        .ToListAsync();
+
+        //    var screeningDictionary = latestScreenings
+        //        .ToDictionary(
+        //            x => x.TrainerRegistrationId,
+        //            x => x);
+        //    var currentUser = await _userManager.GetUserAsync(User);
+
+        //    var employee = currentUser != null
+        //        ? await _context.Employee.FirstOrDefaultAsync(
+        //            x => x.ApplicationUserId == currentUser.Id)
+        //        : null;
+
+        //    bool isReportingManager = employee != null &&
+        //        await _context.Employee.AnyAsync(
+        //            x => x.ReportingManagerId == employee.EmployeeId);
+
+        //    if (isReportingManager)
+        //    {
+        //        var requestedTrainerIds = latestScreenings
+        //            .Where(x =>
+        //                x.ResultRequested &&
+        //                string.Equals(
+        //                    x.Status,
+        //                    "Scheduled",
+        //                    StringComparison.OrdinalIgnoreCase))
+        //            .Select(x => x.TrainerRegistrationId)
+        //            .ToHashSet();
+
+        //        registrations = registrations
+        //            .Where(x => requestedTrainerIds.Contains(x.Id))
+        //            .ToList();
+        //    }
+        //    ViewBag.LatestScreenings = screeningDictionary;
+
+        //    return View(registrations);
+        //}
         public async Task<IActionResult> Details(int id)
         {
             var registration = await _context.TrainerRegistration
@@ -454,371 +537,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             return View(model);
         }
-        //[HttpGet]
-        //public async Task<IActionResult> GetBatchTrainersForScreening(int batchId)
-        //{
-        //    var trainers = await _context.BatchMasterTrainers
-        //        .AsNoTracking()
-        //        .Where(x => x.BatchId == batchId)
-        //        .OrderBy(x => x.TrainerRegistration.CandidateName)
-        //        .Select(x => new
-        //        {
-        //            id = x.TrainerRegistrationId,
-        //            registrationNo = x.TrainerRegistration.RegistrationNo,
-        //            trainerName = x.TrainerRegistration.CandidateName,
-        //            email = x.TrainerRegistration.Email,
-        //            mobile = x.TrainerRegistration.Mobile
-        //        })
-        //        .ToListAsync();
-
-        //    return Json(trainers);
-        //}
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> CreateScreening(ScreeningScheduleVM model)
-        //{
-        //    // =====================================================
-        //    // LOAD DROPDOWNS
-        //    // =====================================================
-        //    async Task LoadDropdowns()
-        //    {
-        //        model.BatchList = await _context.BatchMaster
-        //            .AsNoTracking()
-        //            .Where(x => x.Status == "Active")
-        //            .OrderByDescending(x => x.Id)
-        //            .Select(x => new SelectListItem
-        //            {
-        //                Value = x.Id.ToString(),
-        //                Text = x.BatchName
-        //            })
-        //            .ToListAsync();
-
-        //        model.TrainerList = new List<SelectListItem>();
-
-        //        if (model.BatchId.HasValue)
-        //        {
-        //            model.TrainerList = await _context.BatchMasterTrainers
-        //                .AsNoTracking()
-        //                .Include(x => x.TrainerRegistration)
-        //                .Where(x => x.BatchId == model.BatchId.Value)
-        //                .OrderBy(x => x.TrainerRegistration.CandidateName)
-        //                .Select(x => new SelectListItem
-        //                {
-        //                    Value = x.TrainerRegistrationId.ToString(),
-        //                    Text = x.TrainerRegistration.CandidateName
-        //                           + " (" +
-        //                           x.TrainerRegistration.RegistrationNo +
-        //                           ")"
-        //                })
-        //                .ToListAsync();
-        //        }
-        //    }
-
-
-        //    // =====================================================
-        //    // 1. MODEL VALIDATION
-        //    // =====================================================
-        //    if (!ModelState.IsValid)
-        //    {
-        //        await LoadDropdowns();
-        //        return View(model);
-        //    }
-
-
-        //    // =====================================================
-        //    // 2. CHECK BATCH + TRAINER MAPPING
-        //    // =====================================================
-        //    var batchTrainer = await _context.BatchMasterTrainers
-        //        .AsNoTracking()
-        //        .Include(x => x.Batch)
-        //        .Include(x => x.TrainerRegistration)
-        //        .FirstOrDefaultAsync(x =>
-        //            x.BatchId == model.BatchId!.Value &&
-        //            x.TrainerRegistrationId == model.TrainerRegistrationId!.Value
-        //        );
-
-        //    if (batchTrainer == null)
-        //    {
-        //        ModelState.AddModelError(
-        //            "TrainerRegistrationId",
-        //            "Selected trainer is not assigned to the selected batch."
-        //        );
-
-        //        await LoadDropdowns();
-        //        return View(model);
-        //    }
-
-
-        //    // =====================================================
-        //    // 3. GET TRAINER + BATCH
-        //    // =====================================================
-        //    var trainer = batchTrainer.TrainerRegistration;
-        //    var batch = batchTrainer.Batch;
-
-
-        //    // =====================================================
-        //    // 4. DATE / TIME VALIDATION
-        //    // =====================================================
-        //    if (model.EndTime.HasValue &&
-        //        model.EndTime.Value <= model.StartTime!.Value)
-        //    {
-        //        ModelState.AddModelError(
-        //            "EndTime",
-        //            "End Time must be greater than Start Time."
-        //        );
-
-        //        await LoadDropdowns();
-        //        return View(model);
-        //    }
-
-
-        //    // =====================================================
-        //    // 5. ONLINE VALIDATION
-        //    // =====================================================
-        //    if (model.ScreeningMode == "Online" &&
-        //        string.IsNullOrWhiteSpace(model.MeetingLink))
-        //    {
-        //        ModelState.AddModelError(
-        //            "MeetingLink",
-        //            "Meeting Link is required for online screening."
-        //        );
-
-        //        await LoadDropdowns();
-        //        return View(model);
-        //    }
-
-
-        //    // =====================================================
-        //    // 6. OFFLINE VALIDATION
-        //    // =====================================================
-        //    if (model.ScreeningMode == "Offline" &&
-        //        string.IsNullOrWhiteSpace(model.Location))
-        //    {
-        //        ModelState.AddModelError(
-        //            "Location",
-        //            "Location is required for offline screening."
-        //        );
-
-        //        await LoadDropdowns();
-        //        return View(model);
-        //    }
-
-
-        //    // =====================================================
-        //    // 7. DUPLICATE SCREENING CHECK
-        //    // =====================================================
-        //    var alreadyScheduled = await _context.ScreeningSchedule
-        //        .AnyAsync(x =>
-        //            x.BatchId == model.BatchId.Value &&
-        //            x.TrainerRegistrationId == model.TrainerRegistrationId.Value &&
-        //            x.ScreeningDate == model.ScreeningDate.Value &&
-        //            x.StartTime == model.StartTime.Value &&
-        //            x.Status != "Cancelled"
-        //        );
-
-        //    if (alreadyScheduled)
-        //    {
-        //        TempData["error"] =
-        //            "Screening is already scheduled for this trainer on the selected date and time.";
-
-        //        await LoadDropdowns();
-        //        return View(model);
-        //    }
-
-
-        //    // =====================================================
-        //    // 8. CREATE SCREENING
-        //    // =====================================================
-        //    var screening = new ScreeningSchedule
-        //    {
-        //        BatchId = model.BatchId.Value,
-
-        //        TrainerRegistrationId =
-        //            model.TrainerRegistrationId.Value,
-
-        //        ScreeningDate =
-        //            model.ScreeningDate.Value,
-
-        //        StartTime =
-        //            model.StartTime.Value,
-
-        //        EndTime =
-        //            model.EndTime,
-
-        //        ScreeningMode =
-        //            model.ScreeningMode?.Trim(),
-
-        //        Location =
-        //            model.ScreeningMode == "Offline"
-        //                ? model.Location?.Trim()
-        //                : null,
-
-        //        MeetingLink =
-        //            model.ScreeningMode == "Online"
-        //                ? model.MeetingLink?.Trim()
-        //                : null,
-
-        //        Status = "Scheduled",
-
-        //        Remarks =
-        //            string.IsNullOrWhiteSpace(model.Remarks)
-        //                ? null
-        //                : model.Remarks.Trim(),
-
-        //        CreatedDate = DateTime.Now
-        //    };
-
-        //    _context.ScreeningSchedule.Add(screening);
-
-        //    await _context.SaveChangesAsync();
-
-
-        //    // =====================================================
-        //    // 9. SEND EMAIL TO TRAINER
-        //    // =====================================================
-        //    if (trainer != null &&
-        //        !string.IsNullOrWhiteSpace(trainer.Email))
-        //    {
-        //        try
-        //        {
-        //            string templatePath = Path.Combine(
-        //                _environment.WebRootPath,
-        //                "EmailTemplates",
-        //                "TrainerScreeningSchedule.html"
-        //            );
-
-        //            string baseUrl =
-        //                $"{Request.Scheme}://{Request.Host}";
-
-
-        //            // ---------------------------------------------
-        //            // EMAIL REPLACEMENTS
-        //            // ---------------------------------------------
-        //            var replacements =
-        //                new Dictionary<string, string>
-        //                {
-        //            {
-        //                "BaseUrl",
-        //                baseUrl
-        //            },
-
-        //            {
-        //                "TrainerName",
-        //                trainer.CandidateName ?? ""
-        //            },
-
-        //            {
-        //                "RegistrationNo",
-        //                trainer.RegistrationNo ?? ""
-        //            },
-
-        //            {
-        //                "BatchName",
-        //                batch?.BatchName ?? ""
-        //            },
-
-        //            {
-        //                "ScreeningDate",
-        //                model.ScreeningDate.Value
-        //                    .ToString("dd-MM-yyyy")
-        //            },
-
-        //            {
-        //                "StartTime",
-        //                model.StartTime.Value
-        //                    .ToString(@"hh\:mm")
-        //            },
-
-        //            {
-        //                "EndTime",
-        //                model.EndTime.HasValue
-        //                    ? model.EndTime.Value
-        //                        .ToString(@"hh\:mm")
-        //                    : "N/A"
-        //            },
-
-        //            {
-        //                "ScreeningMode",
-        //                model.ScreeningMode ?? ""
-        //            },
-
-        //            {
-        //                "Location",
-        //                model.ScreeningMode == "Offline"
-        //                    ? model.Location ?? ""
-        //                    : ""
-        //            },
-
-        //            {
-        //                "MeetingLink",
-        //                model.ScreeningMode == "Online"
-        //                    ? model.MeetingLink ?? ""
-        //                    : ""
-        //            },
-
-        //            {
-        //                "Remarks",
-        //                string.IsNullOrWhiteSpace(model.Remarks)
-        //                    ? "N/A"
-        //                    : model.Remarks.Trim()
-        //            }
-        //                };
-
-
-        //            // ---------------------------------------------
-        //            // SEND EMAIL
-        //            // ---------------------------------------------
-        //            string result =
-        //                await _emailService.SendEmailAsync(
-        //                    trainer.Email,
-        //                    "Trainer Screening Scheduled - TSSC",
-        //                    templatePath,
-        //                    replacements
-        //                );
-
-
-        //            if (result == "True")
-        //            {
-        //                screening.EmailSent = true;
-
-        //                await _context.SaveChangesAsync();
-
-        //                _logger.LogInformation(
-        //                    "Screening email sent successfully to {Email}",
-        //                    trainer.Email
-        //                );
-        //            }
-        //            else
-        //            {
-        //                _logger.LogError(
-        //                    "Screening email failed for {Email}. Error: {Error}",
-        //                    trainer.Email,
-        //                    result
-        //                );
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            // Screening is already saved.
-        //            // Do NOT rollback screening because of email failure.
-
-        //            _logger.LogError(
-        //                ex,
-        //                "Unable to send screening schedule email to {Email}",
-        //                trainer.Email
-        //            );
-        //        }
-        //    }
-
-
-        //    // =====================================================
-        //    // 10. SUCCESS
-        //    // =====================================================
-        //    TempData["msg"] =
-        //        "Screening scheduled successfully.";
-
-        //    return RedirectToAction(nameof(BatchList));
-        //}
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateScreening(ScreeningScheduleVM model)
@@ -1298,8 +1017,9 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             var query = _context.TrainerRegistration
                 .AsNoTracking()
                 .Where(x =>
-                    x.PaymentStatus == "Success" &&
-                    x.PaymentVerified);
+                    x.PaymentStatus == "Success" 
+                    //&& x.PaymentVerified
+                    );
 
             if (string.Equals(tab, "Approved", StringComparison.OrdinalIgnoreCase))
             {
@@ -1328,7 +1048,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                     PaymentStatus = x.PaymentStatus,
                     PaymentDate = x.PaymentDate,
-                    PaymentVerified = x.PaymentVerified,
+                    //PaymentVerified = x.PaymentVerified,
                     FinanceApproved = x.FinanceApproved,
                     FinanceApprovedDate = x.FinanceApprovedDate
                 })
@@ -1341,7 +1061,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ApprovePayment(int id)
+        public async Task<IActionResult> ApprovePayment(int id, string FinanceReferenceNo)
         {
             var trainer = await _context.TrainerRegistration
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -1355,7 +1075,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     new { tab = "Pending" });
             }
 
-            if (!trainer.PaymentVerified ||
+            if (/*!trainer.PaymentVerified ||*/
                 !string.Equals(
                     trainer.PaymentStatus,
                     "Success",
@@ -1372,6 +1092,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             trainer.FinanceApproved = true;
             trainer.FinanceApprovedDate = DateTime.Now;
             trainer.UpdatedDate = DateTime.Now;
+            trainer.FinanceReferenceNo = FinanceReferenceNo;
 
             await _context.SaveChangesAsync();
 
@@ -1984,6 +1705,37 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     batchId = batchMapping.BatchId
                 });
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RequestScreeningResult(int id)
+        {
+            var screening = await _context.ScreeningSchedule
+                .FirstOrDefaultAsync(x => x.Id == id);
 
+            if (screening == null)
+                return NotFound();
+
+            if (!string.Equals(
+                screening.Status,
+                "Scheduled",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["error"] = "This screening is not available for result request.";
+                return RedirectToAction(nameof(RegistrationList));
+            }
+
+            if (screening.ResultRequested)
+            {
+                TempData["msg"] = "Result request has already been sent.";
+                return RedirectToAction(nameof(RegistrationList));
+            }
+
+            screening.ResultRequested = true;
+            await _context.SaveChangesAsync();
+
+            TempData["msg"] = "Result request sent to Manager successfully.";
+
+            return RedirectToAction(nameof(RegistrationList));
+        }
     }
 }

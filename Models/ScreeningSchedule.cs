@@ -43,7 +43,7 @@ namespace TSSC.Unified.Models
 
         public DateTime? UpdatedDate { get; set; }
         public bool EmailSent { get; set; } = false;
-
+        public bool ResultRequested { get; set; } = false;
         // Navigation Properties
 
         //[ForeignKey(nameof(BatchId))]

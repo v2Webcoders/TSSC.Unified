@@ -85,5 +85,6 @@ public class Reimbursement
         public DateTime? UpdatedOn { get; set; }
 
         public bool IsActive { get; set; }
+        public string PaymentStatus { get; set; } = "Pending";
     }
 }

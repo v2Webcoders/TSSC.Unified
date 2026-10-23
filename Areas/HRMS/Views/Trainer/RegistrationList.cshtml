@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TSSC.Unified.Models.TrainerRegistration>
+@model IEnumerable<TSSC.Unified.Models.TrainerRegistration>
 
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
@@ -10,6 +10,8 @@
         ViewBag.LatestScreenings
         as Dictionary<int, TSSC.Unified.Models.ScreeningSchedule>
         ?? new Dictionary<int, TSSC.Unified.Models.ScreeningSchedule>();
+    bool isReportingManager =
+ViewBag.IsReportingManager is bool value && value;
 }
 
 <div class="nk-block-head nk-block-head-sm">
@@ -271,34 +273,53 @@
                                         "Scheduled",
                                         StringComparison.OrdinalIgnoreCase))
                                         {
-                                            var screeningEndDateTime =
-                                            screening.ScreeningDate.Date
-                                            .Add(screening.EndTime ?? screening.StartTime);
-
-                                            if (DateTime.Now >= screeningEndDateTime)
+                                            @if (isReportingManager)
                                             {
-                                                <!-- UPDATE RESULT -->
-                                                <button type="button"
-                                                        class="btn btn-sm btn-outline-success"
-                                                        title="Update Screening Result"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#screeningResultModal_@item.Id">
-
-                                                    <em class="icon ni ni-check-circle"></em>
-
-                                                </button>
+                                                @if (screening.ResultRequested)
+                                                {
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-success"
+                                                            title="Approve Screening Result"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#screeningResultModal_@item.Id">
+                                                        <em class="icon ni ni-check-circle"></em>
+                                                        Update Result
+                                                    </button>
+                                                }
                                             }
                                             else
                                             {
-                                                <!-- SCREENING SCHEDULED -->
-                                                <button type="button"
-                                                        class="btn btn-sm btn-outline-warning"
-                                                        title="Screening Scheduled"
-                                                        disabled>
+                                                @if (screening.ResultRequested)
+                                                {
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-warning"
+                                                            disabled>
+                                                        <em class="icon ni ni-clock"></em>
+                                                        Requested
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <form method="post"
+                                                          asp-area="HRMS"
+                                                          asp-controller="Trainer"
+                                                          asp-action="RequestScreeningResult"
+                                                          class="d-inline">
 
-                                                    <em class="icon ni ni-clock"></em>
+                                                        @Html.AntiForgeryToken()
 
-                                                </button>
+                                                        <input type="hidden"
+                                                               name="id"
+                                                               value="@screening.Id" />
+
+                                                        <button type="submit"
+                                                                class="btn btn-sm btn-outline-primary"
+                                                                onclick="return confirm('Send this screening result request to the manager?');">
+                                                            <em class="icon ni ni-send"></em>
+                                                            Request Result
+                                                        </button>
+                                                    </form>
+                                                }
                                             }
                                         }
                                         else
@@ -342,7 +363,7 @@
                             serial++;
                         }
                     }
-                    else
+                    @* else
                     {
                         <tr>
 
@@ -354,11 +375,17 @@
                             </td>
 
                         </tr>
-                    }
+                    } *@
 
                 </tbody>
 
             </table>
+        </div>
+
+    </div>
+
+</div>
+
             @foreach (var item in Model)
             {
                 if (latestScreenings.TryGetValue(
@@ -369,12 +396,6 @@
                 "Scheduled",
                 StringComparison.OrdinalIgnoreCase))
                 {
-                    var screeningEndDateTime =
-                    screening.ScreeningDate.Date
-                    .Add(screening.EndTime ?? screening.StartTime);
-
-                    if (DateTime.Now >= screeningEndDateTime)
-                    {
                         <div class="modal fade"
                              id="screeningResultModal_@item.Id"
                              tabindex="-1"
@@ -559,11 +580,31 @@
                             </div>
 
                         </div>
-                    }
                 }
             }
-        </div>
 
-    </div>
+<script>
+    function handleScreeningResultClick(button) {
+        // First click: change the text button into the green result icon.
+        if (button.dataset.resultIcon !== 'true') {
+            button.dataset.resultIcon = 'true';
+            button.classList.remove('btn-outline-primary');
+            button.classList.add('btn-outline-success');
+            button.title = 'Update Screening Result';
+            button.innerHTML = '<em class="icon ni ni-check-circle"></em>';
+            return;
+        }
 
-</div>
+        // Second click: open this trainer's screening result modal.
+        const modalSelector = button.getAttribute('data-result-modal');
+        const modalElement = document.querySelector(modalSelector);
+
+        if (modalElement && window.bootstrap && window.bootstrap.Modal) {
+            window.bootstrap.Modal.getOrCreateInstance(modalElement).show();
+        } else if (!modalElement) {
+            console.error('Screening result modal not found:', modalSelector);
+        } else {
+            console.error('Bootstrap Modal JavaScript is not loaded.');
+        }
+    }
+</script>

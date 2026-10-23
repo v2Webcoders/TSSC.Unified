@@ -100,12 +100,24 @@
                         </select>
                     </div>
 
-                    <div class="col-md-4">
+                   @*  <div class="col-md-4">
                         <label class="form-label">Delegated By</label>
                         <select asp-for="DelegatedBy"
                                 asp-items="Model.EmployeeList"
                                 class="form-select">
                             <option value="">Select Employee</option>
+                        </select>
+                    </div> *@
+                    <div class="col-md-4">
+                        <label class="form-label">Delegated By</label>
+                        <select asp-for="DelegatedBy" class="form-select">
+                            <option value="">Select Employee</option>
+
+                            @foreach (var emp in Model.EmployeeList
+                                                        .Where(x => x.Value == "22" || x.Value == "35"))
+                            {
+                                <option value="@emp.Value">@emp.Text</option>
+                            }
                         </select>
                     </div>
 

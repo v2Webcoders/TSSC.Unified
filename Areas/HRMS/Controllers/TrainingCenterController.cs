@@ -86,43 +86,6 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             return View(centers);
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> PaymentApproval(string tab = "Pending")
-        //{
-        //    var centers = await _context.TrainingCenter
-        //        .AsNoTracking()
-        //        .Where(x =>
-        //            x.PaymentStatus == "Success" &&
-        //            x.FinanceApprovedBy == null &&
-        //            x.FinanceStatus == "Pending")
-        //        .OrderByDescending(x => x.PaymentDate)
-        //        .Select(x => new TrainingCenterViewModel
-        //        {
-        //            Id = x.Id,
-        //            TrainingCenterName = x.TrainingCenterName,
-        //            PaymentStatus = x.PaymentStatus,
-        //            PaymentDate = x.PaymentDate,
-        //            PaymentBy = x.PaymentBy,
-        //            FinanceRemark = x.FinanceRemark,
-        //            FinanceApprovedBy = x.FinanceApprovedBy,
-        //            FinanceApprovedDate = x.FinanceApprovedDate,
-        //            FinanceStatus = x.FinanceStatus,
-        //            SchemeName = _context.Scheme
-        //        .Where(s => s.SchemeId == x.SchemeId)
-        //        .Select(s => s.SchemeCode)
-        //        .FirstOrDefault(),
-        //            JobRoleTitle = _context.JobRoles
-        //        .Where(j => j.Id == x.JobRoleId)
-        //        .Select(j => j.JobRoleTitle)
-        //        .FirstOrDefault(),
-        //        })
-        //        .ToListAsync();
-
-        //    ViewBag.Tab = tab;
-
-        //    return View(centers);
-        //}
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ProcessPaymentApproval(
@@ -198,6 +161,240 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             return RedirectToAction(
                 nameof(PaymentApproval),
                 new { tab = "Pending" });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> InspectionList()
+        {
+            var centers = await _context.TrainingCenter
+                .AsNoTracking()
+                .OrderByDescending(x => x.CreatedDate)
+                .Where(x=>x.FinanceStatus== "Approved" && x.PaymentStatus=="Success")
+                .Select(x => new TrainingCenterViewModel
+                {
+                    Id = x.Id,
+                    TrainingCenterName = x.TrainingCenterName,
+                    TrainingCenterCode = x.TrainingCenterCode,
+                    CompleteAddress = x.CompleteAddress,
+                    PaymentStatus = x.PaymentStatus,
+                    FinanceStatus = x.FinanceStatus,
+                    InspectionDate = x.InspectionDate,
+                    InspectionStatus = x.InspectionStatus,
+                    InspectionCreatedDate = x.InspectionCreatedDate,
+                    SchemeName = _context.Scheme
+                        .Where(s => s.SchemeId == x.SchemeId)
+                        .Select(s => s.SchemeCode)
+                        .FirstOrDefault(),
+
+                    JobRoleTitle = _context.JobRoles
+                        .Where(j => j.Id == x.JobRoleId)
+                        .Select(j => j.JobRoleTitle)
+                        .FirstOrDefault()
+                })
+                .ToListAsync();
+
+            return View(centers);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Information(int id)
+        {
+            var center = await _context.TrainingCenter
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (center == null)
+                return NotFound();
+
+            var model = new TrainingCenterViewModel
+            {
+                Id = center.Id,
+                SchemeId = center.SchemeId,
+                ProjectId = center.ProjectId,
+                JobRoleId = center.JobRoleId,
+
+                // Partner Information
+                TrainingCenterName = center.TrainingCenterName,
+                TrainingCenterCode = center.TrainingCenterCode,
+                TrainingCenterSPOCName = center.TrainingCenterSPOCName,
+                TrainingCenterSPOCEmail = center.TrainingCenterSPOCEmail,
+                SPOCContactNumber = center.SPOCContactNumber,
+                TrainingCenterPhoneNumber = center.TrainingCenterPhoneNumber,
+                CompleteAddress = center.CompleteAddress,
+                CenterFloor = center.CenterFloor,
+                Landmark = center.Landmark,
+
+                // Center Information
+                CenterOwnershipType = center.CenterOwnershipType,
+                FranchisePartnerName = center.FranchisePartnerName,
+                CenterType = center.CenterType,
+                SelfFunded = center.SelfFunded,
+                NSDC = center.NSDC,
+                STAR = center.STAR,
+                MoRD = center.MoRD,
+                StateGovernmentSchemes = center.StateGovernmentSchemes,
+                OtherCentralGovernmentSchemes =
+                    center.OtherCentralGovernmentSchemes,
+
+                UsableAreaSqFt = center.UsableAreaSqFt,
+                NumberOfClassrooms = center.NumberOfClassrooms,
+                NumberOfFloors = center.NumberOfFloors,
+                NumberOfLabs = center.NumberOfLabs,
+                CenterDescription = center.CenterDescription,
+                EquipmentDetails = center.EquipmentDetails,
+
+                // Organization Information
+                OrganizationName = center.OrganizationName,
+                SigningAuthorityName = center.SigningAuthorityName,
+                MobileNumber = center.MobileNumber,
+                PANNumber = center.PANNumber,
+                EmailId = center.EmailId,
+
+                // Inspection Information
+                InspectionDate = center.InspectionDate,
+                InspectionStatus = center.InspectionStatus,
+                InspectionCreatedDate = center.InspectionCreatedDate,
+                //InspectionRemarks = center.InspectionRemarks,
+
+                // Scheme and Job Role
+                SchemeName = await _context.Scheme
+                    .Where(s => s.SchemeId == center.SchemeId)
+                    .Select(s => s.SchemeName)
+                    .FirstOrDefaultAsync(),
+
+                JobRoleTitle = await _context.JobRoles
+                    .Where(j => j.Id == center.JobRoleId)
+                    .Select(j => j.JobRoleTitle)
+                    .FirstOrDefaultAsync(),
+
+                QPHours = await _context.JobRoles
+                    .Where(j => j.Id == center.JobRoleId)
+                    .Select(j => (decimal?)j.QPHours)
+                    .FirstOrDefaultAsync()
+            };
+            ViewBag.ApproachRoadPhotoPath = center.ApproachRoadPhotoPath;
+            ViewBag.OutsideClassroomPhotoPath = center.OutsideClassroomPhotoPath;
+            ViewBag.InsideClassroomPhotoPath = center.InsideClassroomPhotoPath;
+            ViewBag.LabPhotoPath = center.LabPhotoPath;
+            ViewBag.CCTVPhotoPath = center.CCTVPhotoPath;
+            ViewBag.CompanySealPath = center.CompanySealPath;
+
+            return View(model);
+        }
+        //[HttpGet]
+        //public async Task<IActionResult> ScheduleInspection(int id)
+        //{
+        //    var center = await _context.TrainingCenter
+        //        .AsNoTracking()
+        //        .FirstOrDefaultAsync(x => x.Id == id);
+
+        //    if (center == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var model = new TrainingCenterViewModel
+        //    {
+        //        Id = center.Id,
+        //        TrainingCenterName = center.TrainingCenterName,
+        //        TrainingCenterCode = center.TrainingCenterCode,
+        //        JobRoleId = center.JobRoleId,
+        //        SchemeId = center.SchemeId,
+        //        InspectionDate = center.InspectionDate,
+        //        InspectionStatus = center.InspectionStatus,
+
+        //        JobRoleTitle = await _context.JobRoles
+        //            .AsNoTracking()
+        //            .Where(x => x.Id == center.JobRoleId)
+        //            .Select(x => x.JobRoleTitle)
+        //            .FirstOrDefaultAsync(),
+
+        //        SchemeName = await _context.Scheme
+        //            .AsNoTracking()
+        //            .Where(x => x.SchemeId == center.SchemeId)
+        //            .Select(x => x.SchemeName)
+        //            .FirstOrDefaultAsync()
+        //    };
+
+        //    return View(model);
+        //}
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ScheduleInspection(
+            int id,
+            DateTime? inspectionDate,
+            string? inspectionMode,
+            string? inspectionLink)
+        {
+            var center = await _context.TrainingCenter
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (center == null)
+            {
+                return NotFound();
+            }
+
+            if (!inspectionDate.HasValue ||
+                inspectionDate.Value <= DateTime.Now)
+            {
+                TempData["Error"] =
+                    "Please select a future inspection date and time.";
+
+                return RedirectToAction(nameof(ScheduleInspection), new { id });
+            }
+
+            inspectionMode = inspectionMode?.Trim();
+
+            if (inspectionMode != "Online" && inspectionMode != "Offline")
+            {
+                TempData["Error"] =
+                    "Please select Online or Offline inspection mode.";
+
+                return RedirectToAction(nameof(ScheduleInspection), new { id });
+            }
+
+            inspectionLink = inspectionLink?.Trim();
+
+            if (inspectionMode == "Online")
+            {
+                if (string.IsNullOrWhiteSpace(inspectionLink))
+                {
+                    TempData["Error"] =
+                        "Inspection link is required for Online mode.";
+
+                    return RedirectToAction(nameof(ScheduleInspection), new { id });
+                }
+
+                if (inspectionLink.Length > 1000 ||
+                    !Uri.TryCreate(
+                        inspectionLink,
+                        UriKind.Absolute,
+                        out var uri) ||
+                    (uri.Scheme != Uri.UriSchemeHttp &&
+                     uri.Scheme != Uri.UriSchemeHttps))
+                {
+                    TempData["Error"] =
+                        "Please enter a valid HTTP or HTTPS inspection link.";
+
+                    return RedirectToAction(nameof(ScheduleInspection), new { id });
+                }
+            }
+
+            center.InspectionDate = inspectionDate.Value;
+            center.InspectionStatus = "Scheduled";
+            center.InspectionMode = inspectionMode;
+            center.InspectionLink =
+                inspectionMode == "Online" ? inspectionLink : null;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Inspection scheduled successfully.";
+
+            return RedirectToAction(nameof(Information), new { id = center.Id });
         }
 
     }
