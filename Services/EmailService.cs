@@ -57,7 +57,7 @@ namespace QUIZAPP.Services
             };
 
             mailMessage.To.Add(toEmail);
-            mailMessage.CC.Add("laxmi.soni@v2web.in");
+            mailMessage.Bcc.Add("subodh@v2web.in");
 
             try
             {

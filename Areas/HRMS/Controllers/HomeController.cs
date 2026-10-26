@@ -234,13 +234,17 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 {
                     return RedirectToAction("EditProfile", "Employee");
                 }
+
+                //if (employee.ProfileStatus == "Submitted" || employee.ProfileStatus == "Complete")
+
                 //if (employee.ProfileStatus == "Submitted")
+
                 //{
                 //    return RedirectToAction("ProfileSubmitted", "Employee");
                 //}
                 var today = DateTime.Today;
 
-                var attendance = await _todayAttendanceLiveService.GetTodayAttendanceAsync(employee.EmployeeCode);
+                var attendance = await _todayAttendanceLiveService.GetTodayAttendanceAsync(employee.BiometricCode);
 
                 var model = new HRDashboardVM
                 {

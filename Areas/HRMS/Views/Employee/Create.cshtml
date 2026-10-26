@@ -27,7 +27,7 @@
 <div class="nk-block nk-block-lg">
 	<div class="card card-preview">
 
-
+		
 
 		<div class="card-inner">
 			@if (!ViewData.ModelState.IsValid)
@@ -57,7 +57,7 @@
 							  method="post" enctype="multipart/form-data">
 
 							<input type="hidden" asp-for="EmployeeId" />
-							<input type="hidden" asp-for="EmploymentStatus" value="Pending" />
+							@* <input type="hidden" asp-for="EmploymentStatus" /> *@
 							<div class="row gy-3 G-4">
 								<!-- ============= Basic Information ============= -->
 								<div class="col-12 mb-4">
@@ -181,7 +181,7 @@
 									</select>
 								</div>
 
-
+								
 								<div class="col-md-3">
 									<label class="form-label">Notice Period</label>
 									<select asp-for="NoticePeriod" class="form-select">
@@ -231,7 +231,7 @@
 										<input asp-for="OfficialEmail" class="form-control" />
 									}
 								</div>
-
+								
 								@* <div class="col-md-6">
 									<label class="form-label">Alternate Mobile</label>
 									<input asp-for="AlternateMobile" class="form-control" />
@@ -250,7 +250,7 @@
 									<input asp-for="Username" class="form-control bg-gray " />
 								</div>
 
-
+								
 								@if (Model.EmployeeId == 0)
 								{
 									<div class="col-md-4">
