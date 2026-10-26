@@ -4,10 +4,11 @@
 @using Microsoft.AspNetCore.Identity
 @using QUIZAPP
 @using TSSC.Unified.Models
+@using TSSC.Unified.Services
 @inject AppdbContext Context
 @inject UserManager<AppUser> UserManager
 @inject SignInManager<AppUser> SignInManager
-
+@inject IMenuCountService MenuCountService
 @{
 	var currentUser = await UserManager.GetUserAsync(User);
 
@@ -155,6 +156,11 @@
 
 	}
 
+	var counts = employee != null
+	? await MenuCountService.GetAsync(new MenuUser(
+		employee.EmployeeId, isHR, isReportingManager,
+		isFinanceEmployee, isFinanceHead, isCEO))
+	: MenuCounts.Empty;
 }
 
 <style>
@@ -390,7 +396,7 @@
 			<span class="nk-menu-text">
 				My Tasks
 			</span>
-
+			<partial name="_MenuBadge" model="counts.Tasks" />
 		</a>
 
 	</li>
@@ -882,7 +888,8 @@
 
 					</a>
 				</li>
-				<li class="nk-menu-item">
+				@* when manager approved the it direct sent to assessment agency *@
+				@* <li class="nk-menu-item">
 					<a href="/HRMS/Trainer/SendToAgency"
 					   class="nk-menu-link">
 
@@ -891,7 +898,7 @@
 						</span>
 
 					</a>
-				</li>
+				</li> *@
 				<li class="nk-menu-item">
 					<a href="/HRMS/Trainer/UploadCertificate"
 					   class="nk-menu-link">

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assessment Agency Dashboard — TSSC Unified Portal</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link href="content-polish.css" rel="stylesheet">
+
+
+<style>
+:root{
+  --bs-primary:#12406B;
+  --bs-primary-rgb:18,64,107;
+  --bs-secondary:#F0943D;
+  --bs-secondary-rgb:240,148,61;
+  --navy:#12406B;
+  --navy-dark:#0A2E52;
+  --blue:#1868B0;
+  --saffron:#F0943D;
+  --saffron-dark:#DB7F1C;
+}
+body{background:#F5F7FA;font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;}
+
+.btn-primary{--bs-btn-bg:var(--navy);--bs-btn-border-color:var(--navy);--bs-btn-hover-bg:var(--navy-dark);--bs-btn-hover-border-color:var(--navy-dark);--bs-btn-active-bg:var(--navy-dark);}
+.btn-secondary{--bs-btn-bg:var(--saffron);--bs-btn-border-color:var(--saffron);--bs-btn-hover-bg:var(--saffron-dark);--bs-btn-hover-border-color:var(--saffron-dark);}
+.btn-outline-primary{--bs-btn-color:var(--navy);--bs-btn-border-color:var(--navy);--bs-btn-hover-bg:var(--navy);--bs-btn-hover-border-color:var(--navy);}
+.btn-outline-danger{--bs-btn-color:#D64545;--bs-btn-border-color:#D64545;--bs-btn-hover-bg:#D64545;--bs-btn-hover-border-color:#D64545;}
+.btn-outline-success{--bs-btn-color:#1E8E5A;--bs-btn-border-color:#1E8E5A;--bs-btn-hover-bg:#1E8E5A;--bs-btn-hover-border-color:#1E8E5A;}
+.text-primary{color:var(--navy)!important;}
+.text-secondary-brand{color:var(--saffron-dark)!important;}
+.bg-navy{background:var(--navy)!important;}
+.bg-navy-dark{background:var(--navy-dark)!important;}
+.bg-gradient-brand{background:linear-gradient(120deg,var(--navy) 0%,var(--blue) 100%)!important;}
+
+.topbar{background:var(--navy-dark);color:#cfe0f0;font-size:13.5px;}
+.topbar a{color:#cfe0f0;text-decoration:none;opacity:.85;}
+.topbar a:hover{opacity:1;color:#fff;}
+
+.brand-mark{
+  width:38px;height:38px;border-radius:8px;
+  background:linear-gradient(135deg,var(--navy),var(--blue));
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;letter-spacing:.5px;
+}
+
+/* Sidebar */
+.sidebar{background:var(--navy-dark);min-height:calc(100vh - 106px);}
+.sidebar .nav-link{color:#dbe7f2;font-size:14.5px;border-radius:8px;padding:.6rem .75rem;}
+.sidebar .nav-link:hover{background:rgba(255,255,255,.06);color:#fff;}
+.sidebar .nav-link.active{background:var(--saffron);color:#fff;font-weight:600;}
+.sidebar .nav-group-label{font-size:11.5px;text-transform:uppercase;letter-spacing:1px;color:#7f9cb8;margin:14px 10px 6px;}
+
+.avatar-circle{
+  width:26px;height:26px;border-radius:50%;background:var(--saffron);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;
+}
+
+.card-stat .stat-num{font-size:27px;font-weight:800;color:var(--navy);}
+
+.success-icon{
+  width:64px;height:64px;border-radius:50%;background:#E4F5EC;color:#1E8E5A;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:31px;
+}
+
+.step-dot{width:26px;height:26px;border-radius:50%;background:#E2E8F0;color:#8494a3;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+.step-dot.done{background:#1E8E5A;color:#fff;}
+.step-dot.active{background:var(--navy);color:#fff;}
+
+.policy-row{border:1px solid var(--bs-border-color);border-radius:8px;transition:.15s;}
+.policy-row:hover{border-color:var(--blue);background:#F7FAFD;}
+.policy-icon{
+  width:34px;height:34px;border-radius:7px;background:#E7F0FA;color:var(--blue);
+  display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;
+}
+
+/* Approval request cards */
+.request-card{border:1px solid var(--bs-border-color);border-radius:10px;background:#fff;transition:.15s;}
+.request-card:hover{border-color:var(--blue);box-shadow:0 4px 14px rgba(18,64,107,.08);}
+.emp-avatar{
+  width:42px;height:42px;border-radius:50%;background:var(--navy);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;
+}
+.filter-pill{
+  border:1px solid var(--bs-border-color);border-radius:999px;padding:6px 16px;
+  font-size:13.5px;font-weight:600;color:var(--navy);background:#fff;cursor:pointer;
+}
+.filter-pill.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+footer.site-footer{background:var(--navy-dark);color:#a9c0d6;font-size:13.5px;}
+
+@media(max-width:767.98px){
+  .sidebar{min-height:auto;}
+  .sidebar .nav{flex-direction:row!important;overflow-x:auto;flex-wrap:nowrap;}
+  .sidebar .nav-group-label{display:none;}
+}
+
+
+/* ============================================================
+   TSSC Portal — Content Area Polish CSS
+   Add this AFTER your existing styles (inside <style> or as a
+   linked stylesheet loaded after the base CSS).
+   Targets: stat cards, tables, quick-action buttons, cards.
+   ============================================================ */
+
+/* Stat cards — colored top accent + gradient numbers + hover lift */
+.card-stat{position:relative;overflow:hidden;transition:.2s ease;}
+.card-stat::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--blue),var(--navy));
+}
+.card-stat:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(18,64,107,.12)!important;}
+.card-stat .badge{font-size:11.5px;font-weight:800;letter-spacing:.3px;padding:5px 11px;}
+
+/* 2nd/3rd/4th stat card in a row get orange/red/green top accents */
+.row.g-3.mb-4 .col-6:nth-of-type(4n+2) .card-stat::before,
+.row.g-3.mb-4 .col-lg-3:nth-of-type(4n+2) .card-stat::before{background:linear-gradient(90deg,#F5A623,var(--saffron-dark));}
+.row.g-3.mb-4 .col-6:nth-of-type(4n+3) .card-stat::before,
+.row.g-3.mb-4 .col-lg-3:nth-of-type(4n+3) .card-stat::before{background:linear-gradient(90deg,#E8615C,#C0392B);}
+.row.g-3.mb-4 .col-6:nth-of-type(4n+4) .card-stat::before,
+.row.g-3.mb-4 .col-lg-3:nth-of-type(4n+4) .card-stat::before{background:linear-gradient(90deg,#3DBE7E,#1E8E5A);}
+
+.card-stat .stat-num{
+  background:linear-gradient(90deg,var(--navy),var(--blue));-webkit-background-clip:text;
+  background-clip:text;-webkit-text-fill-color:transparent;
+}
+
+/* Tables — gradient header, hover row, bold first column */
+.table thead th{
+  background:linear-gradient(180deg,#F7FAFD,#F0F4F8);color:var(--navy);
+  font-weight:800;letter-spacing:.4px;border-bottom:2px solid var(--border,#E2E8F0)!important;
+}
+.table tbody tr{transition:.15s;}
+.table tbody tr:hover{background:#F7FAFD;}
+.table tbody tr td:first-child{font-weight:600;color:var(--text,#1A2733);}
+
+/* Quick-action buttons — icon-tile style with slide-in accent bar */
+.card-body .btn-outline-primary{
+  text-align:left;border-radius:10px;padding:11px 14px;font-weight:600;
+  border-width:1.5px;position:relative;padding-left:18px;transition:.2s ease;
+  display:flex;align-items:center;gap:10px;
+}
+.card-body .btn-outline-primary::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:10px 0 0 10px;
+  background:var(--saffron);transform:scaleY(0);transition:.2s ease;
+}
+.card-body .btn-outline-primary:hover{
+  background:var(--navy);border-color:var(--navy);color:#fff;
+  transform:translateX(3px);box-shadow:0 6px 16px rgba(18,64,107,.18);
+}
+.card-body .btn-outline-primary:hover::before{transform:scaleY(1);}
+
+/* General cards — soft hover lift */
+.card.border-0.shadow-sm{transition:.2s ease;}
+.card.border-0.shadow-sm:hover{box-shadow:0 10px 26px rgba(18,64,107,.08)!important;}
+
+/* Readability polish — slightly larger, calmer line spacing (close to the
+   golden ratio, ~1.618) and less washed-out secondary text so pages feel
+   easier on the eye without changing the overall brand identity. */
+body{line-height:1.6;-webkit-font-smoothing:antialiased;}
+p,li,td,.small{line-height:1.6;}
+.text-muted{color:#46586B!important;}
+
+
+</style>
+</head>
+<body>
+
+
+
+<div class="container-fluid">
+  <div class="row">
+
+
+    <main class="col-md-9 col-lg-10 p-4">
+      <div class="mb-4">
+        <h1 class="fs-4 text-primary fw-bold mb-1">Assigned Batches</h1>
+        <p class="text-muted small mb-0">Certification batches assigned to SkillCert Assessment Agency.</p>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+          <div class="card card-stat h-100 border-0 shadow-sm"><div class="card-body">
+            <span class="badge bg-warning-subtle text-warning-emphasis mb-2">Upcoming</span>
+            <div class="stat-num">1</div><div class="small text-muted">Batches scheduled</div>
+          </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card card-stat h-100 border-0 shadow-sm"><div class="card-body">
+            <span class="badge bg-primary-subtle text-primary mb-2">Trainers</span>
+            <div class="stat-num">3</div><div class="small text-muted">To be assessed</div>
+          </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card card-stat h-100 border-0 shadow-sm"><div class="card-body">
+            <span class="badge bg-success-subtle text-success mb-2">Completed</span>
+            <div class="stat-num">42</div><div class="small text-muted">Assessments this year</div>
+          </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card card-stat h-100 border-0 shadow-sm"><div class="card-body">
+            <span class="badge bg-success-subtle text-success mb-2">Pass Rate</span>
+            <div class="stat-num">91%</div><div class="small text-muted">Overall</div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="fs-6 text-primary fw-bold mb-0">Certification Batch — Aug 2026</h3>
+            <span class="badge bg-primary-subtle text-primary">Assigned — 15 Aug 2026</span>
+          </div>
+          <table class="table table-sm align-middle mb-3">
+            <thead><tr class="text-muted small text-uppercase"><th>Trainer</th><th>Type</th><th>Sector</th></tr></thead>
+            <tbody>
+              <tr><td>Ravi Kumar</td><td>TOA</td><td>Optical Fibre</td></tr>
+              <tr><td>Meena Rathi</td><td>TOT</td><td>Handset & Retail</td></tr>
+              <tr><td>Kavita Joshi</td><td>TOT</td><td>Customer Service</td></tr>
+            </tbody>
+          </table>
+          <a href="assessment-agency-2.html" class="btn btn-primary">Start Assessment →</a>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const path = location.pathname.split('/').pop() || 'rm-dashboard.html';
+  document.querySelectorAll('.sidebar a[data-page]').forEach(a => {
+    if (a.getAttribute('data-page') === path) a.classList.add('active');
+  });
+});
+
+function handleFormSubmit(formId, redirectUrl) {
+  const form = document.getElementById(formId);
+  if (!form) return;
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      return;
+    }
+    window.location.href = redirectUrl;
+  }, false);
+}
+
+// Approve / reject a request card -> update its status badge in place
+function decideRequest(btn, decision) {
+  const card = btn.closest('.request-card');
+  if (!card) return;
+  const badge = card.querySelector('.decision-badge');
+  const actions = card.querySelector('.decision-actions');
+  if (badge) {
+    badge.classList.remove('bg-warning-subtle', 'text-warning-emphasis');
+    if (decision === 'approve') {
+      badge.textContent = 'Approved';
+      badge.classList.add('bg-success-subtle', 'text-success');
+    } else {
+      badge.textContent = 'Rejected';
+      badge.classList.add('bg-danger-subtle', 'text-danger');
+    }
+  }
+  if (actions) actions.style.display = 'none';
+  card.style.opacity = '0.7';
+}
+
+</script>
+</body>
+</html>
