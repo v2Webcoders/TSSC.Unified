@@ -582,57 +582,7 @@
                     </div>
                 </div>
             }
-            <!-- BACK BUTTON -->
-
-            @* <div class="row mt-4">
-
-                <div class="col-md-12 text-end">
-                    @if (Model.Status == "Pending" && Model.IsActive)
-                    {
-                        <a href="/HRMS/JobRoles/Approval?status=Pending"
-                           class="btn btn-light">
-
-                            <em class="icon ni ni-arrow-left"></em>
-                            Back to List
-
-                        </a>
-                    }
-                    @if (Model.Status == "Approved" && Model.IsActive)
-                            {
-                    <a href="/HRMS/JobRoles/Approval?status=Approved"
-                       class="btn btn-light">
-
-                        <em class="icon ni ni-arrow-left"></em>
-                        Back to List
-
-                    </a>
-                            }
-                    @if (Model.Status == "Rejected" && Model.IsActive)
-                    {
-                        <a href="/HRMS/JobRoles/Approval?status=Rejected"
-                           class="btn btn-light">
-
-                            <em class="icon ni ni-arrow-left"></em>
-                            Back to List
-
-                        </a>
-                    }
-                    @if (!Model.IsActive)
-                    {
-                        <a asp-area="HRMS"
-                           asp-controller="JobRoles"
-                           asp-action="Approval"
-                           asp-route-status="Archived"
-                           class="btn btn-light">
-
-                            <em class="icon ni ni-arrow-left"></em>
-                            Back to List
-
-                        </a>
-                    }
-                </div>
-
-            </div> *@
+           
             <div class="row mt-4">
                 <div class="col-md-12 text-end">
 

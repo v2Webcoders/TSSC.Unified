@@ -81,15 +81,15 @@
                         <td>
 
                             <div class="btn-group">
+                                @if (item.EmployeeReceiveStatus == "Not Received"){
+                                    <a asp-action="LetterSend"
+                                    asp-route-id="@item.LetterId"
+                                    class="btn btn-sm btn-outline-warning">
 
-                                <a asp-action="LetterSend"
-                                   asp-route-id="@item.LetterId"
-                                   class="btn btn-sm btn-outline-warning">
+                                        <em class="icon ni ni-edit"></em>
 
-                                    <em class="icon ni ni-edit"></em>
-
-                                </a>
-
+                                    </a>
+                                
                                 <a asp-action="Delete"
                                    asp-route-id="@item.LetterId"
                                    class="btn btn-sm btn-outline-danger">
@@ -97,7 +97,7 @@
                                     <em class="icon ni ni-trash"></em>
 
                                 </a>
-
+                                }
                             </div>
 
                         </td>

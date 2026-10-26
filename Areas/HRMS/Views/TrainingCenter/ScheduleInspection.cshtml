@@ -1,0 +1,284 @@
+﻿@model TSSC.Unified.ViewModel.TrainingCenterViewModel
+
+@{
+    ViewData["Title"] = "Schedule Inspection";
+    Layout = "_Layout";
+
+    var inspectionDateValue = Model.InspectionDate.HasValue
+        ? Model.InspectionDate.Value.ToString("yyyy-MM-ddTHH:mm")
+        : string.Empty;
+}
+
+<div class="nk-content">
+    <div class="container-fluid">
+
+        <div class="nk-block-head nk-block-head-sm">
+            <div class="nk-block-between">
+                <div class="nk-block-head-content">
+                    <h3 class="nk-block-title page-title">Schedule Inspection</h3>
+                    <div class="nk-block-des text-soft">
+                        <p>Schedule or update the inspection for this training center.</p>
+                    </div>
+                </div>
+
+                <div class="nk-block-head-content">
+                    <a asp-area="HRMS"
+                       asp-controller="TrainingCenter"
+                       asp-action="Information"
+                       asp-route-id="@Model.Id"
+                       class="btn btn-outline-light">
+                        <em class="icon ni ni-arrow-left"></em>
+                        <span>Back to Information</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="nk-block nk-block-lg">
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-icon">
+                    <em class="icon ni ni-check-circle"></em>
+                    @TempData["Success"]
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-icon">
+                    <em class="icon ni ni-alert-circle"></em>
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-danger"
+                 role="alert"></div>
+
+            <div class="card card-bordered">
+                <div class="card-inner">
+
+                    <form asp-area="HRMS"
+                          asp-controller="TrainingCenter"
+                          asp-action="ScheduleInspection"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" asp-for="Id" />
+
+                        <!-- Training Center Information -->
+                        <div class="nk-block-head mt-1">
+                            <h5 class="title"
+                                style="border-left:5px solid #D9622F; padding-left:12px;">
+                                Training Center Information
+                            </h5>
+                        </div>
+
+                        <div class="row gy-3">
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label">Training Center Name</label>
+                                    <div class="form-control bg-light">
+                                        @(string.IsNullOrWhiteSpace(Model.TrainingCenterName)
+                                                                                ? "—" : Model.TrainingCenterName)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label">Training Center Code</label>
+                                    <div class="form-control bg-light">
+                                        @(string.IsNullOrWhiteSpace(Model.TrainingCenterCode)
+                                                                                ? "—" : Model.TrainingCenterCode)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label">Job Role</label>
+                                    <div class="form-control bg-light">
+                                        @(string.IsNullOrWhiteSpace(Model.JobRoleTitle)
+                                                                                ? "—" : Model.JobRoleTitle)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label">Scheme</label>
+                                    <div class="form-control bg-light">
+                                        @(string.IsNullOrWhiteSpace(Model.SchemeName)
+                                                                                ? "—" : Model.SchemeName)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label">Current Status</label>
+                                    <div class="form-control bg-light">
+                                        @(string.IsNullOrWhiteSpace(Model.InspectionStatus)
+                                                                                ? "Not Scheduled" : Model.InspectionStatus)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label">Existing Inspection Date</label>
+                                    <div class="form-control bg-light">
+                                        @(Model.InspectionDate.HasValue
+                                                                                ? Model.InspectionDate.Value.ToString("dd-MM-yyyy hh:mm tt")
+                                                                                : "Not Scheduled")
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Schedule Details -->
+                        <div class="nk-block-head mt-4">
+                            <h5 class="title"
+                                style="border-left:5px solid #D9622F; padding-left:12px;">
+                                Inspection Schedule Details
+                            </h5>
+                        </div>
+
+                        <div class="row gy-3">
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="InspectionDate" class="form-label">
+                                        Inspection Date &amp; Time
+                                        <span class="text-danger">*</span>
+                                    </label>
+
+                                    <input asp-for="InspectionDate"
+                                           type="datetime-local"
+                                           class="form-control"
+                                           value="@inspectionDateValue"
+                                           id="InspectionDate"
+                                           required />
+
+                                    <span asp-validation-for="InspectionDate"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="InspectionMode" class="form-label">
+                                        Inspection Mode
+                                        <span class="text-danger">*</span>
+                                    </label>
+
+                                    <select asp-for="InspectionMode"
+                                            id="InspectionMode"
+                                            class="form-select"
+                                            required>
+                                        <option value="">Select Inspection Mode</option>
+                                        <option value="Online">Online</option>
+                                        <option value="Offline">Offline</option>
+                                    </select>
+
+                                    <span asp-validation-for="InspectionMode"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4" id="inspectionLinkContainer">
+                                <div class="form-group">
+                                    <label asp-for="InspectionLink" class="form-label">
+                                        Inspection Link
+                                        <span id="inspectionLinkRequired"
+                                              class="text-danger">*</span>
+                                    </label>
+
+                                    <input asp-for="InspectionLink"
+                                           type="url"
+                                           id="InspectionLink"
+                                           class="form-control"
+                                           maxlength="1000"
+                                           placeholder="https://meet.google.com/..." />
+
+                                    <span class="text-soft" id="inspectionLinkHelp">
+                                        Required for online inspections.
+                                    </span>
+
+                                    <span asp-validation-for="InspectionLink"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="form-group d-flex flex-wrap gap-2">
+
+                                    <button type="submit" class="btn btn-primary">
+                                        <em class="icon ni ni-calendar-check"></em>
+                                        <span>
+                                            @(Model.InspectionDate.HasValue
+                                                                                        ? "Update Inspection Schedule"
+                                                                                        : "Schedule Inspection")
+                                        </span>
+                                    </button>
+
+                                    <a asp-area="HRMS"
+                                       asp-controller="TrainingCenter"
+                                       asp-action="Information"
+                                       asp-route-id="@Model.Id"
+                                       class="btn btn-outline-light">
+                                        Cancel
+                                    </a>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const mode = document.getElementById("InspectionMode");
+            const link = document.getElementById("InspectionLink");
+            const linkContainer = document.getElementById("inspectionLinkContainer");
+            const requiredMark = document.getElementById("inspectionLinkRequired");
+            const help = document.getElementById("inspectionLinkHelp");
+
+            function updateInspectionLink() {
+                const isOnline = mode.value === "Online";
+
+                linkContainer.style.display = isOnline ? "" : "none";
+                link.required = isOnline;
+                requiredMark.style.display = isOnline ? "" : "none";
+                link.disabled = !isOnline;
+
+                help.textContent = isOnline
+                    ? "Required for online inspections."
+                    : "The inspection link is not required for offline inspections.";
+
+                if (!isOnline) {
+                    link.value = "";
+                }
+            }
+
+            mode.addEventListener("change", updateInspectionLink);
+            updateInspectionLink();
+        });
+    </script>
+}

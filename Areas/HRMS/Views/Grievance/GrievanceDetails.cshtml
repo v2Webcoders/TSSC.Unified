@@ -1,0 +1,405 @@
+﻿@model TSSC.Unified.Models.Grievance
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Grievance Details";
+}
+
+
+@if (TempData["msg"] != null)
+{
+    <div class="example-alert w-100">
+        <div class="alert alert-success alert-icon">
+            <em class="icon ni ni-check-circle"></em>
+            <strong>@TempData["msg"]</strong>
+        </div>
+    </div>
+}
+
+
+<div class="nk-block-head nk-block-head-sm">
+
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+
+            <h3 class="nk-block-title page-title">
+                Grievance Detail
+            </h3>
+
+            <div class="nk-block-des text-soft">
+                View and manage grievance details
+            </div>
+
+        </div>
+
+
+        <div class="nk-block-head-content">
+
+        @*     <a asp-action="GrievanceList"
+               asp-controller="Grievance"
+               class="btn btn-primary d-none d-md-inline-flex">
+
+                <em class="icon ni ni-list"></em>
+                &nbsp; Grievance List
+
+            </a> *@
+            @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+            {
+                <a href="@ViewBag.ReturnUrl"
+                   class="btn btn-primary d-none d-md-inline-flex">
+
+                    <em class="icon ni ni-list"></em>
+                    &nbsp; Grievance List
+
+                </a>
+            }
+            else
+            {
+                <a asp-action="GrievanceList"
+                   asp-controller="Grievance"
+                   class="btn btn-primary d-none d-md-inline-flex">
+
+                    <em class="icon ni ni-list"></em>
+                    &nbsp; Grievance List
+
+                </a>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="card card-bordered">
+
+    <div class="card-inner">
+
+        <div class="preview-block">
+
+            <div class="row gy-4">
+
+                <div class="col-sm-12">
+
+                    <form asp-action="GrievanceDetails"
+                          asp-controller="Grievance"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        <input type="hidden" asp-for="Id" />
+
+                        <!-- ================= Grievance Information ================= -->
+
+                        <div class="row gy-3">
+
+
+                            <!-- Grievance Number -->
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Grievance Number
+                                </label>
+
+                                <input asp-for="GrievanceNo"
+                                       class="form-control"
+                                       readonly />
+
+                            </div>
+
+
+                            <!-- Created Date -->
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Submitted On
+                                </label>
+
+                                <input value="@Model.CreatedDate.ToString("dd-MMM-yyyy hh:mm tt")"
+                                       class="form-control"
+                                       readonly />
+
+                            </div>
+
+
+                            <!-- Name -->
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Name
+                                </label>
+
+                                <input asp-for="Name"
+                                       class="form-control"
+                                       readonly />
+
+                            </div>
+
+
+                            <!-- Mobile -->
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Mobile Number
+                                </label>
+
+                                <input asp-for="MobileNumber"
+                                       class="form-control"
+                                       readonly />
+
+                            </div>
+
+
+                            <!-- Email -->
+
+                            <div class="col-md-12">
+
+                                <label class="form-label">
+                                    Email Address
+                                </label>
+
+                                <input asp-for="Email"
+                                       class="form-control"
+                                       readonly />
+
+                            </div>
+
+
+                            <!-- Description -->
+
+                            <div class="col-md-12">
+
+                                <label class="form-label">
+                                    Grievance Description
+                                </label>
+
+                                <textarea asp-for="Description"
+                                          class="form-control"
+                                          rows="5"
+                                          readonly></textarea>
+
+                            </div>
+
+
+                            <!-- ================= Priority ================= -->
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Priority
+                                </label>
+
+                                <select asp-for="Priority"
+                                        class="form-select">
+
+                                    <option value="Normal">
+                                        Normal
+                                    </option>
+
+                                    <option value="High">
+                                        High
+                                    </option>
+
+                                    <option value="Low">
+                                        Low
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- ================= Status ================= -->
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Current Status
+                                </label>
+
+                                <select asp-for="Status"
+                                        class="form-select">
+
+                                    <option value="Submitted">
+                                        Submitted
+                                    </option>
+
+                                    <option value="In Progress">
+                                        In Progress
+                                    </option>
+
+                                    <option value="Resolved">
+                                        Resolved
+                                    </option>
+
+                                    <option value="Rejected">
+                                        Rejected
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- ================= Attachment ================= -->
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Attachment
+                                </label>
+
+                                @if (!string.IsNullOrEmpty(Model.AttachmentPath))
+                                {
+                                    <br />
+
+                                    <a href="@Model.AttachmentPath"
+                                       target="_blank"
+                                       class="btn btn-outline-info">
+
+                                        <em class="icon ni ni-file-text"></em>
+                                        View Attachment
+
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        No Attachment
+                                    </span>
+                                }
+
+                            </div>
+
+
+                            <!-- ================= Updated Date ================= -->
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Last Updated
+                                </label>
+
+                                <input value="@(Model.UpdatedDate.HasValue
+                                                                                       ? Model.UpdatedDate.Value.ToString("dd-MMM-yyyy hh:mm tt")
+                                                                                       : "-")"
+                                       class="form-control"
+                                       readonly />
+
+                            </div>
+
+
+                            <!-- ================= Team Remarks ================= -->
+
+                            <div class="col-md-12">
+
+                                <label class="form-label">
+                                    Grievance Team Remarks
+                                </label>
+
+                                <textarea asp-for="TeamRemarks"
+                                          class="form-control"
+                                          rows="4"
+                                          placeholder="Enter remarks or action taken..."></textarea>
+
+                            </div>
+
+
+                            <!-- ================= Upload Report ================= -->
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Upload Report
+                                </label>
+
+                                <input type="file"
+                                       name="ReportFile"
+                                       class="form-control"
+                                       accept=".pdf,.doc,.docx" />
+
+                                <div class="form-note">
+                                    <small class="text-muted">
+                                        Allowed formats: PDF, DOC, DOCX. Maximum size: 5 MB.
+                                    </small>
+                                </div>
+
+                            </div>
+
+
+                            <!-- ================= Existing Report ================= -->
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Uploaded Report
+                                </label>
+
+                                @if (!string.IsNullOrEmpty(Model.ReportPath))
+                                {
+                                    <br />
+
+                                    <a href="@Model.ReportPath"
+                                       target="_blank"
+                                       class="btn btn-outline-success">
+
+                                        <em class="icon ni ni-file-text"></em>
+                                        View Report
+
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        No Report Uploaded
+                                    </span>
+                                }
+
+                            </div>
+
+
+                            <!-- ================= Buttons ================= -->
+
+                            <div class="col-12 mt-4">
+                                @if (Model.Status != "Resolved"){
+                                    <button type="submit"
+                                    class="btn btn-primary"
+                                    onclick="return confirm('Are you sure you want to update this grievance request?');">
+
+                                        <em class="icon ni ni-save"></em>
+
+                                        Save Update
+
+                                    </button>
+                                }
+
+                                <a asp-action="GrievanceDetails"
+                                   asp-controller="Grievance"
+                                   class="btn btn-outline-secondary ms-2">
+
+                                    Cancel
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

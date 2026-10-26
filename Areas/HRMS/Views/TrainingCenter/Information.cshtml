@@ -1,0 +1,826 @@
+﻿@model TSSC.Unified.ViewModel.TrainingCenterViewModel
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Training Center Details";
+
+    string approachRoadPhoto = ViewBag.ApproachRoadPhotoPath as string ?? "";
+    string outsideClassroomPhoto = ViewBag.OutsideClassroomPhotoPath as string ?? "";
+    string insideClassroomPhoto = ViewBag.InsideClassroomPhotoPath as string ?? "";
+    string labPhoto = ViewBag.LabPhotoPath as string ?? "";
+    string cctvPhoto = ViewBag.CCTVPhotoPath as string ?? "";
+    string companySeal = ViewBag.CompanySealPath as string ?? "";
+
+    bool isScheduled = string.Equals(
+        Model.InspectionStatus,
+        "Scheduled",
+        StringComparison.OrdinalIgnoreCase);
+}
+
+@functions {
+    string Val(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? "—" : value.Trim();
+
+    string BoolVal(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return "—";
+
+        if (bool.TryParse(value, out bool result))
+            return result ? "Yes" : "No";
+
+        return value.Trim();
+    }
+
+    string DateVal(DateTime? value) =>
+        value.HasValue ? value.Value.ToString("dd-MM-yyyy") : "—";
+
+    string DateTimeVal(DateTime? value) =>
+        value.HasValue
+            ? value.Value.ToString("dd-MM-yyyy hh:mm tt")
+            : "Not Scheduled";
+
+    string PhotoUrl(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return string.Empty;
+
+        if (Uri.TryCreate(path, UriKind.Absolute, out var uri)
+            && (uri.Scheme == Uri.UriSchemeHttp ||
+                uri.Scheme == Uri.UriSchemeHttps))
+        {
+            return path;
+        }
+
+        return Url.Content("~/" + path.TrimStart('~', '/'));
+    }
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Training Center Details</h3>
+        </div>
+
+        <div class="nk-block-head-content">
+            <a asp-area="HRMS"
+               asp-controller="TrainingCenter"
+               asp-action="InspectionList"
+               class="btn btn-primary">
+                <em class="icon ni ni-arrow-left"></em>
+                <span>Inspection List</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="nk-block nk-block-lg">
+
+    <div class="card card-bordered">
+    <div>
+        <div class="card-inner">
+
+            <!-- CENTER SUMMARY -->
+            <div class="nk-block-head">
+                <h5 class="title">
+                    <span style="border-left:5px solid #D9622F;padding-left:12px;">
+                        <em class="icon ni ni-building me-1"></em>
+                        Training Center Information
+                    </span>
+                </h5>
+            </div>
+
+            <div class="row gy-3 mb-4">
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Training Center Name</label>
+                        <div class="form-control bg-light">@Val(Model.TrainingCenterName)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Training Center Code</label>
+                        <div class="form-control bg-light">@Val(Model.TrainingCenterCode)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Inspection Status</label>
+                        <div class="form-control bg-light">
+                            @if (isScheduled)
+                            {
+                                <span class="text-success">
+                                    <span class="dot bg-success"></span>
+                                    Scheduled
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-warning">
+                                    <span class="dot bg-warning"></span>
+                                    @Val(Model.InspectionStatus ?? "Not Scheduled")
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr />
+
+            <!-- CENTER INFORMATION -->
+            <div class="nk-block-head mt-4">
+                <h5 class="title">
+                    <span style="border-left:5px solid #D9622F;padding-left:12px;">
+                        <em class="icon ni ni-home me-1"></em>
+                        Center Information
+                    </span>
+                </h5>
+            </div>
+
+            <div class="row gy-3">
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Scheme</label>
+                        <div class="form-control bg-light">@Val(Model.SchemeName)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Job Role</label>
+                        <div class="form-control bg-light">@Val(Model.JobRoleTitle)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">QP Hours</label>
+                        <div class="form-control bg-light">
+                            @(Model.QPHours.HasValue? Model.QPHours.Value.ToString("0.##") : "—")
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Center Type</label>
+                        <div class="form-control bg-light">@Val(Model.CenterType)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Ownership Type</label>
+                        <div class="form-control bg-light">@Val(Model.CenterOwnershipType)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Franchise Partner Name</label>
+                        <div class="form-control bg-light">@Val(Model.FranchisePartnerName)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Center Floor</label>
+                        <div class="form-control bg-light">@Val(Model.CenterFloor)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Landmark</label>
+                        <div class="form-control bg-light">@Val(Model.Landmark)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Usable Area (Sq. Ft.)</label>
+                        <div class="form-control bg-light">
+                            @(Model.UsableAreaSqFt.HasValue? Model.UsableAreaSqFt.Value.ToString("0.##") : "—")
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Number of Classrooms</label>
+                        <div class="form-control bg-light">@(Model.NumberOfClassrooms?.ToString() ?? "—")</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Number of Floors</label>
+                        <div class="form-control bg-light">@(Model.NumberOfFloors?.ToString() ?? "—")</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Number of Labs</label>
+                        <div class="form-control bg-light">@(Model.NumberOfLabs?.ToString() ?? "—")</div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="form-label">Complete Address</label>
+                        <div class="form-control bg-light"
+                             style="min-height:70px;white-space:pre-wrap;height:auto;">
+                            @Val(Model.CompleteAddress)
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr />
+
+            <!-- PARTNER INFORMATION -->
+            <div class="nk-block-head mt-4">
+                <h5 class="title">
+                    <span style="border-left:5px solid #D9622F;padding-left:12px;">
+                        <em class="icon ni ni-users me-1"></em>
+                        Partner Information
+                    </span>
+                </h5>
+            </div>
+
+            <div class="row gy-3">
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Organization Name</label>
+                        <div class="form-control bg-light">@Val(Model.OrganizationName)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Signing Authority Name</label>
+                        <div class="form-control bg-light">@Val(Model.SigningAuthorityName)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Mobile Number</label>
+                        <div class="form-control bg-light">@Val(Model.MobileNumber)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">PAN Number</label>
+                        <div class="form-control bg-light">@Val(Model.PANNumber)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Email ID</label>
+                        <div class="form-control bg-light text-break">@Val(Model.EmailId)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">SPOC Name</label>
+                        <div class="form-control bg-light">@Val(Model.TrainingCenterSPOCName)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">SPOC Email</label>
+                        <div class="form-control bg-light text-break">@Val(Model.TrainingCenterSPOCEmail)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">SPOC Contact Number</label>
+                        <div class="form-control bg-light">@Val(Model.SPOCContactNumber)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Center Phone Number</label>
+                        <div class="form-control bg-light">@Val(Model.TrainingCenterPhoneNumber)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Payment Status</label>
+                        <div class="form-control bg-light">@Val(Model.PaymentStatus)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Finance Status</label>
+                        <div class="form-control bg-light">@Val(Model.FinanceStatus)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Center Status</label>
+                        <div class="form-control bg-light">@Val(Model.Status)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Company Seal</label>
+                        <div class="form-control bg-light d-flex align-items-center">
+                            @if (!string.IsNullOrWhiteSpace(companySeal))
+                            {
+                                <a href="@PhotoUrl(companySeal)"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <em class="icon ni ni-eye"></em>
+                                    View Seal
+                                </a>
+                            }
+                            else
+                            {
+                                <span>Not uploaded</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr />
+
+            <!-- FACILITIES AND SCHEMES -->
+            <div class="nk-block-head mt-4">
+                <h5 class="title">
+                    <span style="border-left:5px solid #D9622F;padding-left:12px;">
+                        <em class="icon ni ni-list-check me-1"></em>
+                        Facilities &amp; Schemes
+                    </span>
+                </h5>
+            </div>
+
+            <div class="row gy-3">
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Self Funded</label>
+                        <div class="form-control bg-light">@BoolVal(Model.SelfFunded)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">NSDC</label>
+                        <div class="form-control bg-light">@BoolVal(Model.NSDC)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">STAR</label>
+                        <div class="form-control bg-light">@BoolVal(Model.STAR)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">MoRD</label>
+                        <div class="form-control bg-light">@BoolVal(Model.MoRD)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">State Government Schemes</label>
+                        <div class="form-control bg-light">@BoolVal(Model.StateGovernmentSchemes)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Other Central Government Schemes</label>
+                        <div class="form-control bg-light">@BoolVal(Model.OtherCentralGovernmentSchemes)</div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="form-label">Center Description</label>
+                        <div class="form-control bg-light"
+                             style="min-height:80px;white-space:pre-wrap;height:auto;">
+                            @Val(Model.CenterDescription)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="form-label">Equipment Details</label>
+                        <div class="form-control bg-light"
+                             style="min-height:70px;white-space:pre-wrap;height:auto;">
+                            @Val(Model.EquipmentDetails)
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr />
+
+            <!-- DOCUMENTS / PHOTOS -->
+            <div class="nk-block-head mt-4">
+                <h5 class="title">
+                    <span style="border-left:5px solid #D9622F;padding-left:12px;">
+                        <em class="icon ni ni-file-img me-1"></em>
+                        Center Photos &amp; Documents
+                    </span>
+                </h5>
+            </div>
+
+            <div class="row gy-3">
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Approach Road Photo</label>
+                        <div class="form-control bg-light d-flex align-items-center">
+                            @if (!string.IsNullOrWhiteSpace(approachRoadPhoto))
+                            {
+                                <a href="@PhotoUrl(approachRoadPhoto)" target="_blank"
+                                   rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                    <em class="icon ni ni-eye"></em> View Photo
+                                </a>
+                            }
+                            else
+                            {
+                                <span>Not uploaded</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Outside Classroom Photo</label>
+                        <div class="form-control bg-light d-flex align-items-center">
+                            @if (!string.IsNullOrWhiteSpace(outsideClassroomPhoto))
+                            {
+                                <a href="@PhotoUrl(outsideClassroomPhoto)" target="_blank"
+                                   rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                    <em class="icon ni ni-eye"></em> View Photo
+                                </a>
+                            }
+                            else
+                            {
+                                <span>Not uploaded</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Inside Classroom Photo</label>
+                        <div class="form-control bg-light d-flex align-items-center">
+                            @if (!string.IsNullOrWhiteSpace(insideClassroomPhoto))
+                            {
+                                <a href="@PhotoUrl(insideClassroomPhoto)" target="_blank"
+                                   rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                    <em class="icon ni ni-eye"></em> View Photo
+                                </a>
+                            }
+                            else
+                            {
+                                <span>Not uploaded</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Lab Photo</label>
+                        <div class="form-control bg-light d-flex align-items-center">
+                            @if (!string.IsNullOrWhiteSpace(labPhoto))
+                            {
+                                <a href="@PhotoUrl(labPhoto)" target="_blank"
+                                   rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                    <em class="icon ni ni-eye"></em> View Photo
+                                </a>
+                            }
+                            else
+                            {
+                                <span>Not uploaded</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">CCTV Photo</label>
+                        <div class="form-control bg-light d-flex align-items-center">
+                            @if (!string.IsNullOrWhiteSpace(cctvPhoto))
+                            {
+                                <a href="@PhotoUrl(cctvPhoto)" target="_blank"
+                                   rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                    <em class="icon ni ni-eye"></em> View Photo
+                                </a>
+                            }
+                            else
+                            {
+                                <span>Not uploaded</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr />
+
+
+                <!-- INSPECTION INFORMATION -->
+                <div class="nk-block-head mt-4">
+                    <h5 class="title">
+                        <span style="border-left:5px solid #D9622F;padding-left:12px;">
+                            <em class="icon ni ni-calendar me-1"></em>
+                            Inspection Information
+                        </span>
+                    </h5>
+                </div>
+
+                <div class="row gy-3">
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Inspection Status</label>
+                            <div class="form-control bg-light">
+                                @Val(Model.InspectionStatus ?? "Not Scheduled")
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Inspection Date &amp; Time</label>
+                            <div class="form-control bg-light">
+                                @DateTimeVal(Model.InspectionDate)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Created Date</label>
+                            <div class="form-control bg-light">
+                                @DateVal(Model.InspectionCreatedDate)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Inspection Mode</label>
+                            <div class="form-control bg-light">
+                                @Val(Model.InspectionMode)
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.InspectionMode == "Online" &&
+                                        !string.IsNullOrWhiteSpace(Model.InspectionLink))
+                    {
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Inspection Link</label>
+                                <div class="form-control bg-light">
+                                    @if (Uri.TryCreate(Model.InspectionLink,
+                                                                    UriKind.Absolute, out var meetingUri) &&
+                                                                    (meetingUri.Scheme == Uri.UriSchemeHttps ||
+                                                                    meetingUri.Scheme == Uri.UriSchemeHttp))
+                                    {
+                                        <a href="@meetingUri.AbsoluteUri"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            Join Inspection
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span>Invalid inspection link</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @* <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="form-label">Inspection Remarks</label>
+                            <div class="form-control bg-light"
+                                 style="min-height:70px;white-space:pre-wrap;height:auto;">
+                                @Val(Model.InspectionRemarks)
+                            </div>
+                        </div>
+                    </div>*@
+
+                </div>
+
+                <!-- ACTION BUTTONS -->
+                <div class="row mt-4">
+                    <div class="col-md-12 d-flex flex-wrap justify-content-end gap-2">
+
+                        <button type="button"
+                                id="toggleInspectionForm"
+                                class="btn @(isScheduled ? "btn-warning" : "btn-primary")">
+                            <em class="icon ni ni-calendar"></em>
+
+                            @(isScheduled
+                                                        ? "Update Inspection Schedule"
+                                                        : "Schedule for Inspection")
+                        </button>
+
+                        <a asp-area="HRMS"
+                           asp-controller="TrainingCenter"
+                           asp-action="InspectionList"
+                           class="btn btn-light">
+                            <em class="icon ni ni-arrow-left"></em>
+                            Back to List
+                        </a>
+
+                    </div>
+                </div>
+
+                <!-- INLINE SCHEDULE FORM -->
+                <div id="inspectionFormContainer"
+                     class="card card-bordered mt-4"
+                     style="display:none;">
+
+                    <div class="card-inner">
+
+                        <div class="nk-block-head">
+                            <h5 class="title"
+                                style="border-left:5px solid #D9622F;padding-left:12px;">
+                                @(isScheduled
+                                                                ? "Update Inspection Schedule"
+                                                                : "Schedule New Inspection")
+                            </h5>
+                        </div>
+
+                        <form asp-area="HRMS"
+                              asp-controller="TrainingCenter"
+                              asp-action="ScheduleInspection"
+                              method="post">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden" name="id" value="@Model.Id" />
+
+                            <div class="row gy-3">
+
+                                <div class="col-md-4">
+                                    <label class="form-label">
+                                        Inspection Date &amp; Time
+                                        <span class="text-danger">*</span>
+                                    </label>
+
+                                    <input type="datetime-local"
+                                           name="inspectionDate"
+                                           class="form-control"
+                                           value="@(Model.InspectionDate.HasValue
+                                                                          ? Model.InspectionDate.Value.ToString("yyyy-MM-ddTHH:mm")
+                                                                          : "")"
+                                           required />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">
+                                        Inspection Mode
+                                        <span class="text-danger">*</span>
+                                    </label>
+
+                                    <select name="inspectionMode"
+                                            id="inspectionMode"
+                                            class="form-select"
+                                            required>
+                                        <option value="">Select Mode</option>
+                                        <option value="Online"
+                                                selected="@(Model.InspectionMode == "Online")">
+                                            Online
+                                        </option>
+                                        <option value="Offline"
+                                                selected="@(Model.InspectionMode == "Offline")">
+                                            Offline
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4"
+                                     id="inspectionLinkContainer">
+                                    <label class="form-label">
+                                        Inspection Link
+                                        <span id="inspectionLinkRequired"
+                                              class="text-danger">*</span>
+                                    </label>
+
+                                    <input type="url"
+                                           name="inspectionLink"
+                                           id="inspectionLink"
+                                           class="form-control"
+                                           maxlength="1000"
+                                           value="@Model.InspectionLink"
+                                           placeholder="https://meet.google.com/..." />
+
+                                    <small class="text-soft">
+                                        Required for Online inspection only.
+                                    </small>
+                                </div>
+
+                            </div>
+
+                            <div class="mt-4 d-flex flex-wrap gap-2">
+                                <button type="submit" class="btn btn-success">
+                                    <em class="icon ni ni-check-circle"></em>
+                                    Save Inspection
+                                </button>
+
+                                <button type="button"
+                                        id="cancelInspectionForm"
+                                        class="btn btn-light">
+                                    Cancel
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const toggleButton = document.getElementById("toggleInspectionForm");
+                        const cancelButton = document.getElementById("cancelInspectionForm");
+                        const formContainer = document.getElementById("inspectionFormContainer");
+                        const modeSelect = document.getElementById("inspectionMode");
+                        const linkInput = document.getElementById("inspectionLink");
+                        const linkContainer = document.getElementById("inspectionLinkContainer");
+                        const requiredMark = document.getElementById("inspectionLinkRequired");
+
+                        toggleButton.addEventListener("click", function () {
+                            formContainer.style.display = "block";
+
+                            formContainer.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start"
+                            });
+
+                            updateLinkField();
+                        });
+
+                        cancelButton.addEventListener("click", function () {
+                            formContainer.style.display = "none";
+                        });
+
+                        function updateLinkField() {
+                            const isOnline = modeSelect.value === "Online";
+
+                            linkContainer.style.display = isOnline ? "" : "none";
+                            linkInput.required = isOnline;
+                            linkInput.disabled = !isOnline;
+                            requiredMark.style.display = isOnline ? "" : "none";
+
+                            if (!isOnline) {
+                                linkInput.value = "";
+                            }
+                        }
+
+                        modeSelect.addEventListener("change", updateLinkField);
+                        updateLinkField();
+                    });
+                </script>
+
+
+        </div>
+        </div>
+    </div>
+</div>

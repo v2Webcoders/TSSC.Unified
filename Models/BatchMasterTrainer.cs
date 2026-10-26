@@ -17,12 +17,25 @@ namespace TSSC.Unified.Models
 
         public DateTime CreatedDate { get; set; }
 
-        // Navigation Properties
+        public bool ResultUploaded { get; set; } = false;
+
+        public DateTime? ResultUploadedDate { get; set; }
+
+        public bool ResultEmailSent { get; set; } = false;
+
+        public DateTime? ResultEmailSentDate { get; set; }
+
+
+        // =========================================================
+        // NAVIGATION
+        // =========================================================
 
         [ForeignKey(nameof(BatchId))]
         public virtual BatchMaster? Batch { get; set; }
 
         [ForeignKey(nameof(TrainerRegistrationId))]
         public virtual TrainerRegistration? TrainerRegistration { get; set; }
+       
+
     }
 }

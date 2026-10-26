@@ -1,0 +1,199 @@
+﻿
+@model IEnumerable<TSSC.Unified.ViewModel.JobRoleViewModel>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Select Job Role
+            </h3>
+        </div>
+    </div>
+</div>
+
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <!-- Scheme and Project -->
+        <div class="row g-3 mb-4">
+
+            <div class="col-lg-4 col-md-6">
+                <div class="form-group">
+                    <label class="form-label" for="schemeId">
+                        Select Scheme <span class="text-danger">*</span>
+                    </label>
+
+                    <div class="form-control-wrap">
+                        <select id="schemeId"
+                                name="schemeId"
+                                class="form-select"
+                                required>
+                            <option value="">Select Scheme</option>
+
+                            @if (ViewBag.Schemes != null)
+                            {
+                                foreach (var scheme in ViewBag.Schemes)
+                                {
+                                    <option value="@scheme.Value">
+                                        @scheme.Text
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="form-group">
+                    <label class="form-label" for="projectId">
+                        Select Project <span class="text-danger">*</span>
+                    </label>
+
+                    <div class="form-control-wrap">
+                        <select id="projectId"
+                                name="projectId"
+                                class="form-select"
+                                required>
+                            <option value="">Select Project</option>
+
+                            @if (ViewBag.Projects != null)
+                            {
+                                foreach (var project in ViewBag.Projects)
+                                {
+                                    <option value="@project.Value">
+                                        @project.Text
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+  
+
+        <!-- Heading -->
+        <div class="nk-block-head nk-block-head-sm">
+            <div class="nk-block-between">
+                <div class="nk-block-head-content">
+                    <h5 class="nk-block-title">
+                        Available Job Roles
+                    </h5>
+                </div>
+
+                <div class="nk-block-head-content">
+                    <span class="badge bg-primary">
+                        Total: @(Model?.Count() ?? 0)
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Roles Table -->
+        <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>QP Code</th>
+                    <th>Job Role</th>
+                    <th>Sub Sector</th>
+                    <th>QP Version</th>
+                    <th>NSQF Level</th>
+                    <th>QP Hours</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@serial</td>
+
+                            <td>@item.QPCode</td>
+
+                            <td>@item.JobRoleTitle</td>
+
+                            <td>@item.SubSectorId</td>
+
+                            <td>@item.QPVersion</td>
+
+                            <td>@item.NSQFLevel</td>
+
+                            <td>
+                                @(item.QPHours.HasValue
+                                                        ? item.QPHours.Value.ToString("0.##") + " Hours"
+                                                        : "-")
+                    </td>
+
+                            <td>
+                                <a asp-area="TP"
+                                   asp-controller="TrainingCenter"
+                                   asp-action="Create"
+                                   asp-route-jobRoleId="@item.Id"
+                                   class="btn btn-success btn-sm"
+                                   onclick="return validateSelection(this);">
+                                    <em class="icon ni ni-plus"></em>
+                                    Add Center
+                                </a>
+                            </td>
+                        </tr>
+
+                                serial++;
+                    }
+                }
+            </tbody>
+
+        </table>
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="alert alert-info mt-3">
+                No approved job roles found.
+            </div>
+        }
+
+    </div>
+</div>
+<script>
+    function validateSelection(button) {
+
+        const schemeElement = document.getElementById("schemeId");
+        const projectElement = document.getElementById("projectId");
+
+        const schemeId = schemeElement?.value;
+        const projectId = projectElement?.value;
+
+        if (!schemeId) {
+            alert("Please select Scheme.");
+            schemeElement?.focus();
+            return false;
+        }
+
+        const url = new URL(button.href, window.location.origin);
+        url.searchParams.set("schemeId", schemeId);
+
+        if (projectId) {
+            url.searchParams.set("projectId", projectId);
+        } else {
+            url.searchParams.delete("projectId");
+        }
+
+
+        window.location.href = url.toString();
+        return false;
+    }
+</script>
+

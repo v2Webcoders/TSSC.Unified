@@ -6,6 +6,74 @@
     Layout = "_Layout";
     int serial = 1;
 }
+<style>
+    .approval-progress {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        min-width: 190px;
+        padding: 0 5px;
+    }
+
+    /* Line passes exactly through the center of circles */
+    .approval-line {
+        position: absolute;
+        top: 14px;
+        left: 18px;
+        right: 18px;
+        height: 2px;
+        background: #d9dee7;
+        z-index: 0;
+    }
+
+    .approval-step {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: transparent;
+    }
+
+    .approval-circle {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        background: #fff;
+        border: 2px solid #d9dee7;
+    }
+
+        .approval-circle.approved {
+            background: #e7f7ee;
+            border-color: #28a745;
+            color: #28a745;
+        }
+
+        .approval-circle.rejected {
+            background: #fdeaea;
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .approval-circle.pending {
+            background: #fff8e1;
+            border-color: #f0ad00;
+            color: #f0ad00;
+        }
+
+    .approval-step small {
+        margin-top: 5px;
+        font-size: 10px;
+        font-weight: 600;
+        color: #8091a5;
+    }
+</style>
 
 <div class="nk-block-head nk-block-head-sm">
     <div class="nk-block-between">
@@ -27,6 +95,7 @@
             <thead>
                 <tr>
                     <th>S.No.</th>
+                    <th>Progress</th>
                     <th>Employee</th>
                     <th>Expense Category</th>
                     <th>Expense Amount</th>
@@ -36,6 +105,7 @@
                     <th>Invoice / Bill</th>
                     <th>HR Status</th>
                     <th>Finance Head Status</th>
+                    <th>Payment Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -49,7 +119,66 @@
                         <td>
                             @serial
                         </td>
+                        <td>
+                            <div class="approval-progress">
+                                <div class="approval-line"></div>
 
+                                <!-- Vertical Head -->
+                                <div class="approval-step">
+                                    <div class="approval-circle @(item.Status == "Manager Approved" ? "manager approved" : item.Status == "Rejected" ? "rejected" : "pending")"
+                                         data-bs-toggle="tooltip"
+                                         data-bs-placement="top"
+                                         title="Vertical Head - @(item.Status == "Manager Approved" ? "Approved" : item.Status == "Rejected" ? "Rejected" : "Pending")">
+                                        @(item.Status == "Manager Approved" ? "✓" : item.Status == "Rejected" ? "✕" : "•")
+                                    </div>
+                                    <small>VH</small>
+                                </div>
+
+                                <!-- Finance Team -->
+                                <div class="approval-step">
+                                    <div class="approval-circle @(item.FinanceStatus == "Finance Approved" ? "finance approved" : item.FinanceStatus == "Finance Rejected" || item.FinanceStatus == "Rejected" ? "rejected" : "pending")"
+                                         data-bs-toggle="tooltip"
+                                         data-bs-placement="top"
+                                         title="Finance Team - @(item.FinanceStatus == "Finance Approved" ? "Approved" : item.FinanceStatus == "Finance Rejected" || item.FinanceStatus == "Rejected" ? "Rejected" : "Pending")">
+                                        @(item.FinanceStatus == "Finance Approved" ? "✓" : item.FinanceStatus == "Finance Rejected" || item.FinanceStatus == "Rejected" ? "✕" : "•")
+                                    </div>
+                                    <small>FT</small>
+                                </div>
+
+                                <!-- HR -->
+                                <div class="approval-step">
+                                    <div class="approval-circle @(item.HRStatus == "HR Approved" ? "hr approved" : item.HRStatus == "HR Rejected" || item.HRStatus == "Rejected" ? "rejected" : "pending")"
+                                         data-bs-toggle="tooltip"
+                                         data-bs-placement="top"
+                                         title="HR - @(item.HRStatus == "HR Approved" ? "Approved" : item.HRStatus == "HR Rejected" || item.HRStatus == "Rejected" ? "Rejected" : "Pending")">
+                                        @(item.HRStatus == "HR Approved" ? "✓" : item.HRStatus == "HR Rejected" || item.HRStatus == "Rejected" ? "✕" : "•")
+                                    </div>
+                                    <small>HR</small>
+                                </div>
+
+                                <!-- Finance Head -->
+                                <div class="approval-step">
+                                    <div class="approval-circle @(item.FinanceHeadStatus == "Finance Head Approved" ? "finance-head approved" : item.FinanceHeadStatus == "Finance Head Rejected" || item.FinanceHeadStatus == "Rejected" ? "rejected" : "pending")"
+                                         data-bs-toggle="tooltip"
+                                         data-bs-placement="top"
+                                         title="Finance Head - @(item.FinanceHeadStatus == "Finance Head Approved" ? "Approved" : item.FinanceHeadStatus == "Finance Head Rejected" || item.FinanceHeadStatus == "Rejected" ? "Rejected" : "Pending")">
+                                        @(item.FinanceHeadStatus == "Finance Head Approved" ? "✓" : item.FinanceHeadStatus == "Finance Head Rejected" || item.FinanceHeadStatus == "Rejected" ? "✕" : "•")
+                                    </div>
+                                    <small>FH</small>
+                                </div>
+
+                                <!-- CEO -->
+                                <div class="approval-step">
+                                    <div class="approval-circle @(item.CEOStatus == "CEO Approved" ? "ceo approved" : item.CEOStatus == "CEO Rejected" || item.CEOStatus == "Rejected" ? "rejected" : "pending")"
+                                         data-bs-toggle="tooltip"
+                                         data-bs-placement="top"
+                                         title="CEO - @(item.CEOStatus == "CEO Approved" ? "Approved" : item.CEOStatus == "CEO Rejected" || item.CEOStatus == "Rejected" ? "Rejected" : "Pending")">
+                                        @(item.CEOStatus == "CEO Approved" ? "✓" : item.CEOStatus == "CEO Rejected" || item.CEOStatus == "Rejected" ? "✕" : "•")
+                                    </div>
+                                    <small>CEO</small>
+                                </div>
+                            </div>
+                        </td>
                         <td>
                             @item.EmployeeId
                         </td>
@@ -145,7 +274,7 @@
                             }
 
                         </td>
-
+                        <td>@item.PaymentStatus</td>
                         <td>
 
                             @if (item.FinanceHeadStatus == "Pending")

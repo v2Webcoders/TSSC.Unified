@@ -7,43 +7,28 @@
     int serial = 1;
 }
 
-<!-- ============================================ -->
-<!-- PAGE HEADER -->
-<!-- ============================================ -->
-
 <div class="nk-block-head nk-block-head-sm">
-
     <div class="nk-block-between">
 
-        <!-- TITLE -->
         <div class="nk-block-head-content">
-
             <h3 class="nk-block-title page-title">
                 Batch List
             </h3>
-
         </div>
 
-
-        <!-- CREATE BATCH -->
         <div class="nk-block-head-content">
-
             <div class="toggle-wrap nk-block-tools-toggle">
 
                 <a href="#"
                    class="btn btn-icon btn-trigger toggle-expand me-n1"
                    data-target="pageMenu">
-
                     <em class="icon ni ni-more-v"></em>
-
                 </a>
-
 
                 <div class="toggle-expand-content"
                      data-content="pageMenu">
 
                     <ul class="nk-block-tools g-3">
-
                         <li class="nk-block-tools-opt">
 
                             <a asp-area="HRMS"
@@ -60,23 +45,16 @@
                             </a>
 
                         </li>
-
                     </ul>
 
                 </div>
-
             </div>
-
         </div>
 
     </div>
-
 </div>
 
 
-<!-- ============================================ -->
-<!-- SUCCESS MESSAGE -->
-<!-- ============================================ -->
 @if (TempData["msg"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show">
@@ -93,9 +71,6 @@
 }
 
 
-<!-- ============================================ -->
-<!-- ERROR MESSAGE -->
-<!-- ============================================ -->
 @if (TempData["error"] != null)
 {
     <div class="alert alert-danger alert-dismissible fade show">
@@ -112,12 +87,7 @@
 }
 
 
-<!-- ============================================ -->
-<!-- BATCH TABLE -->
-<!-- ============================================ -->
-
 <div class="card card-bordered">
-
     <div class="card-inner">
 
         <div class="table-responsive">
@@ -125,7 +95,6 @@
             <table class="datatable-init-export table table-tranx table_custom table-bordered">
 
                 <thead>
-
                     <tr>
 
                         <th>
@@ -165,9 +134,7 @@
                         </th>
 
                     </tr>
-
                 </thead>
-
 
                 <tbody>
 
@@ -177,15 +144,11 @@
                         {
                             <tr>
 
-                                <!-- S.NO -->
                                 <td>
                                     @serial
                                 </td>
 
-
-                                <!-- BATCH CODE -->
                                 <td>
-
                                     @if (!string.IsNullOrWhiteSpace(item.BatchCode))
                                     {
                                         @item.BatchCode
@@ -194,45 +157,30 @@
                                     {
                                         <span>-</span>
                                     }
-
                                 </td>
 
-
-                                <!-- BATCH NAME -->
                                 <td>
-
                                     <strong>
                                         @item.BatchName
                                     </strong>
-
                                 </td>
 
-
-                                <!-- JOB ROLE -->
                                 <td>
-                                    @item.JobRoleId
+                                    @(item.JobRole?.JobRoleTitle ?? "-")
                                 </td>
 
-
-                                <!-- TP -->
                                 <td>
                                     @(item.TPId?.ToString() ?? "-")
                                 </td>
 
-
-                                <!-- START DATE -->
                                 <td>
                                     @(item.StartDate?.ToString("dd-MMM-yyyy") ?? "-")
                                 </td>
 
-
-                                <!-- END DATE -->
                                 <td>
                                     @(item.EndDate?.ToString("dd-MMM-yyyy") ?? "-")
                                 </td>
 
-
-                                <!-- STATUS -->
                                 <td>
 
                                     @if (item.Status == "Active")
@@ -262,12 +210,9 @@
 
                                 </td>
 
-
-                                <!-- ACTIONS -->
                                 <td>
 
-                                    <div class="btn-group"
-                                         role="group">
+                                    <div class="btn-group" role="group">
 
                                         <!-- VIEW BATCH -->
                                         <a asp-area="HRMS"
@@ -282,7 +227,6 @@
                                         </a>
 
 
-                                        
                                         <!-- VIEW TRAINERS -->
                                         <button type="button"
                                                 class="btn btn-sm btn-outline-primary"
@@ -323,14 +267,10 @@
         </div>
 
     </div>
-
 </div>
 
 
-<!-- ============================================ -->
-<!-- TRAINER MODAL -->
-<!-- ============================================ -->
-
+<!-- BATCH TRAINERS MODAL -->
 <div class="modal fade"
      id="batchTrainerModal"
      tabindex="-1"
@@ -341,7 +281,6 @@
 
         <div class="modal-content">
 
-            <!-- HEADER -->
             <div class="modal-header">
 
                 <h5 class="modal-title"
@@ -360,7 +299,6 @@
             </div>
 
 
-            <!-- BODY -->
             <div class="modal-body">
 
                 <div class="table-responsive">
@@ -368,7 +306,6 @@
                     <table class="table table-bordered table-hover">
 
                         <thead>
-
                             <tr>
 
                                 <th>
@@ -391,20 +328,14 @@
                                     Mobile
                                 </th>
 
-                                <th>
-                                    Action
-                                </th>
-
                             </tr>
-
                         </thead>
-
 
                         <tbody id="batchTrainerTableBody">
 
                             <tr>
 
-                                <td colspan="6"
+                                <td colspan="5"
                                     class="text-center py-4">
 
                                     Loading...
@@ -422,7 +353,6 @@
             </div>
 
 
-            <!-- FOOTER -->
             <div class="modal-footer">
 
                 <button type="button"
@@ -438,138 +368,6 @@
         </div>
 
     </div>
-
-</div>
-
-
-<!-- ============================================ -->
-<!-- SCREENING RESULT MODAL -->
-<!-- ============================================ -->
-
-<div class="modal fade"
-     id="screeningResultModal"
-     tabindex="-1"
-     aria-labelledby="screeningResultModalLabel"
-     aria-hidden="true">
-
-    <div class="modal-dialog modal-md modal-dialog-centered">
-
-        <div class="modal-content">
-
-            <form asp-area="HRMS"
-                  asp-controller="Trainer"
-                  asp-action="UpdateScreeningResult"
-                  method="post">
-
-                @Html.AntiForgeryToken()
-
-
-                <!-- HEADER -->
-                <div class="modal-header">
-
-                    <h5 class="modal-title"
-                        id="screeningResultModalLabel">
-
-                        Update Screening Result
-
-                    </h5>
-
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close">
-                    </button>
-
-                </div>
-
-
-                <!-- BODY -->
-                <div class="modal-body">
-
-                    <input type="hidden"
-                           id="resultScreeningId"
-                           name="id" />
-
-
-                    <!-- RESULT -->
-                    <div class="form-group mb-3">
-
-                        <label class="form-label">
-                            Screening Result
-                        </label>
-
-                        <select name="status"
-                                id="screeningResultStatus"
-                                class="form-select"
-                                required>
-
-                            <option value="">
-                                Select Result
-                            </option>
-
-                            <option value="Success">
-                                Success
-                            </option>
-
-                            <option value="Rejected">
-                                Reject
-                            </option>
-
-                            <option value="On Hold">
-                                On Hold
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <!-- REMARKS -->
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Remarks
-                        </label>
-
-                        <textarea name="remarks"
-                                  id="screeningResultRemarks"
-                                  class="form-control"
-                                  rows="4"
-                                  placeholder="Enter screening remarks"
-                                  required></textarea>
-
-                    </div>
-
-                </div>
-
-
-                <!-- FOOTER -->
-                <div class="modal-footer">
-
-                    <button type="button"
-                            class="btn btn-light"
-                            data-bs-dismiss="modal">
-
-                        Cancel
-
-                    </button>
-
-
-                    <button type="submit"
-                            class="btn btn-primary">
-
-                        Save Result
-
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
 </div>
 
 
@@ -577,26 +375,16 @@
 
     <script>
 
-        // =====================================================
-        // SHOW BATCH TRAINERS
-        // =====================================================
+        function showBatchTrainers(batchId) {
 
-        function showBatchTrainers(batchId)
-        {
-            // Loading
             $('#batchTrainerTableBody').html(`
                 <tr>
-                    <td colspan="6"
-                        class="text-center py-4">
-
+                    <td colspan="5" class="text-center py-4">
                         Loading trainers...
-
                     </td>
                 </tr>
             `);
 
-
-            // Open modal
             var modalElement =
                 document.getElementById('batchTrainerModal');
 
@@ -606,7 +394,6 @@
             modal.show();
 
 
-            // AJAX
             $.ajax({
 
                 url: '/HRMS/Trainer/GetBatchTrainers',
@@ -617,22 +404,16 @@
                     batchId: batchId
                 },
 
-                success: function (data)
-                {
+                success: function (data) {
 
-                    // No trainers
-                    if (!data || data.length === 0)
-                    {
+                    if (!data || data.length === 0) {
+
                         $('#batchTrainerTableBody').html(`
                             <tr>
-
-                                <td colspan="6"
+                                <td colspan="5"
                                     class="text-center py-4">
-
                                     No trainers assigned to this batch.
-
                                 </td>
-
                             </tr>
                         `);
 
@@ -643,184 +424,7 @@
                     $('#batchTrainerTableBody').empty();
 
 
-                    // ========================================
-                    // TRAINERS
-                    // ========================================
-
-                    $.each(data, function (index, item)
-                    {
-
-                        var actionHtml = '';
-
-
-                        // ====================================
-                        // NO SCREENING
-                        // ====================================
-
-                        if (!item.screeningStatus)
-                        {
-
-                            actionHtml = `
-                                <a href="/HRMS/Trainer/CreateScreening?batchId=${batchId}&trainerId=${item.id}"
-                                   class="btn btn-sm btn-outline-success"
-                                   title="Schedule Screening">
-
-                                    <em class="icon ni ni-calendar-check"></em>
-
-                                    Schedule
-
-                                </a>
-                            `;
-
-                        }
-
-
-                        // ====================================
-                        // SCREENING SCHEDULED
-                        // ====================================
-
-                        else if (
-                            item.screeningStatus === 'Scheduled'
-                        )
-                        {
-
-                            if (item.canUpdateResult)
-                            {
-
-                                actionHtml = `
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-primary"
-                                            title="Update Screening Result"
-                                            onclick="openScreeningResult(${item.screeningId})">
-
-                                        <em class="icon ni ni-check-circle"></em>
-
-                                        Update Result
-
-                                    </button>
-                                `;
-
-                            }
-                            else
-                            {
-
-                                actionHtml = `
-                                    <span class="badge badge-dim bg-warning">
-
-                                        Scheduled
-
-                                    </span>
-                                `;
-                            }
-
-                        }
-
-
-                        // ====================================
-                        // SUCCESS
-                        // ====================================
-
-                        else if (
-                            item.screeningStatus === 'Success'
-                        )
-                        {
-
-                            actionHtml = `
-                                <span class="badge badge-dim bg-success">
-
-                                    Success
-
-                                </span>
-                            `;
-
-                        }
-
-
-                        // ====================================
-                        // REJECTED
-                        // ====================================
-
-                        else if (
-                            item.screeningStatus === 'Rejected'
-                        )
-                        {
-
-                            actionHtml = `
-                                <span class="badge badge-dim bg-danger">
-
-                                    Rejected
-
-                                </span>
-                            `;
-
-                        }
-
-
-                        // ====================================
-                        // ON HOLD
-                        // ====================================
-
-                        else if (
-                            item.screeningStatus === 'On Hold'
-                        )
-                        {
-
-                            actionHtml = `
-                                <span class="badge badge-dim bg-warning">
-
-                                    On Hold
-
-                                </span>
-                            `;
-
-                        }
-
-
-                        // ====================================
-                        // CANCELLED
-                        // ====================================
-
-                        else if (
-                            item.screeningStatus === 'Cancelled'
-                        )
-                        {
-
-                            actionHtml = `
-                                <a href="/HRMS/Trainer/CreateScreening?batchId=${batchId}&trainerId=${item.id}"
-                                   class="btn btn-sm btn-outline-success"
-                                   title="Schedule Screening">
-
-                                    <em class="icon ni ni-calendar-check"></em>
-
-                                    Schedule
-
-                                </a>
-                            `;
-
-                        }
-
-
-                        // ====================================
-                        // OTHER STATUS
-                        // ====================================
-
-                        else
-                        {
-
-                            actionHtml = `
-                                <span class="badge badge-dim bg-secondary">
-
-                                    ${item.screeningStatus}
-
-                                </span>
-                            `;
-
-                        }
-
-
-                        // ====================================
-                        // APPEND ROW
-                        // ====================================
+                    $.each(data, function (index, item) {
 
                         $('#batchTrainerTableBody').append(`
 
@@ -835,11 +439,9 @@
                                 </td>
 
                                 <td>
-
                                     <strong>
                                         ${item.trainerName ?? '-'}
                                     </strong>
-
                                 </td>
 
                                 <td>
@@ -850,10 +452,6 @@
                                     ${item.mobile ?? '-'}
                                 </td>
 
-                                <td>
-                                    ${actionHtml}
-                                </td>
-
                             </tr>
 
                         `);
@@ -862,25 +460,17 @@
 
                 },
 
+                error: function (xhr) {
 
-                error: function (xhr)
-                {
-
-                    console.log(xhr.status);
-
-                    console.log(xhr.responseText);
-
+                    console.log("STATUS:", xhr.status);
+                    console.log("ERROR:", xhr.responseText);
 
                     $('#batchTrainerTableBody').html(`
                         <tr>
-
-                            <td colspan="6"
+                            <td colspan="5"
                                 class="text-center text-danger py-4">
-
                                 Unable to load trainers.
-
                             </td>
-
                         </tr>
                     `);
 
@@ -890,35 +480,5 @@
 
         }
 
-
-        // =====================================================
-        // OPEN SCREENING RESULT MODAL
-        // =====================================================
-
-        function openScreeningResult(screeningId)
-        {
-
-            $('#resultScreeningId').val(screeningId);
-
-            $('#screeningResultStatus').val('');
-
-            $('#screeningResultRemarks').val('');
-
-
-            var modalElement =
-                document.getElementById(
-                    'screeningResultModal'
-                );
-
-
-            var modal =
-                new bootstrap.Modal(modalElement);
-
-
-            modal.show();
-
-        }
-
     </script>
-
 }

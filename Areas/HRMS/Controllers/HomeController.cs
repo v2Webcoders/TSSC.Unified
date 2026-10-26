@@ -234,7 +234,11 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 {
                     return RedirectToAction("EditProfile", "Employee");
                 }
+
                 //if (employee.ProfileStatus == "Submitted" || employee.ProfileStatus == "Complete")
+
+                //if (employee.ProfileStatus == "Submitted")
+
                 //{
                 //    return RedirectToAction("ProfileSubmitted", "Employee");
                 //}
