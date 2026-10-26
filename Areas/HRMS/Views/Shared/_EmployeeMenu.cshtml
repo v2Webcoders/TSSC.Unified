@@ -873,13 +873,33 @@
 
 					</a>
 				</li>
+				@* when manager approved the it direct sent to assessment agency *@
+				@* <li class="nk-menu-item">
+<a href="/HRMS/Trainer/SendToAgency"
+				   class="nk-menu-link">
 
+					<span class="nk-menu-text">
+						Send to Assesment Agency
+</span>
+
+				</a>
+</li> *@
+				<li class="nk-menu-item">
+					<a href="/HRMS/Trainer/UploadCertificate"
+					   class="nk-menu-link">
+
+						<span class="nk-menu-text">
+							Upload Certificate
+						</span>
+
+					</a>
+				</li>
 			</ul>
 
 		</li>
 	}
 
-	@if (isFinanceEmployee)
+	@if (User.IsInRole("Finance"))
 	{
 		<li class="nk-menu-heading">
 			<div class="nk-menu-heading-content">
@@ -931,6 +951,67 @@
 			</ul>
 
 		</li>
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					<em class="icon ni ni-user-check"></em>
+					Training Center
+				</span>
+			</div>
+		</li>
+		<li class="nk-menu-item has-sub">
+
+			<a href="#"
+			   class="nk-menu-link nk-menu-toggle">
+
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-user-check"></em>
+				</span>
+
+				<span class="nk-menu-text">
+					Manage Training Center
+				</span>
+
+			</a>
+
+
+			<ul class="nk-menu-sub">
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/PaymentApproval?tab=Pending"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Pending" ? "active" : "")">
+
+						<span class="nk-menu-text">
+							Pending
+						</span>
+
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/PaymentApproval?tab=Approved"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Approved" ? "active" : "")">
+
+						<span class="nk-menu-text">
+							Approved
+						</span>
+
+					</a>
+				</li>
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/PaymentApproval?tab=Rejected"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Rejected" ? "active" : "")">
+
+						<span class="nk-menu-text">
+							Rejected
+						</span>
+
+					</a>
+				</li>
+
+			</ul>
+
+		</li>
 	}
 
 	@if (isReportingManager)
@@ -959,7 +1040,16 @@
 			</a>
 
 			<ul class="nk-menu-sub">
+				<li class="nk-menu-item">
+					<a href="/HRMS/Trainer/RegistrationList"
+					   class="nk-menu-link">
 
+						<span class="nk-menu-text">
+							Screening Result Approval
+						</span>
+
+					</a>
+				</li>
 				<li class="nk-menu-item">
 					<a href="/HRMS/Trainer/AgencyApprovalByManager"
 					   class="nk-menu-link">
@@ -986,7 +1076,6 @@
 
 		</li>
 	}
-
 
 	<!-- HR MANAGEMENT - HR ONLY -->
 	<!-- ===================================================== -->
