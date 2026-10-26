@@ -266,7 +266,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                         ProfileStatus = "Pending",
                         OfficialEmail = model.OfficialEmail,
                         PersonalEmail = model.PersonalEmail,
-                        MobileNo = /*model.MobileNo,*/"9999999999",
+                        MobileNo = model.MobileNo/*"9999999999"*/,
                         AlternateMobile = model.AlternateMobile,
 
                         CurrentAddress = model.CurrentAddress,

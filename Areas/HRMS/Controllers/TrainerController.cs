@@ -188,7 +188,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 .Where(x =>
                     x.JobRoleId == jobRoleId &&
                     x.Status == "Approved" &&
-                    x.IsActive &&
+                    x.IsActive && x.PaymentStatus=="Success" &&
 
                     _context.ScreeningSchedule
                         .Where(s =>
@@ -951,14 +951,14 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 screening.ScreeningDate.Date
                     .Add(screening.EndTime.Value);
 
-            if (DateTime.Now < screeningEndDateTime)
-            {
-                TempData["error"] =
-                    "Screening result can be updated only after the screening end time.";
+            //if (DateTime.Now < screeningEndDateTime)
+            //{
+            //    TempData["error"] =
+            //        "Screening result can be updated only after the screening end time.";
 
-                return RedirectToAction(
-                    nameof(RegistrationList));
-            }
+            //    return RedirectToAction(
+            //        nameof(RegistrationList));
+            //}
 
             screening.Status = status;
             screening.Remarks = remarks;
@@ -1115,7 +1115,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                         bt.BatchId == x.Id &&
                         bt.TrainerRegistration != null &&
                         bt.TrainerRegistration.FinanceApproved &&
-                        bt.TrainerRegistration.PaymentVerified &&
+                        //bt.TrainerRegistration.PaymentVerified &&
                         bt.TrainerRegistration.IsActive
                     ))
                 .OrderByDescending(x => x.Id)
@@ -1235,6 +1235,10 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 TempData["error"] = "Employee record not found.";
                 return RedirectToAction(nameof(AgencyApprovalByManager));
             }
+            ////need to auto send batch to agency when manager approve
+            batch.AgencySent = true;
+            batch.AgencySentDate = DateTime.Now;
+            //---------------------------------------------------
             batch.AgencyApprovalStatus = "Approved";
             batch.VerticalHeadApprovedBy = employee.EmployeeId.ToString();
             batch.VerticalHeadApprovedDate = DateTime.Now;
