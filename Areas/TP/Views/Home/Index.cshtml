@@ -51,6 +51,35 @@
 
     </div>
 </div>
+
+@if (ViewBag.HasScheduledScreening == true)
+{
+    <div class="alert alert-warning alert-dismissible">
+        <div class="d-flex align-items-start">
+            <em class="icon ni ni-bell-ring fs-2 me-3"></em>
+
+            <div class="flex-grow-1">
+                <h5 class="alert-heading mb-1">
+                    New Screening Scheduled
+                </h5>
+
+                <p class="mb-2">
+                    A screening has been scheduled for one or more of your
+                    training batches. Please check the date and time.
+                </p>
+
+                <a asp-area="TP"
+                   asp-controller="Batch"
+                   asp-action="Index"
+                   class="btn btn-sm btn-warning">
+                    <em class="icon ni ni-calendar-check"></em>
+                    View Batches
+                </a>
+            </div>
+        </div>
+    </div>
+}
+
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-inner">
        

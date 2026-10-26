@@ -1373,8 +1373,26 @@
 	}
 
 
+	@if (roles.Contains("MonitoringTeam"))
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">TRAINING AND MONITORING</span>
+			</div>
+		</li>
 
-
+		<li class="nk-menu-item">
+			<a asp-area="HRMS"
+			   asp-controller="TrainingMonitoring"
+			   asp-action="BatchList"
+			   class="nk-menu-link">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-activity"></em>
+				</span>
+				<span class="nk-menu-text">Training Batches</span>
+			</a>
+		</li>
+	}
 	@if (roles.Contains("RegionalHead") ||
 			roles.Contains("AffiliationTeam") ||
 			roles.Contains("Finance") ||

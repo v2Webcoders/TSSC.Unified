@@ -1,0 +1,128 @@
+﻿@model TSSC.Unified.ViewModel.CandidateDashboardVM
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Candidate Dashboard";
+    var today = DateTime.Today;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between align-items-center">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                <em class="icon ni ni-dashboard me-2"></em>
+                Candidate Dashboard
+            </h3>
+            <div class="nk-block-des text-soft">
+                <p>View your enrolled batches and track their status.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- My Batches -->
+<div class="nk-block nk-block-lg">
+    <div class="nk-block-head nk-block-head-sm">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h5 class="nk-block-title title">My Batches</h5>
+                <div class="nk-block-des">
+                    <p class="text-soft">View details of the batches in which you are enrolled.</p>
+                </div>
+            </div>
+            <div class="nk-block-head-content">
+                <a asp-area="CandidatePortal" asp-controller="Batch" asp-action="Index"
+                   class="btn btn-dim btn-outline-primary">
+                    <em class="icon ni ni-eye"></em><span>View All Batches</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-bordered card-stretch">
+        <div class="card-inner-group">
+            <div class="card-inner p-0">
+                <div class="nk-tb-list nk-tb-ext is-separate">
+
+                    <div class="nk-tb-item nk-tb-head">
+                        <div class="nk-tb-col"><span class="sub-text">Batch</span></div>
+                        <div class="nk-tb-col tb-col-md"><span class="sub-text">Project</span></div>
+                        <div class="nk-tb-col tb-col-lg"><span class="sub-text">Training Center</span></div>
+                        <div class="nk-tb-col tb-col-lg"><span class="sub-text">Job Role</span></div>
+                        <div class="nk-tb-col tb-col-md"><span class="sub-text">Trainer</span></div>
+                        <div class="nk-tb-col tb-col-mb"><span class="sub-text">Duration</span></div>
+                        <div class="nk-tb-col"><span class="sub-text">Status</span></div>
+                    </div>
+
+                    @if (Model.RecentBatches != null && Model.RecentBatches.Count > 0)
+                    {
+                        foreach (var batch in Model.RecentBatches)
+                        {
+                            string statusText, statusClass;
+                            if (today < batch.StartDate.Date) { statusText = "Upcoming"; statusClass = "bg-info"; }
+                            else if (today > batch.EndDate.Date) { statusText = "Completed"; statusClass = "bg-secondary"; }
+                            else { statusText = "Ongoing"; statusClass = "bg-success"; }
+
+                            <div class="nk-tb-item">
+                                <div class="nk-tb-col">
+                                    <div class="user-card">
+                                        <div class="user-avatar sm bg-primary-dim">
+                                            <em class="icon ni ni-layers"></em>
+                                        </div>
+                                        <div class="user-info">
+                                            <span class="tb-lead">@batch.BatchId</span>
+                                            <span class="sub-text">@(string.IsNullOrWhiteSpace(batch.SchemeName) ? "-" : batch.SchemeName)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="nk-tb-col tb-col-md">
+                                    <span class="tb-sub">@(string.IsNullOrWhiteSpace(batch.ProjectName) ? "-" : batch.ProjectName)</span>
+                                </div>
+
+                                <div class="nk-tb-col tb-col-lg">
+                                    <span class="tb-sub"><em class="icon ni ni-map-pin text-soft me-1"></em>@(string.IsNullOrWhiteSpace(batch.CenterName) ? "-" : batch.CenterName)</span>
+                                </div>
+
+                                <div class="nk-tb-col tb-col-lg">
+                                    <span class="tb-sub"><em class="icon ni ni-briefcase text-soft me-1"></em>@(string.IsNullOrWhiteSpace(batch.JobRoleName) ? "-" : batch.JobRoleName)</span>
+                                </div>
+
+                                <div class="nk-tb-col tb-col-md">
+                                    <span class="tb-sub"><em class="icon ni ni-user text-soft me-1"></em>@(string.IsNullOrWhiteSpace(batch.TrainerName) ? "-" : batch.TrainerName)</span>
+                                </div>
+
+                                <div class="nk-tb-col tb-col-mb">
+                                    <span class="tb-lead-sub">@batch.StartDate.ToString("dd MMM yyyy")</span>
+                                    <span class="sub-text">to @batch.EndDate.ToString("dd MMM yyyy")</span>
+                                </div>
+
+                                <div class="nk-tb-col">
+                                    <span class="badge badge-dim @statusClass">@statusText</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="nk-tb-item">
+                            <div class="nk-tb-col text-center py-5" style="flex-basis:100%">
+                                <div class="user-avatar lg bg-light mx-auto mb-3">
+                                    <em class="icon ni ni-folder"></em>
+                                </div>
+                                <h6 class="mb-1">No batches yet</h6>
+                                <span class="text-soft">You are not enrolled in any batches yet.</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+

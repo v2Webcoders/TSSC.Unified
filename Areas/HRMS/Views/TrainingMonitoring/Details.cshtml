@@ -1,0 +1,360 @@
+﻿@model TSSC.Unified.Models.Batch
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Batch Details";
+    var candidates = ViewBag.BatchCandidates;
+}
+
+<div class="nk-content">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+
+                
+                <!-- Page Header -->
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between align-items-start">
+
+                        <!-- Left: Title and Status Details -->
+                        <div class="nk-block-head-content flex-grow-1">
+                            <h3 class="nk-block-title page-title">
+                                Batch Details
+                            </h3>
+
+                            <div class="nk-block-des text-soft">
+                                <p>View batch information and enrolled candidates.</p>
+                            </div>
+
+                            <!-- Status, Remarks and Date/Time in Same Line -->
+                            <div class="d-flex flex-wrap align-items-center gap-3 mt-3">
+
+                                @if (string.Equals(Model.Status, "Rejected", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge bg-danger">Rejected</span>
+
+                                    <span>
+                                        <strong class="text-danger">Remarks:</strong>
+                                        <span class="text-danger">
+                                            @(string.IsNullOrWhiteSpace(Model.ApprovalRemarks)
+                                                ? "No rejection remarks provided."
+                                                : Model.ApprovalRemarks)
+                                        </span>
+                                    </span>
+
+                                    @if (Model.ApprovedOn.HasValue)
+                                    {
+                                        <span class="text-soft">
+                                            <em class="icon ni ni-calendar"></em>
+                                            Rejected on:
+                                            @Model.ApprovedOn.Value.ToString("dd MMM yyyy, hh:mm tt")
+                                        </span>
+                                    }
+                                }
+                                else if (string.Equals(Model.Status, "Approved", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge bg-success">Approved</span>
+
+                                    @if (Model.ApprovedOn.HasValue)
+                                    {
+                                        <span class="text-soft">
+                                            <em class="icon ni ni-calendar"></em>
+                                            Approved on:
+                                            @Model.ApprovedOn.Value.ToString("dd MMM yyyy, hh:mm tt")
+                                        </span>
+                                    }
+                                }
+                                else if (string.Equals(Model.Status, "Pending", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge bg-warning text-dark">Pending Approval</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        @(string.IsNullOrWhiteSpace(Model.Status)
+                                            ? "N/A"
+                                            : Model.Status)
+                                    </span>
+                                }
+
+                            </div>
+                        </div>
+
+                        <!-- Right: Header Actions -->
+                        <div class="nk-block-head-content d-flex flex-wrap gap-2">
+                            <a asp-action="BatchList"
+                               class="btn btn-outline-light">
+                                <em class="icon ni ni-arrow-left"></em>
+                                <span>Back to Batches</span>
+                            </a>
+                            
+                        </div>
+
+                    </div>
+                </div>
+                
+                <!-- Batch Information -->
+                <div class="nk-block">
+                    <div class="card card-bordered">
+                        <div class="card-inner">
+                            <div class="row g-4">
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-soft">
+                                        Batch ID
+                                    </label>
+                                    <div class="fw-bold">
+                                        @Model.BatchId
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-soft">Status</label>
+
+                                    <div class="d-flex flex-wrap align-items-center gap-2">
+
+                                        @if (string.Equals(Model.Status, "Approved", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="badge bg-success">Approved</span>
+                                        }
+                                        else if (string.Equals(Model.Status, "Rejected", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="badge bg-danger">Rejected</span>
+
+                                            <span class="text-danger">
+                                                <strong>Remarks:</strong>
+                                                @(string.IsNullOrWhiteSpace(Model.ApprovalRemarks)
+                                                    ? "No rejection remarks provided."
+                                                    : Model.ApprovalRemarks)
+                                            </span>
+
+                                            @if (Model.ApprovedOn.HasValue)
+                                            {
+                                                <small class="text-soft">
+                                                    <em class="icon ni ni-clock"></em>
+                                                    @Model.ApprovedOn.Value.ToString("dd MMM yyyy, hh:mm tt")
+                                                </small>
+                                            }
+                                        }
+                                        else if (string.Equals(Model.Status, "Active", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="badge bg-success">Active</span>
+                                        }
+                                        else if (string.Equals(Model.Status, "Pending", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="badge bg-warning text-dark">Pending Approval</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                @(string.IsNullOrWhiteSpace(Model.Status) ? "N/A" : Model.Status)
+                                            </span>
+                                        }
+
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-soft">
+                                        Scheme
+                                    </label>
+                                    <div>
+                                        @(ViewBag.SchemeName ?? "N/A")
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-soft">
+                                        Project
+                                    </label>
+                                    <div>
+                                        @(ViewBag.ProjectName ?? "N/A")
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-soft">
+                                        Training Center
+                                    </label>
+                                    <div>
+                                        @(ViewBag.CenterName ?? "N/A")
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-soft">
+                                        Job Role
+                                    </label>
+                                    <div>
+                                        @(ViewBag.JobRoleName ?? "N/A")
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-soft">
+                                        Trainer
+                                    </label>
+                                    <div>
+                                        @(ViewBag.TrainerName ?? "N/A")
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-soft">
+                                        Start Date
+                                    </label>
+                                    <div>
+                                        @Model.StartDate.ToString("dd MMM yyyy")
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-soft">
+                                        End Date
+                                    </label>
+                                    <div>
+                                        @Model.EndDate.ToString("dd MMM yyyy")
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-soft">
+                                        Candidates Enrolled
+                                    </label>
+                                    <div class="fw-bold">
+                                        @(candidates == null
+                                            ? 0
+                                            : ((IEnumerable<dynamic>)candidates).Count())
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Candidate List -->
+     
+                <div class="nk-block">
+                    <div class="card card-bordered">
+                        <div class="card-inner-group">
+
+                            <div class="card-inner">
+                                <div class="nk-block-between">
+                                    <div class="nk-block-head-content">
+                                        <h5 class="title">Enrolled Candidates</h5>
+                                        <p class="text-soft mb-0">
+                                            Candidates currently associated with this batch.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-inner p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th style="width: 70px;">#</th>
+                                                <th>Candidate Name</th>
+                                                <th>Father Name</th>
+                                                <th>Aadhaar Number</th>
+                                                <th>DOB</th>
+                                                <th>Mobile Number</th>
+                                                <th>Email</th>
+                                                <th>Enrollment Date</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            @if (candidates != null &&
+                                            ((IEnumerable<dynamic>)candidates).Any())
+                                            {
+                                                var serial = 1;
+
+                                                foreach (var candidate in candidates)
+                                                {
+                                                    <tr>
+                                                        <td>@serial</td>
+
+                                                        <td>
+                                                            <span class="fw-medium">
+                                                                @candidate.CandidateName
+                                                            </span>
+                                                        </td>
+
+                                                        <td>
+                                                            @(candidate.FatherName ?? "N/A")
+                                                        </td>
+
+                                                        <td>
+                                                            @(candidate.AadharNo ?? "N/A")
+                                                        </td>
+
+                                                        <td>
+                                                            @(candidate.DOB ?? "N/A")
+                                                        </td>
+
+                                                        <td>
+                                                            @(candidate.MobileNumber ?? "N/A")
+                                                        </td>
+
+                                                        <td>
+                                                            @(candidate.Email ?? "N/A")
+                                                        </td>
+
+                                                        <td>
+                                                            @(((DateTime)candidate.EnrollmentDate)
+                                                                .ToString("dd MMM yyyy"))
+                                                        </td>
+
+                                                        <td>
+                                                            @if (string.Equals(
+                                                           (string)candidate.Status,
+                                                           "Enrolled",
+                                                           StringComparison.OrdinalIgnoreCase))
+                                                            {
+                                                                <span class="badge bg-success">
+                                                                    @candidate.Status
+                                                                </span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="badge bg-secondary">
+                                                                    @candidate.Status
+                                                                </span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+
+                                                    serial++;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="9"
+                                                        class="text-center text-soft py-4">
+                                                        <em class="icon ni ni-users"
+                                                            style="font-size: 2rem;"></em>
+                                                        <p class="mt-2 mb-0">
+                                                            No candidates enrolled in this batch.
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                
+
+            </div>
+        </div>
+    </div>
+</div>

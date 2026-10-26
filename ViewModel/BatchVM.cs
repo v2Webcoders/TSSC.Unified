@@ -79,8 +79,21 @@ namespace TSSC.Unified.ViewModel
         public string? CenterName { get; set; }
 
         public string? JobRoleName { get; set; }
+
         public string? TrainerName { get; set; }
+
         public string? ProjectName { get; set; }
+
+        // Screening information
+        public DateTime? MonitoringDateTime { get; set; }
+
+        public string? MonitoringStatus { get; set; }
+        public int? MonitoringId { get; set; }
+
+        // Approval information
+        public string? ApprovalRemarks { get; set; }
+
+        public DateTime? ApprovedOn { get; set; }
     }
 
 }

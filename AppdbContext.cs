@@ -103,5 +103,7 @@ namespace QUIZAPP
         public DbSet<Candidate> Candidates { get; set; }
         public DbSet<BatchCandidate> BatchCandidates { get; set; }
         public DbSet<Project> Project { get; set; }
+        public DbSet<BatchMonitoring> BatchMonitorings { get; set; }
+        public DbSet<BatchMonitoringReport> BatchMonitoringReports { get; set; }
     }
 }

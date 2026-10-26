@@ -304,7 +304,28 @@ namespace TSSC.Unified.Areas.TP.Controllers
                     for (int i = 0; i < importedCandidates.Count; i++)
                     {
                         var candidate = importedCandidates[i];
+                        if (string.IsNullOrWhiteSpace(candidate.FatherName))
+                        {
+                            ModelState.AddModelError(
+                                nameof(vm.CandidateFile),
+                                $"Father name is missing in Excel row {i + 2}.");
+                        }
 
+                        if (string.IsNullOrWhiteSpace(candidate.AadharNo) ||
+                            !System.Text.RegularExpressions.Regex.IsMatch(
+                                candidate.AadharNo.Trim(), @"^\d{12}$"))
+                        {
+                            ModelState.AddModelError(
+                                nameof(vm.CandidateFile),
+                                $"A valid 12-digit Aadhaar number is required in Excel row {i + 2}.");
+                        }
+
+                        if (string.IsNullOrWhiteSpace(candidate.DOB))
+                        {
+                            ModelState.AddModelError(
+                                nameof(vm.CandidateFile),
+                                $"Date of birth is missing in Excel row {i + 2}.");
+                        }
                         if (string.IsNullOrWhiteSpace(candidate.CandidateName))
                         {
                             ModelState.AddModelError(
@@ -330,22 +351,16 @@ namespace TSSC.Unified.Areas.TP.Controllers
                     }
 
                     // Prevent duplicate candidates in the same upload.
-                    var duplicateEmails = importedCandidates
-                        .Where(c => !string.IsNullOrWhiteSpace(c.Email))
-                        .GroupBy(c => c.Email!.Trim(),
-                            StringComparer.OrdinalIgnoreCase)
-                        .Any(g => g.Count() > 1);
+                    var duplicateAadhars = importedCandidates
+                    .Where(c => !string.IsNullOrWhiteSpace(c.AadharNo))
+                    .GroupBy(c => c.AadharNo.Trim())
+                    .Any(g => g.Count() > 1);
 
-                    var duplicateMobiles = importedCandidates
-                        .Where(c => !string.IsNullOrWhiteSpace(c.MobileNumber))
-                        .GroupBy(c => c.MobileNumber.Trim())
-                        .Any(g => g.Count() > 1);
-
-                    if (duplicateEmails || duplicateMobiles)
+                    if (duplicateAadhars)
                     {
                         ModelState.AddModelError(
                             nameof(vm.CandidateFile),
-                            "The Excel file contains duplicate candidate email addresses or mobile numbers.");
+                            "The Excel file contains duplicate Aadhaar numbers.");
                     }
                 }
                 catch (InvalidDataException ex)
@@ -442,136 +457,38 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 // TABLE 3: Create batch enrollments
                 foreach (var imported in importedCandidates)
                 {
-                    var email = imported.Email!.Trim().ToLowerInvariant();
+                    var email = imported.Email?.Trim().ToLowerInvariant();
                     var mobile = imported.MobileNumber.Trim();
+                    var aadharNo = imported.AadharNo.Trim();
 
-                    // Match candidate by email OR mobile.
+                    // Find candidate using Aadhaar number.
                     var candidate = await _context.Candidates
-                        .FirstOrDefaultAsync(c =>
-                            (c.Email != null &&
-                             c.Email.ToLower() == email)
-                            ||
-                            c.MobileNumber == mobile);
-
-                    if (candidate != null &&
-                        !string.IsNullOrWhiteSpace(candidate.Email) &&
-                        !string.Equals(
-                            candidate.Email.Trim(),
-                            email,
-                            StringComparison.OrdinalIgnoreCase))
-                    {
-                        throw new InvalidOperationException(
-                            $"The mobile number {mobile} already belongs to a candidate with a different email address.");
-                    }
-
-                    var isNewCandidate = candidate == null;
+                        .FirstOrDefaultAsync(c => c.AadharNo == aadharNo);
 
                     if (candidate == null)
                     {
+                        // Aadhaar does not exist: create a new candidate.
                         candidate = new Candidate
                         {
                             CandidateName = imported.CandidateName.Trim(),
+                            FatherName = imported.FatherName.Trim(),
+                            AadharNo = aadharNo,
+                            DOB = imported.DOB?.Trim(),
                             MobileNumber = mobile,
                             Email = email,
                             CreatedOn = now
                         };
-                    }
-                    else if (string.IsNullOrWhiteSpace(candidate.Email))
-                    {
-                        candidate.Email = email;
-                    }
 
-                    // Find an existing Identity account.
-                    AppUser? user = null;
-
-                    if (!string.IsNullOrWhiteSpace(candidate.ApplicationUserId))
-                    {
-                        user = await _userManager.FindByIdAsync(
-                            candidate.ApplicationUserId);
-
-                        if (user == null)
-                        {
-                            throw new InvalidOperationException(
-                                $"The linked login account for {email} was not found.");
-                        }
-
-                        if (!string.Equals(
-                            user.Email, email,
-                            StringComparison.OrdinalIgnoreCase))
-                        {
-                            throw new InvalidOperationException(
-                                $"The email for candidate {candidate.CandidateName} does not match the linked login account.");
-                        }
-                    }
-                    else
-                    {
-                        user = await _userManager.FindByEmailAsync(email);
-                    }
-
-                    var isNewUser = user == null;
-                    var temporaryPassword = string.Empty;
-
-                    if (user == null)
-                    {
-                        user = new AppUser
-                        {
-                            UserName = email,
-                            Email = email,
-                            EmailConfirmed = false
-                        };
-
-                        temporaryPassword = GenerateTemporaryPassword();
-
-                        var createUserResult = await _userManager.CreateAsync(
-                            user, temporaryPassword);
-
-                        if (!createUserResult.Succeeded)
-                        {
-                            throw new InvalidOperationException(
-                                $"Could not create login for {email}: " +
-                                string.Join(
-                                    ", ",
-                                    createUserResult.Errors.Select(e => e.Description)));
-                        }
-
-                        newlyCreatedUsers.Add(user);
-
-                        var roleResult = await _userManager.AddToRoleAsync(
-                            user, "Candidate");
-
-                        if (!roleResult.Succeeded)
-                        {
-                            throw new InvalidOperationException(
-                                $"Could not assign Candidate role to {email}: " +
-                                string.Join(
-                                    ", ",
-                                    roleResult.Errors.Select(e => e.Description)));
-                        }
-                    }
-                    else if (!await _userManager.IsInRoleAsync(user, "Candidate"))
-                    {
-                        var roleResult = await _userManager.AddToRoleAsync(
-                            user, "Candidate");
-
-                        if (!roleResult.Succeeded)
-                        {
-                            throw new InvalidOperationException(
-                                $"Could not assign Candidate role to {email}.");
-                        }
-                    }
-
-                    candidate.ApplicationUserId = user.Id;
-
-                    if (isNewCandidate)
-                    {
                         _context.Candidates.Add(candidate);
+
+                        // Generate the candidate ID before creating enrollment.
+                        await _context.SaveChangesAsync();
                     }
 
-                    // Save candidate to generate CandidateId if new.
-                    await _context.SaveChangesAsync();
+                    // Aadhaar already exists: reuse the existing candidate.
+                    // Existing personal details and linked Identity account remain unchanged.
 
-                    // Avoid duplicate enrollment if the candidate is already
-                    // enrolled in this batch.
+                    // Avoid duplicate enrollment in the same batch.
                     var alreadyEnrolled = await _context.BatchCandidates.AnyAsync(
                         x => x.BatchRecordId == batch.Id &&
                              x.CandidateId == candidate.Id);
@@ -587,62 +504,16 @@ namespace TSSC.Unified.Areas.TP.Controllers
                             Status = "Enrolled"
                         });
                     }
-
-                    // Prepare email using your existing HTML template.
-                    // A password is sent only for newly created accounts.
-                    var replacements = new Dictionary<string, string>
-                    {
-                        ["Name"] = candidate.CandidateName,
-                        ["UserName"] = user.Email ?? email,
-                        ["Password"] = isNewUser
-                            ? temporaryPassword
-                            : "Use your existing password",
-                        ["BaseUrl"] = _configuration["BaseUrl"]
-                            ?? "https://erp.tsscindia.com/",
-                        ["BatchId"] = batch.BatchId,
-                        ["StartDate"] = batch.StartDate.ToString("dd MMM yyyy"),
-                        ["EndDate"] = batch.EndDate.ToString("dd MMM yyyy")
-                    };
-
-                    pendingEmails.Add((email, replacements));
                 }
-
-                // Save enrollment records.
+                // Save all enrollments.
                 await _context.SaveChangesAsync();
 
-                // All three application tables have saved successfully.
                 await transaction.CommitAsync();
 
-                // Send notifications only after successful database commit.
-                int emailsSent = 0;
-                int emailFailures = 0;
-
-                foreach (var pending in pendingEmails)
-                {
-                    try
-                    {
-                        await _emailService.SendEmailAsync(
-                            pending.Email,
-                            $"TSSC Batch Details - {batch.BatchId}",
-                            templatePath,
-                            pending.Replacements);
-
-                        emailsSent++;
-                    }
-                    catch (Exception ex)
-                    {
-                        emailFailures++;
-
-                        // Replace with your ILogger logging in production.
-                        // Do not log passwords or the full replacement dictionary.
-                    }
-                }
 
                 TempData["SuccessMessage"] =
                     $"Batch {batch.BatchId} created successfully. " +
-                    $"Candidates processed: {importedCandidates.Count}. " +
-                    $"Emails sent: {emailsSent}. " +
-                    $"Email failures: {emailFailures}.";
+                    $"Candidates processed: {importedCandidates.Count}. ";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -731,8 +602,17 @@ namespace TSSC.Unified.Areas.TP.Controllers
                     Status = x.Status,
                     CreatedOn = x.CreatedOn,
 
+                    // Approval information
+                    ApprovalRemarks = x.ApprovalRemarks,
+                    ApprovedOn = x.ApprovedOn,
+
                     CandidateCount = x.Candidates.Count(),
-                    ProjectName=x.ProjectId.ToString(),
+
+                    ProjectName = _context.Project
+                        .Where(p => p.Id == x.ProjectId)
+                        .Select(p => p.ProjectName)
+                        .FirstOrDefault(),
+
                     SchemeName = _context.Scheme
                         .Where(s => s.SchemeId == x.SchemeId)
                         .Select(s => s.SchemeName)
@@ -751,13 +631,25 @@ namespace TSSC.Unified.Areas.TP.Controllers
                     TrainerName = _context.TrainerRegistration
                         .Where(t => t.Id == x.TrainerRegistrationId)
                         .Select(t => t.CandidateName)
+                        .FirstOrDefault(),
+
+                    // Latest monitoring details for this batch
+                    MonitoringDateTime = _context.BatchMonitorings
+                        .Where(m => m.BatchId == x.Id)
+                        .OrderByDescending(m => m.CreatedOn)
+                        .Select(m => (DateTime?)m.MonitoringDateTime)
+                        .FirstOrDefault(),
+
+                    MonitoringStatus = _context.BatchMonitorings
+                        .Where(m => m.BatchId == x.Id)
+                        .OrderByDescending(m => m.CreatedOn)
+                        .Select(m => m.Status)
                         .FirstOrDefault()
                 })
                 .ToListAsync();
 
             return View(batches);
         }
-
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -799,25 +691,29 @@ namespace TSSC.Unified.Areas.TP.Controllers
 
             // Get the candidates currently enrolled in this batch.
             ViewBag.BatchCandidates = await _context.BatchCandidates
-                .AsNoTracking()
-                .Where(x => x.BatchRecordId == batch.Id)
-                .Include(x => x.Candidate)
-                .Select(x => new
-                {
-                    x.Candidate.Id,
-                    x.Candidate.CandidateName,
-                    x.Candidate.MobileNumber,
-                    x.Candidate.Email,
-                    x.EnrollmentDate,
-                    x.Status
-                })
-                .ToListAsync();
+            .AsNoTracking()
+            .Where(x => x.BatchRecordId == batch.Id)
+            .Include(x => x.Candidate)
+            .Select(x => new
+            {
+                x.Candidate.Id,
+                x.Candidate.CandidateName,
+                x.Candidate.FatherName,
+                x.Candidate.AadharNo,
+                x.Candidate.DOB,
+                x.Candidate.MobileNumber,
+                x.Candidate.Email,
+                x.EnrollmentDate,
+                x.Status
+            })
+            .ToListAsync();
 
             return View(batch);
         }
 
-        private static Task<List<CandidateExcelRow>> ReadCandidatesAsync(
-            IFormFile file)
+
+private static Task<List<CandidateExcelRow>> ReadCandidatesAsync(
+    IFormFile file)
         {
             var candidates = new List<CandidateExcelRow>();
 
@@ -830,52 +726,122 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 throw new InvalidDataException("The Excel worksheet is empty.");
 
             var headerRow = worksheet.FirstRowUsed().RowNumber();
-            var lastColumn = worksheet.Row(headerRow).LastCellUsed()?.Address.ColumnNumber ?? 0;
+            var lastColumn = worksheet.Row(headerRow)
+                .LastCellUsed()?.Address.ColumnNumber ?? 0;
 
-            int nameColumn = 0, mobileColumn = 0, emailColumn = 0;
+            int nameColumn = 0;
+            int fatherNameColumn = 0;
+            int aadharColumn = 0;
+            int dobColumn = 0;
+            int mobileColumn = 0;
+            int emailColumn = 0;
 
             for (int column = 1; column <= lastColumn; column++)
             {
                 var header = worksheet.Cell(headerRow, column)
-                    .GetString().Trim();
+                    .GetString()
+                    .Trim();
 
                 if (header.Equals("CandidateName", StringComparison.OrdinalIgnoreCase) ||
                     header.Equals("Candidate Name", StringComparison.OrdinalIgnoreCase))
+                {
                     nameColumn = column;
+                }
+                else if (header.Equals("FatherName", StringComparison.OrdinalIgnoreCase) ||
+                         header.Equals("Father Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    fatherNameColumn = column;
+                }
+                else if (header.Equals("AadharNo", StringComparison.OrdinalIgnoreCase) ||
+                         header.Equals("AadhaarNo", StringComparison.OrdinalIgnoreCase) ||
+                         header.Equals("Aadhaar Number", StringComparison.OrdinalIgnoreCase) ||
+                         header.Equals("Aadhar Number", StringComparison.OrdinalIgnoreCase))
+                {
+                    aadharColumn = column;
+                }
+                else if (header.Equals("DOB", StringComparison.OrdinalIgnoreCase) ||
+                         header.Equals("Date of Birth", StringComparison.OrdinalIgnoreCase))
+                {
+                    dobColumn = column;
+                }
                 else if (header.Equals("MobileNumber", StringComparison.OrdinalIgnoreCase) ||
+                         header.Equals("Mobile Number", StringComparison.OrdinalIgnoreCase) ||
                          header.Equals("Mobile", StringComparison.OrdinalIgnoreCase))
+                {
                     mobileColumn = column;
+                }
                 else if (header.Equals("Email", StringComparison.OrdinalIgnoreCase) ||
-                         header.Equals("EmailAddress", StringComparison.OrdinalIgnoreCase))
+                         header.Equals("EmailAddress", StringComparison.OrdinalIgnoreCase) ||
+                         header.Equals("Email Address", StringComparison.OrdinalIgnoreCase))
+                {
                     emailColumn = column;
+                }
             }
 
             if (nameColumn == 0)
                 throw new InvalidDataException(
                     "Excel must contain a CandidateName or Candidate Name column.");
 
+            if (fatherNameColumn == 0)
+                throw new InvalidDataException(
+                    "Excel must contain a FatherName or Father Name column.");
+
+            if (aadharColumn == 0)
+                throw new InvalidDataException(
+                    "Excel must contain an Aadhaar Number or AadharNo column.");
+
+            if (dobColumn == 0)
+                throw new InvalidDataException(
+                    "Excel must contain a DOB or Date of Birth column.");
+
             if (mobileColumn == 0)
                 throw new InvalidDataException(
-                    "Excel must contain a MobileNumber or Mobile column.");
+                    "Excel must contain a MobileNumber, Mobile Number, or Mobile column.");
+
+            if (emailColumn == 0)
+                throw new InvalidDataException(
+                    "Excel must contain an Email or EmailAddress column.");
 
             var lastRow = worksheet.LastRowUsed()?.RowNumber() ?? headerRow;
 
             for (int row = headerRow + 1; row <= lastRow; row++)
             {
                 var name = worksheet.Cell(row, nameColumn).GetString().Trim();
+                var fatherName = worksheet.Cell(row, fatherNameColumn).GetString().Trim();
+                var aadharNo = worksheet.Cell(row, aadharColumn).GetString().Trim();
+                var dob = worksheet.Cell(row, dobColumn).GetString().Trim();
                 var mobile = worksheet.Cell(row, mobileColumn).GetString().Trim();
-                var email = emailColumn > 0
-                    ? worksheet.Cell(row, emailColumn).GetString().Trim()
-                    : null;
+                var email = worksheet.Cell(row, emailColumn).GetString().Trim();
 
+                // Skip completely empty rows.
                 if (string.IsNullOrWhiteSpace(name) &&
+                    string.IsNullOrWhiteSpace(fatherName) &&
+                    string.IsNullOrWhiteSpace(aadharNo) &&
+                    string.IsNullOrWhiteSpace(dob) &&
                     string.IsNullOrWhiteSpace(mobile) &&
                     string.IsNullOrWhiteSpace(email))
+                {
                     continue;
+                }
 
                 if (string.IsNullOrWhiteSpace(name))
                     throw new InvalidDataException(
                         $"Candidate name is missing at Excel row {row}.");
+
+                if (string.IsNullOrWhiteSpace(fatherName))
+                    throw new InvalidDataException(
+                        $"Father name is missing at Excel row {row}.");
+
+                if (!System.Text.RegularExpressions.Regex.IsMatch(
+                        aadharNo, @"^\d{12}$"))
+                {
+                    throw new InvalidDataException(
+                        $"A valid 12-digit Aadhaar number is required at Excel row {row}.");
+                }
+
+                if (string.IsNullOrWhiteSpace(dob))
+                    throw new InvalidDataException(
+                        $"Date of birth is missing at Excel row {row}.");
 
                 if (string.IsNullOrWhiteSpace(mobile))
                     throw new InvalidDataException(
@@ -885,19 +851,22 @@ namespace TSSC.Unified.Areas.TP.Controllers
                     throw new InvalidDataException(
                         $"Mobile number is too long at Excel row {row}.");
 
-                if (!string.IsNullOrWhiteSpace(email) &&
+                if (string.IsNullOrWhiteSpace(email) ||
                     !new System.ComponentModel.DataAnnotations.EmailAddressAttribute()
                         .IsValid(email))
                 {
                     throw new InvalidDataException(
-                        $"Invalid email address at Excel row {row}.");
+                        $"A valid email address is required at Excel row {row}.");
                 }
 
                 candidates.Add(new CandidateExcelRow
                 {
                     CandidateName = name,
+                    FatherName = fatherName,
+                    AadharNo = aadharNo,
+                    DOB = dob,
                     MobileNumber = mobile,
-                    Email = string.IsNullOrWhiteSpace(email) ? null : email
+                    Email = email
                 });
             }
 
@@ -1111,8 +1080,8 @@ namespace TSSC.Unified.Areas.TP.Controllers
         }
 
         private async Task<bool> ReplaceBatchCandidatesAsync(
-        Batch batch,
-        IFormFile file)
+            Batch batch,
+            IFormFile file)
         {
             List<CandidateExcelRow> rows;
 
@@ -1138,191 +1107,170 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 return false;
             }
 
-            // Normalize uploaded values.
+            // Normalize uploaded candidate data.
             var candidates = rows.Select(r => new
             {
                 Name = r.CandidateName?.Trim() ?? string.Empty,
+                FatherName = r.FatherName?.Trim() ?? string.Empty,
+                AadharNo = r.AadharNo?.Trim() ?? string.Empty,
+                DOB = r.DOB?.Trim() ?? string.Empty,
                 Mobile = r.MobileNumber?.Trim() ?? string.Empty,
                 Email = string.IsNullOrWhiteSpace(r.Email)
                     ? null
                     : r.Email.Trim().ToLowerInvariant()
             }).ToList();
 
-            if (candidates.Any(c =>
-                string.IsNullOrWhiteSpace(c.Name) ||
-                string.IsNullOrWhiteSpace(c.Mobile)))
+            // Validate required fields.
+            for (int i = 0; i < candidates.Count; i++)
             {
-                ModelState.AddModelError(
-                    nameof(EditBatchVM.CandidateFile),
-                    "Every candidate must have a name and mobile number.");
+                var c = candidates[i];
+                int excelRow = i + 2;
 
-                return false;
+                if (string.IsNullOrWhiteSpace(c.Name))
+                {
+                    ModelState.AddModelError(
+                        nameof(EditBatchVM.CandidateFile),
+                        $"Candidate name is missing in Excel row {excelRow}.");
+                }
+
+                if (string.IsNullOrWhiteSpace(c.FatherName))
+                {
+                    ModelState.AddModelError(
+                        nameof(EditBatchVM.CandidateFile),
+                        $"Father name is missing in Excel row {excelRow}.");
+                }
+
+                if (!System.Text.RegularExpressions.Regex.IsMatch(
+                        c.AadharNo, @"^\d{12}$"))
+                {
+                    ModelState.AddModelError(
+                        nameof(EditBatchVM.CandidateFile),
+                        $"A valid 12-digit Aadhaar number is required in Excel row {excelRow}.");
+                }
+
+                if (string.IsNullOrWhiteSpace(c.DOB))
+                {
+                    ModelState.AddModelError(
+                        nameof(EditBatchVM.CandidateFile),
+                        $"Date of birth is missing in Excel row {excelRow}.");
+                }
+
+                if (string.IsNullOrWhiteSpace(c.Mobile))
+                {
+                    ModelState.AddModelError(
+                        nameof(EditBatchVM.CandidateFile),
+                        $"Mobile number is missing in Excel row {excelRow}.");
+                }
+
+                if (c.Email == null ||
+                    !new System.ComponentModel.DataAnnotations.EmailAddressAttribute()
+                        .IsValid(c.Email))
+                {
+                    ModelState.AddModelError(
+                        nameof(EditBatchVM.CandidateFile),
+                        $"A valid email address is required in Excel row {excelRow}.");
+                }
             }
 
-            // Reject duplicate mobile numbers in the uploaded file.
-            if (candidates.GroupBy(c => c.Mobile,
-                    StringComparer.OrdinalIgnoreCase).Any(g => g.Count() > 1))
-            {
-                ModelState.AddModelError(
-                    nameof(EditBatchVM.CandidateFile),
-                    "The Excel file contains duplicate mobile numbers.");
-
+            if (!ModelState.IsValid)
                 return false;
-            }
 
-            // Reject duplicate email addresses in the uploaded file.
-            var emails = candidates
-                .Where(c => c.Email != null)
-                .Select(c => c.Email!)
-                .ToList();
-
-            if (emails.GroupBy(e => e, StringComparer.OrdinalIgnoreCase)
+            // Reject duplicate Aadhaar numbers within this upload only.
+            if (candidates
+                .GroupBy(c => c.AadharNo, StringComparer.Ordinal)
                 .Any(g => g.Count() > 1))
             {
                 ModelState.AddModelError(
                     nameof(EditBatchVM.CandidateFile),
-                    "The Excel file contains duplicate email addresses.");
+                    "The Excel file contains duplicate Aadhaar numbers.");
 
                 return false;
             }
 
-            // Validate email syntax when an email is supplied.
-            foreach (var candidate in candidates.Where(c => c.Email != null))
-            {
-                try
-                {
-                    _ = new System.Net.Mail.MailAddress(candidate.Email!);
-                }
-                catch
-                {
-                    ModelState.AddModelError(
-                        nameof(EditBatchVM.CandidateFile),
-                        $"Invalid email address: {candidate.Email}");
-
-                    return false;
-                }
-            }
-
-            var mobiles = candidates
-                .Select(c => c.Mobile)
-                .Distinct()
+            var aadhaarNumbers = candidates
+                .Select(c => c.AadharNo)
                 .ToList();
 
-            // Match existing records using mobile or email.
-            // ToLower() helps make email matching case-insensitive.
+            // Find existing candidates by Aadhaar number.
             var existingCandidates = await _context.Candidates
-                .Where(c =>
-                    mobiles.Contains(c.MobileNumber) ||
-                    (c.Email != null &&
-                     emails.Contains(c.Email.ToLower())))
+                .Where(c => aadhaarNumbers.Contains(c.AadharNo))
                 .ToListAsync();
 
+            var candidateByAadhaar = existingCandidates
+                .GroupBy(c => c.AadharNo)
+                .ToDictionary(g => g.Key, g => g.First());
+
+            // Detect pre-existing duplicate Aadhaar records in the database.
+            if (existingCandidates
+                .GroupBy(c => c.AadharNo)
+                .Any(g => g.Count() > 1))
+            {
+                ModelState.AddModelError(
+                    nameof(EditBatchVM.CandidateFile),
+                    "Duplicate Aadhaar records exist in the candidate database. Please resolve them before updating this batch.");
+
+                return false;
+            }
+
             var desiredCandidateIds = new List<int>();
-            var resolvedRows = new List<(int? CandidateId, string Name,
-                string Mobile, string? Email)>();
+            var now = DateTime.UtcNow;
 
             foreach (var row in candidates)
             {
-                var mobileMatches = existingCandidates
-                    .Where(c => string.Equals(
-                        c.MobileNumber?.Trim(),
-                        row.Mobile,
-                        StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-
-                var emailMatches = row.Email == null
-                    ? new List<Candidate>()
-                    : existingCandidates
-                        .Where(c => string.Equals(
-                            c.Email?.Trim(),
-                            row.Email,
-                            StringComparison.OrdinalIgnoreCase))
-                        .ToList();
-
-                // Existing data must not map one uploaded row to multiple people.
-                var matchedIds = mobileMatches
-                    .Concat(emailMatches)
-                    .Select(c => c.Id)
-                    .Distinct()
-                    .ToList();
-
-                if (matchedIds.Count > 1 ||
-                    mobileMatches.Count > 1 ||
-                    emailMatches.Count > 1)
+                if (candidateByAadhaar.TryGetValue(
+                        row.AadharNo, out var candidate))
                 {
-                    ModelState.AddModelError(
-                        nameof(EditBatchVM.CandidateFile),
-                        $"The mobile number or email for '{row.Name}' matches conflicting candidate records.");
-
-                    return false;
-                }
-
-                resolvedRows.Add((
-                    matchedIds.Count == 1 ? matchedIds[0] : null,
-                    row.Name,
-                    row.Mobile,
-                    row.Email));
-            }
-
-            // No candidate or enrollment changes have been made before this point.
-            var candidateById = existingCandidates.ToDictionary(c => c.Id);
-
-            foreach (var row in resolvedRows)
-            {
-                if (row.CandidateId.HasValue)
-                {
-                    var candidate = candidateById[row.CandidateId.Value];
-
-                    // Candidate records are shared, so these detail updates
-                    // are reflected wherever this candidate is used.
-                    candidate.CandidateName = row.Name;
-                    candidate.MobileNumber = row.Mobile;
-                    candidate.Email = row.Email;
-
+                    // Reuse the existing candidate.
+                    // Do not overwrite shared personal details.
                     desiredCandidateIds.Add(candidate.Id);
                 }
                 else
                 {
-                    var candidate = new Candidate
+                    // Aadhaar does not exist: create a new candidate.
+                    candidate = new Candidate
                     {
                         CandidateName = row.Name,
+                        FatherName = row.FatherName,
+                        AadharNo = row.AadharNo,
+                        DOB = row.DOB,
                         MobileNumber = row.Mobile,
                         Email = row.Email,
-                        CreatedOn = DateTime.UtcNow
+                        CreatedOn = now
                     };
 
                     _context.Candidates.Add(candidate);
 
-                    // Save to obtain the generated Candidate ID.
+                    // Generate the new candidate ID.
                     await _context.SaveChangesAsync();
 
-                    existingCandidates.Add(candidate);
-                    candidateById[candidate.Id] = candidate;
+                    candidateByAadhaar[row.AadharNo] = candidate;
                     desiredCandidateIds.Add(candidate.Id);
                 }
             }
 
-            desiredCandidateIds = desiredCandidateIds.Distinct().ToList();
+            desiredCandidateIds = desiredCandidateIds
+                .Distinct()
+                .ToList();
 
-            // Load enrollment links for THIS batch only.
+            // Load enrollment links for this batch only.
             var currentEnrollments = await _context.BatchCandidates
                 .Where(x => x.BatchRecordId == batch.Id)
                 .ToListAsync();
 
-            // Remove candidates absent from the uploaded file from this batch only.
+            // Remove enrollments for candidates no longer in the upload.
+            // Candidate records themselves are never deleted.
             var enrollmentsToRemove = currentEnrollments
                 .Where(x => !desiredCandidateIds.Contains(x.CandidateId))
                 .ToList();
 
             _context.BatchCandidates.RemoveRange(enrollmentsToRemove);
 
-            // Preserve existing enrollment dates and statuses for candidates
-            // who remain in the batch.
             var currentlyEnrolledIds = currentEnrollments
                 .Where(x => desiredCandidateIds.Contains(x.CandidateId))
                 .Select(x => x.CandidateId)
                 .ToHashSet();
 
+            // Add missing enrollments; preserve existing enrollment status/date.
             foreach (var candidateId in desiredCandidateIds)
             {
                 if (currentlyEnrolledIds.Contains(candidateId))
@@ -1332,14 +1280,15 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 {
                     BatchRecordId = batch.Id,
                     CandidateId = candidateId,
-                    EnrollmentDate = DateTime.UtcNow,
-                    Status = "Enrolled",
-                    CreatedOn = DateTime.UtcNow
+                    EnrollmentDate = now,
+                    CreatedOn = now,
+                    Status = "Enrolled"
                 });
             }
 
             return true;
         }
+
         private async Task LoadEditDropdownsAsync(EditBatchVM vm)
         {
             vm.Schemes = await _context.Scheme
@@ -1402,16 +1351,35 @@ namespace TSSC.Unified.Areas.TP.Controllers
 
             var worksheet = workbook.Worksheets.Add("Candidates");
 
+            // Column headers
             worksheet.Cell(1, 1).Value = "Candidate Name";
-            worksheet.Cell(1, 2).Value = "Mobile Number";
-            worksheet.Cell(1, 3).Value = "Email";
+            worksheet.Cell(1, 2).Value = "Father Name";
+            worksheet.Cell(1, 3).Value = "Aadhaar Number";
+            worksheet.Cell(1, 4).Value = "DOB";
+            worksheet.Cell(1, 5).Value = "Mobile Number";
+            worksheet.Cell(1, 6).Value = "Email";
 
+            // Sample candidate
             worksheet.Cell(2, 1).Value = "Rahul Sharma";
-            worksheet.Cell(2, 2).Value = "9876543210";
-            worksheet.Cell(2, 3).Value = "rahul@example.com";
+            worksheet.Cell(2, 2).Value = "Rajesh Sharma";
+            worksheet.Cell(2, 3).Value = "123456789012";
+            worksheet.Cell(2, 4).Value = "15-08-2000";
+            worksheet.Cell(2, 5).Value = "9876543210";
+            worksheet.Cell(2, 6).Value = "rahul@example.com";
 
+            // Format Aadhaar and mobile as text to preserve digits.
+            worksheet.Column(3).Style.NumberFormat.Format = "@";
+            worksheet.Column(5).Style.NumberFormat.Format = "@";
+
+            // Format header
             worksheet.Row(1).Style.Font.Bold = true;
+            worksheet.Row(1).Style.Fill.BackgroundColor =
+                ClosedXML.Excel.XLColor.LightGray;
+
             worksheet.Columns().AdjustToContents();
+
+            // Freeze header row
+            worksheet.SheetView.FreezeRows(1);
 
             using var stream = new MemoryStream();
             workbook.SaveAs(stream);
@@ -1420,6 +1388,85 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 stream.ToArray(),
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 "Candidate_Sample_Format.xlsx");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Monitoring(int id)
+        {
+            var tpId = GetCurrentTPId();
+
+            var batch = await _context.Batches
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id && x.TPId == tpId);
+
+            if (batch == null)
+                return NotFound();
+
+            var monitoring = await _context.BatchMonitorings
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.BatchId == batch.Id);
+
+            var vm = new BatchMonitoringVM
+            {
+                BatchId = batch.Id,
+                BatchNumber = batch.BatchId,
+                MonitoringDateTime = monitoring?.MonitoringDateTime
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Monitoring(BatchMonitoringVM vm)
+        {
+            var tpId = GetCurrentTPId();
+
+            var batch = await _context.Batches
+                .FirstOrDefaultAsync(x => x.Id == vm.BatchId && x.TPId == tpId);
+
+            if (batch == null)
+                return NotFound();
+
+            vm.BatchNumber = batch.BatchId;
+
+            if (vm.MonitoringDateTime.HasValue &&
+                vm.MonitoringDateTime.Value <= DateTime.Now)
+            {
+                ModelState.AddModelError(
+                    nameof(vm.MonitoringDateTime),
+                    "Monitoring date and time must be in the future.");
+            }
+
+            if (!ModelState.IsValid)
+                return View(vm);
+
+            var monitoring = await _context.BatchMonitorings
+                .FirstOrDefaultAsync(x => x.BatchId == batch.Id);
+
+            if (monitoring == null)
+            {
+                monitoring = new BatchMonitoring
+                {
+                    BatchId = batch.Id,
+                    MonitoringDateTime = vm.MonitoringDateTime!.Value,
+                    Status = "Scheduled",
+                    CreatedOn = DateTime.UtcNow
+                };
+
+                _context.BatchMonitorings.Add(monitoring);
+            }
+            else
+            {
+                monitoring.MonitoringDateTime = vm.MonitoringDateTime!.Value;
+                monitoring.Status = "Scheduled";
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Monitoring scheduled successfully.";
+
+            return RedirectToAction(nameof(Details), new { id = batch.Id });
         }
     }
 }

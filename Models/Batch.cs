@@ -37,7 +37,12 @@ namespace TSSC.Unified.Models
 
         [Required, StringLength(30)]
         public string Status { get; set; } = "Draft";
+        public string? ApprovedByUserId { get; set; }
 
+        public DateTime? ApprovedOn { get; set; }
+
+        [StringLength(1000)]
+        public string? ApprovalRemarks { get; set; }
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
         public DateTime? UpdatedOn { get; set; }
@@ -45,6 +50,8 @@ namespace TSSC.Unified.Models
         public ICollection<BatchCandidate> Candidates { get; set; }
             = new List<BatchCandidate>();
     }
+
+
 
     [Table("Candidates")]
     public class Candidate
@@ -55,6 +62,16 @@ namespace TSSC.Unified.Models
 
         [Required, StringLength(200)]
         public string CandidateName { get; set; } = string.Empty;
+
+        [Required, StringLength(200)]
+        public string FatherName { get; set; } = string.Empty;
+
+        [Required, StringLength(12, MinimumLength = 12)]
+        [RegularExpression(@"^\d{12}$", ErrorMessage = "Aadhaar number must contain exactly 12 digits.")]
+        public string AadharNo { get; set; } = string.Empty;
+
+        [StringLength(10)]
+        public string? DOB { get; set; }
 
         [Required, StringLength(20)]
         public string MobileNumber { get; set; } = string.Empty;
@@ -92,6 +109,12 @@ namespace TSSC.Unified.Models
     public class CandidateExcelRow
     {
         public string CandidateName { get; set; } = string.Empty;
+
+        public string FatherName { get; set; } = string.Empty;
+
+        public string AadharNo { get; set; } = string.Empty;
+
+        public string? DOB { get; set; }
 
         public string MobileNumber { get; set; } = string.Empty;
 

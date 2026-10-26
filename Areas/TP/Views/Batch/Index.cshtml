@@ -80,6 +80,7 @@
                         <tr>
                             <th width="60">S.No.</th>
                             <th>Batch ID</th>
+                            <th>Screening Details</th>
                             <th>Scheme Name</th>
                             <th>Project Name</th>
                             <th>Training Center</th>
@@ -88,7 +89,9 @@
                             <th>Start Date</th>
                             <th>End Date</th>
                             <th>Total Candidates</th>
+                            <th>Created On</th>
                             <th>Status</th>
+                           
                             <th width="130">Action</th>
                         </tr>
                     </thead>
@@ -98,38 +101,119 @@
                         {
                             <tr>
                                 <td>@serial</td>
-                                <td><strong>@item.BatchId</strong></td>
+
+                                <td>
+                                    <strong>@item.BatchId</strong>
+                                </td>
+                                @* Screening Details *@
+                                <td style="min-width:150px;">
+                                    @if (item.MonitoringStatus == "Scheduled"
+                                   && item.MonitoringDateTime.HasValue)
+                                    {
+                                        <span class="badge bg-info">
+                                            <em class="icon ni ni-calendar-check"></em>
+                                            Scheduled
+                                        </span>
+
+                                        <div class="small mt-1">
+                                            <em class="icon ni ni-calendar"></em>
+                                            @item.MonitoringDateTime.Value.ToString("dd-MMM-yyyy")
+                                        </div>
+
+                                        <div class="small text-muted">
+                                            <em class="icon ni ni-clock"></em>
+                                            @item.MonitoringDateTime.Value.ToString("hh:mm tt")
+                                        </div>
+                                    }
+                                    else if (item.MonitoringStatus == "Completed")
+                                    {
+                                        <span class="badge bg-success">
+                                            <em class="icon ni ni-check-circle"></em>
+                                            Screening Completed
+                                        </span>
+
+                                        @if (item.MonitoringDateTime.HasValue)
+                                        {
+                                            <div class="small mt-1">
+                                                @item.MonitoringDateTime.Value.ToString("dd-MMM-yyyy, hh:mm tt")
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-light text-muted">
+                                            Not Scheduled
+                                        </span>
+                                    }
+                                </td>
+
                                 <td>@item.SchemeName</td>
                                 <td>@item.ProjectName</td>
                                 <td>@item.CenterName</td>
                                 <td>@item.JobRoleName</td>
                                 <td>@item.TrainerName</td>
+
                                 <td>@item.StartDate.ToString("dd-MMM-yyyy")</td>
                                 <td>@item.EndDate.ToString("dd-MMM-yyyy")</td>
                                 <td>@item.CandidateCount</td>
                                 <td>
-                                    @if (item.Status == "Active")
+                                    @item.CreatedOn.ToString("dd-MMM-yyyy")
+                                </td>
+                                <td style="min-width:150px;">
+                                    @if (string.Equals(item.Status, "Active", StringComparison.OrdinalIgnoreCase))
                                     {
                                         <span class="badge badge-dot bg-success">Active</span>
                                     }
-                                    else if (item.Status == "Completed")
+                                    else if (string.Equals(item.Status, "Completed", StringComparison.OrdinalIgnoreCase))
                                     {
                                         <span class="badge badge-dot bg-primary">Completed</span>
                                     }
-                                    else if (item.Status == "Cancelled")
+                                    else if (string.Equals(item.Status, "Cancelled", StringComparison.OrdinalIgnoreCase))
                                     {
                                         <span class="badge badge-dot bg-danger">Cancelled</span>
                                     }
+                                    else if (string.Equals(item.Status, "Approved", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <span class="badge badge-dot bg-success">Approved</span>
+                                    }
+                                    else if (string.Equals(item.Status, "Rejected", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <span class="badge badge-dot bg-danger">Rejected</span>
+                                    }
+                                    else if (string.Equals(item.Status, "Pending", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <span class="badge badge-dot bg-warning">Pending Approval</span>
+                                    }
                                     else
                                     {
-                                        <span class="badge badge-dot bg-warning">@item.Status</span>
+                                        <span class="badge badge-dot bg-warning">
+                                            @(string.IsNullOrWhiteSpace(item.Status) ? "N/A" : item.Status)
+                                        </span>
                                     }
 
-                                    <br />
-                                    <small class="text-muted">
-                                        Created: @item.CreatedOn.ToString("dd-MMM-yyyy")
-                                    </small>
+                                   
+
+                                    @if (string.Equals(item.Status, "Rejected", StringComparison.OrdinalIgnoreCase)
+                                   && !string.IsNullOrWhiteSpace(item.ApprovalRemarks))
+                                    {
+                                        <br />
+                                        <small class="text-danger">
+                                            <em class="icon ni ni-alert-circle"></em>
+                                            Remarks: @item.ApprovalRemarks
+                                        </small>
+                                    }
+
+                                    @if (string.Equals(item.Status, "Rejected", StringComparison.OrdinalIgnoreCase)
+                                   && item.ApprovedOn.HasValue)
+                                    {
+                                        <br />
+                                        <small class="text-muted">
+                                            @item.ApprovedOn.Value.ToString("dd-MMM-yyyy hh:mm tt")
+                                        </small>
+                                    }
                                 </td>
+                                
+                               
                                 <td>
                                     <div class="btn-group">
                                         <a asp-action="Details"
@@ -152,7 +236,6 @@
                             serial++;
                         }
                     </tbody>
-
                 </table>
 
             </div>

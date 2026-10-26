@@ -1,0 +1,145 @@
+﻿@using TSSC.Unified.ViewModel
+@model IEnumerable<BatchIndexVM>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+<!-- Page Header -->
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">My Batches</h3>
+            <div class="nk-block-des text-soft">
+                <p>View your enrolled batches, training schedule, trainer and batch status.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Batch List -->
+<div class="nk-block nk-block-lg">
+    <div class="card card-preview">
+        <div class="card-inner">
+            <div class="table-responsive">
+                <table class="datatable-init-export table table-tranx table_custom table-bordered"
+                       data-auto-responsive="false">
+
+                    <thead>
+                        <tr>
+                            <th width="60">S.No.</th>
+                            <th>Batch ID</th>
+                           
+                            <th>Scheme Name</th>
+                            <th>Project Name</th>
+                            <th>Training Center</th>
+                            <th>Job Role</th>
+                            <th>Trainer Name</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Batch Status</th>
+                            
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@serial</td>
+
+                                    <td>
+                                        <strong>@item.BatchId</strong>
+                                    </td>
+
+                                   
+
+                                    <td>@item.SchemeName</td>
+                                    <td>@item.ProjectName</td>
+                                    <td>@item.CenterName</td>
+                                    <td>@item.JobRoleName</td>
+                                    <td>@item.TrainerName</td>
+
+                                    <td>@item.StartDate.ToString("dd-MMM-yyyy")</td>
+                                    <td>@item.EndDate.ToString("dd-MMM-yyyy")</td>
+
+                                    <!-- Batch Status -->
+                                    <td style="min-width:180px;">
+                                        @if (string.Equals(item.Status, "Approved", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="badge badge-dot bg-success">Active</span>
+                                        }
+                                        else if (string.Equals(item.Status, "Rejected", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="badge badge-dot bg-danger">Rejected</span>
+
+                                            @if (!string.IsNullOrWhiteSpace(item.ApprovalRemarks))
+                                            {
+                                                <div class="small text-danger mt-1">
+                                                    <strong>Remarks:</strong>
+                                                    @item.ApprovalRemarks
+                                                </div>
+                                            }
+
+                                            @if (item.ApprovedOn.HasValue)
+                                            {
+                                                <div class="small text-muted mt-1">
+                                                    <em class="icon ni ni-clock"></em>
+                                                    @item.ApprovedOn.Value.ToString("dd-MMM-yyyy hh:mm tt")
+                                                </div>
+                                            }
+                                        }
+                                        else if (string.Equals(item.Status, "Pending", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="badge badge-dot bg-warning">Pending Approval</span>
+                                        }
+                                        else if (string.Equals(item.Status, "Active", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="badge badge-dot bg-success">Active</span>
+                                        }
+                                        else if (string.Equals(item.Status, "Completed", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="badge badge-dot bg-primary">Completed</span>
+                                        }
+                                        else if (string.Equals(item.Status, "Cancelled", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="badge badge-dot bg-danger">Cancelled</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-dot bg-secondary">
+                                                @(string.IsNullOrWhiteSpace(item.Status) ? "N/A" : item.Status)
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <!-- View Only -->
+                                    
+                                </tr>
+
+                                serial++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="12" class="text-center text-soft py-4">
+                                    <em class="icon ni ni-inbox"
+                                        style="font-size:2rem;"></em>
+                                    <p class="mt-2 mb-0">
+                                        You are not enrolled in any batches yet.
+                                    </p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
