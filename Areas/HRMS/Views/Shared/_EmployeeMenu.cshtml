@@ -1544,7 +1544,7 @@
 	}
 	<!-- MANAGER - REPORTING MANAGER ONLY -->
 	<!-- ===================================================== -->
-	@if (isReportingManager || showReimbursementApproverMenu || isFinanceEmployee || isHR || isFinanceHead || isCEO || User.IsInRole("GrievanceTeam")) ;)
+	@if (isReportingManager || showReimbursementApproverMenu || isFinanceEmployee || isHR || isFinanceHead || isCEO || User.IsInRole("GrievanceTeam"))
 
 	{
 		<li class="nk-menu-heading">
@@ -1713,8 +1713,8 @@
 				</ul>
 			</li>
 		}
-		@* Reimbursements — Management (actual expense claims, 5-stage chain) *@
-	@{
+		
+
 		var reimbursementStages =
 		new List<(bool Show, string Action, string StatusColumn,
 		string PendingStatus, string ApprovedStatus, string RejectedStatus)>
@@ -1769,7 +1769,7 @@
 		.FirstOrDefault(s => s.Show);
 
 		var hasActiveStage = activeStage.Show;
-	}
+	
 
 	@if (hasActiveStage)
 	{

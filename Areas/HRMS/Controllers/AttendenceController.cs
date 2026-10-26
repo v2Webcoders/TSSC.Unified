@@ -1474,24 +1474,21 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             // =========================================
 
             string baseAttendanceStatus;
-
-            if (!request.RequestedInTime.HasValue)
+            var effectiveInTime = request.RequestedInTime ?? attendance?.InTime;
+            if (!effectiveInTime.HasValue)
             {
                 baseAttendanceStatus = "Absent";
             }
-            else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(10, 0, 0))
+            else if (effectiveInTime.Value.TimeOfDay < new TimeSpan(10, 0, 0))
             {
-                // Before 10:00 AM
                 baseAttendanceStatus = "Present";
             }
-            else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(11, 0, 0))
+            else if (effectiveInTime.Value.TimeOfDay < new TimeSpan(11, 0, 0))
             {
-                // 10:00 AM - 10:59 AM
                 baseAttendanceStatus = "Late";
             }
             else
             {
-                // 11:00 AM onwards
                 baseAttendanceStatus = "Half Day";
             }
 
@@ -2193,7 +2190,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> ODRequests(
-    string status = "Pending")
+       string status = "Pending")
         {
             var currentUser =
                 await _userManager.GetUserAsync(User);
@@ -3374,25 +3371,45 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             // =========================================
             string baseAttendanceStatus;
 
-            if (!request.RequestedInTime.HasValue)
+            //if (!request.RequestedInTime.HasValue)
+            //{
+            //    baseAttendanceStatus = "Absent";
+            //}
+            //else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(10, 0, 0))
+            //{
+            //    // Before 10:00 AM
+            //    baseAttendanceStatus = "Present";
+            //}
+            //else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(11, 0, 0))
+            //{
+            //    // 10:00 AM - 10:59 AM
+            //    baseAttendanceStatus = "Late";
+            //}
+            //else
+            //{
+            //    // 11:00 AM onwards
+            //    baseAttendanceStatus = "Half Day";
+            //}
+            var effectiveInTime =
+            request.RequestedInTime ?? attendance?.InTime;
+
+            if (!effectiveInTime.HasValue)
             {
                 baseAttendanceStatus = "Absent";
             }
-            else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(10, 0, 0))
+            else if (effectiveInTime.Value.TimeOfDay < new TimeSpan(10, 0, 0))
             {
-                // Before 10:00 AM
                 baseAttendanceStatus = "Present";
             }
-            else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(11, 0, 0))
+            else if (effectiveInTime.Value.TimeOfDay < new TimeSpan(11, 0, 0))
             {
-                // 10:00 AM - 10:59 AM
                 baseAttendanceStatus = "Late";
             }
             else
             {
-                // 11:00 AM onwards
                 baseAttendanceStatus = "Half Day";
             }
+
             if (attendance == null)
             {
                 attendance = new EmployeeAttendance
@@ -3652,27 +3669,56 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 // IF NO ATTENDANCE EXISTS
                 // CREATE ONE
                 // =========================================
+                //string baseAttendanceStatus;
+
+                //if (!request.RequestedInTime.HasValue)
+                //{
+                //    baseAttendanceStatus = "Absent";
+                //}
+                //else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(10, 0, 0))
+                //{
+                //    // Before 10:00 AM
+                //    baseAttendanceStatus = "Present";
+                //}
+                //else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(11, 0, 0))
+                //{
+                //    // 10:00 AM - 10:59 AM
+                //    baseAttendanceStatus = "Late";
+                //}
+                //else
+                //{
+                //    // 11:00 AM onwards
+                //    baseAttendanceStatus = "Half Day";
+                //}
+
+                var effectiveInTime =
+                request.RequestedInTime ?? attendance?.InTime;
+
+                
+                // =========================================
+                // DETERMINE ATTENDANCE STATUS
+                // =========================================
+
                 string baseAttendanceStatus;
 
-                if (!request.RequestedInTime.HasValue)
+                if (!effectiveInTime.HasValue)
                 {
                     baseAttendanceStatus = "Absent";
                 }
-                else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(10, 0, 0))
+                else if (effectiveInTime.Value.TimeOfDay < new TimeSpan(10, 0, 0))
                 {
-                    // Before 10:00 AM
                     baseAttendanceStatus = "Present";
                 }
-                else if (request.RequestedInTime.Value.TimeOfDay < new TimeSpan(11, 0, 0))
+                else if (effectiveInTime.Value.TimeOfDay < new TimeSpan(11, 0, 0))
                 {
-                    // 10:00 AM - 10:59 AM
                     baseAttendanceStatus = "Late";
                 }
                 else
                 {
-                    // 11:00 AM onwards
                     baseAttendanceStatus = "Half Day";
                 }
+
+
                 if (attendance == null)
                 {
                     attendance = new EmployeeAttendance
@@ -4572,32 +4618,57 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 // DETERMINE ATTENDANCE STATUS
                 // =========================================
 
+                //string baseAttendanceStatus;
+
+                //if (!request.RequestedInTime.HasValue)
+                //{
+                //    baseAttendanceStatus = "Absent";
+                //}
+                //else if (
+                //    request.RequestedInTime.Value.TimeOfDay
+                //    < new TimeSpan(10, 0, 0))
+                //{
+                //    // Before 10:00 AM
+                //    baseAttendanceStatus = "Present";
+                //}
+                //else if (
+                //    request.RequestedInTime.Value.TimeOfDay
+                //    < new TimeSpan(11, 0, 0))
+                //{
+                //    // 10:00 AM - 10:59 AM
+                //    baseAttendanceStatus = "Late";
+                //}
+                //else
+                //{
+                //    // 11:00 AM onwards
+                //    baseAttendanceStatus = "Half Day";
+                //}
+                var effectiveInTime =
+               request.RequestedInTime ?? attendance?.InTime;
+
+
+                // =========================================
+                // DETERMINE ATTENDANCE STATUS
+                // =========================================
+
                 string baseAttendanceStatus;
 
-                if (!request.RequestedInTime.HasValue)
+                if (!effectiveInTime.HasValue)
                 {
                     baseAttendanceStatus = "Absent";
                 }
-                else if (
-                    request.RequestedInTime.Value.TimeOfDay
-                    < new TimeSpan(10, 0, 0))
+                else if (effectiveInTime.Value.TimeOfDay < new TimeSpan(10, 0, 0))
                 {
-                    // Before 10:00 AM
                     baseAttendanceStatus = "Present";
                 }
-                else if (
-                    request.RequestedInTime.Value.TimeOfDay
-                    < new TimeSpan(11, 0, 0))
+                else if (effectiveInTime.Value.TimeOfDay < new TimeSpan(11, 0, 0))
                 {
-                    // 10:00 AM - 10:59 AM
                     baseAttendanceStatus = "Late";
                 }
                 else
                 {
-                    // 11:00 AM onwards
                     baseAttendanceStatus = "Half Day";
                 }
-
                 // =========================================
                 // CREATE ATTENDANCE
                 // =========================================
