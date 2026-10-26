@@ -379,17 +379,33 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             int daysInMonth = DateTime.DaysInMonth(selectedYear, selectedMonth);
 
-            // If viewing current month, count until today; if past month, count entire month
-            DateTime countUntilDate = DateTime.Today;
+            //// If viewing current month, count until today; if past month, count entire month
+            //DateTime countUntilDate = DateTime.Today;
 
-            // If selected month is in future or today is before end of selected month
-            if (DateTime.Today.Year > selectedYear ||
-                (DateTime.Today.Year == selectedYear && DateTime.Today.Month > selectedMonth))
+            //// If selected month is in future or today is before end of selected month
+            //if (DateTime.Today.Year > selectedYear ||
+            //    (DateTime.Today.Year == selectedYear && DateTime.Today.Month > selectedMonth))
+            //{
+            //    // Past month - count entire month
+            //    countUntilDate = new DateTime(selectedYear, selectedMonth, daysInMonth);
+            //}
+            DateTime today = DateTime.Today;
+            DateTime monthEnd = startDate.AddDays(daysInMonth - 1);
+
+            DateTime countUntilDate;
+
+            if (startDate > today)
             {
-                // Past month - count entire month
-                countUntilDate = new DateTime(selectedYear, selectedMonth, daysInMonth);
+                countUntilDate = startDate.AddDays(-1);
             }
-
+            else if (monthEnd < today)
+            {
+                countUntilDate = monthEnd;
+            }
+            else
+            {
+                countUntilDate = today;
+            }
             // Count only weekdays (Mon-Fri) from 1st of month until countUntilDate
             var weekdaysInRange = Enumerable.Range(
         0,

@@ -410,7 +410,10 @@
 			<span class="nk-menu-text">
 				My Tasks
 			</span>
-
+			@if (counts.Tasks > 0)
+			{
+				<partial name="_MenuBadge" model="counts.Tasks" />
+			}
 		</a>
 
 	</li>
