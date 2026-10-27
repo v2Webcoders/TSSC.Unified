@@ -1,271 +1,401 @@
-﻿@{
+﻿@model TSSC.Unified.Models.TrainerRegistration
+
+@{
     Layout = "_Layout";
+
+    bool hasScreening =
+        ViewBag.HasScreening is bool hs && hs;
+
+    bool screeningSuccess =
+        ViewBag.ScreeningSuccess is bool ss && ss;
+
+    bool screeningRejected =
+        ViewBag.ScreeningRejected is bool sr && sr;
+
+    bool screeningOnHold =
+        ViewBag.ScreeningOnHold is bool sh && sh;
+
+    bool paymentCompleted =
+        ViewBag.PaymentCompleted is bool pc && pc;
+
+    bool certificateUploaded =
+        ViewBag.CertificateUploaded is bool cu && cu;
+
+    bool batchAssigned =
+        ViewBag.BatchAssigned is bool ba && ba;
+
+    bool resultUploaded =
+        ViewBag.ResultUploaded is bool ru && ru;
+
+    bool paymentPaid =
+        ViewBag.PaymentPaid is bool pp && pp;
+
+    bool paymentVerified =
+        ViewBag.PaymentVerified is bool pv && pv;
+
+    bool financeApproved =
+        ViewBag.FinanceApproved is bool fa && fa;
+
+    bool certificateRequestRaised = Model.RaiseReq;
+
+    string screeningText =
+        ViewBag.ScreeningText?.ToString() ?? "Awaiting schedule";
+
+    string paymentText =
+        ViewBag.PaymentText?.ToString() ?? "Payment pending";
+
+    string certificateText =
+        ViewBag.CertificateText?.ToString() ?? "Certificate pending";
+
+    string currentStage =
+        ViewBag.CurrentStage?.ToString() ?? "Registration";
+
+    string nextStep =
+        ViewBag.NextStep?.ToString() ?? "Please check your application status.";
+
+    string registrationStatus = Model.Status ?? "Pending";
+
+    bool registrationApproved = string.Equals(
+        registrationStatus,
+        "Approved",
+        StringComparison.OrdinalIgnoreCase);
+
+    string screeningCircleClass =
+        screeningSuccess ? "bg-success text-white"
+        : screeningRejected ? "bg-danger text-white"
+        : "bg-primary text-white";
+
+    string screeningCircleText =
+        screeningSuccess ? "✓"
+        : screeningRejected ? "×"
+        : "2";
+
+    string paymentCircleClass =
+        paymentCompleted ? "bg-success text-white"
+        : screeningSuccess ? "bg-primary text-white"
+        : "bg-light text-muted";
+
+    string paymentCircleText = paymentCompleted ? "✓" : "3";
+
+    bool certificateInProgress =
+        batchAssigned &&
+        resultUploaded &&
+        certificateRequestRaised &&
+        !certificateUploaded;
+
+    string certificateCircleClass =
+        certificateUploaded ? "bg-success text-white"
+        : certificateInProgress ? "bg-primary text-white"
+        : "bg-light text-muted";
+
+    string certificateCircleText = certificateUploaded ? "✓" : "4";
 }
 
 <div class="container py-4">
 
-    <!-- ===================================================== -->
     <!-- WELCOME -->
-    <!-- ===================================================== -->
 
     <div class="mb-4">
-
         <h1 class="fs-4 text-primary fw-bold mb-1">
-            Welcome, Ravi 👋
+            Welcome, @(string.IsNullOrWhiteSpace(Model.CandidateName)
+                        ? "Trainer"
+                        : Model.CandidateName) 👋
         </h1>
 
         <p class="text-muted small mb-0">
             Track your trainer registration journey from here.
         </p>
-
     </div>
 
 
-    <!-- ===================================================== -->
     <!-- APPLICATION JOURNEY -->
-    <!-- ===================================================== -->
 
     <div class="card border-0 shadow-sm mb-4">
-
         <div class="card-body p-4">
 
             <h3 class="fs-6 text-primary fw-bold mb-4">
-                Your Application — TOA-2026-00512
+                Your Application —
+                @(Model.RegistrationNo ?? "Registration Pending")
             </h3>
 
-
-            <div class="d-flex align-items-center w-100">
+            <div class="d-flex align-items-center w-100 dashboard-timeline">
 
                 <!-- REGISTERED -->
 
                 <div class="d-flex align-items-center flex-shrink-0">
-
                     <span class="rounded-circle bg-success text-white
                                  d-flex align-items-center justify-content-center
                                  fw-bold"
                           style="width:40px;height:40px;">
-
                         ✓
-
                     </span>
 
                     <div class="ms-3">
-
-                        <div class="fw-semibold">
-                            Registered
-                        </div>
-
+                        <div class="fw-semibold">Registered</div>
                         <div class="text-muted small">
-                            20 Jul
+                            @ViewBag.RegistrationDateText
                         </div>
-
                     </div>
-
                 </div>
 
-
-                <!-- LINE -->
-
-                <div class="flex-grow-1 border-top mx-4"></div>
+                <div class="flex-grow-1 border-top mx-3"></div>
 
 
                 <!-- SCREENING -->
 
                 <div class="d-flex align-items-center flex-shrink-0">
-
-                    <span class="rounded-circle bg-primary text-white
+                    <span class="rounded-circle @screeningCircleClass
                                  d-flex align-items-center justify-content-center
                                  fw-bold"
                           style="width:40px;height:40px;">
-
-                        2
-
+                        @screeningCircleText
                     </span>
 
                     <div class="ms-3">
-
-                        <div class="fw-semibold text-primary">
+                        <div class="fw-semibold
+                            @(screeningSuccess ? "text-success"
+                                                             : screeningRejected ? "text-danger"
+                                                             : "text-primary")">
                             Screening
                         </div>
 
                         <div class="text-muted small">
-                            Awaiting schedule
+                            @screeningText
                         </div>
-
                     </div>
-
                 </div>
 
-
-                <!-- LINE -->
-
-                <div class="flex-grow-1 border-top mx-4"></div>
+                <div class="flex-grow-1 border-top mx-3"></div>
 
 
                 <!-- PAYMENT -->
 
                 <div class="d-flex align-items-center flex-shrink-0">
-
-                    <span class="rounded-circle bg-light text-muted
+                    <span class="rounded-circle @paymentCircleClass
                                  d-flex align-items-center justify-content-center
                                  fw-bold"
                           style="width:40px;height:40px;">
-
-                        3
-
+                        @paymentCircleText
                     </span>
 
                     <div class="ms-3">
-
-                        <div class="fw-semibold text-secondary">
+                        <div class="fw-semibold
+                            @(paymentCompleted ? "text-success"
+                                                             : screeningSuccess ? "text-primary"
+                                                             : "text-secondary")">
                             Payment
                         </div>
 
+                        <div class="text-muted small">
+                            @paymentText
+                        </div>
                     </div>
-
                 </div>
 
-
-                <!-- LINE -->
-
-                <div class="flex-grow-1 border-top mx-4"></div>
+                <div class="flex-grow-1 border-top mx-3"></div>
 
 
-                <!-- CERTIFIED -->
+                <!-- CERTIFICATE -->
 
                 <div class="d-flex align-items-center flex-shrink-0">
-
-                    <span class="rounded-circle bg-light text-muted
+                    <span class="rounded-circle @certificateCircleClass
                                  d-flex align-items-center justify-content-center
                                  fw-bold"
                           style="width:40px;height:40px;">
-
-                        4
-
+                        @certificateCircleText
                     </span>
 
                     <div class="ms-3">
-
-                        <div class="fw-semibold text-secondary">
+                        <div class="fw-semibold
+                            @(certificateUploaded ? "text-success"
+                                                             : certificateInProgress ? "text-primary"
+                                                             : "text-secondary")">
                             Certified
                         </div>
 
+                        <div class="text-muted small">
+                            @certificateText
+                        </div>
                     </div>
-
                 </div>
 
             </div>
-
         </div>
-
     </div>
 
 
-    <!-- ===================================================== -->
-    <!-- APPLICATION + WHAT'S NEXT -->
-    <!-- ===================================================== -->
+    <!-- APPLICATION DETAILS + WHAT'S NEXT -->
 
     <div class="row g-3">
 
         <!-- APPLICATION DETAILS -->
 
         <div class="col-lg-8">
-
             <div class="card border-0 shadow-sm h-100">
-
                 <div class="card-body p-4">
 
                     <h3 class="fs-6 text-primary fw-bold mb-4">
                         Application Details
                     </h3>
 
-
                     <div class="row g-4 small">
 
                         <div class="col-sm-6">
-
                             <span class="text-muted d-block mb-1">
-                                Registering As
+                                Candidate Name
                             </span>
 
                             <span class="fw-semibold">
-                                Trainer of Assessors (TOA)
+                                @(Model.CandidateName ?? "-")
                             </span>
-
                         </div>
 
-
                         <div class="col-sm-6">
-
                             <span class="text-muted d-block mb-1">
-                                Sector
+                                Registration Number
                             </span>
 
                             <span class="fw-semibold">
-                                Optical Fibre
+                                @(Model.RegistrationNo ?? "-")
                             </span>
-
                         </div>
 
+                        <div class="col-sm-6">
+                            <span class="text-muted d-block mb-1">
+                                Job Role
+                            </span>
+
+                            <span class="fw-semibold">
+                                @ViewBag.JobRoleTitle
+                            </span>
+                        </div>
 
                         <div class="col-sm-6">
-
                             <span class="text-muted d-block mb-1">
                                 Submitted On
                             </span>
 
                             <span class="fw-semibold">
-                                20 Jul 2026
+                                @ViewBag.RegistrationDateText
                             </span>
-
                         </div>
 
+                        <div class="col-sm-6">
+                            <span class="text-muted d-block mb-1">
+                                Registration Status
+                            </span>
+
+                            <span class="fw-semibold
+                                @(registrationApproved
+                                                                      ? "text-success"
+                                                                      : "text-warning-emphasis")">
+                                @registrationStatus
+                            </span>
+                        </div>
 
                         <div class="col-sm-6">
-
                             <span class="text-muted d-block mb-1">
                                 Current Stage
                             </span>
 
-                            <span class="fw-semibold text-warning-emphasis">
-                                Screening — Awaiting Schedule
+                            <span class="fw-semibold
+                                @(screeningRejected
+                                                                      ? "text-danger"
+                                                                      : certificateUploaded
+                                                                          ? "text-success"
+                                                                          : "text-warning-emphasis")">
+                                @currentStage
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <span class="text-muted d-block mb-1">
+                                Payment Status
                             </span>
 
+                            <span class="fw-semibold">
+                                @paymentText
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <span class="text-muted d-block mb-1">
+                                Batch
+                            </span>
+
+                            <span class="fw-semibold">
+                                @(batchAssigned
+                                                                ? $"{ViewBag.BatchCode} — {ViewBag.BatchName}"
+                                                                : "Not assigned yet")
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <span class="text-muted d-block mb-1">
+                                Assessment Result
+                            </span>
+
+                            <span class="fw-semibold
+                                @(resultUploaded ? "text-success" : "text-secondary")">
+                                @(resultUploaded ? "Uploaded" : "Pending")
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <span class="text-muted d-block mb-1">
+                                Certificate
+                            </span>
+
+                            <span class="fw-semibold
+                                @(certificateUploaded ? "text-success" : "text-secondary")">
+                                @certificateText
+                            </span>
                         </div>
 
                     </div>
 
+                    @if (certificateUploaded &&
+                                        !string.IsNullOrWhiteSpace(Model.CertificateFileName))
+                    {
+                        <div class="mt-4">
+                            <a href="@Url.Content(
+                                                               "~/uploads/TrainerCertificates/" +
+                                                               Model.RegistrationNo + "/" +
+                                                               Model.CertificateFileName)"
+                           download="@Model.CertificateFileName"
+                           class="btn btn-sm btn-success">
+                            <em class="icon ni ni-download me-1"></em>
+                            Download Certificate
+                        </a>
+                    </div>
+                                        }
+
                 </div>
-
             </div>
-
         </div>
 
 
         <!-- WHAT'S NEXT -->
 
         <div class="col-lg-4">
-
             <div class="card border-0 shadow-sm h-100">
-
                 <div class="card-body p-4">
 
                     <h3 class="fs-6 text-primary fw-bold mb-3">
                         What's Next?
                     </h3>
 
-                    <p class="small text-muted mb-0">
-
-                        TSSC will schedule your screening shortly.
-                        You'll receive a notification with the date,
-                        time and venue or video link.
-
+                    <p class="small text-muted mb-3">
+                        @nextStep
                     </p>
 
+                    <a href="/Trainer/Trainer/ApplicationStatus"
+                       class="btn btn-sm btn-outline-primary">
+                        View Application Status
+                    </a>
+
                 </div>
-
             </div>
-
         </div>
 
     </div>

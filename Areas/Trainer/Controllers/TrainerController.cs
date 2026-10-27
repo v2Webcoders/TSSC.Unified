@@ -242,29 +242,60 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
                     .ToList();
             }
 
-            // City
-            model.CityList = new List<SelectListItem>();
+            //// City
+            //model.CityList = new List<SelectListItem>();
 
-            if (model.DistrictId.HasValue)
-            {
-                model.CityList = _context.City
-                    .Where(x =>
-                        x.DistrictId == model.DistrictId.Value &&
-                        x.IsActive)
-                    .OrderBy(x => x.CityName)
-                    .Select(x => new SelectListItem
-                    {
-                        Value = x.Id.ToString(),
-                        Text = x.CityName
-                    })
-                    .ToList();
-            }
+            //if (model.DistrictId.HasValue)
+            //{
+            //    model.CityList = _context.City
+            //        .Where(x =>
+            //            x.DistrictId == model.DistrictId.Value &&
+            //            x.IsActive)
+            //        .OrderBy(x => x.CityName)
+            //        .Select(x => new SelectListItem
+            //        {
+            //            Value = x.Id.ToString(),
+            //            Text = x.CityName
+            //        })
+            //        .ToList();
+            //}
         }
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Registration(TrainerRegistrationViewModel model)
         {
+            bool isAjaxRequest = string.Equals(
+    Request.Headers["X-Requested-With"].ToString(),
+    "XMLHttpRequest",
+    StringComparison.OrdinalIgnoreCase
+);
+
+            IActionResult ReturnValidationFailure()
+            {
+                if (isAjaxRequest)
+                {
+                    var errors = ModelState
+                        .Where(x => x.Value?.Errors.Count > 0)
+                        .SelectMany(x => x.Value!.Errors.Select(e => new
+                        {
+                            field = x.Key,
+                            message = string.IsNullOrWhiteSpace(e.ErrorMessage)
+                                ? "Invalid value."
+                                : e.ErrorMessage
+                        }))
+                        .ToList();
+
+                    return BadRequest(new
+                    {
+                        success = false,
+                        errors
+                    });
+                }
+
+                LoadDropdowns(model);
+                return View(model);
+            }
             // =====================================================
             // 1. VALIDATE EMAIL
             // =====================================================
@@ -296,8 +327,10 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
 
             if (!ModelState.IsValid)
             {
-                LoadDropdowns(model);
-                return View(model);
+                //LoadDropdowns(model);
+                //return View(model);
+
+                return ReturnValidationFailure();
             }
 
 
@@ -354,8 +387,10 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
 
                     await transaction.RollbackAsync();
 
-                    LoadDropdowns(model);
-                    return View(model);
+                    //LoadDropdowns(model);
+                    //return View(model);
+
+                    return ReturnValidationFailure();
                 }
 
 
@@ -382,8 +417,10 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
 
                         await transaction.RollbackAsync();
 
-                        LoadDropdowns(model);
-                        return View(model);
+                        //LoadDropdowns(model);
+                        //return View(model);
+
+                        return ReturnValidationFailure();
                     }
                 }
 
@@ -405,8 +442,10 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
 
                     await transaction.RollbackAsync();
 
-                    LoadDropdowns(model);
-                    return View(model);
+                    //LoadDropdowns(model);
+                    // return View(model);
+
+                    return ReturnValidationFailure();
                 }
 
 
@@ -431,7 +470,7 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
                     Address = model.Address,
                     StateId = model.StateId,
                     DistrictId = model.DistrictId,
-                    CityId = model.CityId,
+                    City = model.City,
                     Pincode = model.Pincode,
 
                     Email = email,
@@ -801,6 +840,19 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
                     $"Registration submitted successfully. " +
                     $"Registration No: {registration.RegistrationNo}";
 
+                if (isAjaxRequest)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        redirectUrl = Url.Action(
+                            nameof(Registration),
+                            "Trainer",
+                            new { area = "Trainer" }
+                        )
+                    });
+                }
+
                 return RedirectToAction(nameof(Registration));
             }
             catch (Exception ex)
@@ -837,10 +889,10 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
                     "Something went wrong while submitting the registration."
                 );
 
+                return ReturnValidationFailure();
+                //LoadDropdowns(model);
 
-                LoadDropdowns(model);
-
-                return View(model);
+                //return View(model);
             }
         }
         private async Task<string> SavePdfFile( IFormFile file,string uploadFolder,List<string> uploadedFiles)
@@ -945,13 +997,9 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
                     .FirstOrDefaultAsync()
                 : null;
 
-            var cityName = trainer.CityId.HasValue
-                ? await _context.City
-                    .AsNoTracking()
-                    .Where(x => x.Id == trainer.CityId.Value)
-                    .Select(x => x.CityName)
-                    .FirstOrDefaultAsync()
-                : null;
+            var cityName = string.IsNullOrWhiteSpace(trainer.City)
+     ? null
+     : trainer.City.Trim();
 
 
             // ================================
@@ -996,7 +1044,7 @@ namespace TSSC.Unified.Areas.Trainer.Controllers
                 Address = trainer.Address,
                 StateId = trainer.StateId,
                 DistrictId = trainer.DistrictId,
-                CityId = trainer.CityId,
+                City = trainer.City,
                 Pincode = trainer.Pincode,
 
                 Email = trainer.Email ?? "",

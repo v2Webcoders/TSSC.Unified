@@ -27,8 +27,8 @@ namespace TSSC.Unified.ViewModel
         public string? MeetingLink { get; set; }
 
         public string? Remarks { get; set; }
-
-       // public List<SelectListItem> BatchList { get; set; } = new();
+        public bool ResultRequested { get; set; } = false;
+        // public List<SelectListItem> BatchList { get; set; } = new();
 
         public List<SelectListItem> TrainerList { get; set; } = new();
     }
