@@ -3254,7 +3254,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                         else
                         {
-                            day.Status = null;
+                            day.Status = "null";
                         }
 
 
