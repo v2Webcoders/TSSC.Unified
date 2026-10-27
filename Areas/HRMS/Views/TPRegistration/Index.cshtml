@@ -5,330 +5,354 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
-    Layout = "_Layout";
-    ViewData["Title"] = "TP Registrations"; 
-    var pageTitle = "Pending TP Registrations";
-    var pageDescription = "Training Partner registrations awaiting your approval.";
+	Layout = "_Layout";
+	ViewData["Title"] = "TP Registrations";
+	var pageTitle = "Pending TP Registrations";
+	var pageDescription = "Training Partner registrations awaiting your approval.";
 
-    if (ViewBag.CurrentTab == "approved")
-    {
-        pageTitle = "Approved TP Registrations";
-        pageDescription = "Training Partner registrations approved by you.";
-    }
-    else if (ViewBag.CurrentTab == "rejected")
-    {
-        pageTitle = "Rejected TP Registrations";
-        pageDescription = "Training Partner registrations rejected by you.";
-    }
+	if (ViewBag.CurrentTab == "approved")
+	{
+		pageTitle = "Approved TP Registrations";
+		pageDescription = "Training Partner registrations approved by you.";
+	}
+	else if (ViewBag.CurrentTab == "rejected")
+	{
+		pageTitle = "Rejected TP Registrations";
+		pageDescription = "Training Partner registrations rejected by you.";
+	}
 }
 
 <div class="nk-block-head">
-    <div class="nk-block-between">
+	<div class="nk-block-between">
 
-        <div class="nk-block-head-content">
+		<div class="nk-block-head-content">
 
-            <h3 class="nk-block-title page-title">
-                @pageTitle
-            </h3>
+			<h3 class="nk-block-title page-title">
+				@pageTitle
+			</h3>
 
-            <div class="nk-block-des text-soft">
-                <p>
-                    @pageDescription
-                </p>
-            </div>
+			<div class="nk-block-des text-soft">
+				<p>
+					@pageDescription
+				</p>
+			</div>
 
-        </div>
+		</div>
 
-    </div>
+	</div>
 </div>
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-icon">
-        <em class="icon ni ni-check-circle"></em>
-        @TempData["SuccessMessage"]
-    </div>
+	<div class="alert alert-success alert-icon">
+		<em class="icon ni ni-check-circle"></em>
+		@TempData["SuccessMessage"]
+	</div>
 }
 
 @if (TempData["ErrorMessage"] != null)
 {
-    <div class="alert alert-danger alert-icon">
-        <em class="icon ni ni-alert-circle"></em>
-        @TempData["ErrorMessage"]
-    </div>
+	<div class="alert alert-danger alert-icon">
+		<em class="icon ni ni-alert-circle"></em>
+		@TempData["ErrorMessage"]
+	</div>
 }
+<form id="bulkDownloadForm"
+	  asp-area="HRMS"
+	  asp-controller="TPRegistration"
+	  asp-action="BulkDownload"
+	  method="post">
 
-<div class="card card-bordered">
-    <div class="card-inner">
-        <p class="mb-3 small">
-            <span class="text-primary fw-semibold">Senior Reviewer 1:</span>
-            Sumit Munjal
-            <span class="text-soft mx-2">|</span>
-            <span class="text-primary fw-semibold">Senior Reviewer 2:</span>
-            Praveen Sirohi
-        </p>
-        <div class="table-responsive">
-            <div class="table-responsive">
+	@Html.AntiForgeryToken()
 
-                <table class="datatable-init-export table table-tranx table_custom table-bordered" data-auto-responsive="false">
+	<!-- Bulk Download button -->
+	<div class="d-flex justify-content-end mb-3">
+		<button type="submit" class="btn btn-primary">
+			<em class="icon ni ni-download"></em>
+			<span>Bulk Download</span>
+		</button>
+	</div>
 
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Organization</th>
-                            <th>Registration No.</th>
-                            <th>Applicant / Signatory</th>
-                            <th>Contact Details</th>
-                            <th>Submitted On</th>
+	<!-- YOUR EXISTING CARD STARTS HERE -->
+	<div class="card card-bordered">
+		<div class="card-inner">
+			<p class="mb-3 small">
+				<span class="text-primary fw-semibold">Senior Reviewer 1:</span>
+				Sumit Munjal
+				<span class="text-soft mx-2">|</span>
+				<span class="text-primary fw-semibold">Senior Reviewer 2:</span>
+				Praveen Sirohi
+			</p>
 
-                            <th>Regional</th>
-                            <th>Affiliations</th>
-                            <th>Finance</th>
-                            <th>Vertical Head</th>
-                            <th>Senior Reviewer 1</th>
-                            <th>Senior Reviewer 2</th>
-                            <th>CEO</th>
-                            <th>Payment</th>
-                            <th>Certificate</th>
+			<div class="table-responsive">
 
-                            <th>Current Stage</th>
+				<table class="datatable-init-export table table-tranx table_custom table-bordered" data-auto-responsive="false">
 
-                            <th class="text-end">Action</th>
-                        </tr>
-                    </thead>
+					<thead>
+						<tr>
+							<th data-orderable="false">
+								<input type="checkbox" id="selectAllRecords" />
+							</th>
+							<th>#</th>
+							<th>Organization</th>
+							<th>Registration No.</th>
+							<th>Applicant / Signatory</th>
+							<th>Contact Details</th>
+							<th>Submitted On</th>
 
-                    <tbody>
+							<th>Regional</th>
+							<th>Affiliations</th>
+							<th>Finance</th>
+							<th>Vertical Head</th>
+							<th>Senior Reviewer 1</th>
+							<th>Senior Reviewer 2</th>
+							<th>CEO</th>
+							<th>Payment</th>
+							<th>Certificate</th>
 
-                        @{
-                            var count = 1;
-                        }
+							<th>Current Stage</th>
 
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <!-- # -->
-                                <td>@count</td>
+							<th class="text-end">Action</th>
+						</tr>
+					</thead>
 
-                                <!-- Organization -->
-                                <td>
-                                    <strong>@item.OrganizationName</strong>
-                                    <br />
-                                    <small class="text-soft">@item.OrganizationType</small>
-                                </td>
+					<tbody>
+						@{
+							var count = 1;
+						}
 
-                                <!-- Registration Number -->
-                                <td>@item.RegistrationNumber</td>
+						@foreach (var item in Model)
+						{
+							<tr>
+								<td>
+									<input type="checkbox"
+										   name="selectedIds"
+										   value="@item.Id"
+										   class="record-checkbox" />
+								</td>
+								<!-- # -->
+								<td>@count</td>
 
-                                <!-- Applicant / Signatory -->
-                                <td>
-                                    @item.AuthorizedSignatoryName
-                                    <br />
-                                    <small class="text-soft">@item.Designation</small>
-                                </td>
+								<!-- Organization -->
+								<td>
+									<strong>@item.OrganizationName</strong>
+									<br />
+									<small class="text-soft">@item.OrganizationType</small>
+								</td>
 
-                                <!-- Contact -->
-                                <td>
-                                    @item.Email
-                                    <br />
-                                    <small class="text-soft">@item.MobileNumber</small>
-                                </td>
+								<!-- Registration Number -->
+								<td>@item.RegistrationNumber</td>
 
-                                <!-- Submitted On -->
-                                <td>@item.CreatedOn.ToString("dd MMM yyyy")</td>
+								<!-- Applicant / Signatory -->
+								<td>
+									@item.AuthorizedSignatoryName
+									<br />
+									<small class="text-soft">@item.Designation</small>
+								</td>
 
-                                <!-- Regional -->
-                                <td>
-                                    @if (item.Regional_Head_Status == "Approved")
-                                    {
-                                        <span class="badge bg-success">Approved</span>
-                                    }
-                                    else if (item.Regional_Head_Status == "Rejected")
-                                    {
-                                        <span class="badge bg-danger">Rejected</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-warning">Pending</span>
-                                    }
+								<!-- Contact -->
+								<td>
+									@item.Email
+									<br />
+									<small class="text-soft">@item.MobileNumber</small>
+								</td>
 
-                                    @if (item.Regional_Head_Date.HasValue)
-                                    {
-                                        <br />
-                                        <small class="text-soft">
-                                            @item.Regional_Head_Date.Value.ToString("dd MMM yyyy")
-                                        </small>
-                                    }
-                                </td>
+								<!-- Submitted On -->
+								<td>@item.CreatedOn.ToString("dd MMM yyyy")</td>
 
-                                <!-- Affiliations -->
-                                <td>
-                                    @if (item.Affiliations_Status == "Approved")
-                                    {
-                                        <span class="badge bg-success">Approved</span>
-                                    }
-                                    else if (item.Affiliations_Status == "Rejected")
-                                    {
-                                        <span class="badge bg-danger">Rejected</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-warning">Pending</span>
-                                    }
+								<!-- Regional -->
+								<td>
+									@if (item.Regional_Head_Status == "Approved")
+									{
+										<span class="badge bg-success">Approved</span>
+									}
+									else if (item.Regional_Head_Status == "Rejected")
+									{
+										<span class="badge bg-danger">Rejected</span>
+									}
+									else
+									{
+										<span class="badge bg-warning">Pending</span>
+									}
 
-                                    @if (item.Affiliations_Date.HasValue)
-                                    {
-                                        <br />
-                                        <small class="text-soft">
-                                            @item.Affiliations_Date.Value.ToString("dd MMM yyyy")
-                                        </small>
-                                    }
-                                </td>
+									@if (item.Regional_Head_Date.HasValue)
+									{
+										<br />
+										<small class="text-soft">
+											@item.Regional_Head_Date.Value.ToString("dd MMM yyyy")
+										</small>
+									}
+								</td>
 
-                                <!-- Finance -->
-                                <td>
-                                    @if (item.Finance_Status == "Approved")
-                                    {
-                                        <span class="badge bg-success">Approved</span>
-                                    }
-                                    else if (item.Finance_Status == "Rejected")
-                                    {
-                                        <span class="badge bg-danger">Rejected</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-warning">Pending</span>
-                                    }
+								<!-- Affiliations -->
+								<td>
+									@if (item.Affiliations_Status == "Approved")
+									{
+										<span class="badge bg-success">Approved</span>
+									}
+									else if (item.Affiliations_Status == "Rejected")
+									{
+										<span class="badge bg-danger">Rejected</span>
+									}
+									else
+									{
+										<span class="badge bg-warning">Pending</span>
+									}
 
-                                    @if (item.Finance_Date.HasValue)
-                                    {
-                                        <br />
-                                        <small class="text-soft">
-                                            @item.Finance_Date.Value.ToString("dd MMM yyyy")
-                                        </small>
-                                    }
-                                </td>
+									@if (item.Affiliations_Date.HasValue)
+									{
+										<br />
+										<small class="text-soft">
+											@item.Affiliations_Date.Value.ToString("dd MMM yyyy")
+										</small>
+									}
+								</td>
 
-                                <!-- Vertical Head -->
-                                <td>
-                                    @if (item.Vertical_Head_Status == "Approved")
-                                    {
-                                        <span class="badge bg-success">Approved</span>
-                                    }
-                                    else if (item.Vertical_Head_Status == "Rejected")
-                                    {
-                                        <span class="badge bg-danger">Rejected</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-warning">Pending</span>
-                                    }
+								<!-- Finance -->
+								<td>
+									@if (item.Finance_Status == "Approved")
+									{
+										<span class="badge bg-success">Approved</span>
+									}
+									else if (item.Finance_Status == "Rejected")
+									{
+										<span class="badge bg-danger">Rejected</span>
+									}
+									else
+									{
+										<span class="badge bg-warning">Pending</span>
+									}
 
-                                    @if (item.Vertical_Head_Date.HasValue)
-                                    {
-                                        <br />
-                                        <small class="text-soft">
-                                            @item.Vertical_Head_Date.Value.ToString("dd MMM yyyy")
-                                        </small>
-                                    }
-                                </td>
+									@if (item.Finance_Date.HasValue)
+									{
+										<br />
+										<small class="text-soft">
+											@item.Finance_Date.Value.ToString("dd MMM yyyy")
+										</small>
+									}
+								</td>
 
-                                <!-- Senior Reviewer 1 -->
-                                <td>
-                                    @if (item.SeniorReviewer1_Status == "Approved")
-                                    {
-                                        <span class="badge bg-success">Approved</span>
-                                    }
-                                    else if (item.SeniorReviewer1_Status == "Rejected")
-                                    {
-                                        <span class="badge bg-danger">Rejected</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-warning">Pending</span>
-                                    }
+								<!-- Vertical Head -->
+								<td>
+									@if (item.Vertical_Head_Status == "Approved")
+									{
+										<span class="badge bg-success">Approved</span>
+									}
+									else if (item.Vertical_Head_Status == "Rejected")
+									{
+										<span class="badge bg-danger">Rejected</span>
+									}
+									else
+									{
+										<span class="badge bg-warning">Pending</span>
+									}
 
-                                    @if (item.SeniorReviewer1_Date.HasValue)
-                                    {
-                                        <br />
-                                        <small class="text-soft">
-                                            @item.SeniorReviewer1_Date.Value.ToString("dd MMM yyyy")
-                                        </small>
-                                    }
-                                </td>
+									@if (item.Vertical_Head_Date.HasValue)
+									{
+										<br />
+										<small class="text-soft">
+											@item.Vertical_Head_Date.Value.ToString("dd MMM yyyy")
+										</small>
+									}
+								</td>
 
-                                <!-- Senior Reviewer 2 -->
-                                <td>
-                                    @if (item.SeniorReviewer2_Status == "Approved")
-                                    {
-                                        <span class="badge bg-success">Approved</span>
-                                    }
-                                    else if (item.SeniorReviewer2_Status == "Rejected")
-                                    {
-                                        <span class="badge bg-danger">Rejected</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-warning">Pending</span>
-                                    }
+								<!-- Senior Reviewer 1 -->
+								<td>
+									@if (item.SeniorReviewer1_Status == "Approved")
+									{
+										<span class="badge bg-success">Approved</span>
+									}
+									else if (item.SeniorReviewer1_Status == "Rejected")
+									{
+										<span class="badge bg-danger">Rejected</span>
+									}
+									else
+									{
+										<span class="badge bg-warning">Pending</span>
+									}
 
-                                    @if (item.SeniorReviewer2_Date.HasValue)
-                                    {
-                                        <br />
-                                        <small class="text-soft">
-                                            @item.SeniorReviewer2_Date.Value.ToString("dd MMM yyyy")
-                                        </small>
-                                    }
-                                </td>
+									@if (item.SeniorReviewer1_Date.HasValue)
+									{
+										<br />
+										<small class="text-soft">
+											@item.SeniorReviewer1_Date.Value.ToString("dd MMM yyyy")
+										</small>
+									}
+								</td>
 
-                                <!-- CEO -->
-                                <td>
-                                    @if (item.CEO_Status == "Approved")
-                                    {
-                                        <span class="badge bg-success">Approved</span>
-                                    }
-                                    else if (item.CEO_Status == "Rejected")
-                                    {
-                                        <span class="badge bg-danger">Rejected</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-warning">Pending</span>
-                                    }
+								<!-- Senior Reviewer 2 -->
+								<td>
+									@if (item.SeniorReviewer2_Status == "Approved")
+									{
+										<span class="badge bg-success">Approved</span>
+									}
+									else if (item.SeniorReviewer2_Status == "Rejected")
+									{
+										<span class="badge bg-danger">Rejected</span>
+									}
+									else
+									{
+										<span class="badge bg-warning">Pending</span>
+									}
 
-                                    @if (item.CEO_Date.HasValue)
-                                    {
-                                        <br />
-                                        <small class="text-soft">
-                                            @item.CEO_Date.Value.ToString("dd MMM yyyy")
-                                        </small>
-                                    }
-                                </td>
+									@if (item.SeniorReviewer2_Date.HasValue)
+									{
+										<br />
+										<small class="text-soft">
+											@item.SeniorReviewer2_Date.Value.ToString("dd MMM yyyy")
+										</small>
+									}
+								</td>
 
-                                <!-- Payment Process -->
-                                <td>
-                                    @if (item.PaymentProcess_Status == "Approved")
-                                    {
-                                        <span class="badge bg-success">Approved</span>
-                                    }
-                                    else if (item.PaymentProcess_Status == "Rejected")
-                                    {
-                                        <span class="badge bg-danger">Rejected</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-warning">Pending</span>
-                                    }
+								<!-- CEO -->
+								<td>
+									@if (item.CEO_Status == "Approved")
+									{
+										<span class="badge bg-success">Approved</span>
+									}
+									else if (item.CEO_Status == "Rejected")
+									{
+										<span class="badge bg-danger">Rejected</span>
+									}
+									else
+									{
+										<span class="badge bg-warning">Pending</span>
+									}
 
-                                    @if (item.PaymentProcess_Date.HasValue)
-                                    {
-                                        <br />
-                                        <small class="text-soft">
-                                            @item.PaymentProcess_Date.Value.ToString("dd MMM yyyy")
-                                        </small>
-                                    }
-                                </td>
+									@if (item.CEO_Date.HasValue)
+									{
+										<br />
+										<small class="text-soft">
+											@item.CEO_Date.Value.ToString("dd MMM yyyy")
+										</small>
+									}
+								</td>
 
-                                @* <!-- Finance Certificate -->
+								<!-- Payment Process -->
+								<td>
+									@if (item.PaymentProcess_Status == "Approved")
+									{
+										<span class="badge bg-success">Approved</span>
+									}
+									else if (item.PaymentProcess_Status == "Rejected")
+									{
+										<span class="badge bg-danger">Rejected</span>
+									}
+									else
+									{
+										<span class="badge bg-warning">Pending</span>
+									}
+
+									@if (item.PaymentProcess_Date.HasValue)
+									{
+										<br />
+										<small class="text-soft">
+											@item.PaymentProcess_Date.Value.ToString("dd MMM yyyy")
+										</small>
+									}
+								</td>
+
+								@* <!-- Finance Certificate -->
         <td>
             @if (item.FinanceCertificate_Status == "Approved")
             {
@@ -353,61 +377,170 @@
         </td>
         *@
 
-                                <!-- Certificate Issuance -->
-                                <td>
-                                    @if (item.CertificateIssuance_Status == "Approved")
-                                    {
-                                        <span class="badge bg-success">Approved</span>
-                                    }
-                                    else if (item.CertificateIssuance_Status == "Rejected")
-                                    {
-                                        <span class="badge bg-danger">Rejected</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-warning">Pending</span>
-                                    }
+								<!-- Certificate Issuance -->
+								<td>
+									@if (item.CertificateIssuance_Status == "Approved")
+									{
+										<span class="badge bg-success">Approved</span>
+									}
+									else if (item.CertificateIssuance_Status == "Rejected")
+									{
+										<span class="badge bg-danger">Rejected</span>
+									}
+									else
+									{
+										<span class="badge bg-warning">Pending</span>
+									}
 
-                                    @if (item.CertificateIssuance_Date.HasValue)
-                                    {
-                                        <br />
-                                        <small class="text-soft">
-                                            @item.CertificateIssuance_Date.Value.ToString("dd MMM yyyy")
-                                        </small>
-                                    }
-                                </td>
+									@if (item.CertificateIssuance_Date.HasValue)
+									{
+										<br />
+										<small class="text-soft">
+											@item.CertificateIssuance_Date.Value.ToString("dd MMM yyyy")
+										</small>
+									}
+								</td>
 
-                                <!-- Current Stage -->
-                                <td>
-                                    @if (!string.IsNullOrEmpty(item.CurrentStage))
-                                    {
-                                        <span class="badge bg-primary">@item.CurrentStage</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-light text-dark">-</span>
-                                    }
-                                </td>
+								<!-- Current Stage -->
+								<td>
+									@if (!string.IsNullOrEmpty(item.CurrentStage))
+									{
+										<span class="badge bg-primary">@item.CurrentStage</span>
+									}
+									else
+									{
+										<span class="badge bg-light text-dark">-</span>
+									}
+								</td>
 
-                                <!-- Action -->
-                                <td class="text-end">
-                                    <a asp-area="HRMS"
-                                       asp-controller="TPRegistration"
-                                       asp-action="Details"
-                                       asp-route-id="@item.Id"
-                                       class="btn btn-sm btn-primary">
-                                        <em class="icon ni ni-eye"></em>
-                                        View
-                                    </a>
-                                </td>
-                            </tr>
+								<!-- Action -->
+								<td class="text-end">
+									<a asp-area="HRMS"
+									   asp-controller="TPRegistration"
+									   asp-action="Details"
+									   asp-route-id="@item.Id"
+									   class="btn btn-sm btn-primary">
+										<em class="icon ni ni-eye"></em>
+										View
+									</a>
+								</td>
+							</tr>
 
-                            count++;
-                        }
-                    </tbody>
+							count++;
+						}
+					</tbody>
 
-                </table>
-        </div>
-    </div>
-</div>
-</div>
+				</table>
+			</div>
+
+		</div>
+	</div>
+	<!-- YOUR EXISTING CARD ENDS HERE -->
+
+</form>
+
+@section Scripts {
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			const selectAll = document.getElementById("selectAllRecords");
+			const selectedIds = new Set();
+
+			function getVisibleCheckboxes() {
+				return document.querySelectorAll(".record-checkbox");
+			}
+
+			function updateSelectAll() {
+				const checkboxes = getVisibleCheckboxes();
+
+				selectAll.checked =
+					checkboxes.length > 0 &&
+					Array.from(checkboxes).every(cb =>
+						selectedIds.has(cb.value)
+					);
+
+				selectAll.indeterminate =
+					Array.from(checkboxes).some(cb =>
+						selectedIds.has(cb.value)
+					) && !selectAll.checked;
+			}
+
+			// Restore checkbox states when DataTables changes pages
+			function restoreSelections() {
+				getVisibleCheckboxes().forEach(function (checkbox) {
+					checkbox.checked = selectedIds.has(checkbox.value);
+				});
+
+				updateSelectAll();
+			}
+
+			// Select/deselect all records on the current page
+			selectAll.addEventListener("change", function () {
+				getVisibleCheckboxes().forEach(function (checkbox) {
+					checkbox.checked = selectAll.checked;
+
+					if (checkbox.checked) {
+						selectedIds.add(checkbox.value);
+					} else {
+						selectedIds.delete(checkbox.value);
+					}
+				});
+
+				updateSelectAll();
+			});
+
+			// Track individual selections
+			document.addEventListener("change", function (event) {
+				if (event.target.classList.contains("record-checkbox")) {
+					const checkbox = event.target;
+
+					if (checkbox.checked) {
+						selectedIds.add(checkbox.value);
+					} else {
+						selectedIds.delete(checkbox.value);
+					}
+
+					updateSelectAll();
+				}
+			});
+
+			// Hook into DataTables pagination, search, and sorting
+			if (window.jQuery &&
+				$.fn.DataTable &&
+				$.fn.DataTable.isDataTable(".datatable-init-export")) {
+
+				$(".datatable-init-export").on(
+					"draw.dt",
+					restoreSelections
+				);
+			}
+
+			// Submit selected IDs from every page
+			const form = document.getElementById("bulkDownloadForm");
+
+			if (form) {
+				form.addEventListener("submit", function (event) {
+					event.preventDefault();
+
+					if (selectedIds.size === 0) {
+						alert("Please select at least one record.");
+						return;
+					}
+
+					form.querySelectorAll(".generated-selected-id")
+						.forEach(input => input.remove());
+
+					selectedIds.forEach(function (id) {
+						const input = document.createElement("input");
+						input.type = "hidden";
+						input.name = "selectedIds";
+						input.value = id;
+						input.className = "generated-selected-id";
+						form.appendChild(input);
+					});
+
+					form.submit();
+				});
+			}
+		});
+	</script>
+}
