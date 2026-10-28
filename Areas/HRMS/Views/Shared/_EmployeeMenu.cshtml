@@ -1094,6 +1094,164 @@
 	}
 
 
+
+	@if (User.IsInRole("RegionalHead"))
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					<em class="icon ni ni-user-check"></em>
+					Training Center
+				</span>
+			</div>
+		</li>
+
+		<li class="nk-menu-item has-sub">
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-user-check"></em>
+				</span>
+				<span class="nk-menu-text">Manage Training Center</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/RegionalHeadInspection?tab=Pending"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Pending" ? "active" : "")">
+						<span class="nk-menu-text">Pending Inspection</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/RegionalHeadInspection?tab=OnHold"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "OnHold" ? "active" : "")">
+						<span class="nk-menu-text">On Hold</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/RegionalHeadInspection?tab=Rejected"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Rejected" ? "active" : "")">
+						<span class="nk-menu-text">Rejected</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/RegionalHeadInspection?tab=Approved"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Approved" ? "active" : "")">
+						<span class="nk-menu-text">Sent to Vertical Head</span>
+					</a>
+				</li>
+
+			</ul>
+		</li>
+	}
+
+	@if (isReportingManager)
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					<em class="icon ni ni-user-check"></em>
+					Training Center
+				</span>
+			</div>
+		</li>
+
+		<li class="nk-menu-item has-sub">
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-user-check"></em>
+				</span>
+				<span class="nk-menu-text">Manage Training Center</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/VerticalHeadInspection?tab=Pending"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Pending" ? "active" : "")">
+						<span class="nk-menu-text">Pending Inspection</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/VerticalHeadInspection?tab=OnHold"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "OnHold" ? "active" : "")">
+						<span class="nk-menu-text">On Hold</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/VerticalHeadInspection?tab=Rejected"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Rejected" ? "active" : "")">
+						<span class="nk-menu-text">Rejected</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/VerticalHeadInspection?tab=Approved"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Approved" ? "active" : "")">
+						<span class="nk-menu-text">Sent to Business Head</span>
+					</a>
+				</li>
+
+			</ul>
+		</li>
+	}
+
+	@if (User.IsInRole("BusinessHead"))
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					<em class="icon ni ni-user-check"></em>
+					Training Center
+				</span>
+			</div>
+		</li>
+
+		<li class="nk-menu-item has-sub">
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-user-check"></em>
+				</span>
+				<span class="nk-menu-text">Manage Training Center</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/BusinessHeadInspection?tab=Pending"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Pending" ? "active" : "")">
+						<span class="nk-menu-text">Pending Review</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/BusinessHeadInspection?tab=OnHold"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "OnHold" ? "active" : "")">
+						<span class="nk-menu-text">On Hold</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/BusinessHeadInspection?tab=Rejected"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Rejected" ? "active" : "")">
+						<span class="nk-menu-text">Rejected</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/BusinessHeadInspection?tab=Approved"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Approved" ? "active" : "")">
+						<span class="nk-menu-text">Sent to CEO</span>
+					</a>
+				</li>
+			</ul>
+		</li>
+	}
+
 	<!-- HR MANAGEMENT - HR ONLY -->
 	<!-- ===================================================== -->
 	@if (isHR)
