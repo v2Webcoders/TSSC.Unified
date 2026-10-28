@@ -66,7 +66,7 @@
 	@Html.AntiForgeryToken()
 
 	<!-- Bulk Download button -->
-	<div class="d-flex justify-content-end mb-3">
+	<div class="d-flex justify-content-start mb-3">
 		<button type="submit" class="btn btn-primary">
 			<em class="icon ni ni-download"></em>
 			<span>Bulk Download</span>
@@ -91,7 +91,10 @@
 					<thead>
 						<tr>
 							<th data-orderable="false">
-								<input type="checkbox" id="selectAllRecords" />
+								<label for="selectAllRecords" style="cursor: pointer; margin: 0;">
+									<input type="checkbox" id="selectAllRecords" />
+									Check All
+								</label>
 							</th>
 							<th>#</th>
 							<th>Organization</th>
@@ -158,7 +161,7 @@
 								</td>
 
 								<!-- Submitted On -->
-								<td>@item.CreatedOn.ToString("dd MMM yyyy")</td>
+								<td>@item.CreatedOn.ToString("dd MMM yyyy hh:mm:ss tt")</td>
 
 								<!-- Regional -->
 								<td>
@@ -179,7 +182,7 @@
 									{
 										<br />
 										<small class="text-soft">
-											@item.Regional_Head_Date.Value.ToString("dd MMM yyyy")
+											@item.Regional_Head_Date.Value.ToString("dd MMM yyyy hh:mm:ss tt")
 										</small>
 									}
 								</td>
@@ -203,7 +206,7 @@
 									{
 										<br />
 										<small class="text-soft">
-											@item.Affiliations_Date.Value.ToString("dd MMM yyyy")
+											@item.Affiliations_Date.Value.ToString("dd MMM yyyy hh:mm:ss tt")
 										</small>
 									}
 								</td>
@@ -227,7 +230,7 @@
 									{
 										<br />
 										<small class="text-soft">
-											@item.Finance_Date.Value.ToString("dd MMM yyyy")
+											@item.Finance_Date.Value.ToString("dd MMM yyyy hh:mm:ss tt")
 										</small>
 									}
 								</td>
@@ -251,7 +254,7 @@
 									{
 										<br />
 										<small class="text-soft">
-											@item.Vertical_Head_Date.Value.ToString("dd MMM yyyy")
+											@item.Vertical_Head_Date.Value.ToString("dd MMM yyyy hh:mm:ss tt")
 										</small>
 									}
 								</td>
@@ -275,7 +278,7 @@
 									{
 										<br />
 										<small class="text-soft">
-											@item.SeniorReviewer1_Date.Value.ToString("dd MMM yyyy")
+											@item.SeniorReviewer1_Date.Value.ToString("dd MMM yyyy hh:mm:ss tt")
 										</small>
 									}
 								</td>
@@ -299,7 +302,7 @@
 									{
 										<br />
 										<small class="text-soft">
-											@item.SeniorReviewer2_Date.Value.ToString("dd MMM yyyy")
+											@item.SeniorReviewer2_Date.Value.ToString("dd MMM yyyy hh:mm:ss tt")
 										</small>
 									}
 								</td>
@@ -323,7 +326,7 @@
 									{
 										<br />
 										<small class="text-soft">
-											@item.CEO_Date.Value.ToString("dd MMM yyyy")
+											@item.CEO_Date.Value.ToString("dd MMM yyyy hh:mm:ss tt")
 										</small>
 									}
 								</td>
@@ -347,7 +350,7 @@
 									{
 										<br />
 										<small class="text-soft">
-											@item.PaymentProcess_Date.Value.ToString("dd MMM yyyy")
+											@item.PaymentProcess_Date.Value.ToString("dd MMM yyyy hh:mm:ss tt")
 										</small>
 									}
 								</td>
@@ -396,7 +399,7 @@
 									{
 										<br />
 										<small class="text-soft">
-											@item.CertificateIssuance_Date.Value.ToString("dd MMM yyyy")
+											@item.CertificateIssuance_Date.Value.ToString("dd MMM yyyy hh:mm:ss tt")
 										</small>
 									}
 								</td>
