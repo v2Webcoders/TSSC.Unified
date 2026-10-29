@@ -408,6 +408,11 @@
                 }
                 else
                 {
+                    if (currentDate.DayOfWeek == DayOfWeek.Saturday)
+    {
+        statusClass = "work-from-home";
+        statusText = "Work From Home";
+    }
                     if (currentDate.DayOfWeek == DayOfWeek.Sunday)
                     {
                         statusClass = "sunday";
@@ -628,7 +633,12 @@
 
                                 </div>
                             }
-                            
+                            else if (statusClass == "work-from-home")
+                            {
+                                <div class="attendance-status work-from-home">
+                                        Work From Home
+                                </div>
+                            }
                             else if (statusClass == "absent")
                             {
                                 <div class="attendance-status absent">
