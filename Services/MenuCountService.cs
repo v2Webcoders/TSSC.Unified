@@ -107,17 +107,25 @@
             teamRegCount,      // 8 Team > Regularization Requests (manager)
             teamOdCount);      // 9 Team > OD Requests (manager)
     })!;
+        //private async Task<int> GetTaskCountAsync(MenuUser u)
+        //{
+        //    if (!(u.IsManager || u.IsHR || u.IsCEO || u.IsFinanceEmployee || u.IsFinanceHead))
+        //        return 0;
+
+        //    // ASSUMPTION: replace entity/columns with yours.
+        //    // Counts tasks I assigned that are Completed and waiting to be closed.
+        //    return await _db.Tasks.AsNoTracking()
+        //        .CountAsync(t => t.AssignedBy == u.EmployeeId && t.Status == "Completed");
+        //}
         private async Task<int> GetTaskCountAsync(MenuUser u)
         {
-            if (!(u.IsManager || u.IsHR || u.IsCEO || u.IsFinanceEmployee || u.IsFinanceHead))
-                return 0;
-
-            // ASSUMPTION: replace entity/columns with yours.
-            // Counts tasks I assigned that are Completed and waiting to be closed.
-            return await _db.Tasks.AsNoTracking()
-                .CountAsync(t => t.AssignedBy == u.EmployeeId && t.Status == "Completed");
+            return await _db.Tasks
+            .AsNoTracking()
+            .CountAsync(t =>
+                t.AssignedTo == u.EmployeeId &&
+                t.IsActive &&
+                t.Status == "Pending");
         }
-
         private async Task<int> GetReimbursementCountAsync(MenuUser u)
         {
             var claims = _db.Reimbursement.AsNoTracking();   // REIMBURSEMENT

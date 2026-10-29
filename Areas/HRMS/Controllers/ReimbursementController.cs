@@ -453,6 +453,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                     CEOStatus = x.CEOStatus,
                     PaymentStatus=x.PaymentStatus
+
                 })
                 .ToListAsync();
 
@@ -1274,7 +1275,11 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                     ManagerRemarks = x.ManagerRemarks,
                     ManagerApprovedOn = x.ManagerApprovedOn,
-                    CreatedOn = x.CreatedOn
+
+
+                    CreatedOn = x.CreatedOn,
+                    PaymentStatus = x.PaymentStatus
+
                 })
                 .ToListAsync();
 

@@ -401,7 +401,7 @@
                                 @if (attendance != null &&
                                 attendance.InTime.HasValue)
                                 {
-                                    <div class="attendance-status present">
+                                    <div class="attendance-status @(attendance.Status == "Late" ? "late" : "present")">
                                         <div class="attendance-status-label">
                                             @attendance.Status
                                         </div>
@@ -482,7 +482,13 @@
                                         Weekend
                                     </div>
                                 }
-                                
+                                else if (attendance != null &&
+                                attendance.Status == "Work From Home")
+                                {
+                                    <div class="attendance-status work-from-home">
+                                        Work From Home
+                                    </div>
+                                }
                                 else if (attendance != null &&
                                 attendance.Status == "Absent")
                                 {
