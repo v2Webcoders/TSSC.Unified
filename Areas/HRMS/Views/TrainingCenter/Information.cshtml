@@ -647,30 +647,163 @@
 
                 </div>
 
+
+
                 <!-- ACTION BUTTONS -->
                 <div class="row mt-4">
-                    <div class="col-md-12 d-flex flex-wrap justify-content-end gap-2">
+                    <div class="col-md-12">
 
-                        <button type="button"
-                                id="toggleInspectionForm"
-                                class="btn @(isScheduled ? "btn-warning" : "btn-primary")">
-                            <em class="icon ni ni-calendar"></em>
+                        @if (string.IsNullOrWhiteSpace(Model.InspectionStatus)
+                                                || Model.InspectionStatus.Equals(
+                                                "Pending",
+                                                StringComparison.OrdinalIgnoreCase))
+                        {
+                            <div class="d-flex justify-content-end">
+                                <button type="button"
+                                        id="toggleInspectionForm"
+                                        class="btn btn-primary">
+                                    <em class="icon ni ni-calendar"></em>
+                                    Schedule for Inspection
+                                </button>
+                            </div>
+                        }
 
-                            @(isScheduled
-                                                        ? "Update Inspection Schedule"
-                                                        : "Schedule for Inspection")
-                        </button>
+                        @if (string.Equals(
+                                                Model.InspectionStatus,
+                                                "Scheduled",
+                                                StringComparison.OrdinalIgnoreCase))
+                            {
+                                <form asp-area="HRMS"
+                                      asp-controller="TrainingCenter"
+                                      asp-action="UpdateInspectionStatus"
+                                      method="post">
 
-                        <a asp-area="HRMS"
-                           asp-controller="TrainingCenter"
-                           asp-action="InspectionList"
-                           class="btn btn-light">
-                            <em class="icon ni ni-arrow-left"></em>
-                            Back to List
-                        </a>
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@Model.Id" />
+
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            Inspection Remarks
+                                            <span class="text-danger">*</span>
+                                        </label>
+
+                                        <textarea id="inspectionRemarks"
+                                          name="inspectionRemarks"
+                                          class="form-control"
+                                          rows="3"
+                                          maxlength="1000"
+                                          placeholder="Enter inspection remarks..."
+                                          required></textarea>
+                                    </div>
+
+                                <div class="d-flex flex-wrap justify-content-end gap-2 mt-4 pb-3">
+
+                                        <button type="submit"
+                                                name="actionType"
+                                                value="OnHold"
+                                                class="btn btn-info">
+                                            On Hold
+                                        </button>
+
+                                        <button type="submit"
+                                                name="actionType"
+                                                value="Reject"
+                                                class="btn btn-danger">
+                                            Reject
+                                        </button>
+
+                                        <button type="button"
+                                                id="btnSendToRegional"
+                                                class="btn btn-success">
+                                            Send to Regional Head
+                                        </button>
+
+                                    </div>
+                                </form>
+                            }
+
+
+                        <div class="d-flex justify-content-end mt-4">
+                            <a asp-area="HRMS"
+                               asp-controller="TrainingCenter"
+                               asp-action="InspectionList"
+                               class="btn btn-light">
+                                <em class="icon ni ni-arrow-left"></em>
+                                Back to List
+                            </a>
+                        </div>
 
                     </div>
                 </div>
+
+
+                <!-- REGIONAL HEAD SELECTION CARD -->
+                <div id="regionalHeadCard"
+                     class="card card-bordered mt-4"
+                     style="display:none;">
+
+                    <div class="card-inner">
+
+                        <form asp-area="HRMS"
+                              asp-controller="TrainingCenter"
+                              asp-action="SendToRegionalHead"
+                              method="post">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@Model.Id" />
+
+                            <input type="hidden"
+                                   id="regionalInspectionRemarks"
+                                   name="inspectionRemarks" />
+
+                            <div class="form-group">
+                                <label class="form-label fw-bold">
+                                    Select Regional Head
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <select id="regionalHeadId"
+                                        name="regionalHeadEmployeeId"
+                                        class="form-select"
+                                        required>
+                                    <option value="">Select Regional Head</option>
+
+                                    @if (ViewBag.RegionalHeads != null)
+                                    {
+                                        foreach (var head in ViewBag.RegionalHeads)
+                                        {
+                                            <option value="@head.EmployeeId">
+                                                @(head.Name + " (" + head.Email + ")")
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-5 pt-3">
+
+                                <button type="button"
+                                        id="cancelRegionalHead"
+                                        class="btn btn-info">
+                                    Cancel
+                                </button>
+
+                                <button type="submit"
+                                        id="confirmRegionalHead"
+                                        class="btn btn-success">
+                                    Send
+                                </button>
+
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+
 
                 <!-- INLINE SCHEDULE FORM -->
                 <div id="inspectionFormContainer"
@@ -706,11 +839,13 @@
                                     </label>
 
                                     <input type="datetime-local"
+                                           id="inspectionDate"
                                            name="inspectionDate"
                                            class="form-control"
                                            value="@(Model.InspectionDate.HasValue
-                                                                          ? Model.InspectionDate.Value.ToString("yyyy-MM-ddTHH:mm")
-                                                                          : "")"
+                                                          ? Model.InspectionDate.Value.ToString("yyyy-MM-ddTHH:mm")
+                                                          : "")"
+                                           min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"
                                            required />
                                 </div>
 
@@ -777,49 +912,118 @@
                 </div>
 
                 <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                const toggleButton = document.getElementById("toggleInspectionForm");
+                const cancelButton = document.getElementById("cancelInspectionForm");
+                const formContainer = document.getElementById("inspectionFormContainer");
+                const modeSelect = document.getElementById("inspectionMode");
+                const linkInput = document.getElementById("inspectionLink");
+                const linkContainer = document.getElementById("inspectionLinkContainer");
+                const requiredMark = document.getElementById("inspectionLinkRequired");
+
+                if (!toggleButton || !formContainer) {
+                console.error("Inspection schedule button or form is missing.");
+                return;
+                }
+
+                toggleButton.addEventListener("click", function () {
+                formContainer.style.display = "block";
+
+                if (modeSelect && linkInput && linkContainer && requiredMark) {
+                updateLinkField();
+                }
+
+                formContainer.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+                });
+                });
+
+                if (cancelButton) {
+                cancelButton.addEventListener("click", function () {
+                formContainer.style.display = "none";
+                });
+                }
+
+                function updateLinkField() {
+                const isOnline = modeSelect.value === "Online";
+
+                linkContainer.style.display = isOnline ? "" : "none";
+                linkInput.required = isOnline;
+                linkInput.disabled = !isOnline;
+                requiredMark.style.display = isOnline ? "" : "none";
+
+                if (!isOnline) {
+                linkInput.value = "";
+                }
+                }
+
+                if (modeSelect && linkInput && linkContainer && requiredMark) {
+                modeSelect.addEventListener("change", updateLinkField);
+                updateLinkField();
+                }
+                });
+
+
+                </script>
+                <script>
                     document.addEventListener("DOMContentLoaded", function () {
-                        const toggleButton = document.getElementById("toggleInspectionForm");
-                        const cancelButton = document.getElementById("cancelInspectionForm");
-                        const formContainer = document.getElementById("inspectionFormContainer");
-                        const modeSelect = document.getElementById("inspectionMode");
-                        const linkInput = document.getElementById("inspectionLink");
-                        const linkContainer = document.getElementById("inspectionLinkContainer");
-                        const requiredMark = document.getElementById("inspectionLinkRequired");
+                        const sendButton = document.getElementById("btnSendToRegional");
+                        const card = document.getElementById("regionalHeadCard");
+                        const cancelButton = document.getElementById("cancelRegionalHead");
+                        const confirmButton = document.getElementById("confirmRegionalHead");
+                        const regionalHeadSelect = document.getElementById("regionalHeadId");
 
-                        toggleButton.addEventListener("click", function () {
-                            formContainer.style.display = "block";
+                        if (!sendButton || !card) return;
 
-                            formContainer.scrollIntoView({
-                                behavior: "smooth",
-                                block: "start"
-                            });
-
-                            updateLinkField();
+                        sendButton.addEventListener("click", function () {
+                            card.style.display = "block";
+                            card.scrollIntoView({ behavior: "smooth", block: "center" });
                         });
 
-                        cancelButton.addEventListener("click", function () {
-                            formContainer.style.display = "none";
+                        cancelButton?.addEventListener("click", function () {
+                            card.style.display = "none";
                         });
 
-                        function updateLinkField() {
-                            const isOnline = modeSelect.value === "Online";
-
-                            linkContainer.style.display = isOnline ? "" : "none";
-                            linkInput.required = isOnline;
-                            linkInput.disabled = !isOnline;
-                            requiredMark.style.display = isOnline ? "" : "none";
-
-                            if (!isOnline) {
-                                linkInput.value = "";
+                        confirmButton?.addEventListener("click", function () {
+                            if (!regionalHeadSelect.value) {
+                                alert("Please select a Regional Head.");
+                                return;
                             }
-                        }
 
-                        modeSelect.addEventListener("change", updateLinkField);
-                        updateLinkField();
+                            alert("Regional Head selected. Next, we will connect the Send action.");
+                        });
                     });
                 </script>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const sendButton = document.getElementById("btnSendToRegional");
+                        const card = document.getElementById("regionalHeadCard");
+                        const cancelButton = document.getElementById("cancelRegionalHead");
+                        const remarksInput = document.getElementById("inspectionRemarks");
+                        const regionalRemarks = document.getElementById("regionalInspectionRemarks");
 
+                        if (sendButton && card) {
+                            sendButton.addEventListener("click", function () {
+                                if (!remarksInput || !remarksInput.value.trim()) {
+                                    alert("Please enter inspection remarks.");
+                                    remarksInput?.focus();
+                                    return;
+                                }
 
+                                regionalRemarks.value = remarksInput.value.trim();
+                                card.style.display = "block";
+                                card.scrollIntoView({ behavior: "smooth", block: "center" });
+                            });
+                        }
+
+                        if (cancelButton && card) {
+                            cancelButton.addEventListener("click", function () {
+                                card.style.display = "none";
+                            });
+                        }
+                    });
+                </script>
         </div>
         </div>
     </div>

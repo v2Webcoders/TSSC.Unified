@@ -1741,5 +1741,36 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             return RedirectToAction(nameof(RegistrationList));
         }
+        [HttpGet]
+        public async Task<IActionResult> BatchDetails(int id)
+        {
+            var batch = await _context.BatchMaster
+                .AsNoTracking()
+                .Include(x => x.JobRole)
+                .Include(x => x.AssessmentAgency)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (batch == null)
+            {
+                return NotFound();
+            }
+            var trainers = await (
+     from bt in _context.BatchMasterTrainers.AsNoTracking()
+     join tr in _context.TrainerRegistration.AsNoTracking()
+         on bt.TrainerRegistrationId equals tr.Id
+     where bt.BatchId == batch.Id
+     orderby tr.CandidateName
+     select tr
+    ).ToListAsync();
+            ViewBag.TrainingPartnerName = await _context.TPRegistrations
+                .AsNoTracking()
+                .Where(x => x.Id == batch.TPId)
+                .Select(x => x.OrganizationName)
+                .FirstOrDefaultAsync();
+
+            ViewBag.BatchTrainers = trainers;
+
+            return View(batch);
+        }
     }
 }
