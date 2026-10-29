@@ -12,6 +12,18 @@
 @{
 	var currentUser = await UserManager.GetUserAsync(User);
 
+    // =====================================
+	// TP AFFILIATION WORKFLOW MENU ACCESS
+	// =====================================
+
+	var hasTPWorkflowAccess = currentUser != null &&
+		Context.TPWorkflowApprovers.Any(x =>
+			x.IsActive &&
+			x.ApproverType == "User" &&
+			x.ApplicationUserId == currentUser.Id
+		);
+
+
 	var roles = currentUser != null
 		? await UserManager.GetRolesAsync(currentUser)
 		: new List<string>();
@@ -67,7 +79,7 @@
 	var counts = employee != null
 	? await MenuCountService.GetAsync(new MenuUser(
 		employee.EmployeeId, isHR, isReportingManager,
-		isFinanceEmployee, isFinanceHead, isCEO))
+		isFinanceEmployee, isFinanceHead, isCEO, employee.ApplicationUserId))
 	: MenuCounts.Empty;
 
 
@@ -1511,6 +1523,93 @@
 
     }
 
+    @if (roles.Contains("RegionalHead") ||
+    roles.Contains("AffiliationTeam") ||
+    roles.Contains("Finance") ||
+    roles.Contains("VerticalHead") ||
+    roles.Contains("CEO") ||
+    roles.Contains("PaymentProcess") ||
+    roles.Contains("FinanceCertificate") ||
+    roles.Contains("CertificateIssuance") ||
+    hasTPWorkflowAccess)
+    {
+        <li class="nk-menu-heading">
+            <div class="nk-menu-heading-content">
+                <span class="nk-menu-heading-text">AFFILIATION</span>
+            </div>
+        </li>
+
+        <li class="nk-menu-item has-sub">
+
+            <a href="#"
+               class="nk-menu-link nk-menu-toggle">
+
+                <span class="nk-menu-icon">
+                    <em class="icon ni ni-building"></em>
+                </span>
+
+                <span class="nk-menu-text">
+                    TP Registrations
+                </span>
+                @if (counts.tpPendingApprovals > 0)
+                {
+                    <partial name="_MenuBadge" model="counts.tpPendingApprovals" />
+                }
+            </a>
+
+            <ul class="nk-menu-sub">
+
+                <!-- Pending -->
+                <li class="nk-menu-item">
+                    <a asp-area="HRMS"
+                       asp-controller="TPRegistration"
+                       asp-action="Index"
+                       asp-route-tab="pending"
+                       class="nk-menu-link">
+
+                        <span class="nk-menu-text">
+                            Pending Approval
+                        </span>
+                        @if (counts.tpPendingApprovals > 0)
+                        {
+                            <partial name="_MenuBadge" model="counts.tpPendingApprovals" />
+                        }
+                    </a>
+                </li>
+
+                <!-- Approved -->
+                <li class="nk-menu-item">
+                    <a asp-area="HRMS"
+                       asp-controller="TPRegistration"
+                       asp-action="Index"
+                       asp-route-tab="approved"
+                       class="nk-menu-link">
+
+                        <span class="nk-menu-text">
+                            Approved
+                        </span>
+
+                    </a>
+                </li>
+
+                <!-- Rejected -->
+                <li class="nk-menu-item">
+                    <a asp-area="HRMS"
+                       asp-controller="TPRegistration"
+                       asp-action="Index"
+                       asp-route-tab="rejected"
+                       class="nk-menu-link">
+
+                        <span class="nk-menu-text">
+                            Rejected
+                        </span>
+
+                    </a>
+                </li>
+
+            </ul>
+        </li>
+    }
 
     <!-- ===================================================== -->
     @if (isReportingManager || showReimbursementApproverMenu || isFinanceEmployee || isHR || isFinanceHead || isCEO)

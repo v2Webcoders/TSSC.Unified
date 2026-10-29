@@ -67,7 +67,7 @@
 	var counts = employee != null
 	? await MenuCountService.GetAsync(new MenuUser(
 		employee.EmployeeId, isHR, isReportingManager,
-		isFinanceEmployee, isFinanceHead, isCEO))
+		isFinanceEmployee, isFinanceHead, isCEO, employee.ApplicationUserId))
 	: MenuCounts.Empty;
 
 

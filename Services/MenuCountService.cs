@@ -1,17 +1,27 @@
 ﻿namespace TSSC.Unified.Services
 {
+    using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Caching.Memory;
     using QUIZAPP;
+    using QUIZAPP.Models;
+    using TSSC.Unified.Areas.HRMS.Controllers;
 
+    //public record MenuUser(
+    //    int EmployeeId,
+    //    bool IsHR,
+    //    bool IsManager,
+    //    bool IsFinanceEmployee,
+    //    bool IsFinanceHead,
+    //    bool IsCEO);
     public record MenuUser(
-        int EmployeeId,
-        bool IsHR,
-        bool IsManager,
-        bool IsFinanceEmployee,
-        bool IsFinanceHead,
-        bool IsCEO);
-
+    int EmployeeId,
+    bool IsHR,
+    bool IsManager,
+    bool IsFinanceEmployee,
+    bool IsFinanceHead,
+    bool IsCEO,
+    string? ApplicationUserId);
     public record MenuCounts(
     int AllRegularizations,
     int AllODRequests,
@@ -21,9 +31,9 @@
     int PendingApprovals,
     int ReimbursementRequests,
     int ManagerRegularizations,
-    int ManagerODRequests)
+    int ManagerODRequests, int tpPendingApprovals)
     {
-        public static readonly MenuCounts Empty = new(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        public static readonly MenuCounts Empty = new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
         // HR > Attendance Management (parent dot)
         public int AttendanceTotal => AllRegularizations + AllODRequests;
@@ -42,11 +52,13 @@
     {
         private readonly AppdbContext _db;
         private readonly IMemoryCache _cache;
+        UserManager<AppUser> _userManager;
 
-        public MenuCountService(AppdbContext db, IMemoryCache cache)
+        public MenuCountService(AppdbContext db, IMemoryCache cache, UserManager<AppUser> userManager)
         {
             _db = db;
             _cache = cache;
+            _userManager = userManager;
         }
 
         private static string Key(int id) => $"menucounts:{id}";
@@ -97,7 +109,7 @@
 
         // ---------- Reimbursement Requests (one stage per user, same priority as menu) ----------
         int reimb = await GetReimbursementCountAsync(u);
-
+        int tpPendingApprovals = await GetTPPendingApprovalCountAsync(u);
         return new MenuCounts(
             hrRegCount,        // 1 HR > All Regularizations
             hrOdCount,         // 2 HR > All OD Requests
@@ -105,18 +117,9 @@
             teamLeaveCount,    // 4 Team > Manage Leave Requests
             taskCount, approvals, reimb,
             teamRegCount,      // 8 Team > Regularization Requests (manager)
-            teamOdCount);      // 9 Team > OD Requests (manager)
+            teamOdCount, tpPendingApprovals);      // 9 Team > OD Requests (manager)
     })!;
-        //private async Task<int> GetTaskCountAsync(MenuUser u)
-        //{
-        //    if (!(u.IsManager || u.IsHR || u.IsCEO || u.IsFinanceEmployee || u.IsFinanceHead))
-        //        return 0;
-
-        //    // ASSUMPTION: replace entity/columns with yours.
-        //    // Counts tasks I assigned that are Completed and waiting to be closed.
-        //    return await _db.Tasks.AsNoTracking()
-        //        .CountAsync(t => t.AssignedBy == u.EmployeeId && t.Status == "Completed");
-        //}
+        
         private async Task<int> GetTaskCountAsync(MenuUser u)
         {
             return await _db.Tasks
@@ -149,6 +152,92 @@
                     x.HRStatus == "HR Approved" &&
                     x.FinanceHeadStatus == "Finance Head Approved" && x.CEOStatus == "Pending");
             return 0;
+        }
+        private async Task<int> GetTPPendingApprovalCountAsync(MenuUser u)
+        {
+            if (string.IsNullOrWhiteSpace(u.ApplicationUserId))
+                return 0;
+
+            var appUser = await _userManager.FindByIdAsync(u.ApplicationUserId);
+
+            if (appUser == null)
+                return 0;
+
+            var roles = await _userManager.GetRolesAsync(appUser);
+            var roleNames = roles.ToList();
+
+            var assignedStages = await _db.TPWorkflowApprovers
+                .AsNoTracking()
+                .Where(a => a.IsActive &&
+                            a.StageCode != "FINANCE_CERTIFICATE" &&
+                            (
+                                (a.ApproverType == "Role" &&
+                                 a.RoleName != null &&
+                                 roleNames.Contains(a.RoleName))
+                                ||
+                                (a.ApproverType == "User" &&
+                                 a.ApplicationUserId == u.ApplicationUserId)
+                            ))
+                .Select(a => a.StageCode)
+                .Distinct()
+                .ToListAsync();
+
+            if (assignedStages.Count == 0)
+                return 0;
+
+            var registrations = _db.TPRegistrations
+                .AsNoTracking()
+                .Where(r => assignedStages.Contains(r.CurrentStage));
+
+            // Count registrations awaiting approval at the assigned current stage.
+            int count = 0;
+
+            if (assignedStages.Contains("REGIONAL"))
+                count += await registrations.CountAsync(r =>
+                    r.CurrentStage == "REGIONAL" &&
+                    r.Regional_Head_Status == "Pending");
+
+            if (assignedStages.Contains("AFFILIATIONS"))
+                count += await registrations.CountAsync(r =>
+                    r.CurrentStage == "AFFILIATIONS" &&
+                    r.Affiliations_Status == "Pending");
+
+            if (assignedStages.Contains("FINANCE"))
+                count += await registrations.CountAsync(r =>
+                    r.CurrentStage == "FINANCE" &&
+                    r.Finance_Status == "Pending");
+
+            if (assignedStages.Contains("VERTICAL_HEAD"))
+                count += await registrations.CountAsync(r =>
+                    r.CurrentStage == "VERTICAL_HEAD" &&
+                    r.Vertical_Head_Status == "Pending");
+
+            if (assignedStages.Contains("SENIOR_REVIEWER_1"))
+                count += await registrations.CountAsync(r =>
+                    r.CurrentStage == "SENIOR_REVIEWER_1" &&
+                    r.SeniorReviewer1_Status == "Pending");
+
+            if (assignedStages.Contains("SENIOR_REVIEWER_2"))
+                count += await registrations.CountAsync(r =>
+                    r.CurrentStage == "SENIOR_REVIEWER_2" &&
+                    r.SeniorReviewer2_Status == "Pending");
+
+            if (assignedStages.Contains("CEO"))
+                count += await registrations.CountAsync(r =>
+                    r.CurrentStage == "CEO" &&
+                    r.CEO_Status == "Pending");
+
+            if (assignedStages.Contains("PAYMENT_PROCESS"))
+                count += await registrations.CountAsync(r =>
+                    r.CurrentStage == "PAYMENT_PROCESS" &&
+                    r.PaymentProcess_Status == "Pending");
+
+            if (assignedStages.Contains("CERTIFICATE_ISSUANCE"))
+                count += await registrations.CountAsync(r =>
+                    r.CurrentStage == "CERTIFICATE_ISSUANCE" &&
+                    r.CertificateIssuance_Status == "Pending");
+
+            return count;
         }
     }
 }

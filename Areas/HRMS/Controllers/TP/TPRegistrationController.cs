@@ -634,8 +634,6 @@ namespace TSSC.Unified.Areas.HRMS.Controllers.TP
 
                 await _context.SaveChangesAsync();
 
-                await _context.SaveChangesAsync();
-
                 return RedirectToAction(nameof(Details), new { id });
             }
 

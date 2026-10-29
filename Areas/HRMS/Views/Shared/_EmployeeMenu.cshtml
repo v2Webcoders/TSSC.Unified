@@ -12,6 +12,18 @@
 @{
 	var currentUser = await UserManager.GetUserAsync(User);
 
+	// =====================================
+	// TP AFFILIATION WORKFLOW MENU ACCESS
+	// =====================================
+
+	var hasTPWorkflowAccess = currentUser != null &&
+		Context.TPWorkflowApprovers.Any(x =>
+			x.IsActive &&
+			x.ApproverType == "User" &&
+			x.ApplicationUserId == currentUser.Id
+		);
+
+
 	var roles = currentUser != null
 		? await UserManager.GetRolesAsync(currentUser)
 		: new List<string>();
@@ -159,7 +171,7 @@
 	var counts = employee != null
 	? await MenuCountService.GetAsync(new MenuUser(
 		employee.EmployeeId, isHR, isReportingManager,
-		isFinanceEmployee, isFinanceHead, isCEO))
+		isFinanceEmployee, isFinanceHead, isCEO, employee.ApplicationUserId))
 	: MenuCounts.Empty;
 }
 
@@ -1638,11 +1650,15 @@
 
 
 	}
-
 	@if (roles.Contains("RegionalHead") ||
-			roles.Contains("VerticalHead") ||
+			roles.Contains("AffiliationTeam") ||
 			roles.Contains("Finance") ||
-			roles.Contains("CEO"))
+			roles.Contains("VerticalHead") ||
+			roles.Contains("CEO") ||
+			roles.Contains("PaymentProcess") ||
+			roles.Contains("FinanceCertificate") ||
+			roles.Contains("CertificateIssuance") ||
+			hasTPWorkflowAccess)
 	{
 		<li class="nk-menu-heading">
 			<div class="nk-menu-heading-content">
@@ -1713,9 +1729,13 @@
 				</li>
 
 			</ul>
-
 		</li>
 	}
+
+
+
+	
+	
 	<!-- MANAGER - REPORTING MANAGER ONLY -->
 	<!-- ===================================================== -->
 	@if (isReportingManager || showReimbursementApproverMenu || isFinanceEmployee || isHR || isFinanceHead || isCEO || User.IsInRole("GrievanceTeam"))
