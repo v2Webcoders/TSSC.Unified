@@ -1,5 +1,6 @@
 ﻿@using TSSC.Unified.Models
 @using TSSC.Unified.ViewModel
+@using static TSSC.Unified.Services.AttendanceSummaryService
 @model List<TSSC.Unified.Models.EmployeeAttendance>
 
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
@@ -33,24 +34,24 @@
     var nextMonth =
         firstDay.AddMonths(1);
     var leaveList = ViewBag.LeaveList as List<LeaveRequest>
-                 ?? new List<LeaveRequest>();
+                    ?? new List<LeaveRequest>();
     var holidayList = ViewBag.HolidayList as List<Holiday>
-          ?? new List<Holiday>();
+                ?? new List<Holiday>();
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/assets/css/calendar.css" />
-    @* <style>
-        .icon-circle-sm {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-}
-</style> *@
+<link rel="stylesheet" href="~/assets/css/calendar.css" />
+@* <style>
+	        .icon-circle-sm {
+	    width: 32px;
+	    height: 32px;
+	    border-radius: 50%;
+	    display: inline-flex;
+	    align-items: center;
+	    justify-content: center;
+	    font-size: 16px;
+	}
+	</style> *@
 }
 
 
@@ -58,18 +59,18 @@
 <div class="nk-block-head">
     <div class="nk-block-between">
         <div class="nk-block-head-content">
-    <h3 class="nk-block-title page-title">
-        @ViewBag.PageTitle
-    </h3>
+            <h3 class="nk-block-title page-title">
+                @ViewBag.PageTitle
+            </h3>
 
-    <div class="nk-block-des text-soft">
-        <p>
-            @(ViewBag.PageTitle == "Attendance Regularization"
-                ? "Review and regularize your attendance records."
-                : "View your monthly attendance and attendance status.")
-        </p>
-    </div>
-</div>
+            <div class="nk-block-des text-soft">
+                <p>
+                    @(ViewBag.PageTitle == "Attendance Regularization"
+                                                                   ? "Review and regularize your attendance records."
+                                                                   : "View your monthly attendance and attendance status.")
+                </p>
+            </div>
+        </div>
         <div class="nk-block-head-content">
             <div class="toggle-wrap nk-block-tools-toggle">
                 <a href="#" class="btn btn-icon btn-trigger toggle-expand me-n1" data-target="pageMenu">
@@ -134,533 +135,362 @@
                                     <span class="ms-2">10:00–10:59 <span class="badge bg-warning-subtle text-warning ms-1">Late</span></span>
                                     <span class="ms-2">11:00+ <span class="badge bg-danger-subtle text-danger ms-1">Half</span></span>
                                     <span class="ms-2">
-        First 3 Late
-        <span class="badge bg-success-subtle text-success ms-1">No Deduction</span>
-    </span>
+                                        First 3 Late
+                                        <span class="badge bg-success-subtle text-success ms-1">No Deduction</span>
+                                    </span>
 
-    <span class="ms-2">
-        4th Late onward
-        <span class="badge bg-info-subtle text-info ms-1">-0.5 Leave / Late</span>
-    </span>
+                                    <span class="ms-2">
+                                        4th Late onward
+                                        <span class="badge bg-info-subtle text-info ms-1">-0.5 Leave / Late</span>
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
 
-                   <div class="row g-3 mb-4 row-cols-2 row-cols-md-3 row-cols-xl-5">
 
-    <!-- Present -->
-    <div class="col">
-        <div class="card card-bordered h-100">
-            <div class="card-inner card-inner-sm">
-                <div class="d-flex justify-content-between align-items-center gap-2">
-                    <div class="min-w-0">
-                        <span class="text-soft fs-12px d-block text-truncate">Present</span>
-                        <span class="amount fs-20px fw-bold lh-sm">@ViewBag.PresentCount</span>
-                    </div>
-                    <!-- Present -->
-<div class="icon-circle icon-circle-sm bg-success text-white">
-    <em class="icon ni ni-check"></em>
-</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Half Day -->
-    <div class="col">
-        <div class="card card-bordered h-100">
-            <div class="card-inner card-inner-sm">
-                <div class="d-flex justify-content-between align-items-center gap-2">
-                    <div class="min-w-0">
-                        <span class="text-soft fs-12px d-block text-truncate">Half Day</span>
-                        <span class="amount fs-20px fw-bold lh-sm">@ViewBag.HalfDayCount</span>
-                    </div>
-                    <!-- Half Day -->
-<div class="icon-circle icon-circle-sm bg-primary text-white">
-    <em class="icon ni ni-clock"></em>
-</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Absent -->
-    <div class="col">
-        <div class="card card-bordered h-100">
-            <div class="card-inner card-inner-sm">
-                <div class="d-flex justify-content-between align-items-center gap-2">
-                    <div class="min-w-0">
-                        <span class="text-soft fs-12px d-block text-truncate">Absent</span>
-                        <span class="amount fs-20px fw-bold lh-sm">@ViewBag.AbsentCount</span>
-                    </div>
-                   <!-- Absent -->
-<div class="icon-circle icon-circle-sm bg-danger text-white">
-    <em class="icon ni ni-cross"></em>
-</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Late -->
-    <div class="col">
-        <div class="card card-bordered h-100">
-            <div class="card-inner card-inner-sm">
-                <div class="d-flex justify-content-between align-items-center gap-2">
-                    <div class="min-w-0">
-                        <span class="text-soft fs-12px d-block text-truncate">Late</span>
-                        <span class="amount fs-20px fw-bold lh-sm">@ViewBag.LateCount</span>
-                    </div>
-                    <!-- Late -->
-<div class="icon-circle icon-circle-sm bg-warning text-white">
-    <em class="icon ni ni-alert"></em>
-</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Leave Deducted -->
-    <div class="col">
-        <div class="card card-bordered h-100">
-            <div class="card-inner card-inner-sm">
-                <div class="d-flex justify-content-between align-items-center gap-2">
-                    <div class="min-w-0">
-                        <span class="text-soft fs-12px d-block text-truncate">Leave Deducted</span>
-                        <span class="amount fs-20px fw-bold lh-sm">@ViewBag.LateLeaveDeduction</span>
-                    </div>
-                    <!-- Leave Deducted -->
-<div class="icon-circle icon-circle-sm bg-info text-white">
-    <em class="icon ni ni-calendar"></em>
-</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div>
 
                 </div>
+                <partial name="_AttendanceSummary" model="ViewBag.AttendanceSummary" />
 
-   
-    <div class="col-12"> <div class="py-2 px-3 border-start border-4 border-danger bg-light rounded-1 mb-3"> <div class="d-flex align-items-center gap-3"> <em class="icon ni ni-info text-primary fs-6 flex-shrink-0"></em> <div class="small lh-sm"> <span class="text-body text-danger fw-500"> <strong>Click on a date</strong> to regularize attendance. </span> </div> </div> </div> </div> 
+                <div class="col-12"> <div class="py-2 px-3 border-start border-4 border-danger bg-light rounded-1 mb-3"> <div class="d-flex align-items-center gap-3"> <em class="icon ni ni-info text-primary fs-6 flex-shrink-0"></em> <div class="small lh-sm"> <span class="text-body text-danger fw-500"> <strong>Click on a date</strong> to regularize attendance. </span> </div> </div> </div> </div>
                 <!-- ================================================= -->
                 <!-- CALENDAR -->
                 <!-- ================================================= -->
 
                 <div class="card border-0 shadow-sm">
-    <div class="card-inner p-0">
+                    <div class="card-inner p-0">
 
-        <!-- ==============================
-             CALENDAR HEADER
-        =============================== -->
-        <div class="attendance-calendar-header">
-
-            <a asp-action="MyAttendance"
-               asp-route-year="@previousMonth.Year"
-               asp-route-month="@previousMonth.Month"
-               class="calendar-nav">
-
-                <em class="icon ni ni-chevron-left"></em>
-
-            </a>
-
-            <div class="calendar-month-title">
-                @monthName
-            </div>
-
-            <a asp-action="MyAttendance"
-               asp-route-year="@nextMonth.Year"
-               asp-route-month="@nextMonth.Month"
-               class="calendar-nav">
-
-                <em class="icon ni ni-chevron-right"></em>
-
-            </a>
-
-        </div>
-
-
-        
-
-
-        <!-- ==============================
-             WEEK DAYS
-        =============================== -->
-        <div class="calendar-weekdays">
-
-            <div>Sun</div>
-            <div>Mon</div>
-            <div>Tue</div>
-            <div>Wed</div>
-            <div>Thu</div>
-            <div>Fri</div>
-            <div>Sat</div>
-
-        </div>
-
-
-        <!-- ==============================
-             CALENDAR
-        =============================== -->
-        <div class="attendance-calendar">
-
-            @for (int i = 0; i < firstDayOffset; i++)
-            {
-                <div class="calendar-day empty"></div>
-            }
-
-
-            @for (int day = 1; day <= daysInMonth; day++)
-            {
-                var currentDate = new DateTime(year, month, day);
-
-                var record = attendanceList.FirstOrDefault(x =>
-                    x.AttendanceDate.Date == currentDate.Date);
-
-                var leaveRecord = leaveList.FirstOrDefault(x =>
-                    x.FromDate.Date <= currentDate.Date &&
-                    x.ToDate.Date >= currentDate.Date);
-
-                bool isToday =
-                    currentDate.Date == DateTime.Today;
-
-                string statusClass = "no-record";
-                string statusText = "No Record";
-
-
-                var holidayRecord = holidayList.FirstOrDefault(x =>
-                    x.HolidayDate.Date == currentDate.Date);
-
-
-                bool isHalfDay =
-                    record != null &&
-                    record.AttendanceStatus == "Half Day";
-
-
-                /* =========================================
-                   EXISTING STATUS LOGIC
-                ========================================= */
-
-                if (holidayRecord != null)
-                {
-                    statusClass = "holiday";
-                    statusText = "Holiday: " + holidayRecord.HolidayName;
-                }
-                else if (leaveRecord != null && !isHalfDay)
-                {
-                    statusClass = "leave";
-                    statusText = "Leave";
-                }
-                else if (currentDate.Date > DateTime.Today)
-                {
-                    statusClass = "future";
-                    statusText = "";
-                }
-                else if (currentDate.DayOfWeek == DayOfWeek.Saturday)
-                {
-                    statusClass = "work-from-home";
-                    statusText = "Work From Home";
-                }
-                else if (record != null)
-                {
-                    if (record.AttendanceStatus == "Present")
-                    {
-                        statusClass = "present";
-
-                        if (currentDate.DayOfWeek == DayOfWeek.Saturday)
-                            statusText = "Work from Home";
-                        else
-                            statusText = "Present";
-                    }
-                    else if (record.AttendanceStatus == "Late")
-                    {
-                        statusClass = "late";
-
-                        if (currentDate.DayOfWeek == DayOfWeek.Saturday)
-                            statusText = "Work from Home";
-                        else
-                            statusText = "Late";
-                    }
-                    else if (record.AttendanceStatus == "Half Day")
-                    {
-                        statusClass = "present";
-                        statusText = "Half Day";
-                    }
-                    else if (record.AttendanceStatus ==
-                             "Present - Out Punch Missing")
-                    {
-                        statusClass = "missing";
-                        statusText = "Out Punch Missing";
-                    }
-                    else if (record.AttendanceStatus == "Leave")
-                    {
-                        statusClass = "leave";
-                        statusText = "Leave";
-                    }
-                    else
-                    {
-                        statusClass = "other";
-                        statusText = record.AttendanceStatus;
-                    }
-                }
-                else
-                {
-                    if (currentDate.DayOfWeek == DayOfWeek.Saturday)
-    {
-        statusClass = "work-from-home";
-        statusText = "Work From Home";
-    }
-                    if (currentDate.DayOfWeek == DayOfWeek.Sunday)
-                    {
-                        statusClass = "sunday";
-                        statusText = "Weekend";
-                    }
-                    else
-                    {
-                        statusClass = "absent";
-                        statusText = "Absent";
-                    }
-                }
-
-
-                <!-- ==============================
-                     DAY CELL
-                     IMPORTANT:
-                     statusClass is NOT applied here.
-                     This keeps the cell WHITE.
-                =============================== -->
-
-                <div class="calendar-day @(isToday ? "today" : "")"
-                     data-bs-toggle="modal"
-                     data-bs-target="#attendanceModal"
-                     data-date="@currentDate.ToString("yyyy-MM-dd")"
-                     data-in="@record?.InTime?.ToString("hh:mm tt")"
-                     data-out="@record?.OutTime?.ToString("hh:mm tt")"
-                     data-status="@statusText"
-                     data-record-id="@record?.AttendanceId">
-
-
-                    <!-- DAY NUMBER -->
-
-                    <div class="day-number">
-                        @day
-                    </div>
-
-
-                    <!-- ==============================
-                         HOLIDAY
-                    =============================== -->
-
-                    @if (holidayRecord != null)
-                    {
-                        <div class="attendance-status holiday">
-
-                            <div class="holiday-label">
-                                Holiday
-                            </div>
-
-                            <div class="holiday-name">
-                                @holidayRecord.HolidayName
-                            </div>
-
-                        </div>
-                    }
-
-
-                    <!-- ==============================
-                         LEAVE
-                    =============================== -->
-
-                    @if (leaveRecord != null)
-                    {
-                        <div class="attendance-status leave">
-
-                            <div class="leave-label">
-
-                                @if (isHalfDay)
-                                {
-                                    <strong>Half Leave</strong>
-                                }
-                                else
-                                {
-                                    <strong>Full Leave</strong>
-                                }
-
-                            </div>
-
-                            <div class="leave-date">
-
-                                @if (isHalfDay)
-                                {
-                                    <span>
-                                        @leaveRecord.FromDate.ToString("dd MMM")
-                                        -
-                                        @leaveRecord.ToDate.ToString("dd MMM")
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span>
-                                        @leaveRecord.FromDate.ToString("dd MMM yyyy")
-                                        -
-                                        @leaveRecord.ToDate.ToString("dd MMM yyyy")
-                                    </span>
-                                }
-
-                            </div>
-
-                        </div>
-                    }
-
-
-                    <!-- ==============================
-                         ATTENDANCE RECORD
-                    =============================== -->
-
-                    @if (record != null)
-                    {
-                        <div class="attendance-status @statusClass">
-
-                            <div class="attendance-status-label">
-
-                                @(record.AttendanceDate.DayOfWeek ==
-                                    DayOfWeek.Saturday
-                                    ? "Work from Home"
-                                    : statusText)
-
-                            </div>
-
-
-                            <!-- TIME -->
-
-                            @if (record.InTime.HasValue ||
-                                 record.OutTime.HasValue)
-                            {
-                                <div class="attendance-time">
-
-                                    @if (record.InTime.HasValue)
-                                    {
-                                        <span>
-                                            @record.InTime.Value.ToString("hh:mm tt")
-                                        </span>
-                                    }
-
-                                    @if (record.InTime.HasValue &&
-                                         record.OutTime.HasValue)
-                                    {
-                                        <span class="time-separator">
-                                            –
-                                        </span>
-                                    }
-
-                                    @if (record.OutTime.HasValue)
-                                    {
-                                        <span>
-                                            @record.OutTime.Value.ToString("hh:mm tt")
-                                        </span>
-                                    }
-
-                                </div>
-                            }
-
-
-                            <!-- ==============================
-                                 ATTENDANCE SOURCE
-                            =============================== -->
-
-                            @if (!string.IsNullOrWhiteSpace(
-                                record.AttendanceSource))
-                            {
-                                var source =
-                                    record.AttendanceSource.Trim();
-
-
-                                if (source.Equals(
-                                    "Manual",
-                                    StringComparison.OrdinalIgnoreCase))
-                                {
-                                    <span class="attendance-source-badge"
-                                          title="Manual Attendance&#10;Location: @record.CheckInLocation">
-                                        M
-                                    </span>
-                                }
-                                else if (source.Equals(
-                                    "Biometric",
-                                    StringComparison.OrdinalIgnoreCase))
-                                {
-                                    <span class="attendance-source-badge"
-                                          title="Biometric Attendance">
-                                        B
-                                    </span>
-                                }
-                                else if (source.Equals(
-                                    "Regularized",
-                                    StringComparison.OrdinalIgnoreCase))
-                                {
-                                    <span class="attendance-source-badge"
-                                          title="Regularized Attendance">
-                                        R
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="attendance-source-badge"
-                                          title="@source">
-                                        @source.Substring(0, 1).ToUpper()
-                                    </span>
-                                }
-                            }
-
-                        </div>
-                    }
-                    else
-                    {
                         <!-- ==============================
-                             NO ATTENDANCE RECORD
+                        CALENDAR HEADER
                         =============================== -->
-                        @if (!string.IsNullOrWhiteSpace(statusText))
-                        {
-                            if (statusClass == "sunday")
+                        <div class="attendance-calendar-header">
+
+                            <a asp-action="MyAttendance"
+                            asp-route-year="@previousMonth.Year"
+                            asp-route-month="@previousMonth.Month"
+                            class="calendar-nav">
+
+                                <em class="icon ni ni-chevron-left"></em>
+
+                            </a>
+
+                            <div class="calendar-month-title">
+                                @monthName
+                            </div>
+
+                            <a asp-action="MyAttendance"
+                            asp-route-year="@nextMonth.Year"
+                            asp-route-month="@nextMonth.Month"
+                            class="calendar-nav">
+
+                                <em class="icon ni ni-chevron-right"></em>
+
+                            </a>
+
+                        </div>
+
+
+
+
+
+                        <!-- ==============================
+                        WEEK DAYS
+                        =============================== -->
+                        <div class="calendar-weekdays">
+
+                            <div>Sun</div>
+                            <div>Mon</div>
+                            <div>Tue</div>
+                            <div>Wed</div>
+                            <div>Thu</div>
+                            <div>Fri</div>
+                            <div>Sat</div>
+
+                        </div>
+
+
+                        <!-- ==============================
+                        CALENDAR
+                        =============================== -->
+                        <div class="attendance-calendar">
+
+                            @for (int i = 0; i < firstDayOffset; i++)
                             {
-                                <div class="attendance-status weekend">
+                                <div class="calendar-day empty"></div>
+                            }
 
-                                    <div class="holiday-label">
-                                        Weekend
-                                    </div>
+                            @for (int day = 1; day <= daysInMonth; day++)
+                            {
+                                var currentDate = new DateTime(year, month, day);
+                                var inv = System.Globalization.CultureInfo.InvariantCulture;
 
+                                var record = attendanceList.FirstOrDefault(x =>
+                                x.AttendanceDate.Date == currentDate.Date);
+
+                                var leaveRecord = leaveList.FirstOrDefault(x =>
+                                x.FromDate.Date <= currentDate.Date &&
+                                x.ToDate.Date >= currentDate.Date);
+
+
+                                var leaveType = leaveRecord?.LeaveDuration?.Trim();
+
+                                bool isFirstHalfLeave = string.Equals(leaveType, "FirstHalf", StringComparison.OrdinalIgnoreCase);
+                                bool isSecondHalfLeave = string.Equals(leaveType, "SecondHalf", StringComparison.OrdinalIgnoreCase);
+                                bool isHalfDayLeave = isFirstHalfLeave || isSecondHalfLeave;
+                                bool isFullDayLeave = leaveRecord != null && !isHalfDayLeave;
+
+                                string halfLeaveText = isFirstHalfLeave ? "1st Half" : isSecondHalfLeave ? "2nd Half" : "";
+
+                                var holidayRecord = holidayList.FirstOrDefault(x =>
+                                x.HolidayDate.Date == currentDate.Date);
+
+                                bool isToday = currentDate.Date == DateTime.Today;
+
+                                string statusClass = "no-record";
+                                string statusText = "No Record";
+
+                                /* ========== FLAGS (same rules as HR) ========== */
+
+                                bool isHalfDay = false, isLate = false, outMissing = false;
+                                bool isPunchDay = record != null && record.InTime.HasValue;
+
+                                @* if (isPunchDay)
+                                {
+                                    var status = (record.AttendanceStatus ?? "").Trim();
+                                    var statusKey = status.Replace(" ", "").Replace("-", "");
+                                    var inTime = record.InTime.Value.TimeOfDay;
+
+                                    bool leftEarly =
+                                    record.OutTime.HasValue &&
+                                    (record.OutTime.Value - record.InTime.Value) < TimeSpan.FromHours(4.5);
+
+                                    isHalfDay =
+                                    statusKey.StartsWith("HalfDay", StringComparison.OrdinalIgnoreCase) ||
+                                    inTime >= new TimeSpan(11, 0, 0) || leftEarly;
+
+                                    isLate = !isHalfDay && (
+                                    statusKey.StartsWith("Late", StringComparison.OrdinalIgnoreCase) ||
+                                    (inTime >= new TimeSpan(10, 0, 0) && inTime < new TimeSpan(11, 0, 0)));
+
+                                    outMissing =
+                                    statusKey.Contains("Missing", StringComparison.OrdinalIgnoreCase) ||
+                                    (!record.OutTime.HasValue && currentDate.Date < DateTime.Today);
+                                } *@
+                                if (isPunchDay)
+                                {
+                                    var flags = AttendanceRules.Classify(record, currentDate, DateTime.Today);
+
+                                    isHalfDay = flags.IsHalfDay;
+                                    isLate = flags.IsLate;
+                                    outMissing = flags.IsMissing;
+
+                                    if (isFirstHalfLeave)   // afternoon arrival is by design
+                                    {
+                                        isHalfDay = false;
+                                        isLate = false;
+                                    }
+                                }
+                                /* ========== STATUS LOGIC ========== */
+
+                                if (holidayRecord != null)
+                                {
+                                    statusClass = "holiday";
+                                    statusText = "Holiday: " + holidayRecord.HolidayName;
+                                }
+                                else if (isFullDayLeave)                       // was: leaveRecord != null && !isHalfDay
+                                {
+                                    statusClass = "leave";
+                                    statusText = "Leave";
+                                }
+                                else if (isHalfDayLeave && record == null)     // NEW: half-day leave, no punch
+                                {
+                                    statusClass = "leave";
+                                    statusText = $"Half Day Leave ({halfLeaveText})";
+                                }
+                                else if (currentDate.Date > DateTime.Today)
+                                {
+                                    statusClass = "future";
+                                    statusText = "";
+                                }
+                                else if (record != null)
+                                {
+                                    if (isPunchDay)
+                                    {
+                                        statusClass = "present";
+                                        statusText = isHalfDay ? "Half Day" : isLate ? "Late" : "Present";
+                                        if (isHalfDayLeave) statusText += $" + Half Day Leave ({halfLeaveText})";   // NEW
+                                        if (outMissing) statusText += " - Check Out Missing";
+                                    }
+                                    else if ((record.AttendanceStatus ?? "").Equals("Leave", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        statusClass = "leave";
+                                        statusText = "Leave";
+                                    }
+                                    else
+                                    {
+                                        statusClass = "other";
+                                        statusText = record.AttendanceStatus ?? "";
+                                    }
+                                }
+                                else
+                                {
+                                    if (currentDate.DayOfWeek == DayOfWeek.Saturday)
+                                    {
+                                        statusClass = "work-from-home";
+                                        statusText = "Work From Home";
+                                    }
+                                    else if (currentDate.DayOfWeek == DayOfWeek.Sunday)
+                                    {
+                                        statusClass = "sunday";
+                                        statusText = "Weekend";
+                                    }
+                                    else
+                                    {
+                                        statusClass = "absent";
+                                        statusText = "Absent";
+                                    }
+                                }
+
+                                <div class="calendar-day @(isToday ? "today" : "")"
+                                     data-bs-toggle="modal"
+                                     data-bs-target="#attendanceModal"
+                                     data-date="@currentDate.ToString("yyyy-MM-dd")"
+                                     data-in="@(record?.InTime?.ToString("hh':'mm tt", inv))"
+                                     data-out="@(record?.OutTime?.ToString("hh':'mm tt", inv))"
+                                     data-status="@statusText"
+                                     data-record-id="@record?.AttendanceId">
+
+                                    <div class="day-number">@day</div>
+
+                                    @* HOLIDAY *@
+                                    @if (holidayRecord != null)
+                                    {
+                                        <div class="attendance-status holiday">
+                                            <div class="holiday-label">Holiday</div>
+                                            <div class="holiday-name">@holidayRecord.HolidayName</div>
+                                        </div>
+                                    }
+
+                                    @* LEAVE *@
+                                    @if (leaveRecord != null)
+                                    {
+                                        <div class="attendance-status leave @(isHalfDayLeave ? "half-day" : "")">
+                                            <div class="leave-label">
+                                                <strong>@(isHalfDayLeave ? $"Half Day Leave ({halfLeaveText})" : "Leave")</strong>
+                                            </div>
+                                            <div class="leave-date">
+                                                @if (isHalfDayLeave)
+                                                {
+                                                    <span>@currentDate.ToString("dd MMM")</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@leaveRecord.FromDate.ToString("dd MMM yyyy") - @leaveRecord.ToDate.ToString("dd MMM yyyy")</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* ATTENDANCE RECORD *@
+                                    @if (record != null)
+                                    {
+                                        <div class="attendance-status @statusClass">
+
+                                            <div class="attendance-status-label">
+                                                @if (isPunchDay)
+                                                {
+                                                    if (isHalfDay)
+                                                    {
+                                                        <span class="halfday-text">Half Day</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        @:Present
+                                                    }
+
+                                                    if (isLate)
+                                                    {
+                                                        <span class="late-text">· Late</span>
+                                                    }
+                                                    if (outMissing)
+                                                    {
+                                                        <span class="missing-text">· Check Out Missing</span>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    @statusText
+                                                }
+                                            </div>
+
+                                            @if (record.InTime.HasValue || record.OutTime.HasValue)
+                                            {
+                                                <div class="attendance-time">
+                                                    @if (record.InTime.HasValue)
+                                                    {
+                                                        <span>@record.InTime.Value.ToString("hh':'mm tt", inv)</span>
+                                                    }
+                                                    @if (record.InTime.HasValue && record.OutTime.HasValue)
+                                                    {
+                                                        <span class="time-separator">–</span>
+                                                    }
+                                                    @if (record.OutTime.HasValue)
+                                                    {
+                                                        <span>@record.OutTime.Value.ToString("hh':'mm tt", inv)</span>
+                                                    }
+                                                    else if (record.InTime.HasValue)
+                                                    {
+                                                        <span class="time-separator">– --</span>
+                                                    }
+                                                </div>
+                                            }
+
+                                            @if (!string.IsNullOrWhiteSpace(record.AttendanceSource))
+                                            {
+                                                var source = record.AttendanceSource.Trim();
+                                                var (code, tip) = source.ToLowerInvariant() switch
+                                                {
+                                                    "manual" => ("M", $"Manual Attendance\nLocation: {record.CheckInLocation}"),
+                                                    "biometric" => ("B", "Biometric Attendance"),
+                                                    "regularized" => ("R", "Regularized Attendance"),
+                                                    _ => (source.Substring(0, 1).ToUpper(), source)
+                                                };
+
+                                                <span class="attendance-source-badge" title="@tip">@code</span>
+                                            }
+                                        </div>
+                                    }
+                                    else if (!string.IsNullOrWhiteSpace(statusText))
+                                    {
+                                        if (statusClass == "sunday")
+                                        {
+                                            <div class="attendance-status weekend">
+                                                <div class="holiday-label">Weekend</div>
+                                            </div>
+                                        }
+                                        else if (statusClass == "work-from-home")
+                                        {
+                                            <div class="attendance-status work-from-home">Work From Home</div>
+                                        }
+                                        else if (statusClass == "absent")
+                                        {
+                                            <div class="attendance-status absent">Absent</div>
+                                        }
+                                    }
                                 </div>
                             }
-                            else if (statusClass == "work-from-home")
-                            {
-                                <div class="attendance-status work-from-home">
-                                        Work From Home
-                                </div>
-                            }
-                            else if (statusClass == "absent")
-                            {
-                                <div class="attendance-status absent">
-                                    Absent
-                                </div>
-                            }
-                        }
-                    }
+                        </div>
 
-                </div>
-            }
+					</div>
+				</div>
 
-        </div>
+			</div>
 
-    </div>
-</div>
+		</div>
 
-            </div>
-
-        </div>
-
-    </div>
+	</div>
 
 </div>
 
@@ -670,112 +500,112 @@
 <!-- ========================================================= -->
 
 <div class="modal fade"
-     id="attendanceModal"
-     tabindex="-1">
+	 id="attendanceModal"
+	 tabindex="-1">
 
-    <div class="modal-dialog modal-dialog-centered">
+	<div class="modal-dialog modal-dialog-centered">
 
-        <div class="modal-content">
+		<div class="modal-content">
 
-            <div class="modal-header">
+			<div class="modal-header">
 
-                <h5 class="modal-title">
-                    Existing Attendance Details
-                </h5>
+				<h5 class="modal-title">
+					Existing Attendance Details
+				</h5>
 
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                </button>
+				<button type="button"
+						class="btn-close"
+						data-bs-dismiss="modal">
+				</button>
 
-            </div>
-
-
-            <div class="modal-body">
-
-                <h6 id="modalDate"
-                    class="mb-4">
-                </h6>
-                <!-- Add this helper text -->
-    <small class="d-block mb-4">
-        <em class="icon ni ni-info me-1"></em>
-        Review your existing attendance record. Use "Regularize" if the timing needs adjustment.
-    </small>
-
-               <div class="row g-3">
-
-    <!-- In Time - Display Card -->
-    <div class="col-6">
-        <div class="d-flex flex-column">
-            <small class="text-soft mb-2">
-                <em class="icon ni ni-arrow-right me-1"></em>
-                In Time
-            </small>
-            <strong id="modalIn" class="fs-5 text-dark">
-                —
-            </strong>
-            <small id="inTimeNote" class="text-muted mt-1"></small>
-        </div>
-    </div>
-
-    <!-- Out Time - Display Card -->
-    <div class="col-6">
-        <div class="d-flex flex-column">
-            <small class="text-soft mb-2">
-                <em class="icon ni ni-arrow-left me-1"></em>
-                Out Time
-            </small>
-            <strong id="modalOut" class="fs-5 text-dark">
-                —
-            </strong>
-            <small id="outTimeNote" class="text-muted mt-1"></small>
-        </div>
-    </div>
-
-    <!-- Status - Prominent Display -->
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <small class="text-soft d-block mb-2">
-                    <em class="icon ni ni-check-circle me-1"></em>
-                    Status
-                </small>
-                <strong id="modalStatus" class="fs-5 text-dark">
-                    —
-                </strong>
-            </div>
-            <span id="statusBadge" class="badge"></span>
-        </div>
-        <small id="statusAction" class="text-muted d-block mt-2"></small>
-    </div>
-
-</div>
-
-            </div>
+			</div>
 
 
-            <div class="modal-footer">
+			<div class="modal-body">
 
-                <a id="modalRegularizeButton"
-                   href="#"
-                   class="btn btn-primary">
-                    <em class="icon ni ni-edit me-1"></em>
-                    Regularize Attendance
-                </a>
+				<h6 id="modalDate"
+					class="mb-4">
+				</h6>
+				<!-- Add this helper text -->
+				<small class="d-block mb-4">
+					<em class="icon ni ni-info me-1"></em>
+					Review your existing attendance record. Use "Regularize" if the timing needs adjustment.
+				</small>
 
-                <button type="button"
-                        class="btn btn-light"
-                        data-bs-dismiss="modal">
+				<div class="row g-3">
 
-                    Close
+					<!-- In Time - Display Card -->
+					<div class="col-6">
+						<div class="d-flex flex-column">
+							<small class="text-soft mb-2">
+								<em class="icon ni ni-arrow-right me-1"></em>
+								In Time
+							</small>
+							<strong id="modalIn" class="fs-5 text-dark">
+								—
+							</strong>
+							<small id="inTimeNote" class="text-muted mt-1"></small>
+						</div>
+					</div>
 
-                </button>
+					<!-- Out Time - Display Card -->
+					<div class="col-6">
+						<div class="d-flex flex-column">
+							<small class="text-soft mb-2">
+								<em class="icon ni ni-arrow-left me-1"></em>
+								Out Time
+							</small>
+							<strong id="modalOut" class="fs-5 text-dark">
+								—
+							</strong>
+							<small id="outTimeNote" class="text-muted mt-1"></small>
+						</div>
+					</div>
 
-            </div>
+					<!-- Status - Prominent Display -->
+					<div class="col-12">
+						<div class="d-flex justify-content-between align-items-center">
+							<div>
+								<small class="text-soft d-block mb-2">
+									<em class="icon ni ni-check-circle me-1"></em>
+									Status
+								</small>
+								<strong id="modalStatus" class="fs-5 text-dark">
+									—
+								</strong>
+							</div>
+							<span id="statusBadge" class="badge"></span>
+						</div>
+						<small id="statusAction" class="text-muted d-block mt-2"></small>
+					</div>
 
-        </div>
+				</div>
 
-    </div>
+			</div>
+
+
+			<div class="modal-footer">
+
+				<a id="modalRegularizeButton"
+				   href="#"
+				   class="btn btn-primary">
+					<em class="icon ni ni-edit me-1"></em>
+					Regularize Attendance
+				</a>
+
+				<button type="button"
+						class="btn btn-light"
+						data-bs-dismiss="modal">
+
+					Close
+
+				</button>
+
+			</div>
+
+		</div>
+
+	</div>
 
 </div>
 
@@ -1005,87 +835,87 @@
 </script> *@
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+	document.addEventListener("DOMContentLoaded", function () {
 
-        const modal =
-            document.getElementById("attendanceModal");
+		const modal =
+			document.getElementById("attendanceModal");
 
-        if (!modal)
-            return;
+		if (!modal)
+			return;
 
-        modal.addEventListener("show.bs.modal", function (event) {
+		modal.addEventListener("show.bs.modal", function (event) {
 
-            const day = event.relatedTarget;
+			const day = event.relatedTarget;
 
-            if (!day)
-                return;
+			if (!day)
+				return;
 
-            const date =
-                day.getAttribute("data-date");
+			const date =
+				day.getAttribute("data-date");
 
-            const inTime =
-                day.getAttribute("data-in");
+			const inTime =
+				day.getAttribute("data-in");
 
-            const outTime =
-                day.getAttribute("data-out");
+			const outTime =
+				day.getAttribute("data-out");
 
-            const status =
-                day.getAttribute("data-status");
+			const status =
+				day.getAttribute("data-status");
 
 
-            // -----------------------------
-            // Modal information
-            // -----------------------------
+			// -----------------------------
+			// Modal information
+			// -----------------------------
 
-            @* document.getElementById("modalDate").textContent =
+	@* document.getElementById("modalDate").textContent =
                 date || "Attendance"; *@
-                const displayDate = date
-                ? date.split("-").reverse().join("-")
-                : "Attendance";
+				const displayDate = date
+				? date.split("-").reverse().join("-")
+				: "Attendance";
 
-                document.getElementById("modalDate").textContent = displayDate;
-                document.getElementById("modalIn").textContent =
-                inTime || "—";
+				document.getElementById("modalDate").textContent = displayDate;
+				document.getElementById("modalIn").textContent =
+				inTime || "—";
 
-            document.getElementById("modalOut").textContent =
-                outTime || "—";
+			document.getElementById("modalOut").textContent =
+				outTime || "—";
 
-            document.getElementById("modalStatus").textContent =
-                status || "No Record";
-
-
-            // -----------------------------
-            // Regularization URL
-            // ALWAYS USE DATE
-            // -----------------------------
-
-            const button =
-                document.getElementById(
-                    "modalRegularizeButton");
-
-            if (!button)
-                return;
+			document.getElementById("modalStatus").textContent =
+				status || "No Record";
 
 
-            if (date) {
+			// -----------------------------
+			// Regularization URL
+			// ALWAYS USE DATE
+			// -----------------------------
 
-                button.href =
-                    "/HRMS/Attendance/Regularization?date="
-                    + encodeURIComponent(date);
+			const button =
+				document.getElementById(
+					"modalRegularizeButton");
 
-                button.style.display =
-                    "inline-flex";
+			if (!button)
+				return;
 
-            }
-            else {
 
-                button.href = "#";
+			if (date) {
 
-                button.style.display =
-                    "none";
-            }
+				button.href =
+					"/HRMS/Attendance/Regularization?date="
+					+ encodeURIComponent(date);
 
-        });
+				button.style.display =
+					"inline-flex";
 
-    });
+			}
+			else {
+
+				button.href = "#";
+
+				button.style.display =
+					"none";
+			}
+
+		});
+
+	});
 </script>

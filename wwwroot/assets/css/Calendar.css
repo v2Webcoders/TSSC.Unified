@@ -222,16 +222,32 @@
    LATE ATTENDANCE
 ========================================= */
 
-.attendance-status.late {
-    background: #EDE9FE;
-    color: #5B21B6;
-    border-left: 3px solid #8B5CF6;
+/* Remove these old rules */
+/* .attendance-status.late { ... } */
+/* .attendance-status.late .attendance-status-label { ... } */
+
+.attendance-status .halfday-text {
+    color: #B45309;
+    font-weight: 600;
 }
 
-    .attendance-status.late .attendance-status-label {
-        color: #5B21B6;
-        font-weight: 600;
-    }
+.attendance-status .late-text {
+    color: #D92D20;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+.attendance-status .missing-text {
+    color: #B45309;
+    font-weight: 600;
+    margin-left: 4px;
+}
+}
+.attendance-status.half-day {
+    background: #FFF4E5;
+    color: #B45309;
+    border-left: 3px solid #F59E0B;
+}
 .attendance-status.work-from-home {
     background: #E0F2FE;
     color: #075985;

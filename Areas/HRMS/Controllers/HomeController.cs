@@ -31,13 +31,15 @@ namespace QUIZAPP.Areas.HRMS.Controllers
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _environment;
         private readonly ITodayAttendanceLiveService _todayAttendanceLiveService;
-        public HomeController(ITodayAttendanceLiveService todayAttendanceLiveService, ILogger<HomeController> logger, AppdbContext db, IConfiguration configuration, IWebHostEnvironment environment)
+        private readonly IAttendanceSummaryService _attendanceSummaryService;
+        public HomeController(ITodayAttendanceLiveService todayAttendanceLiveService, ILogger<HomeController> logger, AppdbContext db, IConfiguration configuration, IWebHostEnvironment environment, IAttendanceSummaryService attendanceSummaryService)
         {
             _logger = logger;
             _db = db;
             _configuration = configuration;
             _environment = environment;
             _todayAttendanceLiveService = todayAttendanceLiveService;
+            _attendanceSummaryService=attendanceSummaryService;
         }
 
 
@@ -278,58 +280,84 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 // CURRENT MONTH
                 // =================================================
 
-                var firstDayOfMonth =
-                    new DateTime(
-                        today.Year,
-                        today.Month,
-                        1);
+                //var firstDayOfMonth =
+                //    new DateTime(
+                //        today.Year,
+                //        today.Month,
+                //        1);
 
-                var lastDayOfMonth =
-                    firstDayOfMonth.AddMonths(1).AddDays(-1);
+                //var lastDayOfMonth =
+                //    firstDayOfMonth.AddMonths(1).AddDays(-1);
 
 
                 // =================================================
                 // PRESENT DAYS THIS MONTH
                 // =================================================
 
-                model.PresentDaysThisMonth =
-                    await _db.EmployeeAttendance
-                        .CountAsync(x =>
-                            x.EmployeeId == employee.EmployeeId &&
-                            x.AttendanceDate >= firstDayOfMonth &&
-                            x.AttendanceDate <= lastDayOfMonth &&
-                            x.InTime != null);
+                //model.PresentDaysThisMonth =
+                //    await _db.EmployeeAttendance
+                //        .CountAsync(x =>
+                //            x.EmployeeId == employee.EmployeeId &&
+                //            x.AttendanceDate >= firstDayOfMonth &&
+                //            x.AttendanceDate <= lastDayOfMonth &&
+                //            x.InTime != null);
 
 
-                // =================================================
-                // WORKING DAYS THIS MONTH
-                // =================================================
+                //// =================================================
+                //// WORKING DAYS THIS MONTH
+                //// =================================================
+
+                //var holidays = await _db.Holiday
+                //.Where(x => x.HolidayDate >= firstDayOfMonth &&
+                //            x.HolidayDate <= today &&
+                //            x.Status == "Published")
+                //.Select(x => x.HolidayDate.Date)
+                //.ToListAsync();
+
+                //var workingDays = 0;
+
+                //for (
+                //    var date = firstDayOfMonth;
+                //    date <= today;
+                //    date = date.AddDays(1))
+                //{
+                //    // Exclude Sunday and holidays
+                //    if (date.DayOfWeek != DayOfWeek.Sunday &&
+                //        !holidays.Contains(date.Date))
+                //    {
+                //        workingDays++;
+                //    }
+                //}
+
+                //model.WorkingDaysThisMonth = workingDays;
+
+                // CURRENT MONTH: all attendance KPIs come from the shared service
+                var summary = await _attendanceSummaryService
+                    .GetMonthlySummaryAsync(employee.EmployeeId, today.Year, today.Month);
+
+                model.PresentDaysThisMonth = summary.DaysWorked;          // full days + 0.5 per half day
+                model.AttendanceToRegularize = summary.MissingPunchCount;   // days that need regularising
+
+                // WORKING DAYS (up to today, excluding Sundays and holidays)
+                var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
 
                 var holidays = await _db.Holiday
-                .Where(x => x.HolidayDate >= firstDayOfMonth &&
-                            x.HolidayDate <= today &&
-                            x.Status == "Published")
-                .Select(x => x.HolidayDate.Date)
-                .ToListAsync();
+                    .Where(x => x.HolidayDate >= firstDayOfMonth &&
+                                x.HolidayDate <= today &&
+                                x.Status == "Published")      // see note below
+                    .Select(x => x.HolidayDate.Date)
+                    .ToListAsync();
 
-                var workingDays = 0;
+                var holidaySet = holidays.ToHashSet();
+                int workingDays = 0;
 
-                for (
-                    var date = firstDayOfMonth;
-                    date <= today;
-                    date = date.AddDays(1))
+                for (var date = firstDayOfMonth; date <= today; date = date.AddDays(1))
                 {
-                    // Exclude Sunday and holidays
-                    if (date.DayOfWeek != DayOfWeek.Sunday &&
-                        !holidays.Contains(date.Date))
-                    {
+                    if (date.DayOfWeek != DayOfWeek.Sunday && !holidaySet.Contains(date))
                         workingDays++;
-                    }
                 }
 
                 model.WorkingDaysThisMonth = workingDays;
-
-
                 // =================================================
                 // PENDING LEAVE REQUESTS
                 // =================================================

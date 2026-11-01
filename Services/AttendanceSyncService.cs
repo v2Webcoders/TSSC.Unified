@@ -355,11 +355,6 @@ namespace TSSC.Unified.Services
                         missingPunch
                             ? null
                             : outTime;
-
-                    //attendance.AttendanceStatus =
-                    //    missingPunch
-                    //        ? "Present - Check Out Missing"
-                    //        : "Present";
                     attendance.AttendanceStatus = attendanceStatus;
                     attendance.Remarks =
                         missingPunch

@@ -1,0 +1,38 @@
+﻿@using TSSC.Unified.ViewModel
+@model AttendanceSummaryVM
+
+
+@if (Model != null)
+{
+    var stats = new (string Label, string Value, string Css)[]
+    {
+        ("Days Worked", Model.DaysWorked.ToString("0.##"), "text-success"),
+        ("Present",     Model.PresentCount.ToString(),     "text-info"),
+        ("Half Day",    Model.HalfDayCount.ToString(),     ""),
+        ("Absent",      Model.AbsentCount.ToString(),      "text-danger"),
+        ("Late",        Model.LateCount.ToString(),        "text-warning"),
+        ("Leave Ded.",  Model.LateLeaveDeduction.ToString("0.##"), "")
+    };
+
+    <div class="card card-bordered mb-2">
+        <div class="d-flex text-center overflow-auto">
+            @foreach (var s in stats)
+            {
+                
+                    <div class="flex-fill px-3 py-2 border-end border-light @(s.Label == "Days Worked" ? "bg-success bg-opacity-10 rounded" : "")" style="min-width:72px">
+                        <div class="fs-17px fw-bold lh-1 @s.Css">@s.Value</div>
+                        <div class="text-soft fs-11px text-nowrap mt-1">@s.Label</div>
+                    </div>
+                
+                
+            }
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-3 mb-3 px-1 fs-12px text-soft">
+        <span title="Approved Leave"><em class="icon ni ni-calendar-check text-success"></em> Leave <strong class="text-dark">@Model.LeaveCount</strong></span>
+        <span title="Holidays"><em class="icon ni ni-calendar text-primary"></em> Holidays <strong class="text-dark">@Model.HolidayCount</strong></span>
+        <span title="Missing Punch"><em class="icon ni ni-alert-circle text-warning"></em> Missing Punch <strong class="text-dark">@Model.MissingPunchCount</strong></span>
+        <span title="WFH Saturdays"><em class="icon ni ni-home text-info"></em> WFH Sat <strong class="text-dark">@Model.WFHCount</strong></span>
+    </div>
+}
