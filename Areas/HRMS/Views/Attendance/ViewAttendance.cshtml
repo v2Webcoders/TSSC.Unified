@@ -409,6 +409,39 @@
 										</div>
 
 										@* time, working hours and source badge: unchanged *@
+
+										<div class="attendance-time">
+											<span>@attendance.InTime.Value.ToString("hh:mm tt")</span>
+											@if (attendance.OutTime.HasValue)
+											{
+												<span class="time-separator">–</span>
+												<span>@attendance.OutTime.Value.ToString("hh:mm tt")</span>
+											}
+											else
+											{
+												<span>--</span>
+											}
+										</div>
+
+										@if (attendance.WorkingHours.HasValue)
+										{
+											<div class="working-hours">@attendance.WorkingHours.Value.ToString("0.0") hrs</div>
+										}
+
+										@if (!string.IsNullOrWhiteSpace(attendance.AttendanceSource))
+										{
+											var source = attendance.AttendanceSource.Trim();
+											var (code, tip) = source.ToLowerInvariant() switch
+											{
+												"manual" => ("M", $"Manual Attendance\nLocation: {attendance.CheckInLocation}"),
+												"biometric" => ("B", "Biometric Attendance"),
+												"regularized" => ("R", "Regularized Attendance"),
+												_ => (source.Substring(0, 1).ToUpper(), source)
+											};
+
+											<span class="attendance-source-badge" title="@tip">@code</span>
+										}
+										@* time, working hours and source badge: unchanged *@
 									</div>
 								}
 								else if (attendance != null && attendance.Status == "Weekend")

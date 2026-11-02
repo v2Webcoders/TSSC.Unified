@@ -37,10 +37,10 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 return NotFound("TP registration not found.");
 
             // Check whether this TP has any scheduled screening.
-            ViewBag.HasScheduledScreening = await _context.BatchMonitorings
-                .AnyAsync(m =>
-                    m.Batch.TPId == registration.Id &&
-                    m.Status == "Scheduled");
+            //ViewBag.HasScheduledScreening = await _context.BatchMonitorings
+            //    .AnyAsync(m =>
+            //        m.Batch.TPId == registration.Id &&
+            //        m.Status == "Scheduled");
             return View(registration);
         }
     }

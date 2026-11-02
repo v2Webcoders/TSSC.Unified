@@ -134,18 +134,51 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
 
 
+                //// =================================================
+                //// TODAY'S ATTENDANCE FOR LOGGED-IN HR
+                //// =================================================
+
+                //if (employee != null)
+                //{
+                //    var attendance = await _todayAttendanceLiveService.GetTodayAttendanceAsync(employee.BiometricCode);
+                //    model.TodayInTime = attendance.InTime;
+                //    model.TodayOutTime = attendance.OutTime;
+                //}
+
                 // =================================================
                 // TODAY'S ATTENDANCE FOR LOGGED-IN HR
                 // =================================================
 
                 if (employee != null)
                 {
-                    var attendance = await _todayAttendanceLiveService.GetTodayAttendanceAsync(employee.EmployeeCode);
-                    model.TodayInTime = attendance.InTime;
-                    model.TodayOutTime = attendance.OutTime;
+                    var attendance = await _todayAttendanceLiveService
+                        .GetTodayAttendanceAsync(employee.BiometricCode);
+
+                    DateTime? todayInTime = attendance.InTime;
+                    DateTime? todayOutTime = attendance.OutTime;
+
+                    // Fallback: Search manual attendance if live attendance is not found
+                    if (!todayInTime.HasValue )
+                    {
+                        var manualAttendance = await _db.EmployeeAttendance
+                            .Where(x =>
+                                x.EmployeeId == employee.EmployeeId &&
+                                x.AttendanceDate >= today &&
+                                x.AttendanceDate < today.AddDays(1) &&
+                                x.AttendanceSource == "Manual")
+                            .OrderByDescending(x => x.AttendanceId)
+                            .FirstOrDefaultAsync();
+
+                        if (manualAttendance != null)
+                        {
+                            todayInTime = manualAttendance.InTime;
+                            todayOutTime = manualAttendance.OutTime;
+                        }
+                    }
+
+                    model.TodayInTime = todayInTime;
+                    model.TodayOutTime = todayOutTime;
                 }
-
-
                 // =================================================
                 // TOTAL EMPLOYEES
                 // =================================================
@@ -246,14 +279,59 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 //}
                 var today = DateTime.Today;
 
-                var attendance = await _todayAttendanceLiveService.GetTodayAttendanceAsync(employee.BiometricCode);
+               // var attendance = await _todayAttendanceLiveService.GetTodayAttendanceAsync(employee.BiometricCode);
+
+                //var model = new HRDashboardVM
+                //{
+                //    EmployeeName = employee.FirstName,
+                //    EmployeeCode = employee.EmployeeCode,
+                //    TodayInTime = attendance.InTime,
+                //    TodayOutTime = attendance.OutTime,
+                //    DOB = employee.DOB
+                //};
+
+                // =====================================================
+                // TODAY'S ATTENDANCE - LIVE / BIOMETRIC
+                // =====================================================
+
+                var attendance = await _todayAttendanceLiveService
+                    .GetTodayAttendanceAsync(employee.BiometricCode);
+
+                DateTime? todayInTime = attendance.InTime;
+                DateTime? todayOutTime = attendance.OutTime;
+
+                // =====================================================
+                // FALLBACK - MANUAL ATTENDANCE
+                // =====================================================
+
+                if (!todayInTime.HasValue )
+                {
+                    var manualAttendance = await _db.EmployeeAttendance
+                        .Where(x =>
+                            x.EmployeeId == employee.EmployeeId &&
+                            x.AttendanceDate >= today &&
+                            x.AttendanceDate < today.AddDays(1) &&
+                            x.AttendanceSource == "Manual")
+                        .OrderByDescending(x => x.AttendanceId)
+                        .FirstOrDefaultAsync();
+
+                    if (manualAttendance != null)
+                    {
+                        todayInTime = manualAttendance.InTime;
+                        todayOutTime = manualAttendance.OutTime;
+                    }
+                }
+
+                // =====================================================
+                // DASHBOARD MODEL
+                // =====================================================
 
                 var model = new HRDashboardVM
                 {
                     EmployeeName = employee.FirstName,
                     EmployeeCode = employee.EmployeeCode,
-                    TodayInTime = attendance.InTime,
-                    TodayOutTime = attendance.OutTime,
+                    TodayInTime = todayInTime,
+                    TodayOutTime = todayOutTime,
                     DOB = employee.DOB
                 };
 
@@ -276,60 +354,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 })
                 .ToListAsync();
 
-                // =================================================
-                // CURRENT MONTH
-                // =================================================
-
-                //var firstDayOfMonth =
-                //    new DateTime(
-                //        today.Year,
-                //        today.Month,
-                //        1);
-
-                //var lastDayOfMonth =
-                //    firstDayOfMonth.AddMonths(1).AddDays(-1);
-
-
-                // =================================================
-                // PRESENT DAYS THIS MONTH
-                // =================================================
-
-                //model.PresentDaysThisMonth =
-                //    await _db.EmployeeAttendance
-                //        .CountAsync(x =>
-                //            x.EmployeeId == employee.EmployeeId &&
-                //            x.AttendanceDate >= firstDayOfMonth &&
-                //            x.AttendanceDate <= lastDayOfMonth &&
-                //            x.InTime != null);
-
-
-                //// =================================================
-                //// WORKING DAYS THIS MONTH
-                //// =================================================
-
-                //var holidays = await _db.Holiday
-                //.Where(x => x.HolidayDate >= firstDayOfMonth &&
-                //            x.HolidayDate <= today &&
-                //            x.Status == "Published")
-                //.Select(x => x.HolidayDate.Date)
-                //.ToListAsync();
-
-                //var workingDays = 0;
-
-                //for (
-                //    var date = firstDayOfMonth;
-                //    date <= today;
-                //    date = date.AddDays(1))
-                //{
-                //    // Exclude Sunday and holidays
-                //    if (date.DayOfWeek != DayOfWeek.Sunday &&
-                //        !holidays.Contains(date.Date))
-                //    {
-                //        workingDays++;
-                //    }
-                //}
-
-                //model.WorkingDaysThisMonth = workingDays;
+                
 
                 // CURRENT MONTH: all attendance KPIs come from the shared service
                 var summary = await _attendanceSummaryService
@@ -419,7 +444,6 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                     "EmployeeDashboard",
                     model);
             }
-            //return View();
         }
         public IActionResult EmployeeDashboard()
         {
