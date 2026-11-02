@@ -20,7 +20,10 @@ namespace TSSC.Unified.Services
             _scopeFactory = scopeFactory;
             _logger = logger;
         }
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        
+
+        protected override async Task ExecuteAsync(
+            CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -29,37 +32,38 @@ namespace TSSC.Unified.Services
                     var now = DateTime.Now;
 
                     // =============================================
-                    // DAILY SYNC SCHEDULE
+                    // CALCULATE NEXT 12:00 PM
                     // =============================================
 
-                    var scheduledTimes = new[]
+                    var next12PM = now.Date.AddHours(12);
+
+                    if (now >= next12PM)
                     {
-                        now.Date.AddHours(10),                  // 10:00 AM
-                        now.Date.AddHours(12).AddMinutes(30),   // 12:30 PM
-                        now.Date.AddHours(15).AddMinutes(30),   // 3:30 PM
-                        now.Date.AddHours(23)                   // 11:00 PM
-                    };
-
-                    //FOR TESTING
-                    //var scheduledTimes = new[]
-                    //{
-                    //    DateTime.Now.AddMinutes(2)
-                    //};
-
-                    // =============================================
-                    // GET NEXT SCHEDULED TIME
-                    // =============================================
-
-                    var nextRun = scheduledTimes
-                        .FirstOrDefault(x => x > now);
-
-                    // If all today's schedules have passed,
-                    // schedule the first sync tomorrow at 10 AM.
-
-                    if (nextRun == default)
-                    {
-                        nextRun = now.Date.AddDays(1).AddHours(10);
+                        next12PM = next12PM.AddDays(1);
                     }
+
+
+                    // =============================================
+                    // CALCULATE NEXT 12:00 AM (MIDNIGHT)
+                    // =============================================
+
+                    var nextMidnight = now.Date.AddDays(1);
+
+
+                    // =============================================
+                    // GET THE NEXT SCHEDULED TIME
+                    // =============================================
+
+                    //var nextRun =
+                    //    next12PM < nextMidnight
+                    //        ? next12PM
+                    //        : nextMidnight;
+
+                    // =============================================
+                    // FOR TESTING
+                    // =============================================
+
+                    var nextRun = DateTime.Now.AddMinutes(2);
 
                     var delay = nextRun - now;
 
@@ -68,7 +72,7 @@ namespace TSSC.Unified.Services
                         nextRun);
 
                     // =============================================
-                    // WAIT UNTIL NEXT SCHEDULED TIME
+                    // WAIT UNTIL 12:00 PM
                     // =============================================
 
                     await Task.Delay(
@@ -79,7 +83,7 @@ namespace TSSC.Unified.Services
                         break;
 
                     // =============================================
-                    // RUN BIOMETRIC SYNC
+                    // RUN SYNC
                     // =============================================
 
                     await RunBiometricSync(stoppingToken);
@@ -101,90 +105,6 @@ namespace TSSC.Unified.Services
                 }
             }
         }
-
-        //protected override async Task ExecuteAsync(
-        //    CancellationToken stoppingToken)
-        //{
-        //    while (!stoppingToken.IsCancellationRequested)
-        //    {
-        //        try
-        //        {
-        //            var now = DateTime.Now;
-
-        //            // =============================================
-        //            // CALCULATE NEXT 12:00 PM
-        //            // =============================================
-
-        //            var next12PM = now.Date.AddHours(12);
-
-        //            if (now >= next12PM)
-        //            {
-        //                next12PM = next12PM.AddDays(1);
-        //            }
-
-
-        //            // =============================================
-        //            // CALCULATE NEXT 12:00 AM (MIDNIGHT)
-        //            // =============================================
-
-        //            var nextMidnight = now.Date.AddDays(1);
-
-
-        //            // =============================================
-        //            // GET THE NEXT SCHEDULED TIME
-        //            // =============================================
-
-        //            var nextRun =
-        //                next12PM < nextMidnight
-        //                    ? next12PM
-        //                    : nextMidnight;
-
-        //            // =============================================
-        //            // FOR TESTING
-        //            // =============================================
-
-        //            //var nextRun = DateTime.Now.AddMinutes(2);
-
-        //            var delay = nextRun - now;
-
-        //            _logger.LogInformation(
-        //                "Next biometric attendance sync scheduled at {NextRun}",
-        //                nextRun);
-
-        //            // =============================================
-        //            // WAIT UNTIL 12:00 PM
-        //            // =============================================
-
-        //            await Task.Delay(
-        //                delay,
-        //                stoppingToken);
-
-        //            if (stoppingToken.IsCancellationRequested)
-        //                break;
-
-        //            // =============================================
-        //            // RUN SYNC
-        //            // =============================================
-
-        //            await RunBiometricSync(stoppingToken);
-        //        }
-        //        catch (TaskCanceledException)
-        //        {
-        //            break;
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            _logger.LogError(
-        //                ex,
-        //                "Error in biometric attendance scheduler.");
-
-        //            // Retry after 5 minutes
-        //            await Task.Delay(
-        //                TimeSpan.FromMinutes(5),
-        //                stoppingToken);
-        //        }
-        //    }
-        //}
 
         private async Task RunBiometricSync(
             CancellationToken cancellationToken)
