@@ -38,10 +38,10 @@ namespace TSSC.Unified.Services
 
                     var scheduledTimes = new List<DateTime>
                     {
-                        now.Date.AddHours(10),                  // 10:00 AM
-                        now.Date.AddHours(12).AddMinutes(30),   // 12:30 PM
-                        now.Date.AddHours(20),                  // 8:00 PM
-                        now.Date.AddHours(23)                   // 11:00 PM
+                        now.Date.AddHours(1),                  // 10:00 AM
+                        //now.Date.AddHours(12).AddMinutes(30),   // 12:30 PM
+                        //now.Date.AddHours(20),                  // 8:00 PM
+                        //now.Date.AddHours(23)                   // 11:00 PM
                     };
 
                     // =============================================
