@@ -1,0 +1,185 @@
+﻿@model TSSC.Unified.Models.BatchMonitoringReport
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_layout";
+    ViewData["Title"] = "Monitoring Report";
+    var monitoring = Model.BatchMonitoring;
+}
+
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Monitoring Report</h3>
+            <div class="nk-block-des text-soft">
+                Submitted on @Model.SubmittedOn.ToString("dd MMM yyyy, hh:mm tt")
+            </div>
+        </div>
+        <div class="nk-block-head-content">
+            <a asp-area="HRMS"
+               asp-controller="TrainingMonitoring"
+               asp-action="BatchList"
+               class="btn btn-sm btn-outline-secondary">
+                <em class="icon ni ni-arrow-left"></em> Back
+            </a>
+        </div>
+    </div>
+</div>
+@{
+    var totalChecks = 13;
+
+    var passedChecks = new[]
+    {
+        Model.LabAvailable,
+        Model.InternetAvailable,
+        Model.EquipmentAvailable,
+        Model.ClassroomAvailable,
+        Model.CandidateAttendanceVerified,
+        Model.AttendanceUploadedInSystem,
+        Model.BiometricVerified,
+        Model.TrainerPresent,
+        Model.SessionConductedProperly,
+        Model.TrainingMaterialAvailable,
+        Model.PracticalSessionConducted,
+        Model.LMSUsageVerified,
+        Model.CandidateFeedbackCollected
+    }.Count(x => x);
+
+    var qualityScore = (int)Math.Round(
+        passedChecks * 100.0 / totalChecks,
+        MidpointRounding.AwayFromZero);
+
+    var qualityGrade = qualityScore >= 90 ? "A" :
+                       qualityScore >= 75 ? "B" :
+                       qualityScore >= 60 ? "C" : "D";
+
+    var qualityLabel = qualityScore >= 90 ? "Excellent" :
+                       qualityScore >= 75 ? "Good" :
+                       qualityScore >= 60 ? "Needs Improvement" : "Poor";
+
+    var qualityColor = qualityScore >= 90 ? "#198754" :
+                       qualityScore >= 75 ? "#0d6efd" :
+                       qualityScore >= 60 ? "#fd7e14" : "#dc3545";
+}
+
+<div class="card card-bordered mb-3">
+    <div class="card-inner py-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="fw-medium">Training Quality Score</span>
+            <span class="fw-bold text-success">@qualityScore%</span>
+        </div>
+
+        <div style="height:8px; background:#e9ecef; border-radius:5px; overflow:hidden;">
+            <div style="width:@(qualityScore)%; height:100%; background:#198754; border-radius:5px;">
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-2">
+            <small class="text-soft">@passedChecks of @totalChecks checks passed</small>
+            <small class="text-success">@qualityLabel</small>
+        </div>
+    </div>
+</div>
+
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <h5 class="title mb-3">Screening Details</h5>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="text-soft small">Batch ID</div>
+                <strong>@monitoring.Batch.BatchId</strong>
+            </div>
+            <div class="col-md-4">
+                <div class="text-soft small">Screening Date</div>
+                <strong>@monitoring.MonitoringDateTime.ToString("dd MMM yyyy")</strong>
+            </div>
+            <div class="col-md-4">
+                <div class="text-soft small">Screening Time</div>
+                <strong>@monitoring.MonitoringDateTime.ToString("hh:mm tt")</strong>
+            </div>
+        </div>
+
+        <hr />
+
+        <h5 class="title mb-3">Infrastructure Verification</h5>
+        <div class="row g-3">
+            <div class="col-md-6">Lab Available: <strong>@(Model.LabAvailable ? "Yes" : "No")</strong></div>
+            <div class="col-md-6">Internet Available: <strong>@(Model.InternetAvailable ? "Yes" : "No")</strong></div>
+            <div class="col-md-6">Equipment Available: <strong>@(Model.EquipmentAvailable ? "Yes" : "No")</strong></div>
+            <div class="col-md-6">Classroom Available: <strong>@(Model.ClassroomAvailable ? "Yes" : "No")</strong></div>
+        </div>
+
+        <hr />
+
+        <h5 class="title mb-3">Attendance Verification</h5>
+        <div class="row g-3">
+            <div class="col-md-6">Candidate Attendance Verified: <strong>@(Model.CandidateAttendanceVerified ? "Yes" : "No")</strong></div>
+            <div class="col-md-6">Attendance Uploaded in System: <strong>@(Model.AttendanceUploadedInSystem ? "Yes" : "No")</strong></div>
+            <div class="col-md-6">Biometric Verified: <strong>@(Model.BiometricVerified ? "Yes" : "No")</strong></div>
+        </div>
+
+        <hr />
+
+        <h5 class="title mb-3">Trainer Verification</h5>
+        <div class="row g-3">
+            <div class="col-md-6">Trainer Present: <strong>@(Model.TrainerPresent ? "Yes" : "No")</strong></div>
+            <div class="col-md-6">Session Conducted Properly: <strong>@(Model.SessionConductedProperly ? "Yes" : "No")</strong></div>
+            <div class="col-md-6">Training Material Available: <strong>@(Model.TrainingMaterialAvailable ? "Yes" : "No")</strong></div>
+        </div>
+
+        <hr />
+
+        <h5 class="title mb-3">Training Quality Verification</h5>
+        <div class="row g-3">
+            <div class="col-md-6">Practical Session Conducted: <strong>@(Model.PracticalSessionConducted ? "Yes" : "No")</strong></div>
+            <div class="col-md-6">LMS Usage Verified: <strong>@(Model.LMSUsageVerified ? "Yes" : "No")</strong></div>
+            <div class="col-md-6">Candidate Feedback Collected: <strong>@(Model.CandidateFeedbackCollected ? "Yes" : "No")</strong></div>
+        </div>
+
+        <hr />
+
+        <h5 class="title mb-3">Remarks</h5>
+        <div class="p-3 bg-lighter rounded" style="white-space:pre-wrap; overflow-wrap:anywhere;">
+            @if (!string.IsNullOrWhiteSpace(Model.Remarks))
+            {
+                @Model.Remarks
+            }
+            else
+            {
+                <span class="text-soft">No remarks provided.</span>
+            }
+        </div>
+
+        <hr />
+
+        <h5 class="title mb-3">Supporting Evidence</h5>
+
+        @if (!string.IsNullOrWhiteSpace(Model.MonitoringPhotosPath))
+        {
+            <p>
+                <a href="@Url.Content("~/" + Model.MonitoringPhotosPath.TrimStart('/'))"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="btn btn-sm btn-outline-primary">
+                    <em class="icon ni ni-img"></em> View Monitoring Photos
+                </a>
+            </p>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.SupportingDocumentPath))
+        {
+            <p>
+                <a href="@Url.Content("~/" + Model.SupportingDocumentPath.TrimStart('/'))"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="btn btn-sm btn-outline-primary">
+                    <em class="icon ni ni-file-pdf"></em> View Supporting PDF
+                </a>
+            </p>
+        }
+
+    </div>
+</div>
+

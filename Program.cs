@@ -30,7 +30,7 @@ builder.Services.Configure<FormOptions>(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddMvc();
 var connString = builder.Configuration.GetConnectionString("DefaultConnectionString");
-builder.Services.AddDbContext<AppdbContext>(options => options.UseSqlServer(connString));
+builder.Services.AddDbContext<AppdbContext>(options => options.UseSqlServer(connString, sqlOptions => sqlOptions.UseCompatibilityLevel(120)));
 builder.Services.AddSingleton<IFileProvider>(
                   new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"))
                   );
@@ -80,7 +80,9 @@ builder.Services.AddScoped<
 builder.Services.AddHostedService<BiometricAttendanceScheduler>();
 builder.Services.AddScoped<ITodayAttendanceLiveService, TodayAttendanceLiveService>();
 builder.Services.AddScoped<ILeaveService, LeaveService>();
-
+builder.Services.AddScoped<
+    IAttendanceSummaryService,
+    AttendanceSummaryService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IMenuCountService, MenuCountService>();
 var app = builder.Build();
@@ -95,68 +97,71 @@ var app = builder.Build();
 
 //    // Seed Roles
 //    string[] roles = new[]
-//    {
-//    "Employee",
-//    "CEO",
-//    "Finance",
-//    "BusinessHead",
-//    "VerticalHead",
-//    "HR",
-//    "ITAdmin",
-//    "AffiliationTeam",
-//    "RegionalOffice",
-//    "ValidationTeam",
-//    "StandardsTeam",
-//    "AssessmentReviewer",
-//    "ProjectManager",
-//    "GrievanceTeam",
-//"Trainer",
-//    "Assessor",
+//{
+//    "RegionalHead",
 //    "TOTTOAADMIN",
-//"Agency"
+//    "Admin",
+//    "AssessmentReviewer",
+//    "Trainer",
+//    "StandardsTeam",
+//    "CEO",
+//    "ITAdmin",
+//    "ProjectManager",
+//    "Assessor",
+//    "GrievanceTeam",
+//    "ValidationTeam",
+//    "Finance",
+//    "HR",
+//    "Agency",
+//    "BusinessHead",
+//    "Employee",
+//    "AffiliationTeam",
+//    "Letter",
+//    "VerticalHead",
+//    "TrainingPartner"
 //};
 
 
-////    foreach (var role in roles)
-////    {
-////        if (!await roleManager.RoleExistsAsync(role))
-////        {
-////            await roleManager.CreateAsync(new IdentityRole(role));
-////        }
-////    }
+//    foreach (var role in roles)
+//    {
+//        if (!await roleManager.RoleExistsAsync(role))
+//        {
+//            await roleManager.CreateAsync(new IdentityRole(role));
+//        }
+//    }
 
-    //    //// Delete user if needed
-    //    var existing = await userManager.FindByNameAsync("hrmanager@tssc.local");
-    //    if (existing != null)
-    //    {
-    //        await userManager.DeleteAsync(existing);
-    //    }
+//    ////// Delete user if needed
+//    //var existing = await userManager.FindByNameAsync("hrmanager@tssc.local");
+//    //if (existing != null)
+//    //{
+//    //    await userManager.DeleteAsync(existing);
+//    //}
 
-    //    // Seed default admin
-    //    var adminEmail = "hrmanager@tssc.local";
-    //    var admin = await userManager.FindByEmailAsync(adminEmail);
+//    //// Seed default admin
+//    //var adminEmail = "hrmanager@tssc.local";
+//    //var admin = await userManager.FindByEmailAsync(adminEmail);
 
-    //    if (admin == null)
-    //    {
-    //        var newAdmin = new AppUser
-    //        {
-    //            UserName = "hrmanager@tssc.local",
-    //            Email = adminEmail
-    //        };
-
-
-    //        var result = await userManager.CreateAsync(newAdmin, "Localhr@123"); // password must meet Identity rules
+//    //if (admin == null)
+//    //{
+//    //    var newAdmin = new AppUser
+//    //    {
+//    //        UserName = "hrmanager@tssc.local",
+//    //        Email = adminEmail
+//    //    };
 
 
-    //        if (result.Succeeded)
-    //        {
-    //            await userManager.AddToRoleAsync(newAdmin, "HR");
-    //        }
-    //        else
-    //        {
-    //            Console.WriteLine(string.Join("\n", result.Errors.Select(e => e.Description)));
-    //        }
-    //    }
+//    //    var result = await userManager.CreateAsync(newAdmin, "Localhr@123"); // password must meet Identity rules
+
+
+//    //    if (result.Succeeded)
+//    //    {
+//    //        await userManager.AddToRoleAsync(newAdmin, "HR");
+//    //    }
+//    //    else
+//    //    {
+//    //        Console.WriteLine(string.Join("\n", result.Errors.Select(e => e.Description)));
+//    //    }
+//    //}
 //}
 
 // Configure the HTTP request pipeline.

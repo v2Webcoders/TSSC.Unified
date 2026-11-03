@@ -1,556 +1,533 @@
 ﻿@using TSSC.Unified.ViewModel
+@using static TSSC.Unified.Services.AttendanceSummaryService
 @model TSSC.Unified.ViewModel.HRAttendanceCalendarVM
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 
 @{
-    Layout = "_Layout";
-    ViewData["Title"] = "Employee Attendance";
+	Layout = "_Layout";
+	ViewData["Title"] = "Employee Attendance";
 
-    var firstDay =
-        new DateTime(Model.Year, Model.Month, 1);
+	var firstDay =
+		new DateTime(Model.Year, Model.Month, 1);
 
-    var daysInMonth =
-        DateTime.DaysInMonth(Model.Year, Model.Month);
+	var daysInMonth =
+		DateTime.DaysInMonth(Model.Year, Model.Month);
 
-    var startDay =
-        (int)firstDay.DayOfWeek;
+	var startDay =
+		(int)firstDay.DayOfWeek;
 
-    var totalCells =
-        (int)Math.Ceiling((startDay + daysInMonth) / 7.0);
+	var totalCells =
+		(int)Math.Ceiling((startDay + daysInMonth) / 7.0);
 
-    var previousMonth =
-        firstDay.AddMonths(-1);
+	var previousMonth =
+		firstDay.AddMonths(-1);
 
-    var nextMonth =
-        firstDay.AddMonths(1);
-    var selectedYear = ViewBag.SelectedYear ?? DateTime.Now.Year;
-    var selectedMonth = ViewBag.SelectedMonth ?? DateTime.Now.Month;
-    
+	var nextMonth =
+		firstDay.AddMonths(1);
+	var selectedYear = ViewBag.SelectedYear ?? DateTime.Now.Year;
+	var selectedMonth = ViewBag.SelectedMonth ?? DateTime.Now.Month;
 
-    var selectedEmployeeId = ViewBag.SelectedEmployeeId ?? 0;
 
-    
+	var selectedEmployeeId = ViewBag.SelectedEmployeeId ?? 0;
 
-    var yearList =
-        ViewBag.YearList as List<int>
-        ?? new List<int>();
 
-    var employeeList =
-        ViewBag.EmployeeList as List<TSSC.Unified.Models.Employee>
-        ?? new List<TSSC.Unified.Models.Employee>();
-    var selectedEmployee = employeeList
-        .FirstOrDefault(x => x.EmployeeId == selectedEmployeeId);
+
+	var yearList =
+		ViewBag.YearList as List<int>
+		?? new List<int>();
+
+	var employeeList =
+		ViewBag.EmployeeList as List<TSSC.Unified.Models.Employee>
+		?? new List<TSSC.Unified.Models.Employee>();
+	var selectedEmployee = employeeList
+		.FirstOrDefault(x => x.EmployeeId == selectedEmployeeId);
 }
 @section Styles {
-    <link rel="stylesheet" href="~/assets/css/calendar.css" />
+	<link rel="stylesheet" href="~/assets/css/calendar.css" />
 }
 
 <div class="container-fluid">
 
-    <!-- PAGE HEADER -->
-    <div class="d-flex flex-wrap justify-content-between align-items-start mb-4">
+	<!-- PAGE HEADER -->
+	<div class="d-flex flex-wrap justify-content-between align-items-start mb-4">
 
-        <div>
-            <h1 class="page-title mb-1">
-                Employee Attendance 
-            </h1>
+		<div>
+			<h1 class="page-title mb-1">
+				Employee Attendance
+			</h1>
 
-            <p class="text-muted mb-0">
-                Organization-wide attendance overview —
-                @firstDay.ToString("MMMM yyyy")
-            </p>
-           
-        </div>
+			<p class="text-muted mb-0">
+				Organization-wide attendance overview —
+				@firstDay.ToString("MMMM yyyy")
+			</p>
 
-    </div>
-    
-    <div class="col-12 mb-4">
-        <div class="py-2 px-3 border-start border-4 border-primary bg-light rounded-1">
-            <div class="d-flex align-items-center gap-3">
-                <em class="icon ni ni-info text-primary fs-6 flex-shrink-0"></em>
+		</div>
 
-                <div class="small lh-sm">
-                    <span class="text-body fw-500">Attendance Rules:</span>
-                    <span class="ms-2">9:30–9:59 <span class="badge bg-success-subtle text-success ms-1">OK</span></span>
-                    <span class="ms-2">10:00–10:59 <span class="badge bg-warning-subtle text-warning ms-1">Late</span></span>
-                    <span class="ms-2">11:00+ <span class="badge bg-danger-subtle text-danger ms-1">Half</span></span>
-                    <span class="ms-2">
-                        First 3 Late
-                        <span class="badge bg-success-subtle text-success ms-1">No Deduction</span>
-                    </span>
+	</div>
 
-                    <span class="ms-2">
-                        4th Late onward
-                        <span class="badge bg-info-subtle text-info ms-1">-0.5 Leave / Late</span>
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <form method="get"
-          asp-action="ViewAttendance"
-          asp-controller="Attendance">
+	<div class="col-12 mb-4">
+		<div class="py-2 px-3 border-start border-4 border-primary bg-light rounded-1">
+			<div class="d-flex align-items-center gap-3">
+				<em class="icon ni ni-info text-primary fs-6 flex-shrink-0"></em>
 
-        <div class="row g-3 align-items-end mb-1">
+				<div class="small lh-sm">
+					<span class="text-body fw-500">Attendance Rules:</span>
+					<span class="ms-2">9:30–9:59 <span class="badge bg-success-subtle text-success ms-1">OK</span></span>
+					<span class="ms-2">10:00–10:59 <span class="badge bg-warning-subtle text-warning ms-1">Late</span></span>
+					<span class="ms-2">11:00+ <span class="badge bg-danger-subtle text-danger ms-1">Half</span></span>
+					<span class="ms-2">
+						First 3 Late
+						<span class="badge bg-success-subtle text-success ms-1">No Deduction</span>
+					</span>
 
-            <!-- EMPLOYEE -->
+					<span class="ms-2">
+						4th Late onward
+						<span class="badge bg-info-subtle text-info ms-1">-0.5 Leave / Late</span>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
 
-            <div class="col-md-4">
+	<form method="get"
+		  asp-action="ViewAttendance"
+		  asp-controller="Attendance">
 
-                <label class="form-label fw-semibold">
-                    Employee
-                </label>
+		<div class="row g-3 align-items-end mb-1">
 
-                <select name="employeeId"
-                        class="form-select">
+			<!-- EMPLOYEE -->
 
-                    <option value="0">
-                        Select Employee
-                    </option>
+			<div class="col-md-4">
 
-                    @foreach (var employee in employeeList)
-                    {
-                        <option value="@employee.EmployeeId"
-                                selected="@(selectedEmployeeId == employee.EmployeeId)">
+				<label class="form-label fw-semibold">
+					Employee
+				</label>
 
-                            @employee.FirstName @employee.LastName
-                            (@employee.EmployeeCode)
+				<select name="employeeId"
+						class="form-select">
 
-                        </option>
-                    }
+					<option value="0">
+						Select Employee
+					</option>
 
-                </select>
+					@foreach (var employee in employeeList)
+					{
+						<option value="@employee.EmployeeId"
+								selected="@(selectedEmployeeId == employee.EmployeeId)">
 
-            </div>
+							@employee.FirstName @employee.LastName
+							(@employee.EmployeeCode)
 
+						</option>
+					}
 
-            <!-- MONTH -->
+				</select>
 
-            <div class="col-md-3">
-
-                <label class="form-label fw-semibold">
-                    Month
-                </label>
-
-                <select name="month"
-                        class="form-select">
+			</div>
 
-                    @for (int m = 1; m <= 12; m++)
-                    {
-                        <option value="@m"
-                                selected="@(selectedMonth == m)">
-                            @(new DateTime(2000, m, 1).ToString("MMMM"))
-                        </option>
-                    }
 
-                </select>
-
-            </div>
-
+			<!-- MONTH -->
 
-            <!-- YEAR -->
-
-            <div class="col-md-3">
-
-                <label class="form-label fw-semibold">
-                    Year
-                </label>
-
-                <select name="year"
-                        class="form-select">
-
-                    @foreach (var y in yearList)
-                    {
-                        <option value="@y"
-                                selected="@(selectedYear == y)">
-                            @y
-                        </option>
-                    }
-
-                </select>
-
-            </div>
-
-
-            <!-- SHOW -->
-
-            <div class="col-md-2">
-
-                <button type="submit"
-                        class="btn btn-primary w-100">
-
-                    <em class="icon ni ni-search me-1"></em>
-                    Show
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </form>
-    
-    @if (selectedEmployee != null)
-    {
-        <div class="attendance-employee-info mb-3">
-
-            <div class="employee-details d-flex align-items-center">
-                <strong>
-                    @selectedEmployee.FirstName @selectedEmployee.LastName (@selectedEmployee.EmployeeCode )
-                </strong>
+			<div class="col-md-3">
 
-                
+				<label class="form-label fw-semibold">
+					Month
+				</label>
 
-                <span class="ml-1 text-muted ms-3">
-                     @firstDay.ToString("MMMM yyyy")
-                </span>
-            </div>
-            <div class="attendance-kpis">
+				<select name="month"
+						class="form-select">
 
-                <div class="attendance-kpi present">
-                    <span class="kpi-value">
-                        @Model.Days.Count(x => x.Status == "Present" || x.Status=="Late")
-                    </span>
-                    <span class="kpi-label">Present</span>
-                </div>
-                <div class="attendance-kpi halfday">
-                    <span class="kpi-value">
-                        @Model.Days.Count(x =>
-                                
-                                 x.Status == "Half Day")
-                    </span>
-                    <span class="kpi-label">Half Day</span>
-                </div>
-                <div class="attendance-kpi late">
-                    <span class="kpi-value">
-                        @Model.Days.Count(x =>
-                                 x.Status == "Late" ||
-                                 (x.InTime.HasValue &&
-                                 x.InTime.Value.TimeOfDay >= new TimeSpan(10, 0, 0) &&
-                                 x.InTime.Value.TimeOfDay < new TimeSpan(11, 0, 0)))
-                    </span>
+					@for (int m = 1; m <= 12; m++)
+					{
+						<option value="@m"
+								selected="@(selectedMonth == m)">
+							@(new DateTime(2000, m, 1).ToString("MMMM"))
+						</option>
+					}
 
-                    <span class="kpi-label">Late</span>
-                </div>
+				</select>
 
-               
+			</div>
 
-                <div class="attendance-kpi leave">
-                    <span class="kpi-value">
-                        @Model.Days.Count(x => x.Status == "Leave")
-                    </span>
-                    <span class="kpi-label">Leave</span>
-                </div>
 
-                <div class="attendance-kpi absent">
-                    <span class="kpi-value">
-                        @Model.Days.Count(x => x.Status == "Absent")
-                    </span>
-                    <span class="kpi-label">Absent</span>
-                </div>
-                <div class="attendance-kpi halfday">
-                    <span class="kpi-value">
-                        @{
-                            var lateCount = Model.Days.Count(x =>
-                            x.Status == "Late" ||
-                            (x.InTime.HasValue &&
-                            x.InTime.Value.TimeOfDay >= new TimeSpan(10, 0, 0) &&
-                            x.InTime.Value.TimeOfDay < new TimeSpan(11, 0, 0)));
+			<!-- YEAR -->
 
-                            var lateLeaveDeduction = lateCount >= 4
-                            ? (lateCount - 3) * 0.5m
-                            : 0m;
-                        }
+			<div class="col-md-3">
 
-                        @lateLeaveDeduction
-                    </span>
-                    <span class="kpi-label">Leave Deducted</span>
-                </div>
-            </div>
+				<label class="form-label fw-semibold">
+					Year
+				</label>
 
-        </div>
-        
-    }
-    
-    
-    <!-- CALENDAR -->
+				<select name="year"
+						class="form-select">
 
-    <div class="card border-0 shadow-sm">
+					@foreach (var y in yearList)
+					{
+						<option value="@y"
+								selected="@(selectedYear == y)">
+							@y
+						</option>
+					}
 
-        <div class="card-inner p-0">
+				</select>
 
-            <!-- CALENDAR HEADER -->
+			</div>
 
-            <div class="attendance-calendar-header">
 
-                <a asp-action="ViewAttendance"
-                   asp-route-employeeId="@Model.EmployeeId"
-                   asp-route-month="@previousMonth.Month"
-                   asp-route-year="@previousMonth.Year"
-                   class="calendar-nav">
+			<!-- SHOW -->
 
-                    <em class="icon ni ni-chevron-left"></em>
+			<div class="col-md-2">
 
-                </a>
-
-
-                <div class="calendar-month-title">
-
-                    @firstDay.ToString("MMMM yyyy")
-
-                </div>
-
-
-                <a asp-action="ViewAttendance"
-                   asp-route-employeeId="@Model.EmployeeId"
-                   asp-route-month="@nextMonth.Month"
-                   asp-route-year="@nextMonth.Year"
-                   class="calendar-nav">
-
-                    <em class="icon ni ni-chevron-right"></em>
-
-                </a>
-
-            </div>
-
-
-            <!-- WEEK DAYS -->
-
-            <div class="calendar-weekdays">
-
-                <div>Sun</div>
-                <div>Mon</div>
-                <div>Tue</div>
-                <div>Wed</div>
-                <div>Thu</div>
-                <div>Fri</div>
-                <div>Sat</div>
-
-            </div>
-
-
-            <!-- CALENDAR -->
-            @if (Model.EmployeeId.HasValue)
-            {
-                <!-- CALENDAR -->
-
-                <div class="attendance-calendar">
-
-                    @for (int cell = 0; cell < totalCells * 7; cell++)
-                    {
-                        var dayNumber = cell - startDay + 1;
-
-                        if (dayNumber < 1 || dayNumber > daysInMonth)
-                        {
-                            <div class="calendar-day empty"></div>
-                        }
-                        else
-                        {
-                            var currentDate = new DateTime(
-                            Model.Year,
-                            Model.Month,
-                            dayNumber);
-
-                            var attendance = Model.Days.FirstOrDefault(x =>
-                            x.Date.Date == currentDate.Date);
-
-                            <div class="calendar-day">
-
-                                <div class="day-number">
-                                    @dayNumber
-                                </div>
-                                @if (attendance != null && attendance.IsHoliday==true)
-                                {
-                                    <div class="attendance-status holiday">
-                                        <div class="holiday-label">
-                                            <strong>Holiday</strong>
-                                        </div>
-
-                                        <div class="holiday-name">
-                                            @attendance.HolidayName
-                                        </div>
-                                    </div>
-                                }
-                                else if (attendance != null && attendance.Status == "Leave")
-                                {
-                                    var isHalfDayLeave =
-                                    !string.IsNullOrWhiteSpace(attendance.LeaveType) &&
-                                    attendance.LeaveType.Contains("Half", StringComparison.OrdinalIgnoreCase);
-
-                                    <div class="attendance-status leave">
-
-                                        <div class="leave-label">
-                                            <strong>
-                                                @(isHalfDayLeave ? "Half Day Leave" : "Leave")
-                                            </strong>
-                                        </div>
-
-                                        @if (attendance.LeaveFromDate.HasValue &&
-                                       attendance.LeaveToDate.HasValue)
-                                        {
-                                            <div class="leave-date">
-                                                @attendance.LeaveFromDate.Value.ToString("dd MMM")
-                                                -
-                                                @attendance.LeaveToDate.Value.ToString("dd MMM")
-                                            </div>
-                                        }
-                                    </div>
-                                }
-                                @if (attendance != null &&
-                                attendance.InTime.HasValue)
-                                {
-                                    <div class="attendance-status present">
-                                        <div class="attendance-status-label">
-                                            @attendance.Status
-                                        </div>
-                                        <div class="attendance-time">
-
-                                            <span>
-                                                @attendance.InTime.Value.ToString("hh:mm tt")
-                                            </span>
-
-                                            @if (attendance.OutTime.HasValue)
-                                            {
-                                                <span class="time-separator">–</span>
-
-                                                <span>
-                                                    @attendance.OutTime.Value.ToString("hh:mm tt")
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <span>--</span>
-                                            }
-
-                                        </div>
-
-                                        @if (attendance.WorkingHours.HasValue)
-                                        {
-                                            <div class="working-hours">
-                                                @attendance.WorkingHours.Value.ToString("0.0") hrs
-                                            </div>
-                                        }
-
-                                        @if (!string.IsNullOrWhiteSpace(attendance.AttendanceSource))
-                                        {
-                                            var source = attendance.AttendanceSource.Trim();
-
-                                            if (source.Equals(
-                                            "Manual",
-                                            StringComparison.OrdinalIgnoreCase))
-                                            {
-                                                <span class="attendance-source-badge"
-                                                      title="Manual Attendance&#10;Location: @attendance.CheckInLocation">
-                                                    M
-                                                </span>
-                                            }
-                                            else if (source.Equals(
-                                            "Biometric",
-                                            StringComparison.OrdinalIgnoreCase))
-                                            {
-                                                <span class="attendance-source-badge"
-                                                      title="Biometric Attendance">
-                                                    B
-                                                </span>
-                                            }
-                                            else if (source.Equals(
-                                            "Regularized",
-                                            StringComparison.OrdinalIgnoreCase))
-                                            {
-                                                <span class="attendance-source-badge"
-                                                      title="Regularized Attendance">
-                                                    R
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <span class="attendance-source-badge"
-                                                      title="@source">
-                                                    @source.Substring(0, 1).ToUpper()
-                                                </span>
-                                            }
-                                        }
-
-                                    </div>
-                                }
-                                else if (attendance != null &&
-                                attendance.Status == "Weekend")
-                                {
-                                    <div class="attendance-status weekend">
-                                        Weekend
-                                    </div>
-                                }
-                                
-                                else if (attendance != null &&
-                                attendance.Status == "Absent")
-                                {
-                                    <div class="attendance-status absent">
-                                        Absent
-                                    </div>
-                                }
-                            </div>
-                        }
-                    }
-
-                </div>
-            }
-            else
-            {
-                <!-- NO EMPLOYEE SELECTED -->
-
-                <div class="text-center py-5">
-
-                    <em class="icon ni ni-user-list"
-                        style="font-size:45px; color:#D9622F;">
-                    </em>
-
-                    <h5 class="mt-3 mb-2">
-                        Select an Employee
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Please select an employee above to view attendance.
-                    </p>
-
-                </div>
-            }
-
-        </div>
-
-    </div>
-
-
-    <!-- LEGEND -->
-
-    <div class="attendance-legend mt-3">
-
-        <span>
-            <i class="legend-dot present-dot"></i>
-            Present
-        </span>
-
-        <span>
-            <i class="legend-dot absent-dot"></i>
-            Absent
-        </span>
-
-        <span>
-            <i class="legend-dot weekend-dot"></i>
-            Weekend
-        </span>
-
-        <span>
-            <i class="legend-dot leave-dot"></i>
-            Leave
-        </span>
-
-        <span>
-            <i class="legend-dot holiday-dot"></i>
-            Holiday
-        </span>
-
-    </div>
+				<button type="submit"
+						class="btn btn-primary w-100">
+
+					<em class="icon ni ni-search me-1"></em>
+					Show
+
+				</button>
+
+			</div>
+
+		</div>
+
+	</form>
+
+	@if (selectedEmployee != null)
+	{
+		<div class="attendance-employee-info mb-3">
+
+			<div class="employee-details d-flex align-items-center">
+				<strong>
+					@selectedEmployee.FirstName @selectedEmployee.LastName (@selectedEmployee.EmployeeCode )
+				</strong>
+
+
+
+				<span class="ml-1 text-muted ms-3">
+					@firstDay.ToString("MMMM yyyy")
+				</span>
+			</div>
+			@if (ViewBag.AttendanceSummary != null)
+			{
+				<partial name="_AttendanceSummary"
+						 model="ViewBag.AttendanceSummary" />
+			}
+
+
+		</div>
+
+	}
+
+
+	<!-- CALENDAR -->
+
+	<div class="card border-0 shadow-sm">
+
+		<div class="card-inner p-0">
+
+			<!-- CALENDAR HEADER -->
+
+			<div class="attendance-calendar-header">
+
+				<a asp-action="ViewAttendance"
+				   asp-route-employeeId="@Model.EmployeeId"
+				   asp-route-month="@previousMonth.Month"
+				   asp-route-year="@previousMonth.Year"
+				   class="calendar-nav">
+
+					<em class="icon ni ni-chevron-left"></em>
+
+				</a>
+
+
+				<div class="calendar-month-title">
+
+					@firstDay.ToString("MMMM yyyy")
+
+				</div>
+
+
+				<a asp-action="ViewAttendance"
+				   asp-route-employeeId="@Model.EmployeeId"
+				   asp-route-month="@nextMonth.Month"
+				   asp-route-year="@nextMonth.Year"
+				   class="calendar-nav">
+
+					<em class="icon ni ni-chevron-right"></em>
+
+				</a>
+
+			</div>
+
+
+			<!-- WEEK DAYS -->
+
+			<div class="calendar-weekdays">
+
+				<div>Sun</div>
+				<div>Mon</div>
+				<div>Tue</div>
+				<div>Wed</div>
+				<div>Thu</div>
+				<div>Fri</div>
+				<div>Sat</div>
+
+			</div>
+
+
+			<!-- CALENDAR -->
+			@if (Model.EmployeeId.HasValue)
+			{
+				<!-- CALENDAR -->
+
+				<div class="attendance-calendar">
+
+
+					@for (int cell = 0; cell < totalCells * 7; cell++)
+					{
+						var dayNumber = cell - startDay + 1;
+
+						if (dayNumber < 1 || dayNumber > daysInMonth)
+						{
+							<div class="calendar-day empty"></div>
+						}
+						else
+						{
+							var currentDate = new DateTime(
+							Model.Year,
+							Model.Month,
+							dayNumber);
+
+							var attendance = Model.Days.FirstOrDefault(x =>
+							x.Date.Date == currentDate.Date);
+
+							<div class="calendar-day">
+
+								<div class="day-number">
+									@dayNumber
+								</div>
+
+								@if (attendance != null && attendance.IsHoliday == true)
+								{
+									<!-- Holiday -->
+									<div class="attendance-status holiday">
+										<div class="holiday-label">
+											<strong>Holiday</strong>
+										</div>
+
+										<div class="holiday-name">
+											@attendance.HolidayName
+										</div>
+									</div>
+								}
+								else if (attendance != null && attendance.Status == "Leave")
+								{
+									@* <!-- Leave -->
+                var isHalfDayLeave =
+                    !string.IsNullOrWhiteSpace(attendance.LeaveType) &&
+                    attendance.LeaveType.Contains(
+                        "Half", StringComparison.OrdinalIgnoreCase);
+
+                <div class="attendance-status leave">
+
+                    <div class="leave-label">
+                        <strong>
+                            @(isHalfDayLeave ? "Half Day Leave" : "Leave")
+                        </strong>
+                    </div>
+ *@
+
+									var isFirstHalf = string.Equals(attendance.LeaveType, "FirstHalf", StringComparison.OrdinalIgnoreCase);
+									var isSecondHalf = string.Equals(attendance.LeaveType, "SecondHalf", StringComparison.OrdinalIgnoreCase);
+									var isHalfDayLeave = isFirstHalf || isSecondHalf;
+
+									var leaveText = isFirstHalf ? "Half Day Leave (1st Half)"
+									: isSecondHalf ? "Half Day Leave (2nd Half)"
+									: "Leave";
+
+
+									<div class="attendance-status leave @(isHalfDayLeave ? "half-day" : "")">
+										<div class="leave-label">
+											<strong>@leaveText</strong>
+										</div>
+										@if (attendance.LeaveFromDate.HasValue &&
+															attendance.LeaveToDate.HasValue)
+										{
+											<div class="leave-date">
+												@attendance.LeaveFromDate.Value.ToString("dd MMM")
+												-
+												@attendance.LeaveToDate.Value.ToString("dd MMM")
+											</div>
+										}
+
+									</div>
+								}
+								else if (attendance != null && attendance.InTime.HasValue)
+								{
+									var flags = AttendanceRules.Classify(
+									attendance.Status,
+									attendance.InTime,
+									attendance.OutTime,
+									attendance.Date,
+									DateTime.Today);
+
+									bool isFirstHalfLeave = string.Equals(attendance.LeaveType, "FirstHalf", StringComparison.OrdinalIgnoreCase);
+									bool isSecondHalfLeave = string.Equals(attendance.LeaveType, "SecondHalf", StringComparison.OrdinalIgnoreCase);
+									bool isHalfDayLeave = isFirstHalfLeave || isSecondHalfLeave;
+									string halfLeaveText = isFirstHalfLeave ? "1st Half" : isSecondHalfLeave ? "2nd Half" : "";
+
+									bool isHalfDay = flags.IsHalfDay;
+									bool isLate = flags.IsLate;
+									bool checkOutMissing = flags.IsMissing;
+
+									if (isFirstHalfLeave)      // afternoon arrival is by design
+									{
+										isHalfDay = false;
+										isLate = false;
+									}
+
+									var statusClass = "present";
+									var displayStatus = isHalfDay ? "Half Day" : "Present";
+
+									<div class="attendance-status @statusClass">
+
+										<div class="attendance-status-label">
+											<span class="@(isHalfDay ? "halfday-text" : "")">@displayStatus</span>
+											@if (isLate)
+											{
+												<span class="late-text">· Late</span>
+											}
+											@if (isHalfDayLeave)
+											{
+												<span class="leave-text">· Half Day Leave (@halfLeaveText)</span>
+											}
+											@if (checkOutMissing)
+											{
+												<span class="missing-text">· Check Out Missing</span>
+											}
+										</div>
+
+										@* time, working hours and source badge: unchanged *@
+
+										<div class="attendance-time">
+											<span>@attendance.InTime.Value.ToString("hh:mm tt")</span>
+											@if (attendance.OutTime.HasValue)
+											{
+												<span class="time-separator">–</span>
+												<span>@attendance.OutTime.Value.ToString("hh:mm tt")</span>
+											}
+											else
+											{
+												<span>--</span>
+											}
+										</div>
+
+										@if (attendance.WorkingHours.HasValue)
+										{
+											<div class="working-hours">@attendance.WorkingHours.Value.ToString("0.0") hrs</div>
+										}
+
+										@if (!string.IsNullOrWhiteSpace(attendance.AttendanceSource))
+										{
+											var source = attendance.AttendanceSource.Trim();
+											var (code, tip) = source.ToLowerInvariant() switch
+											{
+												"manual" => ("M", $"Manual Attendance\nLocation: {attendance.CheckInLocation}"),
+												"biometric" => ("B", "Biometric Attendance"),
+												"regularized" => ("R", "Regularized Attendance"),
+												_ => (source.Substring(0, 1).ToUpper(), source)
+											};
+
+											<span class="attendance-source-badge" title="@tip">@code</span>
+										}
+										@* time, working hours and source badge: unchanged *@
+									</div>
+								}
+								else if (attendance != null && attendance.Status == "Weekend")
+								{
+									<!-- Sunday -->
+									<div class="attendance-status weekend">
+										Weekend
+									</div>
+								}
+								else if (attendance != null && attendance.Status == "Work From Home")
+								{
+									<!-- Saturday -->
+									<div class="attendance-status work-from-home">
+										Work From Home
+									</div>
+								}
+								else if (attendance != null && attendance.Status == "Absent")
+								{
+									<!-- Absent -->
+									<div class="attendance-status absent">
+										Absent
+									</div>
+								}
+
+							</div>
+						}
+					}
+
+
+				</div>
+			}
+			else
+			{
+				<!-- NO EMPLOYEE SELECTED -->
+
+				<div class="text-center py-5">
+
+					<em class="icon ni ni-user-list"
+						style="font-size:45px; color:#D9622F;">
+					</em>
+
+					<h5 class="mt-3 mb-2">
+						Select an Employee
+					</h5>
+
+					<p class="text-muted mb-0">
+						Please select an employee above to view attendance.
+					</p>
+
+				</div>
+			}
+
+		</div>
+
+	</div>
+
+
+	<!-- LEGEND -->
+
+	<div class="attendance-legend mt-3">
+
+		<span>
+			<i class="legend-dot present-dot"></i>
+			Present
+		</span>
+
+		<span>
+			<i class="legend-dot absent-dot"></i>
+			Absent
+		</span>
+
+		<span>
+			<i class="legend-dot weekend-dot"></i>
+			Weekend
+		</span>
+
+		<span>
+			<i class="legend-dot leave-dot"></i>
+			Leave
+		</span>
+
+		<span>
+			<i class="legend-dot holiday-dot"></i>
+			Holiday
+		</span>
+
+	</div>
 
 </div>

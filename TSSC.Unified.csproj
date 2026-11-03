@@ -18,6 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\uploads\TPPaymentProofs\30f7c67472d94234bd0acb8629e5fd66.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="appsettings.json~RF97bfc7.TMP" />
     <None Remove="Areas\HRMS\Views\LeaveManagement\Balance.cshtml~RFbb1c99b.TMP" />
   </ItemGroup>
@@ -52,6 +56,10 @@
   <ItemGroup>
     <Folder Include="Repository\" />
     <Folder Include="wwwroot\uploads\invoices\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\uploads\TPPaymentProofs\30f7c67472d94234bd0acb8629e5fd66.png" />
   </ItemGroup>
 
 </Project>

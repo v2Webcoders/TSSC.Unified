@@ -355,7 +355,10 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     Status = t.Status,
                     CreatedOn = t.CreatedOn,
                     UpdatedOn = t.UpdatedOn,
-                    IsActive = t.IsActive
+                    IsActive = t.IsActive,
+                    AttachmentByEmployee=t.AttachmentByEmployee,
+                    EmployeeRemarks=t.EmployeeRemarks,
+                    CompletedOn=t.CompletedOn
                 }).ToListAsync();
 
             return View(taskList);

@@ -49,6 +49,9 @@
                     <th>Deadline</th>
                     <th>Status</th>
                     <th>Attachment</th>
+                    <th>Employee Attachment</th>
+                    <th>Employee Remark</th>
+                    <th>Completed On</th>
                     <th>Created On</th>
                     <th>Updated On</th>
                     <th>Action</th>
@@ -122,8 +125,27 @@
                             }
 
                         </td>
+                        <td>
 
+                            @if (!string.IsNullOrEmpty(item.AttachmentByEmployee))
+                            {
+                                <a href="~/Uploads/Tasks/@item.AttachmentByEmployee"
+                                   target="_blank">
+                                    View File
+                                </a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
 
+                        </td>
+                        <td>
+                            @item.EmployeeRemarks
+                        </td>
+                        <td>
+                            @item.CompletedOn?.ToString("dd-MMM-yyyy")
+                        </td>
                         <td>
                             @item.CreatedOn?.ToString("dd-MMM-yyyy")
                         </td>
@@ -138,23 +160,34 @@
 
                             <div class="btn-group" role="group">
 
-                                <a asp-action="EditTask"
-                                asp-controller="Task"
+                                <a asp-action="CompletedTaskDetails"
                                    asp-route-id="@item.TaskId"
-                                   class="btn btn-sm btn-outline-warning"
-                                   title="Edit">
-                                    <em class="icon ni ni-edit"></em>
+                                   class="btn btn-sm btn-outline-info"
+                                   title="View">
+
+                                    <em class="icon ni ni-eye"></em>
+
                                 </a>
+                                @if (item.Status == "Pending")
+                                {
+                                    <a asp-action="EditTask"
+                                    asp-controller="Task"
+                                    asp-route-id="@item.TaskId"
+                                    class="btn btn-sm btn-outline-warning"
+                                    title="Edit">
+                                        <em class="icon ni ni-edit"></em>
+                                    </a>
 
 
-                                <a asp-action="DeleteTask"
-                                asp-controller="Task"
-                                   asp-route-id="@item.TaskId"
-                                   class="btn btn-sm btn-outline-danger"
-                                   title="Delete">
-                                    <em class="icon ni ni-trash"></em>
-                                </a>
-
+                                    <a asp-action="DeleteTask"
+                                    asp-controller="Task"
+                                    asp-route-id="@item.TaskId"
+                                    class="btn btn-sm btn-outline-danger"
+                                    title="Delete"
+                                    onclick="return confirm('Are you sure you want to delete this task?');">
+                                        <em class="icon ni ni-trash"></em>
+                                    </a>
+                                }
                             </div>
 
                         </td>

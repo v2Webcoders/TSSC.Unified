@@ -1,0 +1,556 @@
+﻿@model IEnumerable<TSSC.Unified.Models.TrainerRegistration>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+
+    var latestScreenings =
+        ViewBag.LatestScreenings
+        as Dictionary<int, TSSC.Unified.Models.ScreeningSchedule>
+        ?? new Dictionary<int, TSSC.Unified.Models.ScreeningSchedule>();
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <!-- Page Title -->
+        <div class="nk-block-head-content">
+
+            <h3 class="nk-block-title page-title">
+                Manage TOT / TOA
+            </h3>
+
+        </div>
+
+        <!-- Manage Batch Button -->
+        <div class="nk-block-head-content">
+
+            <div class="toggle-wrap nk-block-tools-toggle">
+
+                <a href="#"
+                   class="btn btn-icon btn-trigger toggle-expand me-n1"
+                   data-target="pageMenu">
+
+                    <em class="icon ni ni-more-v"></em>
+
+                </a>
+
+                <div class="toggle-expand-content"
+                     data-content="pageMenu">
+
+                    <ul class="nk-block-tools g-3">
+
+                        <li class="nk-block-tools-opt">
+
+                            <a href="/Trainer/Batch"
+                               class="btn btn-primary">
+
+                                <em class="icon ni ni-list"></em>
+
+                                <span>
+                                    Manage Batch
+                                </span>
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- SUCCESS MESSAGE -->
+@if (TempData["msg"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+
+        <strong>Success!</strong>
+        @TempData["msg"]
+
+        <button type="button"
+                class="close"
+                data-dismiss="alert"
+                aria-label="Close">
+
+            <span aria-hidden="true">&times;</span>
+
+        </button>
+
+    </div>
+}
+
+
+<!-- ERROR MESSAGE -->
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+
+        <strong>Error!</strong>
+        @TempData["error"]
+
+        <button type="button"
+                class="close"
+                data-dismiss="alert"
+                aria-label="Close">
+
+            <span aria-hidden="true">&times;</span>
+
+        </button>
+
+    </div>
+}
+
+
+<!-- TRAINER LIST -->
+<div class="card card-bordered mt-3">
+
+    <div class="card-inner">
+
+        <div class="table-responsive">
+
+            <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            S.No.
+                        </th>
+
+                        <th>
+                            Registration No.
+                        </th>
+
+                        <th>
+                            Candidate
+                        </th>
+
+                        <th>
+                            Job Role
+                        </th>
+
+                        <th>
+                            Email
+                        </th>
+
+                        <th>
+                            Mobile
+                        </th>
+
+                        <th>
+                            Created On
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <!-- S.No -->
+                                <td>
+                                    @serial
+                                </td>
+
+
+                                <!-- Registration No -->
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(item.RegistrationNo))
+                                    {
+                                        @item.RegistrationNo
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+
+                                </td>
+
+
+                                <!-- Candidate -->
+                                <td>
+
+                                    <strong>
+                                        @item.CandidateName
+                                    </strong>
+
+                                </td>
+
+
+                                <!-- Job Role -->
+                                <td>
+                                    @item.JobRoleId
+                                </td>
+
+
+                                <!-- Email -->
+                                <td>
+                                    @item.Email
+                                </td>
+
+
+                                <!-- Mobile -->
+                                <td>
+                                    @item.Mobile
+                                </td>
+
+
+                                <!-- Created On -->
+                                <td>
+                                    @item.CreatedDate.ToString("dd-MMM-yyyy")
+                                </td>
+
+
+                                <!-- ACTIONS -->
+                                <td>
+
+                                    @{
+                                        latestScreenings.TryGetValue(
+                                        item.Id,
+                                        out var screening);
+                                    }
+
+                                    <div class="btn-group"
+                                         role="group">
+
+                                        <!-- VIEW -->
+                                        <a asp-area="HRMS"
+                                           asp-action="Details"
+                                           asp-controller="Trainer"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-info"
+                                           title="View Details">
+
+                                            <em class="icon ni ni-eye"></em>
+
+                                        </a>
+
+
+                                        @if (screening == null ||
+                                                                        string.Equals(
+                                                                        screening.Status,
+                                                                        "Cancelled",
+                                                                        StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <!-- SCHEDULE SCREENING -->
+                                            <a asp-area="HRMS"
+                                               asp-controller="Trainer"
+                                               asp-action="CreateScreening"
+                                               asp-route-trainerId="@item.Id"
+                                               class="btn btn-sm btn-outline-primary"
+                                               title="Schedule Screening">
+
+                                                <em class="icon ni ni-calendar"></em>
+
+                                            </a>
+                                        }
+                                        else if (string.Equals(screening.Status, "Scheduled",
+                                        StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <!-- Update Result Button -->
+                                            <button type="button"
+                                                    id="updateResultBtn_@item.Id"
+                                                    class="btn btn-sm btn-outline-primary"
+                                                    title="Update Result"
+                                                    onclick="document.getElementById('updateResultBtn_@item.Id').classList.add('d-none'); document.getElementById('screeningResultIcon_@item.Id').classList.remove('d-none');">
+                                                Update Result
+                                            </button>
+
+                                            <!-- Green icon appears after clicking the button -->
+                                            <button type="button"
+                                                    id="screeningResultIcon_@item.Id"
+                                                    class="btn btn-sm btn-outline-success d-none"
+                                                    title="Update Screening Result"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#screeningResultModal_@item.Id">
+                                                <em class="icon ni ni-check-circle"></em>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <!-- RESULT COMPLETED -->
+                                            @if (screening.Status == "Success")
+                                            {
+                                                <span class="btn btn-sm btn-outline-success disabled"
+                                                      title="Screening Result: Success">
+
+                                                    <em class="icon ni ni-check-circle"></em>
+
+                                                </span>
+                                            }
+                                            else if (screening.Status == "Rejected")
+                                            {
+                                                <span class="btn btn-sm btn-outline-danger disabled"
+                                                      title="Screening Result: Rejected">
+
+                                                    <em class="icon ni ni-cross-circle"></em>
+
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="btn btn-sm btn-outline-warning disabled"
+                                                      title="Screening Result: @screening.Status">
+
+                                                    <em class="icon ni ni-alert-circle"></em>
+
+                                                </span>
+                                            }
+                                        }
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                            serial++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+
+                            <td colspan="8"
+                                class="text-center text-soft py-4">
+
+                                No trainer registrations found.
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+            @foreach (var item in Model)
+            {
+                if (latestScreenings.TryGetValue(
+                item.Id,
+                out var screening) &&
+                string.Equals(
+                screening.Status,
+                "Scheduled",
+                StringComparison.OrdinalIgnoreCase))
+                {
+                    var screeningEndDateTime =
+                    screening.ScreeningDate.Date
+                    .Add(screening.EndTime ?? screening.StartTime);
+
+                    if (DateTime.Now >= screeningEndDateTime)
+                    {
+                        <div class="modal fade"
+                             id="screeningResultModal_@item.Id"
+                             tabindex="-1"
+                             aria-labelledby="screeningResultModalLabel_@item.Id"
+                             aria-hidden="true">
+
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+
+                                <div class="modal-content">
+
+                                    <div class="modal-header">
+
+                                        <h5 class="modal-title"
+                                            id="screeningResultModalLabel_@item.Id">
+
+                                            Update Screening Result
+
+                                        </h5>
+
+                                        <button type="button"
+                                                class="btn-close"
+                                                data-bs-dismiss="modal"
+                                                aria-label="Close">
+                                        </button>
+
+                                    </div>
+
+
+                                    <form asp-area="HRMS"
+                                          asp-controller="Trainer"
+                                          asp-action="UpdateScreeningResult"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@screening.Id" />
+
+
+                                        <div class="modal-body">
+
+                                            <div class="row g-3">
+
+                                                <!-- Trainer -->
+                                                <div class="col-md-6">
+
+                                                    <label class="form-label">
+                                                        Trainer
+                                                    </label>
+
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           value="@item.CandidateName"
+                                                           readonly />
+
+                                                </div>
+
+
+                                                <!-- Registration No -->
+                                                <div class="col-md-6">
+
+                                                    <label class="form-label">
+                                                        Registration No.
+                                                    </label>
+
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           value="@item.RegistrationNo"
+                                                           readonly />
+
+                                                </div>
+
+
+                                                <!-- Screening Date -->
+                                                <div class="col-md-6">
+
+                                                    <label class="form-label">
+                                                        Screening Date
+                                                    </label>
+
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           value="@screening.ScreeningDate.ToString("dd-MMM-yyyy")"
+                                                           readonly />
+
+                                                </div>
+
+
+                                                <!-- Screening Time -->
+                                                <div class="col-md-6">
+
+                                                    <label class="form-label">
+                                                        Screening Time
+                                                    </label>
+
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           value="@screening.StartTime.ToString(@"hh\:mm") - @(screening.EndTime.HasValue? screening.EndTime.Value.ToString(@"hh\:mm") : "N/A")"
+                                                           readonly />
+
+                                                </div>
+
+
+                                                <!-- Result -->
+                                                <div class="col-md-12">
+
+                                                    <label class="form-label">
+                                                        Screening Result
+                                                    </label>
+
+                                                    <select name="status"
+                                                            class="form-select"
+                                                            required>
+
+                                                        <option value="">
+                                                            Select Result
+                                                        </option>
+
+                                                        <option value="Success">
+                                                            Success
+                                                        </option>
+
+                                                        <option value="Rejected">
+                                                            Rejected
+                                                        </option>
+
+                                                        <option value="On Hold">
+                                                            On Hold
+                                                        </option>
+
+                                                    </select>
+
+                                                </div>
+
+
+                                                <!-- Remarks -->
+                                                <div class="col-md-12">
+
+                                                    <label class="form-label">
+                                                        Remarks
+                                                    </label>
+
+                                                    <textarea name="remarks"
+                                                  class="form-control"
+                                                  rows="4"
+                                                  placeholder="Enter screening remarks"
+                                                  required></textarea>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="modal-footer">
+
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary"
+                                                    data-bs-dismiss="modal">
+
+                                                Cancel
+
+                                            </button>
+
+                                            <button type="submit"
+                                                    class="btn btn-primary">
+
+                                                <em class="icon ni ni-save"></em>
+
+                                                Update Result
+
+                                            </button>
+
+                                        </div>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                }
+            }
+        </div>
+
+    </div>
+
+</div>

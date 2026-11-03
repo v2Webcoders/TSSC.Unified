@@ -26,9 +26,9 @@
     <!-- Utility bar -->
     <div class="utility-bar text-white py-2">
         <div class="container d-flex justify-content-end align-items-center gap-2 flex-wrap">
-            <a class="chip chip-red" href="#">SIC Registration</a>
-            <a class="chip chip-red" href="#">TelcoJobs.in</a>
-            <a class="chip chip-red" href="#">TelcoLearning.com</a>
+            @* <a class="chip chip-red" href="#">SIC Registration</a> *@
+            <a class="chip chip-red" href="https://telcojobs.in/" target="_blank">TelcoJobs.in</a>
+           @*  <a class="chip chip-red" href="#">TelcoLearning.com</a> *@
             <div class="dropdown login-dropdown">
                 <a class="chip chip-amber dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="far fa-user"></i>Login
@@ -186,27 +186,56 @@
         <div class="reg-card">
             <p class="card-note" style="margin:0 0 4px;">Register with TSSC</p>
             <div class="reg-grid" id="regGrid">
-                <a class="reg-tile" href="javascript:void(0)" data-name="Training Partner">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M3 21h18" /><path d="M5 21V9l6-4 6 4v12" /><path d="M10 21v-5h4v5" /></svg>
-                    <span>Training Partner</span>
-                    <span class="tag">Affiliation</span>
+                <a class="reg-tile"
+                   href="/tp/registration/create?membershipType=Associate%20Member"
+                   data-name="Associate Member">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+                        <path d="M3 21h18" />
+                        <path d="M5 21V9l6-4 6 4v12" />
+                        <path d="M10 21v-5h4v5" />
+                    </svg>
+                    <span>Associate Member</span>
+                    <span class="tag">Training Partner</span>
                 </a>
-                <a class="reg-tile" href="register-tp.html" data-name="Industry Member">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="1.5" /><path d="M9 8h6M9 12h6M9 16h3" /></svg>
+
+                <a class="reg-tile"
+                   href="/tp/registration/create?membershipType=Industry%20Member"
+                   data-name="Industry Member">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+                        <rect x="4" y="3" width="16" height="18" rx="1.5" />
+                        <path d="M9 8h6M9 12h6M9 16h3" />
+                    </svg>
                     <span>Industry Member</span>
                     <span class="tag">Training Partner</span>
                 </a>
-                <a class="reg-tile" href="register-tp.html" data-name="Platinum Industry Member">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M12 2l2.6 5.4 5.9.9-4.3 4.1 1 5.9L12 15.8 6.8 18.3l1-5.9-4.3-4.1 5.9-.9L12 2z" /></svg>
+
+                <a class="reg-tile"
+                   href="/tp/registration/create?membershipType=Platinum%20Industry%20Member"
+                   data-name="Platinum Industry Member">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+                        <path d="M12 2l2.6 5.4 5.9.9-4.3 4.1 1 5.9L12 15.8 6.8 18.3l1-5.9-4.3-4.1 5.9-.9L12 2z" />
+                    </svg>
                     <span>Platinum Industry Member</span>
                     <span class="tag">Training Partner</span>
                 </a>
-                <a class="reg-tile" href="javascript:void(0)" data-name="Trainer">
+
+                <a class="reg-tile"
+                   href="/tp/registration/create?membershipType=Academia%20Member"
+                   data-name="Academia Member">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+                        <path d="M2 9l10-5 10 5-10 5L2 9z" />
+                        <path d="M6 11v5c3.5 3 8.5 3 12 0v-5" />
+                        <path d="M22 9v6" />
+                    </svg>
+                    <span>Academia Member</span>
+                    <span class="tag">Training Partner</span>
+                </a>
+                <a class="reg-tile" href="/Trainer/Trainer/Registration" data-name="Trainer">
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M2 8l10-4 10 4-10 4-10-4z" /><path d="M6 10.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-5.5" /></svg>
                     <span>Trainer</span>
                     <span class="tag">Faculty</span>
                 </a>
-                <a class="reg-tile" href="register-tp.html" data-name="Master Trainer">
+                @* <a class="reg-tile" href="register-tp.html" data-name="Master Trainer">
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="12" cy="8" r="3.2" /><path d="M5 20c0-4 3-6 7-6s7 2 7 6" /></svg>
                     <span>Master Trainer</span>
                     <span class="tag">Faculty</span>
@@ -225,7 +254,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2" /><path d="M8 12l2.5 2.5L16 9" /></svg>
                     <span>Assessment Agency</span>
                     <span class="tag">Organisation</span>
-                </a>
+                </a> *@
             </div>
         </div>
     </div>

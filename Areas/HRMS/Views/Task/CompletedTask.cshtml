@@ -32,7 +32,7 @@
                         <th>Assigned By</th>
 
                         <th>Deadline</th>
-
+                        <th>Attachment</th>
                         <th>Employee Remarks</th>
 
                         <th>Employee Attachment</th>
@@ -64,7 +64,21 @@
                             <td>@item.AssignedByName</td>
 
                             <td>@item.Deadline.ToString("dd-MMM-yyyy")</td>
+                            <td>
 
+                                @if (!string.IsNullOrEmpty(item.Attachment))
+                                {
+                                    <a href="~/Uploads/Tasks/@item.Attachment"
+                                       target="_blank">
+                                        View File
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+
+                            </td>
                             <td>
                                 @if (!string.IsNullOrEmpty(item.EmployeeRemarks))
                                 {

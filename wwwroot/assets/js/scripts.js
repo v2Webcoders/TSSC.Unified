@@ -100,28 +100,85 @@
   };
 
   // CurrentLink Detect @v1.0
-  NioApp.CurrentLink = function () {
-    var _link = '.nk-menu-link, .menu-link, .nav-link',
-      _currentURL = window.location.href,
-      fileName = _currentURL.substring(0, _currentURL.indexOf("#") == -1 ? _currentURL.length : _currentURL.indexOf("#")),
-      fileName = fileName.substring(0, fileName.indexOf("?") == -1 ? fileName.length : fileName.indexOf("?"));
-    $(_link).each(function () {
-      var self = $(this),
-        _self_link = self.attr('href');
-      if (fileName.match(_self_link)) {
-        var _self$parents;
-        self.closest("li").addClass('active current-page').parents().closest("li").addClass("active current-page");
-        self.closest("li").children('.nk-menu-sub').css('display', 'block');
-        self.parents().closest("li").children('.nk-menu-sub').css('display', 'block');
-        (_self$parents = self.parents('.nk-menu-item')[self.parents('.nk-menu-item').length - 1]) === null || _self$parents === void 0 || _self$parents.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
+  //NioApp.CurrentLink = function () {
+  //  var _link = '.nk-menu-link, .menu-link, .nav-link',
+  //    _currentURL = window.location.href,
+  //    fileName = _currentURL.substring(0, _currentURL.indexOf("#") == -1 ? _currentURL.length : _currentURL.indexOf("#")),
+  //    fileName = fileName.substring(0, fileName.indexOf("?") == -1 ? fileName.length : fileName.indexOf("?"));
+  //  $(_link).each(function () {
+  //    var self = $(this),
+  //      _self_link = self.attr('href');
+  //    if (fileName.match(_self_link)) {
+  //      var _self$parents;
+  //      self.closest("li").addClass('active current-page').parents().closest("li").addClass("active current-page");
+  //      self.closest("li").children('.nk-menu-sub').css('display', 'block');
+  //      self.parents().closest("li").children('.nk-menu-sub').css('display', 'block');
+  //      (_self$parents = self.parents('.nk-menu-item')[self.parents('.nk-menu-item').length - 1]) === null || _self$parents === void 0 || _self$parents.scrollIntoView({
+  //        behavior: "smooth",
+  //        block: "start"
+  //      });
+  //    } else {
+  //      self.closest("li").removeClass('active current-page').parents().closest("li:not(.current-page)").removeClass("active");
+  //    }
+  //  });
+  //};
+
+    NioApp.CurrentLink = function () {
+        var _link = '.nk-menu-link, .menu-link, .nav-link';
+        var currentUrl = new URL(window.location.href);
+        var currentPath = currentUrl.pathname.replace(/\/+$/, '').toLowerCase();
+
+        $(_link).each(function () {
+            var self = $(this);
+            var href = self.attr('href');
+
+            // Ignore empty, placeholder and JavaScript links
+            if (!href || href === '#' || href.startsWith('javascript:')) {
+                return;
+            }
+
+            var linkUrl;
+
+            try {
+                linkUrl = new URL(href, window.location.origin);
+            } catch (e) {
+                return;
+            }
+
+            // Only compare links from the same origin
+            var linkPath = linkUrl.pathname.replace(/\/+$/, '').toLowerCase();
+            var isActive = linkUrl.origin === currentUrl.origin
+                && linkPath === currentPath;
+
+            if (isActive) {
+                self.closest('li').addClass('active current-page');
+
+                self.closest('li')
+                    .parents('li')
+                    .addClass('active current-page');
+
+                self.closest('li')
+                    .children('.nk-menu-sub')
+                    .css('display', 'block');
+
+                self.parents('li')
+                    .children('.nk-menu-sub')
+                    .css('display', 'block');
+
+                var menuItems = self.parents('.nk-menu-item');
+
+                if (menuItems.length) {
+                    menuItems[menuItems.length - 1].scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            } else {
+                self.closest('li').removeClass('active current-page');
+            }
         });
-      } else {
-        self.closest("li").removeClass('active current-page').parents().closest("li:not(.current-page)").removeClass("active");
-      }
-    });
-  };
+    };
+
 
   // PasswordSwitch @v1.0
   NioApp.PassSwitch = function () {

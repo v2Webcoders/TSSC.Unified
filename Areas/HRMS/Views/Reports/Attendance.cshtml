@@ -1,0 +1,130 @@
+﻿@using TSSC.Unified.ViewModel
+@model AttendanceReportFilterVM
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Employee Attendance Report";
+    var currentYear = DateTime.Today.Year;
+}
+
+<div class="nk-content">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">
+                                Employee Attendance Report
+                            </h3>
+                            <div class="nk-block-des text-soft">
+                                <p>
+                                    Export monthly attendance for all active employees.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nk-block">
+                    <div class="card card-bordered">
+                        <div class="card-inner">
+                            <form asp-area="HRMS"
+                                  asp-controller="Reports"
+                                  asp-action="ExportAttendanceExcel"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+
+                                <div asp-validation-summary="ModelOnly"
+                                     class="text-danger mb-3"></div>
+                                <div class="row g-4">
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="Month"
+                                                   class="form-label">
+                                                Select Month
+                                            </label>
+                                            <select asp-for="Month"
+                                                    class="form-select">
+                                                <option value="1">January</option>
+                                                <option value="2">February</option>
+                                                <option value="3">March</option>
+                                                <option value="4">April</option>
+                                                <option value="5">May</option>
+                                                <option value="6">June</option>
+                                                <option value="7">July</option>
+                                                <option value="8">August</option>
+                                                <option value="9">September</option>
+                                                <option value="10">October</option>
+                                                <option value="11">November</option>
+                                                <option value="12">December</option>
+                                            </select>
+
+                                            <span asp-validation-for="Month"
+                                                  class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="Year"
+                                                   class="form-label">
+                                                Select Year
+                                            </label>
+
+                                            <select asp-for="Year"
+                                                    class="form-select">
+                                                @for (int year = currentYear - 2;
+                                                year <= currentYear + 1;
+                                                year++)
+                                                {
+                                                    <option value="@year">
+                                                        @year
+                                                    </option>
+                                                }
+                                            </select>
+
+                                            <span asp-validation-for="Year"
+                                                  class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                Employee Filter
+                                            </label>
+                                            <input type="text"
+                                                   class="form-control"
+                                                   value="Active employees only"
+                                                   readonly />
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="mt-4">
+                                    <button type="submit"
+                                            class="btn btn-primary">
+                                        <em class="icon ni ni-file-xls"></em>
+                                        <span>Export to Excel</span>
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

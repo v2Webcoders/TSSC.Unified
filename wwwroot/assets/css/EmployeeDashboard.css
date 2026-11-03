@@ -226,3 +226,156 @@ footer.site-footer {
 }
 
 
+
+/* ===== Dashboard header (single row) ===== */
+.dash-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: .9rem;
+    padding: .75rem 1rem;
+    background: #fff;
+    border: 1px solid #e5e9f2;
+    border-left: 4px solid #6576ff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(31, 41, 55, .04);
+}
+
+.dash-id {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.dash-name {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #364a63;
+    line-height: 1.2;
+    margin: 0;
+}
+
+.dash-date {
+    font-size: 11px;
+    color: #8094ae;
+    margin-top: 2px;
+}
+
+/* status pill */
+.att-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .15rem .6rem;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.att-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.att-in {
+    background: #e6f9f0;
+    color: #1a9e5c;
+}
+
+.att-done {
+    background: #e8f0ff;
+    color: #2c5de5;
+}
+
+.att-none {
+    background: #fff4e5;
+    color: #d97706;
+}
+
+.att-in .att-dot {
+    animation: att-pulse 1.8s infinite;
+}
+
+@keyframes att-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(26, 158, 92, .5);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(26, 158, 92, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(26, 158, 92, 0);
+    }
+}
+
+/* In / Out / So far tiles */
+.punch-strip {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: .4rem;
+    justify-content: center;
+}
+
+.punch-item {
+    display: flex;
+    flex-direction: column;
+    padding: .25rem .65rem;
+    white-space: nowrap;
+    background: #f5f6fa;
+    border-radius: 10px;
+}
+
+.punch-label {
+    font-size: 10px;
+    color: #8094ae;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.punch-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #364a63;
+}
+
+.punch-accent {
+    color: #6576ff;
+}
+
+/* buttons */
+.dash-actions {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex: 0 0 auto;
+}
+
+    .dash-actions .btn {
+        white-space: nowrap;
+    }
+
+.dash-icon-btn {
+    border: 1px solid #e5e9f2;
+    color: #526484;
+}
+
+/* small screens only */
+@media (max-width: 767px) {
+    .dash-row {
+        flex-wrap: wrap;
+    }
+
+    .punch-strip {
+        justify-content: flex-start;
+        margin-left: 1.5rem;
+    }
+
+    .dash-actions {
+        margin-left: auto; /* keeps the calendar button at the far right */
+    }
+}

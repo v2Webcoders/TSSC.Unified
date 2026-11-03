@@ -9,7 +9,6 @@ namespace TSSC.Unified.ViewModel
     {
         public int Id { get; set; }
 
-        public int? ProjectId { get; set; }
 
         [Required(ErrorMessage = "Please select a Job Role.")]
         public int JobRoleId { get; set; }
@@ -88,11 +87,35 @@ namespace TSSC.Unified.ViewModel
         public DateTime? InspectionCreatedDate { get; set; }
         public string? InspectionLink { get; set; }
         public string? InspectionMode { get; set; }
+        public string? InspectionRemarks { get; set; }
+        public int? RegionalHeadEmployeeId { get; set; }
+
+        public string? RegionalHeadStatus { get; set; }
+
+        public string? RegionalHeadRemarks { get; set; }
+
+        public DateTime? SentToRegionalHeadDate { get; set; }
+        public DateTime? RegionalHeadApproveDate { get; set; }
+        public int? VerticalHeadEmployeeId { get; set; }
+
+        public string? VerticalHeadStatus { get; set; }
+
+        public string? VerticalHeadRemarks { get; set; }
+
+        public DateTime? VerticalHeadDateApproveDate { get; set; }
+        public int? BusinessHeadEmployeeId { get; set; }
+        public string? BusinessHeadStatus { get; set; }
+        public string? BusinessHeadRemarks { get; set; }
+        public DateTime? BusinessHeadApproveDate { get; set; }
         public List<SelectListItem> JobRoles { get; set; } = new();
         public decimal? QPHours { get; set; }
         public int? SchemeId { get; set; }
         public string? SchemeName { get; set; }
         public List<SelectListItem> Scheme { get; set; }
+            = new List<SelectListItem>();
+        public int? ProjectId { get; set; }
+        public string? ProjectName { get; set; }
+        public List<SelectListItem> Project { get; set; }
             = new List<SelectListItem>();
     }
 }

@@ -4,12 +4,25 @@
 @using Microsoft.AspNetCore.Identity
 @using QUIZAPP
 @using TSSC.Unified.Models
+@using TSSC.Unified.Services
 @inject AppdbContext Context
 @inject UserManager<AppUser> UserManager
 @inject SignInManager<AppUser> SignInManager
-
+@inject IMenuCountService MenuCountService
 @{
 	var currentUser = await UserManager.GetUserAsync(User);
+
+	// =====================================
+	// TP AFFILIATION WORKFLOW MENU ACCESS
+	// =====================================
+
+	var hasTPWorkflowAccess = currentUser != null &&
+		Context.TPWorkflowApprovers.Any(x =>
+			x.IsActive &&
+			x.ApproverType == "User" &&
+			x.ApplicationUserId == currentUser.Id
+		);
+
 
 	var roles = currentUser != null
 		? await UserManager.GetRolesAsync(currentUser)
@@ -155,6 +168,11 @@
 
 	}
 
+	var counts = employee != null
+	? await MenuCountService.GetAsync(new MenuUser(
+		employee.EmployeeId, isHR, isReportingManager,
+		isFinanceEmployee, isFinanceHead, isCEO, employee.ApplicationUserId))
+	: MenuCounts.Empty;
 }
 
 <style>
@@ -390,7 +408,7 @@
 			<span class="nk-menu-text">
 				My Tasks
 			</span>
-
+			<partial name="_MenuBadge" model="counts.Tasks" />
 		</a>
 
 	</li>
@@ -882,7 +900,8 @@
 
 					</a>
 				</li>
-				<li class="nk-menu-item">
+				@* when manager approved the it direct sent to assessment agency *@
+				@* <li class="nk-menu-item">
 					<a href="/HRMS/Trainer/SendToAgency"
 					   class="nk-menu-link">
 
@@ -891,7 +910,7 @@
 						</span>
 
 					</a>
-				</li>
+				</li> *@
 				<li class="nk-menu-item">
 					<a href="/HRMS/Trainer/UploadCertificate"
 					   class="nk-menu-link">
@@ -1049,7 +1068,16 @@
 			</a>
 
 			<ul class="nk-menu-sub">
+				<li class="nk-menu-item">
+					<a href="/HRMS/Trainer/RegistrationList"
+					   class="nk-menu-link">
 
+						<span class="nk-menu-text">
+							Screening Result Approval
+						</span>
+
+					</a>
+				</li>
 				<li class="nk-menu-item">
 					<a href="/HRMS/Trainer/AgencyApprovalByManager"
 					   class="nk-menu-link">
@@ -1077,6 +1105,164 @@
 		</li>
 	}
 
+
+
+	@if (User.IsInRole("RegionalHead"))
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					<em class="icon ni ni-user-check"></em>
+					Training Center
+				</span>
+			</div>
+		</li>
+
+		<li class="nk-menu-item has-sub">
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-user-check"></em>
+				</span>
+				<span class="nk-menu-text">Manage Training Center</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/RegionalHeadInspection?tab=Pending"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Pending" ? "active" : "")">
+						<span class="nk-menu-text">Pending Inspection</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/RegionalHeadInspection?tab=OnHold"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "OnHold" ? "active" : "")">
+						<span class="nk-menu-text">On Hold</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/RegionalHeadInspection?tab=Rejected"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Rejected" ? "active" : "")">
+						<span class="nk-menu-text">Rejected</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/RegionalHeadInspection?tab=Approved"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Approved" ? "active" : "")">
+						<span class="nk-menu-text">Sent to Vertical Head</span>
+					</a>
+				</li>
+
+			</ul>
+		</li>
+	}
+
+	@if (isReportingManager)
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					<em class="icon ni ni-user-check"></em>
+					Training Center
+				</span>
+			</div>
+		</li>
+
+		<li class="nk-menu-item has-sub">
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-user-check"></em>
+				</span>
+				<span class="nk-menu-text">Manage Training Center</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/VerticalHeadInspection?tab=Pending"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Pending" ? "active" : "")">
+						<span class="nk-menu-text">Pending Inspection</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/VerticalHeadInspection?tab=OnHold"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "OnHold" ? "active" : "")">
+						<span class="nk-menu-text">On Hold</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/VerticalHeadInspection?tab=Rejected"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Rejected" ? "active" : "")">
+						<span class="nk-menu-text">Rejected</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/VerticalHeadInspection?tab=Approved"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Approved" ? "active" : "")">
+						<span class="nk-menu-text">Sent to Business Head</span>
+					</a>
+				</li>
+
+			</ul>
+		</li>
+	}
+
+	@if (User.IsInRole("BusinessHead"))
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					<em class="icon ni ni-user-check"></em>
+					Training Center
+				</span>
+			</div>
+		</li>
+
+		<li class="nk-menu-item has-sub">
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-user-check"></em>
+				</span>
+				<span class="nk-menu-text">Manage Training Center</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/BusinessHeadInspection?tab=Pending"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Pending" ? "active" : "")">
+						<span class="nk-menu-text">Pending Review</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/BusinessHeadInspection?tab=OnHold"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "OnHold" ? "active" : "")">
+						<span class="nk-menu-text">On Hold</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/BusinessHeadInspection?tab=Rejected"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Rejected" ? "active" : "")">
+						<span class="nk-menu-text">Rejected</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/BusinessHeadInspection?tab=Approved"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Approved" ? "active" : "")">
+						<span class="nk-menu-text">Sent to CEO</span>
+					</a>
+				</li>
+			</ul>
+		</li>
+	}
 
 	<!-- HR MANAGEMENT - HR ONLY -->
 	<!-- ===================================================== -->
@@ -1464,11 +1650,15 @@
 
 
 	}
-
 	@if (roles.Contains("RegionalHead") ||
-			roles.Contains("VerticalHead") ||
+			roles.Contains("AffiliationTeam") ||
 			roles.Contains("Finance") ||
-			roles.Contains("CEO"))
+			roles.Contains("VerticalHead") ||
+			roles.Contains("CEO") ||
+			roles.Contains("PaymentProcess") ||
+			roles.Contains("FinanceCertificate") ||
+			roles.Contains("CertificateIssuance") ||
+			hasTPWorkflowAccess)
 	{
 		<li class="nk-menu-heading">
 			<div class="nk-menu-heading-content">
@@ -1539,12 +1729,16 @@
 				</li>
 
 			</ul>
-
 		</li>
 	}
+
+
+
+	
+	
 	<!-- MANAGER - REPORTING MANAGER ONLY -->
 	<!-- ===================================================== -->
-	@if (isReportingManager || showReimbursementApproverMenu || isFinanceEmployee || isHR || isFinanceHead || isCEO || User.IsInRole("GrievanceTeam")) ;)
+	@if (isReportingManager || showReimbursementApproverMenu || isFinanceEmployee || isHR || isFinanceHead || isCEO || User.IsInRole("GrievanceTeam"))
 
 	{
 		<li class="nk-menu-heading">
@@ -1713,8 +1907,8 @@
 				</ul>
 			</li>
 		}
-		@* Reimbursements — Management (actual expense claims, 5-stage chain) *@
-	@{
+		
+
 		var reimbursementStages =
 		new List<(bool Show, string Action, string StatusColumn,
 		string PendingStatus, string ApprovedStatus, string RejectedStatus)>
@@ -1769,7 +1963,7 @@
 		.FirstOrDefault(s => s.Show);
 
 		var hasActiveStage = activeStage.Show;
-	}
+	
 
 	@if (hasActiveStage)
 	{

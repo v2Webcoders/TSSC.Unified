@@ -86,7 +86,10 @@ namespace QUIZAPP
         public DbSet<ScreeningSchedule> ScreeningSchedule { get; set; }
         public DbSet<AssessmentAgency> AssessmentAgency { get; set; }
 
-        public DbSet<CertificateGenerationAssessmentDetail> CertificateGenerationAssessmentDetail { get; set; }
+
+        public DbSet<CertificateGenerationAssessmentDetail> CertificateGenerationAssessmentDetail{ get; set; }
+        public DbSet<TPWorkflowApprover> TPWorkflowApprovers { get; set; }
+
 
         // ------------------------- GRIEVANCE MODULE---------------------------------------
         public DbSet<Grievance> Grievance { get; set; }
@@ -94,6 +97,13 @@ namespace QUIZAPP
         public DbSet<GrievanceEmailVerification> GrievanceEmailVerification { get; set; }
         // ------------------------- JOBROLES AND TC APPROVAL MODULE---------------------------------------
         public DbSet<Scheme> Scheme { get; set; }
+        public DbSet<Project> Project { get; set; }
         public DbSet<TrainingCenter> TrainingCenter { get; set; }
+
+        public DbSet<Batch> Batches { get; set; }
+        public DbSet<Candidate> Candidates { get; set; }
+        public DbSet<BatchCandidate> BatchCandidates { get; set; }
+        public DbSet<BatchMonitoring> BatchMonitorings { get; set; }
+        public DbSet<BatchMonitoringReport> BatchMonitoringReports { get; set; }
     }
 }

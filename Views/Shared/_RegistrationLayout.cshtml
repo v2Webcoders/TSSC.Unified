@@ -37,7 +37,7 @@
                     <li><a class="dropdown-item" href="#"><i class="fas fa-id-badge"></i>Employee Login</a></li>
                 </ul>
             </div>
-            <a class="chip chip-amber" href="#"><i class="fas fa-rocket"></i>Register Now</a>
+            <a class="chip chip-amber" href="/account/category"><i class="fas fa-rocket"></i>Register Now</a>
         </div>
     </div>
 
@@ -196,39 +196,6 @@
             </span>
         </div>
     </div>
-
-    @* <script>
-        const role = sessionStorage.getItem('regRole');
-        if(role) document.getElementById('formTitle').textContent = role + ' Registration';
-
-        function toggleAcc(headEl){
-          const acc = headEl.closest('.accordion');
-          document.querySelectorAll('.accordion').forEach(a => { if(a !== acc) a.classList.remove('open'); });
-          acc.classList.toggle('open');
-          updateProgress();
-        }
-
-        function updateProgress(){
-          const openStep = document.querySelector('.accordion.open');
-          const stepNum = openStep ? parseInt(openStep.dataset.step) : 0;
-          document.querySelectorAll('.form-progress .seg').forEach((seg, i) => {
-            seg.classList.toggle('done', i < stepNum);
-          });
-        }
-        updateProgress();
-
-        function fileChosen(input){
-          const label = input.closest('.file-drop').querySelector('.name');
-          label.textContent = input.files.length ? input.files[0].name : 'no file chosen';
-        }
-
-        document.getElementById('tpForm').addEventListener('submit', (e) => {
-          e.preventDefault();
-          window.location.href = 'notification.html';
-        });
-    </script> *@
-
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

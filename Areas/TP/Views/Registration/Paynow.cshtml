@@ -1,0 +1,183 @@
+﻿@using TSSC.Unified.ViewModel;
+@model PayNowVM
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Affiliation Fee Payment";
+}
+
+<div class="nk-block-head">
+    <div class="nk-block-head-content">
+        <h3 class="nk-block-title page-title">
+            Affiliation Fee Payment
+        </h3>
+        <div class="nk-block-des text-soft">
+            <p>Application ID: <strong>#@Model.Id</strong></p>
+        </div>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="row g-gs">
+    @* QR CODE AND PAYMENT INSTRUCTIONS *@
+    <div class="col-lg-5">
+        <div class="card card-bordered h-100">
+            <div class="card-inner text-center">
+
+                <h5 class="title mb-2">Affiliation Fee Payment</h5>
+
+                <p class="text-soft">
+                    <strong>Telecom Sector Skill Council</strong>
+                </p>
+
+                <div class="border rounded p-3 d-inline-block mb-3">
+                    <img src="@Model.QRCodePath"
+                         alt="Official affiliation fee payment QR code"
+                         class="img-fluid"
+                         style="max-width:280px; width:100%;" />
+                </div>
+
+                <div class="alert alert-warning text-start">
+                    <em class="icon ni ni-info me-1"></em>
+                    Scan the official QR code using your UPI or banking
+                    application. Verify the recipient and amount before paying.
+                </div>
+
+                @* ONLINE PAYMENT BUTTON *@
+                <div class="mb-3">
+                    <a asp-area="TP"
+                       asp-controller="Registration"
+                       asp-action="OnlinePayment"
+                       asp-route-id="@Model.Id"
+                       class="btn btn-primary">
+                        <em class="icon ni ni-wallet me-1"></em>
+                        Online Payment
+                    </a>
+                </div>
+
+                <p class="text-soft small mb-0">
+                    Alternatively, scan the QR code to pay manually.
+                    Keep your transaction reference number and payment
+                    screenshot ready before submitting payment proof.
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+    @* PAYMENT PROOF FORM *@
+    <div class="col-lg-7">
+        <div class="card card-bordered">
+            <div class="card-inner mb-4">
+
+                <h5 class="title mb-1">Submit Payment Proof</h5>
+
+                <p class="text-soft mb-4">
+                    Enter the transaction details after completing payment.
+                    Finance will verify the submitted proof.
+                </p>
+
+                @if (Model.PaymentProofStatus == "Rejected")
+                {
+                    <div class="alert alert-danger">
+                        <strong>Payment proof rejected.</strong>
+                        Please review the remarks, correct the details
+                        and submit the proof again.
+                    </div>
+                }
+
+                @if (Model.PaymentProofStatus == "Pending")
+                {
+                    <div class="alert alert-info">
+                        Your payment proof is awaiting Finance verification.
+                    </div>
+                }
+
+                <form asp-area="TP"
+                      asp-controller="Registration"
+                      asp-action="PayNow"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    @Html.AntiForgeryToken()
+
+                    <input asp-for="Id" type="hidden" />
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger mb-3">
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="PaymentTransactionId"
+                               class="form-label">
+                        </label>
+
+                        <input asp-for="PaymentTransactionId"
+                               class="form-control"
+                               placeholder="Enter UTR / transaction reference number"
+                               autocomplete="off" />
+
+                        <span asp-validation-for="PaymentTransactionId"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label asp-for="PaymentScreenshot"
+                               class="form-label">
+                        </label>
+
+                        <input asp-for="PaymentScreenshot"
+                               type="file"
+                               class="form-control"
+                               accept=".jpg,.jpeg,.png,image/jpeg,image/png" />
+
+                        <span asp-validation-for="PaymentScreenshot"
+                              class="text-danger">
+                        </span>
+
+                        <div class="form-note">
+                            Upload a clear payment screenshot in JPG, JPEG
+                            or PNG format. Maximum size: 5 MB.
+                        </div>
+                    </div>
+
+                    <div class="alert alert-light">
+                        <em class="icon ni ni-info me-1"></em>
+                        Submitting this form does not confirm payment.
+                        Your application will proceed after Finance verifies
+                        the transaction.
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <em class="icon ni ni-upload me-1"></em>
+                            Submit Payment Proof
+                        </button>
+
+                        <a asp-area="TP"
+                           asp-controller="Home"
+                           asp-action="Index"
+                           asp-area="TP"
+                           class="btn btn-outline-light">
+                            Back to My Home
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

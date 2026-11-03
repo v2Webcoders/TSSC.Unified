@@ -38,6 +38,9 @@ namespace TSSC.Unified.Areas.TP.Controllers
 
             ViewBag.Schemes = trainingCenterModel.Scheme;
 
+            await LoadProjects(trainingCenterModel);
+
+            ViewBag.Projects = trainingCenterModel.Project;
             var jobRoles = await _context.JobRoles
                 .AsNoTracking()
                 .Where(x => x.Status == "Approved"
@@ -71,7 +74,7 @@ namespace TSSC.Unified.Areas.TP.Controllers
             model.Scheme = await _context.Scheme
                 .AsNoTracking()
                 .Where(x => x.IsActive)
-                .OrderBy(x => x.SchemeName)
+                .OrderBy(x => x.SchemeId)
                 .Select(x => new SelectListItem
                 {
                     Value = x.SchemeId.ToString(),
@@ -79,6 +82,24 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 })
                 .ToListAsync();
         }
+
+        private async Task LoadProjects(TrainingCenterViewModel model)
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            model.Project = await _context.Project
+                .AsNoTracking()
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.Id)
+                .Select(x => new SelectListItem
+                {
+                    Value = x.Id.ToString(),
+                    Text = x.ProjectName
+                })
+                .ToListAsync();
+        }
+
         [HttpGet]
         public async Task<IActionResult> Create(int jobRoleId,int? schemeId, int? projectId)
         {
@@ -109,7 +130,7 @@ namespace TSSC.Unified.Areas.TP.Controllers
 
             await LoadJobRoles(model);
             await LoadSchemes(model);
-
+           
             return View(model);
         }
 
@@ -361,7 +382,7 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 TempData["Success"] =
                     "Training Center submitted successfully for approval.";
 
-                return RedirectToAction(nameof(SelectJobRole));
+                return RedirectToAction(nameof(CenterList));
             }
             catch (Exception ex)
             {

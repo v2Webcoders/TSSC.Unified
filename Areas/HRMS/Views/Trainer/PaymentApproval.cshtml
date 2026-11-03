@@ -69,6 +69,38 @@
                                 {
                                     <form method="post"
                                           action="/HRMS/Trainer/ApprovePayment"
+                                          class="row g-1 align-items-end flex-nowrap">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden" name="id" value="@item.Id" />
+
+                                        <div class="col">
+                                            <label for="FinanceReferenceNo_@item.Id" class="form-label">
+                                                Reference No. <span class="text-danger">*</span>
+                                            </label>
+
+                                            <input type="text"
+                                                   id="FinanceReferenceNo_@item.Id"
+                                                   name="FinanceReferenceNo"
+                                                   class="form-control"
+                                                   placeholder="Enter reference no."
+                                                   maxlength="100"
+                                                   required />
+                                        </div>
+
+                                        <div class="col-auto">
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-success"
+                                                    onclick="return confirm('Are you sure you want to approve this payment?');">
+                                                <em class="icon ni ni-check"></em>
+                                                Approve
+                                            </button>
+                                        </div>
+
+                                    </form>
+                                    @* <form method="post"
+                                          action="/HRMS/Trainer/ApprovePayment"
                                           style="display:inline;">
 
                                         @Html.AntiForgeryToken()
@@ -85,8 +117,9 @@
                                             Approve
 
                                         </button>
-
-                                    </form>
+                                       
+                                    </form> *@
+                                    
                                 }
                                 else
                                 {

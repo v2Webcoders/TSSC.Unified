@@ -78,5 +78,25 @@ namespace TSSC.Unified.Models
         public string? InspectionLink { get; set; }
 
         public string? InspectionMode { get; set; }
+        public string? InspectionRemarks { get; set; }
+        public int? RegionalHeadEmployeeId { get; set; }
+
+        public string? RegionalHeadStatus { get; set; }
+
+        public string? RegionalHeadRemarks { get; set; }
+
+        public DateTime? SentToRegionalHeadDate { get; set; }
+        public DateTime? RegionalHeadApproveDate { get; set; }
+        public int? VerticalHeadEmployeeId { get; set; }
+
+        public string? VerticalHeadStatus { get; set; }
+
+        public string? VerticalHeadRemarks { get; set; }
+
+        public DateTime? VerticalHeadDateApproveDate { get; set; }
+        public int? BusinessHeadEmployeeId { get; set; }
+        public string? BusinessHeadStatus { get; set; }
+        public string? BusinessHeadRemarks { get; set; }
+        public DateTime? BusinessHeadApproveDate { get; set; }
     }
 }

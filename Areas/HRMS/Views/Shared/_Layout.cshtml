@@ -234,6 +234,31 @@
 			.search-results-dropdown::-webkit-scrollbar-thumb:hover {
 				background: #9ca3af;
 			}
+
+		.nk-team-btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width:32px;
+			height: 32px;
+			border-radius: 50%;
+			background: #e8f0ff;
+			color: #0d6efd;
+			text-decoration: none;
+			transition: all .2s ease;
+		}
+
+			.nk-team-btn svg {
+				width: 20px;
+				height: 20px;
+				display: block;
+			}
+
+			.nk-team-btn:hover,
+			.nk-team-btn:focus-visible {
+				background: #0d6efd;
+				color: #fff;
+			}
 	</style>
 </head>
 <body class="nk-body bg-lighter npc-general has-sidebar ">
@@ -330,7 +355,26 @@
 							</div> *@
 							<div class="nk-header-tools">
 								<ul class="nk-quick-nav">
-
+									
+							
+									
+									<li class="d-flex align-items-center">
+										<a href="/HRMS/Team/TeamMembers"
+										   class="nk-team-btn"
+										   title="My Team"
+										   aria-label="View My Team"
+										   data-bs-toggle="tooltip"
+										   data-bs-placement="bottom">
+											<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+												<circle cx="12" cy="7" r="3.2" />
+												<circle cx="4.8" cy="9" r="2.4" />
+												<circle cx="19.2" cy="9" r="2.4" />
+												<path d="M12 12c-3.3 0-6 1.8-6 4v2h12v-2c0-2.2-2.7-4-6-4z" />
+												<path d="M4.8 12.5C2.7 12.6 1 13.8 1 15.3V17h3.5v-1.3c0-1.3.5-2.4 1.4-3.2-.3 0-.7 0-1.1 0z" />
+												<path d="M19.2 12.5c2.1.1 3.8 1.3 3.8 2.8V17h-3.5v-1.3c0-1.3-.5-2.4-1.4-3.2.3 0 .7 0 1.1 0z" />
+											</svg>
+										</a>
+									</li>
 									<li class="dropdown user-dropdown">
 										<a href="javascript:void(0);" class="dropdown-toggle" data-bs-toggle="dropdown">
 											<div class="user-toggle">

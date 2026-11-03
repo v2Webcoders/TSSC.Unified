@@ -17,85 +17,65 @@
     <div class="row">
 
         <main class="col-md-12 col-lg-12 p-4">
+            @{
+                var firstName = (Model.EmployeeName ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "";
 
-            <div class="d-flex flex-wrap justify-content-between align-items-start gap-4 mb-5">
+                var hasIn = Model.TodayInTime.HasValue;
+                var hasOut = Model.TodayOutTime.HasValue;
 
-                <div>
+                var state = hasOut ? "done" : hasIn ? "in" : "none";
+                var stateText = hasOut ? "Checked out" : hasIn ? "Present" : "Not marked";
 
-                    <h1 class="fs-4 text-primary fw-bold mb-1">
-                        Welcome, @Model.EmployeeName 👋
-                    </h1>
+                string workedText = "--";
+                if (hasIn)
+                {
+                    var end = hasOut ? Model.TodayOutTime.Value : DateTime.Now;
+                    var worked = end - Model.TodayInTime.Value;
+                    if (worked < TimeSpan.Zero) worked = TimeSpan.Zero;
+                    workedText = $"{(int)worked.TotalHours}h {worked.Minutes:00}m";
+                }
+            }
 
-                    <div class="mt-0 mb-4">
+            <div class="dash-row mb-4">
 
-                        <div class="d-flex flex-wrap align-items-center gap-2 text-muted small">
-
-                            <!-- Date -->
-                            <span class="d-flex align-items-center">
-
-                                <em class="icon ni ni-calendar-alt me-1"></em>
-
-                                @DateTime.Today.ToString("dddd, dd MMMM yyyy")
-
-                            </span>
-
-                            <span class="text-light">•</span>
-
-
-                            <!-- Status -->
-                            @if (Model.TodayInTime.HasValue)
-                            {
-                                <span class="d-flex align-items-center text-success">
-
-                                    <em class="icon ni ni-check-circle me-1"></em>
-
-                                    Present
-
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="d-flex align-items-center text-warning">
-
-                                    <em class="icon ni ni-clock me-1"></em>
-
-                                    Not marked
-
-                                </span>
-                            }
-
-
-                            <span class="text-light">•</span>
-
-
-                            <!-- In -->
-                            <span>
-                                In:
-                                @(Model.TodayInTime.HasValue
-                                    ? Model.TodayInTime.Value.ToString("hh:mm tt")
-                                    : "--")
-                            </span>
-
-
-                            <span class="text-light">•</span>
-
-
-                            <!-- Out -->
-                            <span>
-                                Out:
-                                @(Model.TodayOutTime.HasValue
-                                    ? Model.TodayOutTime.Value.ToString("hh:mm tt")
-                                    : "--")
-                            </span>
-
-                        </div>
-
+                <!-- Identity -->
+                <div class="dash-id">
+                    <div class="d-flex align-items-center gap-2">
+                        <h1 class="dash-name mb-0">Welcome, @firstName 👋</h1>
+                        <span class="att-pill att-@state">
+                            <span class="att-dot"></span>@stateText
+                        </span>
                     </div>
-
+                    <div class="dash-date">@DateTime.Today.ToString("ddd, dd MMM yyyy")</div>
                 </div>
 
-            </div>
+                <!-- Punch tiles -->
+                <div class="punch-strip">
+                    <div class="punch-item">
+                        <span class="punch-label">In</span>
+                        <span class="punch-value">@(hasIn ? Model.TodayInTime.Value.ToString("hh:mm tt") : "--")</span>
+                    </div>
+                    <div class="punch-item">
+                        <span class="punch-label">Out</span>
+                        <span class="punch-value">@(hasOut ? Model.TodayOutTime.Value.ToString("hh:mm tt") : "--")</span>
+                    </div>
+                    
+                </div>
 
+                <!-- Actions -->
+                <div class="dash-actions">
+                    <button type="button"
+                            class="btn btn-icon btn-outline-light dash-icon-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#calendarModal"
+                            title="Calendar">
+                        <em class="icon ni ni-calendar-alt"></em>
+                    </button>
+
+                    
+                </div>
+            </div>
+            
             @if (Model.Birthdays != null && Model.Birthdays.Any())
             {
                 <div class="card border-0 shadow-sm mb-4">
@@ -493,4 +473,37 @@
 
     </div>
 </div>
+<!-- CALENDAR MODAL -->
+<div class="modal fade"
+     id="calendarModal"
+     tabindex="-1"
+     aria-labelledby="calendarModalLabel"
+     aria-hidden="true">
 
+    <div class="modal-dialog  modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="calendarModalLabel">
+                    <em class="icon ni ni-calendar-alt me-1"></em>
+                    Calendar
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+
+            <div class="modal-body p-0">
+
+                @Html.Partial("_DashboardCalendar")
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

@@ -58,15 +58,15 @@ namespace QUIZAPP.Services
 
             mailMessage.To.Add(toEmail);
             mailMessage.Bcc.Add("subodh@v2web.in");
-
-            try
-            {
-                await smtpClient.SendMailAsync(mailMessage);
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
+            await smtpClient.SendMailAsync(mailMessage);
+            //try
+            //{
+            //    await smtpClient.SendMailAsync(mailMessage);
+            //}
+            //catch (Exception ex)
+            //{
+            //    return ex.Message;
+            //}
             return "True";
         }
     }

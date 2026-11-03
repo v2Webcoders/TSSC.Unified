@@ -19,7 +19,7 @@
         public List<RecentLeaveRequestVM> RecentLeaveRequests { get; set; } = new();
 
         // Employee Dashboard
-        public int PresentDaysThisMonth { get; set; }
+        public decimal PresentDaysThisMonth { get; set; }
         public int WorkingDaysThisMonth { get; set; }
         public int PendingRequests { get; set; }
         public int LeaveBalance { get; set; }

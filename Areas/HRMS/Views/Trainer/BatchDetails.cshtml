@@ -1,0 +1,191 @@
+﻿@model TSSC.Unified.Models.BatchMaster
+
+@{
+    Layout = "_Layout";
+
+    var trainers = ViewBag.BatchTrainers
+        as List<TSSC.Unified.Models.TrainerRegistration>
+        ?? new List<TSSC.Unified.Models.TrainerRegistration>();
+
+    var partnerName = ViewBag.TrainingPartnerName as string ?? "-";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Batch Details
+            </h3>
+
+            <div class="nk-block-des text-soft">
+                <p>View batch information and assigned trainers.</p>
+            </div>
+        </div>
+
+        <div class="nk-block-head-content">
+            <a href="/HRMS/Trainer/BatchList"
+               class="btn btn-outline-primary">
+                <em class="icon ni ni-arrow-left"></em>
+                Back to Batch List
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Batch Information -->
+<div class="card card-bordered mb-3">
+    <div class="card-inner">
+        <h5 class="title mb-3">Batch Information</h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <label class="form-label">Batch Code</label>
+                <div class="form-control-wrap">
+                    <input class="form-control"
+                           value="@Model.BatchCode"
+                           readonly />
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Batch Name</label>
+                <input class="form-control"
+                       value="@Model.BatchName"
+                       readonly />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Job Role</label>
+                <input class="form-control"
+                       value="@(Model.JobRole?.JobRoleTitle ?? "-")"
+                       readonly />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Training Partner</label>
+                <input class="form-control"
+                       value="@partnerName"
+                       readonly />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Start Date</label>
+                <input class="form-control"
+                       value="@Model.StartDate"
+                       readonly />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">End Date</label>
+                <input class="form-control"
+                       value="@Model.EndDate"
+                       readonly />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Batch Status</label>
+                <input class="form-control"
+                       value="@Model.Status"
+                       readonly />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Assessment Agency ID</label>
+                <input class="form-control"
+                       value="@(Model.AssessmentAgencyId?.ToString() ?? "-")"
+                       readonly />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Agency Approval Status</label>
+                <input class="form-control"
+                       value="@(Model.AgencyApprovalStatus ?? "Pending")"
+                       readonly />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Sent to Agency</label>
+                <input class="form-control"
+                       value="@(Model.AgencySent ? "Yes" : "No")"
+                       readonly />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Email Sent</label>
+                <input class="form-control"
+                       value="@(Model.EmailSent ? "Yes" : "No")"
+                       readonly />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Created On</label>
+                <input class="form-control"
+                       value="@Model.CreatedDate"
+                       readonly />
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Assigned Trainers -->
+<div class="card card-bordered">
+    <div class="card-inner">
+        <div class="card-title-group mb-3">
+            <div class="card-title">
+                <h5 class="title">Assigned Trainers</h5>
+            </div>
+
+            <div class="card-tools">
+                <span class="badge bg-primary">
+                    Total: @trainers.Count
+                </span>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-primary text-dark">
+                    <tr>
+                        <th>S.No.</th>
+                        <th>Registration No.</th>
+                        <th>Trainer Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (trainers.Any())
+                    {
+                        var serial = 1;
+
+                        foreach (var trainer in trainers)
+                        {
+                            <tr>
+                                <td>@serial</td>
+                                <td>@trainer.RegistrationNo</td>
+                                <td>
+                                    <strong>@trainer.CandidateName</strong>
+                                </td>
+                                <td>@trainer.Email</td>
+                                <td>@trainer.Mobile</td>
+                            </tr>
+
+                            serial++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                No trainers assigned to this batch.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

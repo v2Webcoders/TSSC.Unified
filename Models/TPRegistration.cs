@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TSSC.Unified.Models
 {
+
     [Table("TPRegistrations")]
     public class TPRegistration
     {
@@ -22,6 +23,8 @@ namespace TSSC.Unified.Models
 
         [Required, StringLength(10)]
         public string PANNumber { get; set; } = string.Empty;
+
+        public bool IsGSTAvailable { get; set; }
 
         [StringLength(15)]
         public string? GSTNumber { get; set; }
@@ -58,8 +61,33 @@ namespace TSSC.Unified.Models
         [StringLength(150)]
         public string? AlternateContactPerson { get; set; }
 
-        [Required]
-        public string AnnualTurnoverLast3Years { get; set; } = string.Empty;
+        //[Required]
+        //public string AnnualTurnoverLast3Years { get; set; } = string.Empty;
+        // =====================================================
+        // ANNUAL TURNOVER - LAST 3 FINANCIAL YEARS
+        // =====================================================
+
+        // =====================================================
+        // ANNUAL TURNOVER - LAST 3 FINANCIAL YEARS
+        // =====================================================
+
+        [StringLength(7)]
+        public string? AnnualTurnoverFY1 { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? AnnualTurnoverYear1 { get; set; }
+
+        [StringLength(7)]
+        public string? AnnualTurnoverFY2 { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? AnnualTurnoverYear2 { get; set; }
+
+        [StringLength(7)]
+        public string? AnnualTurnoverFY3 { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? AnnualTurnoverYear3 { get; set; }
 
         [Required, StringLength(50)]
         public string BankAccountNumber { get; set; } = string.Empty;
@@ -87,17 +115,22 @@ namespace TSSC.Unified.Models
         [Required, StringLength(30)]
         public string Status { get; set; } = "Submitted";
 
-        // TSSC internal fields
+        // =====================================================
+        // TSSC INTERNAL FIELDS
+        // =====================================================
+
         [StringLength(150)]
         public string? SpocName { get; set; }
 
         public string? ReviewerRemarks { get; set; }
 
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
+
         public DateTime? UpdatedOn { get; set; }
 
         [StringLength(450)]
         public string? ApplicationUserId { get; set; }
+
 
         // =====================================================
         // APPROVAL WORKFLOW - REGIONAL HEAD
@@ -113,19 +146,21 @@ namespace TSSC.Unified.Models
 
         public DateTime? Regional_Head_Date { get; set; }
 
+
         // =====================================================
-        // APPROVAL WORKFLOW - VERTICAL HEAD
+        // APPROVAL WORKFLOW - AFFILIATIONS
         // =====================================================
 
         [StringLength(50)]
-        public string? Vertical_Head_Status { get; set; } = "Pending";
+        public string? Affiliations_Status { get; set; } = "Pending";
 
-        public string? Vertical_Head_Remarks { get; set; }
+        public string? Affiliations_Remarks { get; set; }
 
-        [StringLength(255)]
-        public string? Vertical_Head_ApprovedBy { get; set; }
+        [StringLength(450)]
+        public string? Affiliations_ApprovedBy { get; set; }
 
-        public DateTime? Vertical_Head_Date { get; set; }
+        public DateTime? Affiliations_Date { get; set; }
+
 
         // =====================================================
         // APPROVAL WORKFLOW - FINANCE
@@ -141,6 +176,52 @@ namespace TSSC.Unified.Models
 
         public DateTime? Finance_Date { get; set; }
 
+
+        // =====================================================
+        // APPROVAL WORKFLOW - VERTICAL HEAD
+        // =====================================================
+
+        [StringLength(50)]
+        public string? Vertical_Head_Status { get; set; } = "Pending";
+
+        public string? Vertical_Head_Remarks { get; set; }
+
+        [StringLength(255)]
+        public string? Vertical_Head_ApprovedBy { get; set; }
+
+        public DateTime? Vertical_Head_Date { get; set; }
+
+
+        // =====================================================
+        // APPROVAL WORKFLOW - SENIOR REVIEWER 1
+        // =====================================================
+
+        [StringLength(50)]
+        public string? SeniorReviewer1_Status { get; set; } = "Pending";
+
+        public string? SeniorReviewer1_Remarks { get; set; }
+
+        [StringLength(450)]
+        public string? SeniorReviewer1_ApprovedBy { get; set; }
+
+        public DateTime? SeniorReviewer1_Date { get; set; }
+
+
+        // =====================================================
+        // APPROVAL WORKFLOW - SENIOR REVIEWER 2
+        // =====================================================
+
+        [StringLength(50)]
+        public string? SeniorReviewer2_Status { get; set; } = "Pending";
+
+        public string? SeniorReviewer2_Remarks { get; set; }
+
+        [StringLength(450)]
+        public string? SeniorReviewer2_ApprovedBy { get; set; }
+
+        public DateTime? SeniorReviewer2_Date { get; set; }
+
+
         // =====================================================
         // APPROVAL WORKFLOW - CEO
         // =====================================================
@@ -155,6 +236,60 @@ namespace TSSC.Unified.Models
 
         public DateTime? CEO_Date { get; set; }
 
+
+        // =====================================================
+        // APPROVAL WORKFLOW - PAYMENT PROCESS
+        // =====================================================
+
+        [StringLength(50)]
+        public string? PaymentProcess_Status { get; set; } = "Pending";
+
+        public string? PaymentProcess_Remarks { get; set; }
+
+        [StringLength(450)]
+        public string? PaymentProcess_ApprovedBy { get; set; }
+
+        public DateTime? PaymentProcess_Date { get; set; }
+
+
+        // =====================================================
+        // APPROVAL WORKFLOW - FINANCE AFTER PAYMENT
+        // =====================================================
+
+        [StringLength(50)]
+        public string? FinanceCertificate_Status { get; set; } = "Pending";
+
+        public string? FinanceCertificate_Remarks { get; set; }
+
+        [StringLength(450)]
+        public string? FinanceCertificate_ApprovedBy { get; set; }
+
+        public DateTime? FinanceCertificate_Date { get; set; }
+
+
+        // =====================================================
+        // APPROVAL WORKFLOW - CERTIFICATE ISSUANCE
+        // =====================================================
+
+        [StringLength(50)]
+        public string? CertificateIssuance_Status { get; set; } = "Pending";
+
+        public string? CertificateIssuance_Remarks { get; set; }
+
+        [StringLength(450)]
+        public string? CertificateIssuance_ApprovedBy { get; set; }
+
+        public DateTime? CertificateIssuance_Date { get; set; }
+
+
+        // =====================================================
+        // CURRENT WORKFLOW STAGE
+        // =====================================================
+
+        [StringLength(50)]
+        public string? CurrentStage { get; set; } = "REGIONAL";
+
+
         // =====================================================
         // OVERALL APPROVAL STATUS
         // =====================================================
@@ -162,9 +297,26 @@ namespace TSSC.Unified.Models
         [StringLength(50)]
         public string? OverallApprovalStatus { get; set; } = "In_Progress";
 
+        public DateTime? OverallApprovalStatusUpdatedOn { get; set; }
+
+        public string? PaymentTransactionId { get; set; }
+
+        public string? PaymentProofFileName { get; set; }
+
+        public string? PaymentProofStatus { get; set; }
+
+        public DateTime? PaymentProofSubmittedOn { get; set; }
+
+        public string? MembershipType { get; set; }
+
+        // =====================================================
+        // DOCUMENTS
+        // =====================================================
+
         public ICollection<TPRegistrationDocument> Documents { get; set; }
             = new List<TPRegistrationDocument>();
     }
+
     [Table("TPRegistrationDocuments")]
     public class TPRegistrationDocument
     {

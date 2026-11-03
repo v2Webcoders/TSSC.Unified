@@ -1,0 +1,282 @@
+﻿@model TSSC.Unified.ViewModel.BatchMonitoringReportVM
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_layout";
+    ViewData["Title"] = "Monitoring Checklist";
+}
+
+<div class="nk-content">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">
+                                Monitoring Checklist
+                            </h3>
+
+                            <div class="nk-block-des text-soft">
+                                <p>
+                                    Batch: <strong>@Model.BatchNumber</strong>
+                                    <span class="mx-2">|</span>
+                                    Screening:
+                                    @(Model.MonitoringDateTime?.ToString("dd-MMM-yyyy hh:mm tt")
+                                        ?? "Not available")
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <form asp-area="HRMS"
+                      asp-controller="TrainingMonitoring"
+                      asp-action="SubmitReport"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" asp-for="BatchMonitoringId" />
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger mb-3"></div>
+
+                    <div class="card">
+                        <div class="card-inner">
+                            <div class="row g-4">
+
+                                @* Infrastructure Verification *@
+                                <div class="col-lg-5">
+                                    <h6 class="title border border-warning p-2 mb-3">
+                                        Infrastructure Verification
+                                    </h6>
+
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input asp-for="LabAvailable"
+                                               class="custom-control-input" />
+                                        <label asp-for="LabAvailable"
+                                               class="custom-control-label">
+                                            Lab Available
+                                        </label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input asp-for="InternetAvailable"
+                                               class="custom-control-input" />
+                                        <label asp-for="InternetAvailable"
+                                               class="custom-control-label">
+                                            Internet Available
+                                        </label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input asp-for="EquipmentAvailable"
+                                               class="custom-control-input" />
+                                        <label asp-for="EquipmentAvailable"
+                                               class="custom-control-label">
+                                            Equipment Available
+                                        </label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input asp-for="ClassroomAvailable"
+                                               class="custom-control-input" />
+                                        <label asp-for="ClassroomAvailable"
+                                               class="custom-control-label">
+                                            Classroom Available
+                                        </label>
+                                    </div>
+                                </div>
+
+                                @* Evidence Uploads *@
+                                <div class="col-lg-7">
+                                    <div class="form-group mb-4">
+                                        <label asp-for="MonitoringPhotos"
+                                               class="form-label">
+                                            Upload Monitoring Photos
+                                        </label>
+
+                                        <input asp-for="MonitoringPhotos"
+                                               type="file"
+                                               class="form-control"
+                                               accept=".jpg,.jpeg,.png" />
+
+                                        <span asp-validation-for="MonitoringPhotos"
+                                              class="text-danger"></span>
+
+                                        <small class="text-muted">
+                                            JPG, JPEG or PNG; maximum 5 MB.
+                                        </small>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label asp-for="SupportingDocument"
+                                               class="form-label">
+                                            Upload Supporting Document
+                                        </label>
+
+                                        <input asp-for="SupportingDocument"
+                                               type="file"
+                                               class="form-control"
+                                               accept=".pdf" />
+
+                                        <span asp-validation-for="SupportingDocument"
+                                              class="text-danger"></span>
+
+                                        <small class="text-muted">
+                                            PDF only; maximum 5 MB.
+                                        </small>
+                                    </div>
+                                </div>
+
+                                @* Attendance Verification *@
+                                <div class="col-lg-5">
+                                    <h6 class="title border border-warning p-2 mb-3">
+                                        Attendance Verification
+                                    </h6>
+
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input asp-for="CandidateAttendanceVerified"
+                                               class="custom-control-input" />
+                                        <label asp-for="CandidateAttendanceVerified"
+                                               class="custom-control-label">
+                                            Candidate Attendance Verified
+                                        </label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input asp-for="AttendanceUploadedInSystem"
+                                               class="custom-control-input" />
+                                        <label asp-for="AttendanceUploadedInSystem"
+                                               class="custom-control-label">
+                                            Attendance Uploaded in System
+                                        </label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input asp-for="BiometricVerified"
+                                               class="custom-control-input" />
+                                        <label asp-for="BiometricVerified"
+                                               class="custom-control-label">
+                                            Biometric Verified
+                                        </label>
+                                    </div>
+                                </div>
+
+                                @* Remarks *@
+                                <div class="col-lg-7">
+                                    <div class="form-group">
+                                        <label asp-for="Remarks"
+                                               class="form-label">
+                                            Remarks
+                                        </label>
+
+                                        <textarea asp-for="Remarks"
+                                                  class="form-control"
+                                                  rows="4"
+                                                  maxlength="2000"
+                                                  placeholder="Enter monitoring observations or issues..."></textarea>
+
+                                        <span asp-validation-for="Remarks"
+                                              class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                @* Trainer Verification *@
+                                <div class="col-lg-5">
+                                    <h6 class="title border border-warning p-2 mb-3">
+                                        Trainer Verification
+                                    </h6>
+
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input asp-for="TrainerPresent"
+                                               class="custom-control-input" />
+                                        <label asp-for="TrainerPresent"
+                                               class="custom-control-label">
+                                            Trainer Present
+                                        </label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input asp-for="SessionConductedProperly"
+                                               class="custom-control-input" />
+                                        <label asp-for="SessionConductedProperly"
+                                               class="custom-control-label">
+                                            Session Conducted Properly
+                                        </label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input asp-for="TrainingMaterialAvailable"
+                                               class="custom-control-input" />
+                                        <label asp-for="TrainingMaterialAvailable"
+                                               class="custom-control-label">
+                                            Training Material Available
+                                        </label>
+                                    </div>
+                                </div>
+
+                                @* Training Quality Verification *@
+                                <div class="col-lg-7">
+                                    <h6 class="title border border-warning p-2 mb-3">
+                                        Training Quality Verification
+                                    </h6>
+
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input asp-for="PracticalSessionConducted"
+                                               class="custom-control-input" />
+                                        <label asp-for="PracticalSessionConducted"
+                                               class="custom-control-label">
+                                            Practical Session Conducted
+                                        </label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input asp-for="LMSUsageVerified"
+                                               class="custom-control-input" />
+                                        <label asp-for="LMSUsageVerified"
+                                               class="custom-control-label">
+                                            LMS Usage Verified
+                                        </label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input asp-for="CandidateFeedbackCollected"
+                                               class="custom-control-input" />
+                                        <label asp-for="CandidateFeedbackCollected"
+                                               class="custom-control-label">
+                                            Candidate Feedback Collected
+                                        </label>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-12 mt-4">
+                                <a asp-area="HRMS"
+                                   asp-controller="TrainingMonitoring"
+                                   asp-action="BatchList"
+                                   class="btn btn-outline-light">
+                                    Cancel
+                                </a>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <em class="icon ni ni-check-circle"></em>
+                                    Submit Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
