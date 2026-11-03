@@ -275,6 +275,44 @@ namespace QUIZAPP.Controllers
 
             return View(model);
         }
+
+        [HttpGet]
+        [AllowAnonymous]   // remove once you've finished checking, or restrict it to admins
+        public IActionResult CheckTime()
+        {
+            TimeZoneInfo ist;
+            try { ist = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"); }          // Windows
+            catch (TimeZoneNotFoundException) { ist = TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata"); } // Linux
+
+            var utcNow = DateTime.UtcNow;
+            var istNow = TimeZoneInfo.ConvertTime(utcNow, ist);
+            var serverNow = DateTime.Now;
+
+            // Same slots as the scheduler
+            var slots = new[]
+            {
+        istNow.Date.AddHours(10),
+        istNow.Date.AddHours(12).AddMinutes(30),
+        istNow.Date.AddHours(20),
+        istNow.Date.AddHours(23)
+    };
+
+            var next = slots.OrderBy(x => x).FirstOrDefault(x => x > istNow);
+            if (next == default) next = istNow.Date.AddDays(1).AddHours(10);
+
+            return Json(new
+            {
+                serverLocalTime = serverNow.ToString("dd MMM yyyy hh:mm:ss tt"),
+                serverTimeZone = TimeZoneInfo.Local.Id,
+                utcTime = utcNow.ToString("dd MMM yyyy hh:mm:ss tt"),
+                istTime = istNow.ToString("dd MMM yyyy hh:mm:ss tt"),
+                istTimeZoneId = ist.Id,
+                istToday = istNow.ToString("yyyy-MM-dd"),
+                serverToday = serverNow.ToString("yyyy-MM-dd"),
+                nextScheduledRun = next.ToString("dd MMM yyyy hh:mm tt") + " IST",
+                minutesUntilNext = (int)(next - istNow).TotalMinutes
+            });
+        }
     }
 
 }
