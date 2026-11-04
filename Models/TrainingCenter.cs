@@ -98,5 +98,10 @@ namespace TSSC.Unified.Models
         public string? BusinessHeadStatus { get; set; }
         public string? BusinessHeadRemarks { get; set; }
         public DateTime? BusinessHeadApproveDate { get; set; }
+        public int? CEOEmployeeId { get; set; }
+        public string? CEOStatus { get; set; }
+        public string? CEORemarks { get; set; }
+        public DateTime? CEODateApproveDate { get; set; }
+        public bool EmailSent { get; set; } = false;
     }
 }

@@ -107,6 +107,12 @@ namespace TSSC.Unified.ViewModel
         public string? BusinessHeadStatus { get; set; }
         public string? BusinessHeadRemarks { get; set; }
         public DateTime? BusinessHeadApproveDate { get; set; }
+        public int? CEOEmployeeId { get; set; }
+        public string? CEOStatus { get; set; }
+        public string? CEORemarks { get; set; }
+        public DateTime? CEODateApproveDate { get; set; }
+        public bool EmailSent { get; set; } = false;
+
         public List<SelectListItem> JobRoles { get; set; } = new();
         public decimal? QPHours { get; set; }
         public int? SchemeId { get; set; }

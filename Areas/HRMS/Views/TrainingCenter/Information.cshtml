@@ -671,7 +671,7 @@
                         @if (string.Equals(
                                                 Model.InspectionStatus,
                                                 "Scheduled",
-                                                StringComparison.OrdinalIgnoreCase))
+                                                StringComparison.OrdinalIgnoreCase) && Model.RegionalHeadEmployeeId ==null)
                             {
                                 <form asp-area="HRMS"
                                       asp-controller="TrainingCenter"
@@ -727,6 +727,7 @@
                             <a asp-area="HRMS"
                                asp-controller="TrainingCenter"
                                asp-action="InspectionList"
+                               asp-route-tab="@ViewBag.ActiveTab"
                                class="btn btn-light">
                                 <em class="icon ni ni-arrow-left"></em>
                                 Back to List

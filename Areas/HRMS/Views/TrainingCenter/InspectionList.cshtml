@@ -7,7 +7,74 @@
     ViewData["Title"] = "Training Center Inspection List";
     int serial = 1;
 }
+<style>
+    .approval-progress {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        min-width: 190px;
+        padding: 0 5px;
+    }
 
+    /* Line passes exactly through the center of circles */
+    .approval-line {
+        position: absolute;
+        top: 14px;
+        left: 18px;
+        right: 18px;
+        height: 2px;
+        background: #d9dee7;
+        z-index: 0;
+    }
+
+    .approval-step {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: transparent;
+    }
+
+    .approval-circle {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        background: #fff;
+        border: 2px solid #d9dee7;
+    }
+
+        .approval-circle.approved {
+            background: #e7f7ee;
+            border-color: #28a745;
+            color: #28a745;
+        }
+
+        .approval-circle.rejected {
+            background: #fdeaea;
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .approval-circle.pending {
+            background: #fff8e1;
+            border-color: #f0ad00;
+            color: #f0ad00;
+        }
+
+    .approval-step small {
+        margin-top: 5px;
+        font-size: 10px;
+        font-weight: 600;
+        color: #8091a5;
+    }
+</style>
 <div class="nk-block-head nk-block-head-sm">
     <div class="nk-block-between">
         <div class="nk-block-head-content">
@@ -54,6 +121,7 @@
                 <thead>
                     <tr>
                         <th>S.No.</th>
+                        <th>Progress</th>
                         <th>Training Center Name</th>
                         <th>Center Code</th>
                         <th>Scheme</th>
@@ -73,7 +141,67 @@
                         {
                             <tr>
                                 <td>@serial</td>
+                            <td>
+                                <div class="approval-progress">
+                                    <div class="approval-line"></div>
 
+                                    <!-- 1. Finance -->
+                                    <div class="approval-step">
+                                        <div class="approval-circle @(item.FinanceStatus == "Approved" ? "approved" : item.FinanceStatus == "Rejected" ? "rejected" : item.FinanceStatus == "On Hold" ? "onhold" : "pending")"
+                                             data-bs-toggle="tooltip"
+                                             data-bs-placement="top"
+                                             title="Finance - @(item.FinanceStatus == "Approved" ? "Approved" : item.FinanceStatus == "Rejected" ? "Rejected" : item.FinanceStatus == "On Hold" ? "On Hold" : "Pending")">
+                                            @(item.FinanceStatus == "Approved" ? "✓" : item.FinanceStatus == "Rejected" ? "✕" : item.FinanceStatus == "On Hold" ? "!" : "•")
+                                        </div>
+                                        <small>Finance</small>
+                                    </div>
+
+                                    <!-- 2. Regional Head -->
+                                    <div class="approval-step">
+                                        <div class="approval-circle @(item.RegionalHeadStatus == "Approved" ? "approved" : item.RegionalHeadStatus == "Rejected" ? "rejected" : item.RegionalHeadStatus == "On Hold" ? "onhold" : "pending")"
+                                             data-bs-toggle="tooltip"
+                                             data-bs-placement="top"
+                                             title="Regional Head - @(item.RegionalHeadStatus == "Approved" ? "Approved" : item.RegionalHeadStatus == "Rejected" ? "Rejected" : item.RegionalHeadStatus == "On Hold" ? "On Hold" : "Pending")">
+                                            @(item.RegionalHeadStatus == "Approved" ? "✓" : item.RegionalHeadStatus == "Rejected" ? "✕" : item.RegionalHeadStatus == "On Hold" ? "!" : "•")
+                                        </div>
+                                        <small>RH</small>
+                                    </div>
+
+                                    <!-- 3. Vertical Head -->
+                                    <div class="approval-step">
+                                        <div class="approval-circle @(item.VerticalHeadStatus == "Approved" ? "approved" : item.VerticalHeadStatus == "Rejected" ? "rejected" : item.VerticalHeadStatus == "On Hold" ? "onhold" : "pending")"
+                                             data-bs-toggle="tooltip"
+                                             data-bs-placement="top"
+                                             title="Vertical Head - @(item.VerticalHeadStatus == "Approved" ? "Approved" : item.VerticalHeadStatus == "Rejected" ? "Rejected" : item.VerticalHeadStatus == "On Hold" ? "On Hold" : "Pending")">
+                                            @(item.VerticalHeadStatus == "Approved" ? "✓" : item.VerticalHeadStatus == "Rejected" ? "✕" : item.VerticalHeadStatus == "On Hold" ? "!" : "•")
+                                        </div>
+                                        <small>VH</small>
+                                    </div>
+
+                                    <!-- 4. Business Head -->
+                                    <div class="approval-step">
+                                        <div class="approval-circle @(item.BusinessHeadStatus == "Approved" ? "approved" : item.BusinessHeadStatus == "Rejected" ? "rejected" : item.BusinessHeadStatus == "On Hold" ? "onhold" : "pending")"
+                                             data-bs-toggle="tooltip"
+                                             data-bs-placement="top"
+                                             title="Business Head - @(item.BusinessHeadStatus == "Approved" ? "Approved" : item.BusinessHeadStatus == "Rejected" ? "Rejected" : item.BusinessHeadStatus == "On Hold" ? "On Hold" : "Pending")">
+                                            @(item.BusinessHeadStatus == "Approved" ? "✓" : item.BusinessHeadStatus == "Rejected" ? "✕" : item.BusinessHeadStatus == "On Hold" ? "!" : "•")
+                                        </div>
+                                        <small>BH</small>
+                                    </div>
+
+                                    <!-- 5. CEO -->
+                                    <div class="approval-step">
+                                        <div class="approval-circle @(item.CEOStatus == "Approved" ? "approved" : item.CEOStatus == "Rejected" ? "rejected" : item.CEOStatus == "On Hold" ? "onhold" : "pending")"
+                                             data-bs-toggle="tooltip"
+                                             data-bs-placement="top"
+                                             title="CEO - @(item.CEOStatus == "Approved" ? "Approved" : item.CEOStatus == "Rejected" ? "Rejected" : item.CEOStatus == "On Hold" ? "On Hold" : "Pending")">
+                                            @(item.CEOStatus == "Approved" ? "✓" : item.CEOStatus == "Rejected" ? "✕" : item.CEOStatus == "On Hold" ? "!" : "•")
+                                        </div>
+                                        <small>CEO</small>
+                                    </div>
+
+                                </div>
+                            </td>
                                 <td>
                                     <strong>@item.TrainingCenterName</strong>
                                 </td>
@@ -154,6 +282,7 @@
                                        asp-controller="TrainingCenter"
                                        asp-action="Information"
                                        asp-route-id="@item.Id"
+                                   asp-route-tab="@ViewBag.ActiveTab"
                                        class="btn btn-sm btn-outline-primary"
                                        title="View Training Center Information">
 
@@ -165,14 +294,14 @@
                             serial++;
                         }
                     }
-                    else
+                    @* else
                     {
                         <tr>
                             <td colspan="10" class="text-center text-muted py-4">
                                 No Training Centers found.
                             </td>
                         </tr>
-                    }
+                    } *@
                 </tbody>
 
             </table>
