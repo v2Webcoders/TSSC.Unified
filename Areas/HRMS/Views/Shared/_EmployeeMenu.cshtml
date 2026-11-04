@@ -173,6 +173,33 @@
 		employee.EmployeeId, isHR, isReportingManager,
 		isFinanceEmployee, isFinanceHead, isCEO, employee.ApplicationUserId))
 	: MenuCounts.Empty;
+
+	//for add job role and tc approval module
+
+	bool isvalidationEployee = currentUser != null
+	&& employee != null
+	&& employee.EmployeeId == 70;
+
+
+	//for add job role and tc approval module
+	var isRegionalHeadReportingManager = false;
+
+	if (employee != null)
+	{
+		var regionalHeadReportingManagerIds = Context.TrainingCenter
+			.Where(tc => tc.RegionalHeadEmployeeId != null)
+			.Join(
+				Context.Employee,
+				tc => tc.RegionalHeadEmployeeId,
+				e => e.EmployeeId,
+				(tc, e) => e.ReportingManagerId
+			)
+			.Distinct()
+			.ToList();
+
+		isRegionalHeadReportingManager =
+			regionalHeadReportingManagerIds.Contains(employee.EmployeeId);
+	}
 }
 
 <style>
@@ -979,10 +1006,12 @@
 			</ul>
 
 		</li>
+		
+		@* 	for job role and tc approval module *@
 		<li class="nk-menu-heading">
 			<div class="nk-menu-heading-content">
 				<span class="nk-menu-heading-text">
-					<em class="icon ni ni-user-check"></em>
+					@* <em class="icon ni ni-building"></em> *@
 					Training Center
 				</span>
 			</div>
@@ -993,7 +1022,7 @@
 			   class="nk-menu-link nk-menu-toggle">
 
 				<span class="nk-menu-icon">
-					<em class="icon ni ni-user-check"></em>
+					<em class="icon ni ni-building"></em>
 				</span>
 
 				<span class="nk-menu-text">
@@ -1037,12 +1066,14 @@
 					</a>
 				</li>
 
-			</ul> 
+			</ul>
 
 		</li>
+
+
 	}
 
-	@if (isReportingManager)
+	@if (isReportingManager && !isHR && !isCEO)
 	{
 		<li class="nk-menu-heading">
 			<div class="nk-menu-heading-content">
@@ -1107,12 +1138,12 @@
 
 
 
-	@if (User.IsInRole("RegionalHead"))
+	@if (isvalidationEployee)
 	{
 		<li class="nk-menu-heading">
 			<div class="nk-menu-heading-content">
 				<span class="nk-menu-heading-text">
-					<em class="icon ni ni-user-check"></em>
+					@* <em class="icon ni ni-building"></em> *@
 					Training Center
 				</span>
 			</div>
@@ -1121,7 +1152,59 @@
 		<li class="nk-menu-item has-sub">
 			<a href="#" class="nk-menu-link nk-menu-toggle">
 				<span class="nk-menu-icon">
-					<em class="icon ni ni-user-check"></em>
+					<em class="icon ni ni-building"></em>
+				</span>
+				<span class="nk-menu-text">Manage Training Center</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/InspectionList?tab=Pending"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Pending" ? "active" : "")">
+						<span class="nk-menu-text">Pending Inspection</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/InspectionList?tab=OnHold"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "OnHold" ? "active" : "")">
+						<span class="nk-menu-text">On Hold</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/InspectionList?tab=Rejected"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Rejected" ? "active" : "")">
+						<span class="nk-menu-text">Rejected</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/InspectionList?tab=SentToRegionalHead"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "SentToRegionalHead" ? "active" : "")">
+						<span class="nk-menu-text">Sent to Regional Head</span>
+					</a>
+				</li>
+
+			</ul>
+		</li>
+	}
+
+	@if (User.IsInRole("RegionalHead"))
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					@* <em class="icon ni ni-building"></em> *@
+					Training Center
+				</span>
+			</div>
+		</li>
+
+		<li class="nk-menu-item has-sub">
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-building"></em>
 				</span>
 				<span class="nk-menu-text">Manage Training Center</span>
 			</a>
@@ -1160,12 +1243,12 @@
 		</li>
 	}
 
-	@if (isReportingManager)
+	@if (isReportingManager && isRegionalHeadReportingManager)
 	{
 		<li class="nk-menu-heading">
 			<div class="nk-menu-heading-content">
 				<span class="nk-menu-heading-text">
-					<em class="icon ni ni-user-check"></em>
+					@* <em class="icon ni ni-building"></em> *@
 					Training Center
 				</span>
 			</div>
@@ -1174,7 +1257,7 @@
 		<li class="nk-menu-item has-sub">
 			<a href="#" class="nk-menu-link nk-menu-toggle">
 				<span class="nk-menu-icon">
-					<em class="icon ni ni-user-check"></em>
+					<em class="icon ni ni-building"></em>
 				</span>
 				<span class="nk-menu-text">Manage Training Center</span>
 			</a>
@@ -1218,7 +1301,7 @@
 		<li class="nk-menu-heading">
 			<div class="nk-menu-heading-content">
 				<span class="nk-menu-heading-text">
-					<em class="icon ni ni-user-check"></em>
+					@* <em class="icon ni ni-building"></em> *@
 					Training Center
 				</span>
 			</div>
@@ -1227,7 +1310,7 @@
 		<li class="nk-menu-item has-sub">
 			<a href="#" class="nk-menu-link nk-menu-toggle">
 				<span class="nk-menu-icon">
-					<em class="icon ni ni-user-check"></em>
+					<em class="icon ni ni-building"></em>
 				</span>
 				<span class="nk-menu-text">Manage Training Center</span>
 			</a>
@@ -1263,6 +1346,58 @@
 			</ul>
 		</li>
 	}
+
+	@if (User.IsInRole("CEO"))
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					@* 	<em class="icon ni ni-building"></em> *@
+					Training Center
+				</span>
+			</div>
+		</li>
+
+		<li class="nk-menu-item has-sub">
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-building"></em>
+				</span>
+				<span class="nk-menu-text">Manage Training Center</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/CEOInspection?tab=Pending"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Pending" ? "active" : "")">
+						<span class="nk-menu-text">Pending Review</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/CEOInspection?tab=OnHold"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "OnHold" ? "active" : "")">
+						<span class="nk-menu-text">On Hold</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/CEOInspection?tab=Rejected"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Rejected" ? "active" : "")">
+						<span class="nk-menu-text">Rejected</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/TrainingCenter/CEOInspection?tab=Approved"
+					   class="nk-menu-link @(ViewBag.ActiveTab?.ToString() == "Approved" ? "active" : "")">
+						<span class="nk-menu-text">Final Approved</span>
+					</a>
+				</li>
+			</ul>
+		</li>
+	}
+
 
 	<!-- HR MANAGEMENT - HR ONLY -->
 	<!-- ===================================================== -->
