@@ -181,7 +181,11 @@
             schemeElement?.focus();
             return false;
         }
-
+        if (!projectId) {
+            alert("Please select Project.");
+            projectElement?.focus();
+            return false;
+        }
         const url = new URL(button.href, window.location.origin);
         url.searchParams.set("schemeId", schemeId);
 

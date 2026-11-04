@@ -1,0 +1,407 @@
+﻿@model TSSC.Unified.ViewModel.TrainingCenterViewModel
+
+@{
+    Layout = "_Layout";
+}
+
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <!-- Page Heading -->
+        <div class="nk-block-head nk-block-head-sm">
+            <div class="nk-block-between">
+                <div class="nk-block-head-content">
+                    <h5 class="nk-block-title">Training Center Details</h5>
+                </div>
+
+                <div class="nk-block-head-content">
+                    <a asp-area="TP"
+                       asp-controller="TrainingCenter"
+                       asp-action="Index"
+                       class="btn btn-outline-light">
+                        <em class="icon ni ni-arrow-left"></em>
+                        Back
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. Partner Information -->
+        <div class="card card-bordered mb-3">
+            <div class="card-inner">
+                <h6 class="title text-primary mb-3">Partner Information</h6>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Training Center Name</label>
+                        <input class="form-control" value="@Model.TrainingCenterName" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Training Center Code</label>
+                        <input class="form-control" value="@Model.TrainingCenterCode" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Training Center SPOC Name</label>
+                        <input class="form-control" value="@Model.TrainingCenterSPOCName" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">SPOC Email</label>
+                        <input class="form-control" value="@Model.TrainingCenterSPOCEmail" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">SPOC Contact Number</label>
+                        <input class="form-control" value="@Model.SPOCContactNumber" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Training Center Phone Number</label>
+                        <input class="form-control" value="@Model.TrainingCenterPhoneNumber" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Complete Address</label>
+                        <textarea class="form-control" rows="2" readonly>@Model.CompleteAddress</textarea>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Center Floor</label>
+                        <input class="form-control" value="@Model.CenterFloor" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Landmark</label>
+                        <input class="form-control" value="@Model.Landmark" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Center Information -->
+        <div class="card card-bordered mb-3">
+            <div class="card-inner">
+                <h6 class="title text-primary mb-3">Center Information</h6>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Center Ownership Type</label>
+                        <input class="form-control" value="@Model.CenterOwnershipType" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Franchise Partner Name</label>
+                        <input class="form-control" value="@Model.FranchisePartnerName" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Center Type</label>
+                        <input class="form-control" value="@Model.CenterType" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Self Funded</label>
+                        <input class="form-control"
+                               value="@(Model.SelfFunded == "true" ? "Yes" : "No")" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">NSDC</label>
+                        <input class="form-control"
+                               value="@(Model.NSDC == "true" ? "Yes" : "No")" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">STAR</label>
+                        <input class="form-control"
+                               value="@(Model.STAR == "true" ? "Yes" : "No")" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">MoRD</label>
+                        <input class="form-control"
+                               value="@(Model.MoRD == "true" ? "Yes" : "No")" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">State Government Schemes</label>
+                        <textarea class="form-control" rows="1" readonly>@Model.StateGovernmentSchemes</textarea>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Other Central Government Schemes</label>
+                        <textarea class="form-control" rows="1" readonly>@Model.OtherCentralGovernmentSchemes</textarea>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Usable Area (Sq. Ft.)</label>
+                        <input class="form-control" value="@Model.UsableAreaSqFt" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Number of Classrooms</label>
+                        <input class="form-control" value="@Model.NumberOfClassrooms" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Number of Floors</label>
+                        <input class="form-control" value="@Model.NumberOfFloors" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Number of Labs</label>
+                        <input class="form-control" value="@Model.NumberOfLabs" readonly />
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label">Center Description</label>
+                        <textarea class="form-control" rows="3" readonly>@Model.CenterDescription</textarea>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label">Equipment Details</label>
+                        <textarea class="form-control" rows="3" readonly>@Model.EquipmentDetails</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Organization Information -->
+        <div class="card card-bordered mb-3">
+            <div class="card-inner">
+                <h6 class="title text-primary mb-3">Organization Information</h6>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Organization Name</label>
+                        <input class="form-control" value="@Model.OrganizationName" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Signing Authority Name</label>
+                        <input class="form-control" value="@Model.SigningAuthorityName" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Mobile Number</label>
+                        <input class="form-control" value="@Model.MobileNumber" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">PAN Number</label>
+                        <input class="form-control" value="@Model.PANNumber" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Email ID</label>
+                        <input class="form-control" value="@Model.EmailId" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Scheme and Job Role Information -->
+        <div class="card card-bordered mb-3">
+            <div class="card-inner">
+                <h6 class="title text-primary mb-3">Scheme & Job Role Information</h6>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Scheme</label>
+                        <input class="form-control" value="@Model.SchemeName" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Job Role</label>
+                        <input class="form-control" value="@Model.JobRoleTitle" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">QP Hours</label>
+                        <input class="form-control"
+                               value="@(Model.QPHours.HasValue? Model.QPHours.Value + " Hours" : "-")"
+                               readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Payment Information -->
+        <div class="card card-bordered mb-3">
+            <div class="card-inner">
+                <h6 class="title text-primary mb-3">Payment Information</h6>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Payment Status</label>
+                        <input class="form-control" value="@Model.PaymentStatus" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Finance Status</label>
+                        <input class="form-control" value="@Model.FinanceStatus" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Uploaded Photos -->
+        <div class="card card-bordered mb-3">
+            <div class="card-inner">
+                <h6 class="title text-primary mb-3">Uploaded Photos</h6>
+
+                <div class="row g-3">
+
+                    @if (!string.IsNullOrEmpty(ViewBag.ApproachRoadPhotoPath as string))
+                    {
+                        <div class="col-md-4">
+                            <label class="form-label">Approach Road Photo</label>
+                            <a href="@Url.Content(ViewBag.ApproachRoadPhotoPath)" target="_blank">
+                                <img src="@Url.Content(ViewBag.ApproachRoadPhotoPath)"
+                                     class="img-thumbnail"
+                                     style="width:100%;height:200px;object-fit:cover;" />
+                            </a>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(ViewBag.OutsideClassroomPhotoPath as string))
+                    {
+                        <div class="col-md-4">
+                            <label class="form-label">Outside Classroom Photo</label>
+                            <a href="@Url.Content(ViewBag.OutsideClassroomPhotoPath)" target="_blank">
+                                <img src="@Url.Content(ViewBag.OutsideClassroomPhotoPath)"
+                                     class="img-thumbnail"
+                                     style="width:100%;height:200px;object-fit:cover;" />
+                            </a>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(ViewBag.InsideClassroomPhotoPath as string))
+                    {
+                        <div class="col-md-4">
+                            <label class="form-label">Inside Classroom Photo</label>
+                            <a href="@Url.Content(ViewBag.InsideClassroomPhotoPath)" target="_blank">
+                                <img src="@Url.Content(ViewBag.InsideClassroomPhotoPath)"
+                                     class="img-thumbnail"
+                                     style="width:100%;height:200px;object-fit:cover;" />
+                            </a>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(ViewBag.LabPhotoPath as string))
+                    {
+                        <div class="col-md-4">
+                            <label class="form-label">Lab Photo</label>
+                            <a href="@Url.Content(ViewBag.LabPhotoPath)" target="_blank">
+                                <img src="@Url.Content(ViewBag.LabPhotoPath)"
+                                     class="img-thumbnail"
+                                     style="width:100%;height:200px;object-fit:cover;" />
+                            </a>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(ViewBag.CCTVPhotoPath as string))
+                    {
+                        <div class="col-md-4">
+                            <label class="form-label">CCTV Photo</label>
+                            <a href="@Url.Content(ViewBag.CCTVPhotoPath)" target="_blank">
+                                <img src="@Url.Content(ViewBag.CCTVPhotoPath)"
+                                     class="img-thumbnail"
+                                     style="width:100%;height:200px;object-fit:cover;" />
+                            </a>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(ViewBag.CompanySealPath as string))
+                    {
+                        <div class="col-md-4">
+                            <label class="form-label">Company Seal</label>
+                            <a href="@Url.Content(ViewBag.CompanySealPath)" target="_blank">
+                                <img src="@Url.Content(ViewBag.CompanySealPath)"
+                                     class="img-thumbnail"
+                                     style="width:100%;height:200px;object-fit:cover;" />
+                            </a>
+                        </div>
+                    }
+
+                    @if (string.IsNullOrEmpty(ViewBag.ApproachRoadPhotoPath as string)
+                                        && string.IsNullOrEmpty(ViewBag.OutsideClassroomPhotoPath as string)
+                                        && string.IsNullOrEmpty(ViewBag.InsideClassroomPhotoPath as string)
+                                        && string.IsNullOrEmpty(ViewBag.LabPhotoPath as string)
+                                        && string.IsNullOrEmpty(ViewBag.CCTVPhotoPath as string)
+                                        && string.IsNullOrEmpty(ViewBag.CompanySealPath as string))
+                    {
+                        <div class="col-md-12">
+                            <p class="text-muted">No photos uploaded.</p>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. Inspection Information - LAST -->
+        <div class="card card-bordered mb-3">
+            <div class="card-inner">
+                <h6 class="title text-primary mb-3">Inspection Information</h6>
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        <label class="form-label">Inspection Date</label>
+                        <input class="form-control"
+                               value="@(Model.InspectionDate.HasValue
+                                                                  ? Model.InspectionDate.Value.ToString("dd-MM-yyyy hh:mm tt")
+                                                                  : "Not Scheduled")"
+                               readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Inspection Status</label>
+                        <input class="form-control"
+                               value="@(Model.InspectionStatus ?? "-")"
+                               readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Inspection Created Date</label>
+                        <input class="form-control"
+                               value="@(Model.InspectionCreatedDate.HasValue
+                                                                  ? Model.InspectionCreatedDate.Value.ToString("dd-MM-yyyy")
+                                                                  : "-")"
+                               readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Inspection Mode</label>
+                        <input class="form-control"
+                               value="@(Model.InspectionMode ?? "-")"
+                               readonly />
+                    </div>
+                    @if(Model.InspectionRemarks!=null){
+                    <div class="col-md-12">
+                        <label class="form-label">Inspection Remarks</label>
+                        <textarea class="form-control"
+                                  rows="3"
+                                  readonly>@Model.InspectionRemarks</textarea>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="text-end mt-3">
+            <a asp-area="TP"
+               asp-controller="TrainingCenter"
+               asp-action="Index"
+               class="btn btn-outline-light">
+                <em class="icon ni ni-arrow-left"></em>
+                Back to List
+            </a>
+        </div>
+
+    </div>
+</div>

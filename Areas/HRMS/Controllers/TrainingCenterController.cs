@@ -155,13 +155,76 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 new { tab = "Pending" });
         }
 
+        //[HttpGet]
+        //public async Task<IActionResult> InspectionList()
+        //{
+        //    var centers = await _context.TrainingCenter
+        //        .AsNoTracking()
+        //        .OrderByDescending(x => x.CreatedDate)
+        //        .Where(x=>x.FinanceStatus== "Approved" && x.PaymentStatus=="Success")
+        //        .Select(x => new TrainingCenterViewModel
+        //        {
+        //            Id = x.Id,
+        //            TrainingCenterName = x.TrainingCenterName,
+        //            TrainingCenterCode = x.TrainingCenterCode,
+        //            CompleteAddress = x.CompleteAddress,
+        //            PaymentStatus = x.PaymentStatus,
+        //            FinanceStatus = x.FinanceStatus,
+        //            InspectionDate = x.InspectionDate,
+        //            InspectionStatus = x.InspectionStatus,
+        //            InspectionCreatedDate = x.InspectionCreatedDate,
+        //            SchemeName = _context.Scheme
+        //                .Where(s => s.SchemeId == x.SchemeId)
+        //                .Select(s => s.SchemeCode)
+        //                .FirstOrDefault(),
+
+        //            JobRoleTitle = _context.JobRoles
+        //                .Where(j => j.Id == x.JobRoleId)
+        //                .Select(j => j.JobRoleTitle)
+        //                .FirstOrDefault()
+        //        })
+        //        .ToListAsync();
+
+        //    return View(centers);
+        //}
         [HttpGet]
-        public async Task<IActionResult> InspectionList()
+        public async Task<IActionResult> InspectionList(string tab = "Pending")
         {
-            var centers = await _context.TrainingCenter
+            var query = _context.TrainingCenter
                 .AsNoTracking()
+                .Where(x => x.FinanceStatus == "Approved"
+                         && x.PaymentStatus == "Success");
+
+            switch (tab)
+            {
+                case "Pending":
+                    query = query.Where(x =>
+                        x.InspectionStatus == "Pending" &&
+                        x.RegionalHeadEmployeeId == null);
+                    break;
+
+                case "OnHold":
+                    query = query.Where(x =>
+                        x.InspectionStatus == "On Hold" &&
+                        x.RegionalHeadEmployeeId == null);
+                    break;
+
+                case "Rejected":
+                    query = query.Where(x =>
+                        x.InspectionStatus == "Rejected" &&
+                        x.RegionalHeadEmployeeId == null);
+                    break;
+
+                case "SentToRegionalHead":
+                    query = query.Where(x =>
+                        x.RegionalHeadEmployeeId != null);
+                    break;
+            }
+
+            ViewBag.ActiveTab = tab;
+
+            var centers = await query
                 .OrderByDescending(x => x.CreatedDate)
-                .Where(x=>x.FinanceStatus== "Approved" && x.PaymentStatus=="Success")
                 .Select(x => new TrainingCenterViewModel
                 {
                     Id = x.Id,
@@ -173,6 +236,9 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     InspectionDate = x.InspectionDate,
                     InspectionStatus = x.InspectionStatus,
                     InspectionCreatedDate = x.InspectionCreatedDate,
+
+
+
                     SchemeName = _context.Scheme
                         .Where(s => s.SchemeId == x.SchemeId)
                         .Select(s => s.SchemeCode)
@@ -181,16 +247,20 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     JobRoleTitle = _context.JobRoles
                         .Where(j => j.Id == x.JobRoleId)
                         .Select(j => j.JobRoleTitle)
-                        .FirstOrDefault()
+                        .FirstOrDefault(),
+
+                    RegionalHeadStatus = x.RegionalHeadStatus,
+                    VerticalHeadStatus = x.VerticalHeadStatus,
+                    BusinessHeadStatus = x.BusinessHeadStatus,
+                    CEOStatus = x.CEOStatus
                 })
                 .ToListAsync();
 
             return View(centers);
         }
 
-
         [HttpGet]
-        public async Task<IActionResult> Information(int id)
+        public async Task<IActionResult> Information(int id, string tab = "Pending")
         {
             var regionalHeads =
      await _userManager.GetUsersInRoleAsync("RegionalHead");
@@ -272,7 +342,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 InspectionCreatedDate = center.InspectionCreatedDate,
                 InspectionRemarks = center.InspectionRemarks,
                 InspectionMode = center.InspectionMode,
-
+                RegionalHeadEmployeeId= center.RegionalHeadEmployeeId,
                 // Scheme and Job Role
                 SchemeName = await _context.Scheme
                     .Where(s => s.SchemeId == center.SchemeId)
@@ -296,6 +366,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             ViewBag.CCTVPhotoPath = center.CCTVPhotoPath;
             ViewBag.CompanySealPath = center.CompanySealPath;
 
+            ViewBag.ActiveTab = tab;
             return View(model);
         }
 
@@ -374,9 +445,69 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Inspection scheduled successfully.";
+            center.EmailSent = false;
+
+            await _context.SaveChangesAsync();
+
+            string email = center.CreatedBy;
+
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                try
+                {
+                    string templatePath = System.IO.Path.Combine(
+                        _environment.WebRootPath,
+                        "EmailTemplates",
+                        "InspectionScheduled.html"
+                    );
+
+                    var replacements = new Dictionary<string, string>
+        {
+            { "TrainingCenterName", center.TrainingCenterName ?? "" },
+            { "TrainingCenterCode", center.TrainingCenterCode ?? "" },
+            { "InspectionDate", inspectionDate.Value.ToString("dd MMM yyyy hh:mm tt") },
+            { "InspectionMode", inspectionMode! },
+            { "InspectionLink", inspectionMode == "Online" ? inspectionLink ?? "" : "Not applicable (Offline inspection)" }
+        };
+
+                    string emailResult = await _emailService.SendEmailAsync(
+                        email,
+                        "Training Center Inspection Scheduled",
+                        templatePath,
+                        replacements
+                    );
+
+                    if (emailResult == "True")
+                    {
+                        center.EmailSent = true;
+                        await _context.SaveChangesAsync();
+
+                        TempData["Success"] =
+                            "Inspection scheduled and email sent successfully.";
+                    }
+                    else
+                    {
+                        TempData["Error"] =
+                            "Inspection scheduled, but email could not be sent.";
+                    }
+                }
+                catch (Exception)
+                {
+                    TempData["Error"] =
+                        "Inspection scheduled, but email could not be sent.";
+                }
+            }
+            else
+            {
+                TempData["Error"] =
+                    "Inspection scheduled, but Training Partner email not found.";
+            }
 
             return RedirectToAction(nameof(Information), new { id = center.Id });
+
+            //TempData["Success"] = "Inspection scheduled successfully.";
+
+            //return RedirectToAction(nameof(Information), new { id = center.Id });
         }
 
         [HttpPost]
@@ -572,7 +703,10 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     JobRoleTitle = _context.JobRoles
                         .Where(j => j.Id == x.JobRoleId)
                         .Select(j => j.JobRoleTitle)
-                        .FirstOrDefault()
+                        .FirstOrDefault(),
+                    VerticalHeadStatus = x.VerticalHeadStatus,
+                    BusinessHeadStatus = x.BusinessHeadStatus,
+                    CEOStatus = x.CEOStatus,
                 })
                 .ToListAsync();
 
@@ -673,6 +807,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 InspectionStatus = center.InspectionStatus,
                 InspectionCreatedDate = center.InspectionCreatedDate,
 
+
                 // Scheme and Job Role
                 SchemeName = await _context.Scheme
                     .Where(s => s.SchemeId == center.SchemeId)
@@ -700,23 +835,28 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             ViewBag.RegionalHeadStatus = center.RegionalHeadStatus;
             ViewBag.RegionalHeadRemarks = center.RegionalHeadRemarks;
             ViewBag.RegionalInspectionRemarks = center.InspectionRemarks;
-            ViewBag.IsVerticalHeadWorkflow =
-    center.RegionalHeadStatus == "Approved";
+            ViewBag.IsVerticalHeadWorkflow =center.RegionalHeadStatus == "Approved";
 
             ViewBag.RegionalHeadStatus = center.RegionalHeadStatus;
             ViewBag.VerticalHeadStatus = center.VerticalHeadStatus;
             ViewBag.VerticalHeadRemarks = center.VerticalHeadRemarks;
             ViewBag.BusinessHeadStatus = center.BusinessHeadStatus;
             ViewBag.BusinessHeadRemarks = center.BusinessHeadRemarks;
+            ViewBag.BusinessHeadWorkflow = center.VerticalHeadStatus == "Approved";
+            ViewBag.CEOStatus = center.CEOStatus;
+            ViewBag.CEORemarks = center.CEORemarks;
+            ViewBag.CEOWorkflow = center.BusinessHeadStatus == "Approved";
             ViewBag.ActiveTab = tab;
             ViewBag.CurrentApprovalRole = User.IsInRole("RegionalHead")
-    ? "RegionalHead"
-    : User.IsInRole("VerticalHead")
-        ? "VerticalHead"
-        : User.IsInRole("BusinessHead")
-            ? "BusinessHead"
-            : ""; ;
-              ViewBag.ActiveTab = tab;
+      ? "RegionalHead"
+      : User.IsInRole("VerticalHead")
+          ? "VerticalHead"
+          : User.IsInRole("BusinessHead")
+              ? "BusinessHead"
+              : User.IsInRole("CEO")
+                  ? "CEO"
+                  : "";
+            ViewBag.ActiveTab = tab;
             return View("RegionalHeadDetails", model);
         }
 
@@ -876,7 +1016,9 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     InspectionCreatedDate = x.InspectionCreatedDate,
                     RegionalHeadStatus = x.RegionalHeadStatus,
                     VerticalHeadStatus = x.VerticalHeadStatus,
-
+                    
+                    BusinessHeadStatus = x.BusinessHeadStatus,
+                    CEOStatus = x.CEOStatus,
                     SchemeName = _context.Scheme
                         .Where(s => s.SchemeId == x.SchemeId)
                         .Select(s => s.SchemeName)
@@ -980,6 +1122,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             center.VerticalHeadStatus = status;
             center.VerticalHeadRemarks = verticalHeadRemarks;
             center.VerticalHeadDateApproveDate = DateTime.Now;
+            center.BusinessHeadStatus = "Pending";
 
             await _context.SaveChangesAsync();
 
@@ -1000,7 +1143,6 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 new { tab = redirectTab });
         }
         [HttpGet]
-        [Authorize(Roles = "BusinessHead")]
         public async Task<IActionResult> BusinessHeadInspection(
     string tab = "Pending")
         {
@@ -1068,7 +1210,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     RegionalHeadStatus = x.RegionalHeadStatus,
                     VerticalHeadStatus = x.VerticalHeadStatus,
                     BusinessHeadStatus = x.BusinessHeadStatus,
-
+                    CEOStatus =x.CEOStatus,
                     SchemeName = _context.Scheme
                         .Where(s => s.SchemeId == x.SchemeId)
                         .Select(s => s.SchemeName)
@@ -1088,7 +1230,6 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "BusinessHead")]
         public async Task<IActionResult> BusinessHeadUpdateStatus(
             int id,
             string status,
@@ -1150,7 +1291,6 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     new { id, tab = "Pending" });
             }
 
-            // 5. Get center approved by Vertical Head
             var center = await _context.TrainingCenter
                 .FirstOrDefaultAsync(x =>
                     x.Id == id &&
@@ -1166,7 +1306,6 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     new { tab = "Pending" });
             }
 
-            // 6. Only Pending or On Hold records can be processed
             if (center.BusinessHeadStatus != "Pending" &&
                 center.BusinessHeadStatus != "On Hold")
             {
@@ -1178,16 +1317,13 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     new { tab = "Pending" });
             }
 
-            // 7. Save Business Head approval details
             center.BusinessHeadEmployeeId = employee.EmployeeId;
             center.BusinessHeadStatus = status;
             center.BusinessHeadRemarks = businessHeadRemarks;
             center.BusinessHeadApproveDate = DateTime.Now;
+            center.CEOStatus = "Pending";
 
-            // 8. Save changes
             await _context.SaveChangesAsync();
-
-            // 9. Redirect to the updated tab
             TempData["Success"] =
                 $"Training Center status updated to {status} successfully.";
 
@@ -1201,6 +1337,215 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             return RedirectToAction(
                 nameof(BusinessHeadInspection),
+                new { tab = redirectTab });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CEOInspection(string tab = "Pending")
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return Challenge();
+
+            var employee = await _context.Employee
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.ApplicationUserId == currentUser.Id &&
+                    x.IsActive == true);
+
+            if (employee == null)
+                return Forbid();
+
+            var query = _context.TrainingCenter
+                .AsNoTracking()
+                .Where(x => x.BusinessHeadStatus == "Approved");
+
+            switch (tab)
+            {
+                case "Pending":
+                    query = query.Where(x =>
+                        x.CEOStatus == "Pending" ||
+                        x.CEOStatus == null);
+                    break;
+
+                case "OnHold":
+                    query = query.Where(x => x.CEOStatus == "On Hold");
+                    break;
+
+                case "Rejected":
+                    query = query.Where(x => x.CEOStatus == "Rejected");
+                    break;
+
+                case "Approved":
+                    query = query.Where(x => x.CEOStatus == "Approved");
+                    break;
+
+                default:
+                    tab = "Pending";
+                    query = query.Where(x =>
+                        x.CEOStatus == "Pending" ||
+                        x.CEOStatus == null);
+                    break;
+            }
+
+            var centers = await query
+                .OrderByDescending(x => x.BusinessHeadApproveDate)
+                .Select(x => new TrainingCenterViewModel
+                {
+                    Id = x.Id,
+                    TrainingCenterName = x.TrainingCenterName,
+                    TrainingCenterCode = x.TrainingCenterCode,
+                    CompleteAddress = x.CompleteAddress,
+                    InspectionDate = x.InspectionDate,
+                    InspectionStatus = x.InspectionStatus,
+                    PaymentStatus = x.PaymentStatus,
+                    FinanceStatus = x.FinanceStatus,
+                    InspectionCreatedDate = x.InspectionCreatedDate,
+
+                    RegionalHeadStatus = x.RegionalHeadStatus,
+                    VerticalHeadStatus = x.VerticalHeadStatus,
+                    BusinessHeadStatus = x.BusinessHeadStatus,
+                    CEOStatus = x.CEOStatus,
+
+                    SchemeName = _context.Scheme
+                        .Where(s => s.SchemeId == x.SchemeId)
+                        .Select(s => s.SchemeName)
+                        .FirstOrDefault(),
+
+                    JobRoleTitle = _context.JobRoles
+                        .Where(j => j.Id == x.JobRoleId)
+                        .Select(j => j.JobRoleTitle)
+                        .FirstOrDefault()
+                })
+                .ToListAsync();
+
+            ViewBag.ActiveTab = tab;
+
+            return View("RegionalHeadInspection", centers);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CEOUpdateStatus(
+            int id,
+            string status,
+            string ceoRemarks)
+        {
+            // 1. Get logged-in user
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return Challenge();
+
+            // 2. Find active employee
+            var employee = await _context.Employee
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.ApplicationUserId == currentUser.Id &&
+                    x.IsActive == true);
+
+            if (employee == null)
+                return Forbid();
+
+            // 3. Validate status
+            var allowedStatuses = new[]
+            {
+        "On Hold",
+        "Rejected",
+        "Approved"
+    };
+
+            if (string.IsNullOrWhiteSpace(status) ||
+                !allowedStatuses.Contains(status))
+            {
+                TempData["Error"] = "Invalid status selected.";
+
+                return RedirectToAction(
+                    nameof(CEOInspection),
+                    new { tab = "Pending" });
+            }
+
+            // 4. Validate CEO remarks
+            if (string.IsNullOrWhiteSpace(ceoRemarks))
+            {
+                TempData["Error"] = "Please enter CEO remarks.";
+
+                return RedirectToAction(
+                    nameof(RegionalHeadDetails),
+                    new { id, tab = "Pending" });
+            }
+
+            ceoRemarks = ceoRemarks.Trim();
+
+            if (ceoRemarks.Length > 1000)
+            {
+                TempData["Error"] =
+                    "CEO remarks cannot exceed 1000 characters.";
+
+                return RedirectToAction(
+                    nameof(RegionalHeadDetails),
+                    new { id, tab = "Pending" });
+            }
+
+            // 5. Fetch only Business Head-approved centers
+            var center = await _context.TrainingCenter
+                .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.BusinessHeadStatus == "Approved");
+
+            if (center == null)
+            {
+                TempData["Error"] =
+                    "Training Center not found or not approved by Business Head.";
+
+                return RedirectToAction(
+                    nameof(CEOInspection),
+                    new { tab = "Pending" });
+            }
+
+            // 6. Allow only Pending or On Hold records
+            if (center.CEOStatus != null &&
+                center.CEOStatus != "Pending" &&
+                center.CEOStatus != "On Hold")
+            {
+                TempData["Error"] =
+                    "This Training Center has already been processed.";
+
+                return RedirectToAction(
+                    nameof(CEOInspection),
+                    new { tab = "Pending" });
+            }
+
+            // 7. Save CEO approval details
+            center.CEOEmployeeId = employee.EmployeeId;
+            center.CEOStatus = status;
+            center.CEORemarks = ceoRemarks;
+            center.CEODateApproveDate = DateTime.Now;
+
+            // 8. Save changes
+            await _context.SaveChangesAsync();
+
+            // 9. Success message
+            TempData["Success"] = status switch
+            {
+                "Approved" => "Training Center finally approved by CEO.",
+                "Rejected" => "Training Center rejected by CEO.",
+                "On Hold" => "Training Center placed on hold by CEO.",
+                _ => "Training Center status updated successfully."
+            };
+
+            // 10. Redirect to relevant tab
+            string redirectTab = status switch
+            {
+                "On Hold" => "OnHold",
+                "Rejected" => "Rejected",
+                "Approved" => "Approved",
+                _ => "Pending"
+            };
+
+            return RedirectToAction(
+                nameof(CEOInspection),
                 new { tab = redirectTab });
         }
 

@@ -8,6 +8,16 @@ using QUIZAPP.Models;
 using QUIZAPP.Services;
 using TSSC.Unified.ViewModel;
 
+using iText.IO.Font.Constants;
+using iText.IO.Image;
+using iText.Kernel.Colors;
+using iText.Kernel.Font;
+using iText.Kernel.Geom;
+using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Canvas;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Layout.Properties;
 namespace TSSC.Unified.Areas.TP.Controllers
 {
     [Area("TP")]
@@ -201,7 +211,7 @@ namespace TSSC.Unified.Areas.TP.Controllers
                     if (file == null || file.Length == 0)
                         continue;
 
-                    var extension = Path.GetExtension(file.FileName);
+                    var extension = System.IO.Path.GetExtension(file.FileName);
 
                     if (!allowedImageExtensions.Contains(extension))
                     {
@@ -222,7 +232,7 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 if (model.CompanySeal != null &&
                     model.CompanySeal.Length > 0)
                 {
-                    var extension = Path.GetExtension(
+                    var extension = System.IO.Path.GetExtension(
                         model.CompanySeal.FileName);
 
                     var allowedSealExtensions = new HashSet<string>(
@@ -253,7 +263,7 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 }
 
                 // 3. Upload files
-                var uploadFolder = Path.Combine(
+                var uploadFolder = System.IO.Path.Combine(
                     _environment.WebRootPath,
                     "Uploads",
                     "TrainingCenters");
@@ -265,11 +275,11 @@ namespace TSSC.Unified.Areas.TP.Controllers
                     if (file == null || file.Length == 0)
                         return null;
 
-                    var extension = Path.GetExtension(file.FileName)
+                    var extension = System.IO.Path.GetExtension(file.FileName)
                         .ToLowerInvariant();
 
                     var fileName = $"{Guid.NewGuid():N}{extension}";
-                    var physicalPath = Path.Combine(uploadFolder, fileName);
+                    var physicalPath = System.IO.Path.Combine(uploadFolder, fileName);
 
                     await using (var stream = new FileStream(
                         physicalPath,
@@ -405,9 +415,15 @@ namespace TSSC.Unified.Areas.TP.Controllers
                 return View(model);
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> CenterList()
         {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+                return Unauthorized();
+
             var centers = await (
                 from center in _context.TrainingCenter.AsNoTracking()
 
@@ -419,6 +435,8 @@ namespace TSSC.Unified.Areas.TP.Controllers
                     into schemeGroup
 
                 from scheme in schemeGroup.DefaultIfEmpty()
+
+                where center.CreatedBy == currentUser.Email
 
                 orderby center.CreatedDate descending
 
@@ -438,12 +456,58 @@ namespace TSSC.Unified.Areas.TP.Controllers
 
                     Status = center.Status,
                     PaymentStatus = center.PaymentStatus,
-                    InspectionDate = center.InspectionDate
+                    InspectionDate = center.InspectionDate,
+                    FinanceStatus = center.FinanceStatus,
+
+                    RegionalHeadStatus = center.RegionalHeadStatus,
+                    VerticalHeadStatus = center.VerticalHeadStatus,
+                    BusinessHeadStatus = center.BusinessHeadStatus,
+                    CEOStatus = center.CEOStatus
                 }
             ).ToListAsync();
 
             return View(centers);
         }
+        //[HttpGet]
+        //public async Task<IActionResult> CenterList()
+        //{
+        //    var centers = await (
+        //        from center in _context.TrainingCenter.AsNoTracking()
+
+        //        join jobRole in _context.JobRoles.AsNoTracking()
+        //            on center.JobRoleId equals jobRole.Id
+
+        //        join schemeData in _context.Scheme.AsNoTracking()
+        //            on center.SchemeId equals (int?)schemeData.SchemeId
+        //            into schemeGroup
+
+        //        from scheme in schemeGroup.DefaultIfEmpty()
+
+        //        orderby center.CreatedDate descending
+
+        //        select new TrainingCenterViewModel
+        //        {
+        //            Id = center.Id,
+        //            TrainingCenterName = center.TrainingCenterName,
+
+        //            JobRoleId = center.JobRoleId,
+        //            JobRoleTitle = jobRole.JobRoleTitle,
+        //            QPHours = jobRole.QPHours,
+
+        //            SchemeId = center.SchemeId,
+        //            SchemeName = scheme != null
+        //                ? scheme.SchemeCode
+        //                : "-",
+
+        //            Status = center.Status,
+        //            PaymentStatus = center.PaymentStatus,
+        //            InspectionDate = center.InspectionDate,
+        //            FinanceStatus=center.FinanceStatus
+        //        }
+        //    ).ToListAsync();
+
+        //    return View(centers);
+        //}
         [HttpGet]
         public async Task<IActionResult> Payment(int id)
         {
@@ -511,33 +575,230 @@ namespace TSSC.Unified.Areas.TP.Controllers
 
             return RedirectToAction(nameof(CenterList));
         }
-        //[HttpGet]
-        //public async Task<IActionResult> PaymentApproval(string tab = "Pending")
-        //{
-        //    var centers = await _context.TrainingCenter
-        //        .AsNoTracking()
-        //        .Where(x =>
-        //            x.PaymentStatus == "Success" &&
-        //            x.FinanceApprovedBy == null &&
-        //            x.FinanceStatus == "Pending")
-        //        .OrderByDescending(x => x.PaymentDate)
-        //        .Select(x => new TrainingCenterViewModel
-        //        {
-        //            Id = x.Id,
-        //            TrainingCenterName = x.TrainingCenterName,
-        //            PaymentStatus = x.PaymentStatus,
-        //            PaymentDate = x.PaymentDate,
-        //            PaymentBy = x.PaymentBy,
-        //            FinanceRemark = x.FinanceRemark,
-        //            FinanceApprovedBy = x.FinanceApprovedBy,
-        //            FinanceApprovedDate = x.FinanceApprovedDate,
-        //            FinanceStatus = x.FinanceStatus,
-        //        })
-        //        .ToListAsync();
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var center = await _context.TrainingCenter
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-        //    ViewBag.Tab = tab;
+            if (center == null)
+                return NotFound();
 
-        //    return View(centers);
-        //}
+            var model = new TrainingCenterViewModel
+            {
+                Id = center.Id,
+                SchemeId = center.SchemeId,
+                ProjectId = center.ProjectId,
+                JobRoleId = center.JobRoleId,
+
+                // Partner Information
+                TrainingCenterName = center.TrainingCenterName,
+                TrainingCenterCode = center.TrainingCenterCode,
+                TrainingCenterSPOCName = center.TrainingCenterSPOCName,
+                TrainingCenterSPOCEmail = center.TrainingCenterSPOCEmail,
+                SPOCContactNumber = center.SPOCContactNumber,
+                TrainingCenterPhoneNumber = center.TrainingCenterPhoneNumber,
+                CompleteAddress = center.CompleteAddress,
+                CenterFloor = center.CenterFloor,
+                Landmark = center.Landmark,
+
+                // Center Information
+                CenterOwnershipType = center.CenterOwnershipType,
+                FranchisePartnerName = center.FranchisePartnerName,
+                CenterType = center.CenterType,
+                SelfFunded = center.SelfFunded,
+                NSDC = center.NSDC,
+                STAR = center.STAR,
+                MoRD = center.MoRD,
+                StateGovernmentSchemes = center.StateGovernmentSchemes,
+                OtherCentralGovernmentSchemes = center.OtherCentralGovernmentSchemes,
+                UsableAreaSqFt = center.UsableAreaSqFt,
+                NumberOfClassrooms = center.NumberOfClassrooms,
+                NumberOfFloors = center.NumberOfFloors,
+                NumberOfLabs = center.NumberOfLabs,
+                CenterDescription = center.CenterDescription,
+                EquipmentDetails = center.EquipmentDetails,
+
+                // Organization Information
+                OrganizationName = center.OrganizationName,
+                SigningAuthorityName = center.SigningAuthorityName,
+                MobileNumber = center.MobileNumber,
+                PANNumber = center.PANNumber,
+                EmailId = center.EmailId,
+
+                PaymentStatus = center.PaymentStatus,
+                FinanceStatus = center.FinanceStatus,
+                Status = center.Status,
+
+                InspectionDate = center.InspectionDate,
+                InspectionStatus = center.InspectionStatus,
+                InspectionCreatedDate = center.InspectionCreatedDate,
+                InspectionRemarks = center.InspectionRemarks,
+                InspectionMode = center.InspectionMode,
+
+                SchemeName = await _context.Scheme
+                    .Where(s => s.SchemeId == center.SchemeId)
+                    .Select(s => s.SchemeName)
+                    .FirstOrDefaultAsync(),
+
+                JobRoleTitle = await _context.JobRoles
+                    .Where(j => j.Id == center.JobRoleId)
+                    .Select(j => j.JobRoleTitle)
+                    .FirstOrDefaultAsync(),
+
+                QPHours = await _context.JobRoles
+                    .Where(j => j.Id == center.JobRoleId)
+                    .Select(j => (decimal?)j.QPHours)
+                    .FirstOrDefaultAsync()
+            };
+
+            ViewBag.ApproachRoadPhotoPath = center.ApproachRoadPhotoPath;
+            ViewBag.OutsideClassroomPhotoPath = center.OutsideClassroomPhotoPath;
+            ViewBag.InsideClassroomPhotoPath = center.InsideClassroomPhotoPath;
+            ViewBag.LabPhotoPath = center.LabPhotoPath;
+            ViewBag.CCTVPhotoPath = center.CCTVPhotoPath;
+            ViewBag.CompanySealPath = center.CompanySealPath;
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadCertificate(int id)
+        {
+            try
+            {
+                var currentUser = await _userManager.GetUserAsync(User);
+
+                if (currentUser == null)
+                    return Unauthorized();
+
+                // Get Training Center
+                var center = await _context.TrainingCenter
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (center == null)
+                    return NotFound("Training Center not found.");
+
+                // Verify Training Partner
+                if (center.CreatedBy != currentUser.Email)
+                    return Forbid();
+
+                // Verify all approvals
+                if (center.RegionalHeadStatus != "Approved" ||
+                    center.VerticalHeadStatus != "Approved" ||
+                    center.BusinessHeadStatus != "Approved" ||
+                    center.CEOStatus != "Approved")
+                {
+                    return Forbid();
+                }
+
+                // Get Job Role Title
+                var jobRoleTitle = await _context.JobRoles
+                    .AsNoTracking()
+                    .Where(x => x.Id == center.JobRoleId)
+                    .Select(x => x.JobRoleTitle)
+                    .FirstOrDefaultAsync();
+
+                if (string.IsNullOrWhiteSpace(jobRoleTitle))
+                    return NotFound("Job Role not found.");
+
+                // Certificate Template Path
+                string imagePath = System.IO.Path.Combine(
+                    _environment.WebRootPath,
+                    "uploads",
+                    "certificates",
+                    "TrainingCenterCertificate.png"
+                );
+
+                if (!System.IO.File.Exists(imagePath))
+                    return NotFound("Certificate template not found.");
+
+                // A4 Portrait Page Size
+                var pageSize = iText.Kernel.Geom.PageSize.A4;
+
+                float pageWidth = pageSize.GetWidth();
+                float pageHeight = pageSize.GetHeight();
+
+                // Load Background Image
+                var imageData = ImageDataFactory.Create(imagePath);
+
+                using (var memoryStream = new System.IO.MemoryStream())
+                {
+                    var writer = new PdfWriter(memoryStream);
+                    var pdf = new PdfDocument(writer);
+
+                    // Create A4 Page
+                    var page = pdf.AddNewPage(pageSize);
+
+                    // Draw Background Image
+                    var pdfCanvas = new PdfCanvas(page);
+
+                    var pageRectangle = new iText.Kernel.Geom.Rectangle(
+                        0, 0, pageWidth, pageHeight
+                    );
+
+                    pdfCanvas.AddImageFittedIntoRectangle(
+                        imageData,
+                        pageRectangle,
+                        false
+                    );
+                    var canvas = new Canvas(pdfCanvas, pageRectangle);
+
+                    var font = PdfFontFactory.CreateFont(
+                        StandardFonts.HELVETICA
+                    );
+
+                    // 1. Training Center Code - Top Right
+                    canvas.ShowTextAligned(
+                        new Paragraph(center.TrainingCenterCode ?? "")
+                            .SetFont(font)
+                            .SetFontSize(9),
+                        pageWidth * 0.885f,
+                        pageHeight * 0.935f,
+                        TextAlignment.CENTER
+                    );
+
+                    // 2. Training Center Name - Below Heading
+                    canvas.ShowTextAligned(
+                        new Paragraph(center.TrainingCenterName ?? "")
+                            .SetFont(font)
+                            .SetFontSize(15),
+                        pageWidth / 2,
+                        pageHeight * 0.620f,
+                        TextAlignment.CENTER
+                    );
+
+                    // 3. Job Role - Below Center Address
+                    canvas.ShowTextAligned(
+                        new Paragraph(jobRoleTitle)
+                            .SetFont(font)
+                            .SetFontSize(15),
+                        pageWidth / 2,
+                        pageHeight * 0.325f,
+                        TextAlignment.CENTER
+                    );
+
+                    canvas.Close();
+                    pdf.Close();
+
+                    return File(
+                        memoryStream.ToArray(),
+                        "application/pdf",
+                        $"TrainingCenterCertificate_{center.Id}.pdf"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                // Add your existing logger here if available.
+                return StatusCode(
+                    500,
+                    "Unable to generate certificate."
+                );
+            }
+        }
+
     }
 }

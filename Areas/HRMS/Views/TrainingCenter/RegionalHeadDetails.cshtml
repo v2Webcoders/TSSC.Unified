@@ -655,7 +655,7 @@
 
 
                 <!-- REGIONAL HEAD ACTION SECTION -->
-                @if (ViewBag.CurrentApprovalRole?.ToString() == "RegionalHead"
+                @if (User.IsInRole("RegionalHead") && ViewBag.CurrentApprovalRole?.ToString() == "RegionalHead"
                                 && ViewBag.RegionalHeadStatus?.ToString() == "Pending")
                 {
                     <form asp-area="HRMS"
@@ -701,8 +701,9 @@
                         </div>
                     </form>
                 }
-                @if (ViewBag.IsVerticalHeadWorkflow == true
-                                && ViewBag.VerticalHeadStatus?.ToString() == "Pending")
+                @if (ViewBag.IsVerticalHeadWorkflow == true && ViewBag.RegionalHeadStatus?.ToString() == "Approved"
+                                && ViewBag.VerticalHeadStatus?.ToString() == "Pending"
+                                && string.IsNullOrEmpty(ViewBag.BusinessHeadStatus?.ToString()))
                 {
                     <!-- VERTICAL HEAD ACTION SECTION -->
                     <div class="card card-bordered mt-4">
@@ -757,23 +758,23 @@
                         </div>
                     </div>
                 }
-                @if (ViewBag.BusinessHeadWorkflow == true
+
+                @if (User.IsInRole("BusinessHead") && ViewBag.BusinessHeadWorkflow == true
                                 && ViewBag.VerticalHeadStatus?.ToString() == "Approved"
-                                && (ViewBag.BusinessHeadStatus?.ToString() == "Pending"
-                                || ViewBag.BusinessHeadStatus?.ToString() == "On Hold"))
+                                && (ViewBag.BusinessHeadStatus?.ToString() == "Pending"))
                 {
-                    <form asp-area="HRMS"
-                          asp-controller="TrainingCenter"
-                          asp-action="BusinessHeadUpdateStatus"
-                          method="post">
+                    <!-- BUSINESS HEAD REVIEW SECTION -->
+                    <div class="card card-bordered mt-4">
+                        <div class="card-inner">
+                            <h5 class="title mb-3">Business Head Review</h5>
 
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@Model.Id" />
+                            <form asp-area="HRMS"
+                                  asp-controller="TrainingCenter"
+                                  asp-action="BusinessHeadUpdateStatus"
+                                  method="post">
 
-                        <div class="card card-bordered mt-4">
-                            <div class="card-inner">
-
-                                <h5 class="title mb-3">Business Head Review</h5>
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.Id" />
 
                                 <div class="form-group">
                                     <label class="form-label">
@@ -785,12 +786,11 @@
                                           class="form-control"
                                           rows="3"
                                           maxlength="1000"
-                                          placeholder="Enter Business Head remarks..."
-                                          required></textarea>
+                                          required
+                                          placeholder="Enter Business Head remarks..."></textarea>
                                 </div>
 
                                 <div class="d-flex flex-wrap justify-content-end gap-2 mt-4 pb-3">
-
                                     <button type="submit"
                                             name="status"
                                             value="On Hold"
@@ -811,12 +811,70 @@
                                             class="btn btn-success">
                                         Send to CEO
                                     </button>
-
                                 </div>
-                            </div>
+                            </form>
                         </div>
-                    </form>
+                    </div>
                 }
+
+
+                @if (User.IsInRole("CEO") && ViewBag.CEOWorkflow == true
+                                && ViewBag.BusinessHeadStatus?.ToString() == "Approved"
+                                && (ViewBag.CEOStatus?.ToString() == "Pending"))
+                {
+                    <div class="card card-bordered mt-4">
+                        <div class="card-inner">
+                            <h5 class="title mb-3">CEO Final Review</h5>
+
+                            <form asp-area="HRMS"
+                                  asp-controller="TrainingCenter"
+                                  asp-action="CEOUpdateStatus"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.Id" />
+
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        CEO Remarks <span class="text-danger">*</span>
+                                    </label>
+
+                                    <textarea name="ceoRemarks"
+                                          class="form-control"
+                                          rows="3"
+                                          maxlength="1000"
+                                          required
+                                          placeholder="Enter CEO remarks..."></textarea>
+                                </div>
+
+                                <div class="d-flex flex-wrap justify-content-end gap-2 mt-4 pb-3">
+                                    <button type="submit"
+                                            name="status"
+                                            value="On Hold"
+                                            class="btn btn-info">
+                                        On Hold
+                                    </button>
+
+                                    <button type="submit"
+                                            name="status"
+                                            value="Rejected"
+                                            class="btn btn-danger">
+                                        Reject
+                                    </button>
+
+                                    <button type="submit"
+                                            name="status"
+                                            value="Approved"
+                                            class="btn btn-success">
+                                        Final Approve
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                }
+
+
 
                 else
                 {
@@ -827,64 +885,74 @@
                             <!-- REGIONAL HEAD -->
                             <div class="form-group">
                                 <label class="form-label">Regional Head Status</label>
-                                <input type="text"
-                                       class="form-control"
+                                <input type="text" class="form-control form-control-sm"
                                        value="@(ViewBag.RegionalHeadStatus ?? "Not Updated")"
                                        readonly />
                             </div>
 
-                            @if (!string.IsNullOrWhiteSpace(
-                                                    ViewBag.RegionalHeadRemarks?.ToString()))
+                            @if (!string.IsNullOrWhiteSpace(ViewBag.RegionalHeadRemarks?.ToString()))
                             {
-                                <div class="form-group mt-3">
+                                <div class="form-group mt-2">
                                     <label class="form-label">Regional Head Remarks</label>
-                                    <textarea class="form-control"
-                                      rows="3"
-                                      readonly>@ViewBag.RegionalHeadRemarks</textarea>
+                                    <textarea class="form-control form-control-sm"
+                                      rows="1" readonly>@ViewBag.RegionalHeadRemarks</textarea>
                                 </div>
                             }
 
-                            <hr class="my-4" />
+                            <hr class="my-3" />
 
                             <!-- VERTICAL HEAD -->
                             <div class="form-group">
                                 <label class="form-label">Vertical Head Status</label>
-                                <input type="text"
-                                       class="form-control"
+                                <input type="text" class="form-control form-control-sm"
                                        value="@(ViewBag.VerticalHeadStatus ?? "Not Updated")"
                                        readonly />
                             </div>
 
-                            @if (!string.IsNullOrWhiteSpace(
-                                                    ViewBag.VerticalHeadRemarks?.ToString()))
+                            @if (!string.IsNullOrWhiteSpace(ViewBag.VerticalHeadRemarks?.ToString()))
                             {
-                                <div class="form-group mt-3">
+                                <div class="form-group mt-2">
                                     <label class="form-label">Vertical Head Remarks</label>
-                                    <textarea class="form-control"
-                                      rows="3"
-                                      readonly>@ViewBag.VerticalHeadRemarks</textarea>
+                                    <textarea class="form-control form-control-sm"
+                                      rows="1" readonly>@ViewBag.VerticalHeadRemarks</textarea>
                                 </div>
                             }
 
-                            <hr class="my-4" />
+                            <hr class="my-3" />
 
                             <!-- BUSINESS HEAD -->
                             <div class="form-group">
                                 <label class="form-label">Business Head Status</label>
-                                <input type="text"
-                                       class="form-control"
+                                <input type="text" class="form-control form-control-sm"
                                        value="@(ViewBag.BusinessHeadStatus ?? "Not Updated")"
                                        readonly />
                             </div>
 
-                            @if (!string.IsNullOrWhiteSpace(
-                                                    ViewBag.BusinessHeadRemarks?.ToString()))
+                            @if (!string.IsNullOrWhiteSpace(ViewBag.BusinessHeadRemarks?.ToString()))
                             {
-                                <div class="form-group mt-3">
+                                <div class="form-group mt-2">
                                     <label class="form-label">Business Head Remarks</label>
-                                    <textarea class="form-control"
-                                      rows="3"
-                                      readonly>@ViewBag.BusinessHeadRemarks</textarea>
+                                    <textarea class="form-control form-control-sm"
+                                      rows="1" readonly>@ViewBag.BusinessHeadRemarks</textarea>
+                                </div>
+                            }
+
+                            <hr class="my-3" />
+
+                            <!-- CEO -->
+                            <div class="form-group">
+                                <label class="form-label">CEO Status</label>
+                                <input type="text" class="form-control form-control-sm"
+                                       value="@(ViewBag.CEOStatus ?? "Not Updated")"
+                                       readonly />
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(ViewBag.CEORemarks?.ToString()))
+                            {
+                                <div class="form-group mt-2">
+                                    <label class="form-label">CEO Remarks</label>
+                                    <textarea class="form-control form-control-sm"
+                                      rows="1" readonly>@ViewBag.CEORemarks</textarea>
                                 </div>
                             }
                         </div>
@@ -893,10 +961,22 @@
 
 
 
+
+                @{
+                    string backAction = ViewBag.CurrentApprovalRole?.ToString() switch
+                    {
+                        "RegionalHead" => "RegionalHeadInspection",
+                        "VerticalHead" => "VerticalHeadInspection",
+                        "BusinessHead" => "BusinessHeadInspection",
+                        "CEO" => "CEOInspection",
+                        _ => "RegionalHeadInspection"
+                    };
+                }
+
                 <div class="d-flex justify-content-end mt-4">
                     <a asp-area="HRMS"
                        asp-controller="TrainingCenter"
-                       asp-action="RegionalHeadInspection"
+                       asp-action="@backAction"
                        asp-route-tab="@(ViewBag.ActiveTab ?? "Pending")"
                        class="btn btn-light">
                         <em class="icon ni ni-arrow-left"></em>
