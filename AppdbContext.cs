@@ -105,5 +105,18 @@ namespace QUIZAPP
         public DbSet<BatchCandidate> BatchCandidates { get; set; }
         public DbSet<BatchMonitoring> BatchMonitorings { get; set; }
         public DbSet<BatchMonitoringReport> BatchMonitoringReports { get; set; }
+        public DbSet<CEOApproval> CEOApprovals { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<CEOApproval>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView("vw_CEOApprovals", "dbo");
+            });
+        }
     }
-}
+    
+    }
