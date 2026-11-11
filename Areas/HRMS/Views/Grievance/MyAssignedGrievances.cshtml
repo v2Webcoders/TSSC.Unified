@@ -1,0 +1,194 @@
+﻿@model IEnumerable<TSSC.Unified.Models.Grievance>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "My Assigned Grievances";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                My Assigned Grievances
+            </h3>
+
+            <div class="nk-block-des text-soft">
+                Grievances assigned to you
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@if (TempData["msg"] != null)
+{
+    <div class="example-alert w-100">
+        <div class="alert alert-info alert-icon">
+            <em class="icon ni ni-info"></em>
+            <strong>@TempData["msg"]</strong>
+        </div>
+    </div>
+}
+
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Grievance No.</th>
+                    <th>Name</th>
+                    <th>Mobile</th>
+                    <th>Description</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Assigned Date</th>
+                    <th>Original Attachment</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>@serial</td>
+
+                        <td>
+                            <strong>@item.GrievanceNo</strong>
+                        </td>
+
+                        <td>@item.Name</td>
+
+                        <td>@item.MobileNumber</td>
+
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(item.Description))
+                            {
+                                @(item.Description.Length > 70
+                                                        ? item.Description.Substring(0, 70) + "..."
+                                                        : item.Description)
+                                                }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+
+                        <td>
+                            @if (item.Priority == "High")
+                            {
+                                <span class="badge badge-dot bg-danger">
+                                    High
+                                </span>
+                            }
+                            else if (item.Priority == "Low")
+                            {
+                                <span class="badge badge-dot bg-secondary">
+                                    Low
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-dot bg-warning">
+                                    Normal
+                                </span>
+                            }
+                        </td>
+
+                        <td>
+                            @if (item.Status == "Resolved")
+                            {
+                                <span class="badge badge-dot bg-success">
+                                    Pending Approval
+                                </span>
+                            }
+                            else if (item.Status == "In Progress")
+                            {
+                                <span class="badge badge-dot bg-info">
+                                    In Progress
+                                </span>
+                            }
+                            else if (item.Status == "Assigned")
+                            {
+                                <span class="badge badge-dot bg-primary">
+                                    Assigned
+                                </span>
+                            }
+                            else if (item.Status == "Reopened" ||
+                            item.Status == "Rework")
+                            {
+                                <span class="badge badge-dot bg-warning">
+                                    @item.Status
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-dot bg-secondary">
+                                    @item.Status
+                                </span>
+                            }
+                        </td>
+
+                        <td>
+                            @(item.AssignedDate?.ToString("dd-MMM-yyyy hh:mm tt") ?? "-")
+                        </td>
+
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(item.AttachmentPath))
+                            {
+                                <a href="@item.AttachmentPath"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <em class="icon ni ni-file-text"></em>
+                                    View
+                                </a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+
+                        <td>
+                            <a asp-action="EmployeeGrievanceDetails"
+                               asp-controller="Grievance"
+                               asp-area="HRMS"
+                               asp-route-id="@item.Id"
+                               class="btn btn-sm btn-outline-primary"
+                               title="View Grievance">
+
+                                <em class="icon ni ni-eye"></em>
+
+                            </a>
+                        </td>
+
+                    </tr>
+
+                    serial++;
+                }
+
+            </tbody>
+
+        </table>
+
+        @* @if (!Model.Any())
+        {
+            <div class="text-center p-3">
+                <span class="text-muted">
+                    No grievances assigned to you.
+                </span>
+            </div>
+        } *@
+
+    </div>
+</div>

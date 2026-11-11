@@ -226,15 +226,15 @@
 
                                 <a asp-action="GrievanceDetails"
                                    asp-controller="Grievance"
+                                   asp-area="HRMS"
                                    asp-route-id="@item.Id"
-                                   asp-route-returnUrl="@Context.Request.Path"
+                                   asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)"
                                    class="btn btn-sm btn-outline-primary"
                                    title="View Grievance">
 
                                     <em class="icon ni ni-eye"></em>
 
                                 </a>
-
 
                                @*  <a asp-action="EditGrievance"
                                    asp-controller="Grievance"
