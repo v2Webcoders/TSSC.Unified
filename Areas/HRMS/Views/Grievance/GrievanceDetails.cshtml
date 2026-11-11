@@ -5,8 +5,19 @@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Grievance Details";
-}
 
+    bool isPendingApproval =
+        Model.Status == "Resolved" &&
+        Model.ApprovalStatus == "Pending Approval";
+
+    bool isRejected =
+Model.Status == "Resolved" &&
+Model.ApprovalStatus == "Rejected";
+    bool isAssigned = Model.AssignedTo.HasValue;
+
+    string returnUrl = ViewBag.ReturnUrl as string
+        ?? Url.Action("GrievanceList", "Grievance", new { area = "HRMS" })!;
+}
 
 @if (TempData["msg"] != null)
 {
@@ -18,388 +29,642 @@
     </div>
 }
 
-
 <div class="nk-block-head nk-block-head-sm">
-
     <div class="nk-block-between">
 
         <div class="nk-block-head-content">
-
             <h3 class="nk-block-title page-title">
                 Grievance Detail
             </h3>
-
             <div class="nk-block-des text-soft">
                 View and manage grievance details
             </div>
-
         </div>
 
-
         <div class="nk-block-head-content">
-
-        @*     <a asp-action="GrievanceList"
-               asp-controller="Grievance"
+            <a href="@returnUrl"
                class="btn btn-primary d-none d-md-inline-flex">
-
                 <em class="icon ni ni-list"></em>
                 &nbsp; Grievance List
-
-            </a> *@
-            @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
-            {
-                <a href="@ViewBag.ReturnUrl"
-                   class="btn btn-primary d-none d-md-inline-flex">
-
-                    <em class="icon ni ni-list"></em>
-                    &nbsp; Grievance List
-
-                </a>
-            }
-            else
-            {
-                <a asp-action="GrievanceList"
-                   asp-controller="Grievance"
-                   class="btn btn-primary d-none d-md-inline-flex">
-
-                    <em class="icon ni ni-list"></em>
-                    &nbsp; Grievance List
-
-                </a>
-            }
-
+            </a>
         </div>
 
     </div>
-
 </div>
 
+<!-- ================= GRIEVANCE INFORMATION ================= -->
 
 <div class="card card-bordered">
-
     <div class="card-inner">
 
         <div class="preview-block">
 
-            <div class="row gy-4">
-
-                <div class="col-sm-12">
-
-                    <form asp-action="GrievanceDetails"
-                          asp-controller="Grievance"
-                          method="post"
-                          enctype="multipart/form-data">
-
-                        <input type="hidden" asp-for="Id" />
-
-                        <!-- ================= Grievance Information ================= -->
-
-                        <div class="row gy-3">
-
-
-                            <!-- Grievance Number -->
-
-                            <div class="col-md-6">
-
-                                <label class="form-label">
-                                    Grievance Number
-                                </label>
-
-                                <input asp-for="GrievanceNo"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-
-
-                            <!-- Created Date -->
-
-                            <div class="col-md-6">
-
-                                <label class="form-label">
-                                    Submitted On
-                                </label>
-
-                                <input value="@Model.CreatedDate.ToString("dd-MMM-yyyy hh:mm tt")"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-
-
-                            <!-- Name -->
-
-                            <div class="col-md-6">
-
-                                <label class="form-label">
-                                    Name
-                                </label>
-
-                                <input asp-for="Name"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-
-
-                            <!-- Mobile -->
-
-                            <div class="col-md-6">
-
-                                <label class="form-label">
-                                    Mobile Number
-                                </label>
-
-                                <input asp-for="MobileNumber"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-
-
-                            <!-- Email -->
-
-                            <div class="col-md-12">
-
-                                <label class="form-label">
-                                    Email Address
-                                </label>
-
-                                <input asp-for="Email"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-
-
-                            <!-- Description -->
-
-                            <div class="col-md-12">
-
-                                <label class="form-label">
-                                    Grievance Description
-                                </label>
-
-                                <textarea asp-for="Description"
-                                          class="form-control"
-                                          rows="5"
-                                          readonly></textarea>
-
-                            </div>
-
-
-                            <!-- ================= Priority ================= -->
-
-                            <div class="col-md-6">
-
-                                <label class="form-label">
-                                    Priority
-                                </label>
-
-                                <select asp-for="Priority"
-                                        class="form-select">
-
-                                    <option value="Normal">
-                                        Normal
-                                    </option>
-
-                                    <option value="High">
-                                        High
-                                    </option>
-
-                                    <option value="Low">
-                                        Low
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-
-                            <!-- ================= Status ================= -->
-
-                            <div class="col-md-6">
-
-                                <label class="form-label">
-                                    Current Status
-                                </label>
-
-                                <select asp-for="Status"
-                                        class="form-select">
-
-                                    <option value="Submitted">
-                                        Submitted
-                                    </option>
-
-                                    <option value="In Progress">
-                                        In Progress
-                                    </option>
-
-                                    <option value="Resolved">
-                                        Resolved
-                                    </option>
-
-                                    <option value="Rejected">
-                                        Rejected
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-
-                            <!-- ================= Attachment ================= -->
-
-                            <div class="col-md-6">
-
-                                <label class="form-label">
-                                    Attachment
-                                </label>
-
-                                @if (!string.IsNullOrEmpty(Model.AttachmentPath))
-                                {
-                                    <br />
-
-                                    <a href="@Model.AttachmentPath"
-                                       target="_blank"
-                                       class="btn btn-outline-info">
-
-                                        <em class="icon ni ni-file-text"></em>
-                                        View Attachment
-
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">
-                                        No Attachment
-                                    </span>
-                                }
-
-                            </div>
-
-
-                            <!-- ================= Updated Date ================= -->
-
-                            <div class="col-md-6">
-
-                                <label class="form-label">
-                                    Last Updated
-                                </label>
-
-                                <input value="@(Model.UpdatedDate.HasValue
-                                                                                       ? Model.UpdatedDate.Value.ToString("dd-MMM-yyyy hh:mm tt")
-                                                                                       : "-")"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-
-
-                            <!-- ================= Team Remarks ================= -->
-
-                            <div class="col-md-12">
-
-                                <label class="form-label">
-                                    Grievance Team Remarks
-                                </label>
-
-                                <textarea asp-for="TeamRemarks"
-                                          class="form-control"
-                                          rows="4"
-                                          placeholder="Enter remarks or action taken..."></textarea>
-
-                            </div>
-
-
-                            <!-- ================= Upload Report ================= -->
-
-                            <div class="col-md-6">
-
-                                <label class="form-label">
-                                    Upload Report
-                                </label>
-
-                                <input type="file"
-                                       name="ReportFile"
-                                       class="form-control"
-                                       accept=".pdf,.doc,.docx" />
-
-                                <div class="form-note">
-                                    <small class="text-muted">
-                                        Allowed formats: PDF, DOC, DOCX. Maximum size: 5 MB.
-                                    </small>
-                                </div>
-
-                            </div>
-
-
-                            <!-- ================= Existing Report ================= -->
-
-                            <div class="col-md-6">
-
-                                <label class="form-label">
-                                    Uploaded Report
-                                </label>
-
-                                @if (!string.IsNullOrEmpty(Model.ReportPath))
-                                {
-                                    <br />
-
-                                    <a href="@Model.ReportPath"
-                                       target="_blank"
-                                       class="btn btn-outline-success">
-
-                                        <em class="icon ni ni-file-text"></em>
-                                        View Report
-
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">
-                                        No Report Uploaded
-                                    </span>
-                                }
-
-                            </div>
-
-
-                            <!-- ================= Buttons ================= -->
-
-                            <div class="col-12 mt-4">
-                                @if (Model.Status != "Resolved"){
-                                    <button type="submit"
-                                    class="btn btn-primary"
-                                    onclick="return confirm('Are you sure you want to update this grievance request?');">
-
-                                        <em class="icon ni ni-save"></em>
-
-                                        Save Update
-
-                                    </button>
-                                }
-
-                                <a asp-action="GrievanceDetails"
-                                   asp-controller="Grievance"
-                                   class="btn btn-outline-secondary ms-2">
-
-                                    Cancel
-
-                                </a>
-
-                            </div>
-
+            <h5 class="title mb-4">Grievance Information</h5>
+
+            <div class="row gy-3">
+
+                <div class="col-md-6">
+                    <label class="form-label">Grievance Number</label>
+                    <input asp-for="GrievanceNo"
+                           class="form-control"
+                           readonly />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Submitted On</label>
+                    <input value="@Model.CreatedDate.ToString("dd-MMM-yyyy hh:mm tt")"
+                           class="form-control"
+                           readonly />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Name</label>
+                    <input asp-for="Name"
+                           class="form-control"
+                           readonly />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Mobile Number</label>
+                    <input asp-for="MobileNumber"
+                           class="form-control"
+                           readonly />
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">Email Address</label>
+                    <input asp-for="Email"
+                           class="form-control"
+                           readonly />
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">Grievance Description</label>
+                    <textarea asp-for="Description"
+                              class="form-control"
+                              rows="5"
+                              readonly></textarea>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Priority</label>
+
+                    @if (isPendingApproval || Model.Status == "Closed")
+                    {
+                        <input asp-for="Priority"
+                               class="form-control"
+                               readonly />
+                    }
+                    else
+                    {
+                        <select asp-for="Priority" class="form-select">
+                            <option value="Normal">Normal</option>
+                            <option value="High">High</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    }
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Current Status</label>
+
+                    <input asp-for="Status"
+                           class="form-control"
+                           readonly />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Original Attachment</label>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.AttachmentPath))
+                    {
+                        <div>
+                            <a href="@Url.Content(Model.AttachmentPath)"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="btn btn-outline-info">
+                                <em class="icon ni ni-file-text"></em>
+                                View Attachment
+                            </a>
                         </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No Attachment</span>
+                    }
+                </div>
 
-                    </form>
+                <div class="col-md-6">
+                    <label class="form-label">Last Updated</label>
 
+                    <input value="@(Model.UpdatedDate.HasValue
+                                                   ? Model.UpdatedDate.Value.ToString("dd-MMM-yyyy hh:mm tt")
+                                                   : "-")"
+                           class="form-control"
+                           readonly />
                 </div>
 
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= ASSIGNMENT INFORMATION ================= -->
+@if (isAssigned)
+{
+    <div class="card card-bordered mt-4">
+        <div class="card-inner">
+
+            <h5 class="title mb-4">
+                <em class="icon ni ni-user-check"></em>
+                Assignment Information
+            </h5>
+
+            <div class="row gy-3">
+
+                <div class="col-md-6">
+                    <label class="form-label">Assigned Employee</label>
+                    <input type="text"
+                           class="form-control"
+                           value="@ViewBag.AssignedEmployeeName"
+                           readonly />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Assigned By</label>
+                    <input type="text"
+                           class="form-control"
+                           value="@ViewBag.AssignedByName"
+                           readonly />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Assigned Date</label>
+                    <input value="@(Model.AssignedDate?.ToString("dd-MMM-yyyy hh:mm tt") ?? "-")"
+                           class="form-control"
+                           readonly />
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">Manager Assignment Instructions</label>
+                    <textarea class="form-control"
+                          rows="3"
+                          readonly>@Model.AssignedEmployeeRemarks</textarea>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+<!-- ================= EMPLOYEE RESOLUTION ================= -->
+@if (isPendingApproval || Model.ApprovalStatus == "Approved"
+    || Model.ApprovalStatus == "Rejected")
+{
+    <div class="card card-bordered mt-4">
+        <div class="card-inner">
+
+            <h5 class="title mb-4">
+                <em class="icon ni ni-file-check"></em>
+                Employee Resolution Details
+            </h5>
+
+            <div class="row gy-3">
+
+                <div class="col-md-6">
+                    <label class="form-label">Resolved By</label>
+                    <input type="text"
+                           class="form-control"
+                           value="@ViewBag.AssignedEmployeeName"
+                           readonly />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Resolved Date</label>
+                    <input value="@(Model.ResolvedDate?.ToString("dd-MMM-yyyy hh:mm tt") ?? "-")"
+                           class="form-control"
+                           readonly />
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">Employee Resolution Remarks</label>
+                    <textarea asp-for="TeamRemarks"
+                              class="form-control"
+                              rows="4"
+                              readonly></textarea>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">Employee Uploaded Report</label>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.ReportPath))
+                    {
+                        <div>
+                            <a href="@Url.Content(Model.ReportPath)"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="btn btn-outline-success">
+                                <em class="icon ni ni-file-text"></em>
+                                View Resolution Report
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-danger">No Report Uploaded</span>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@if (Model.ReopenedDate.HasValue)
+{
+    <div class="card card-bordered mt-4">
+        <div class="card-inner">
+
+            <h5 class="title mb-3">
+                <em class="icon ni ni-reload text-warning"></em>
+                Reopening History
+                <span class="badge bg-warning text-dark ms-2">
+                    Reopened
+                </span>
+            </h5>
+
+            <div class="alert alert-warning">
+                This grievance was reopened by the manager
+                and sent back to the assigned employee for further action.
+            </div>
+
+            <div class="row gy-3">
+
+                <div class="col-md-6">
+                    <label class="form-label">Reopened By</label>
+                    <input type="text"
+                           class="form-control"
+                           value="@ViewBag.ReopenedByName"
+                           readonly />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Reopened Date</label>
+                    <input class="form-control"
+                           value="@Model.ReopenedDate?.ToString("dd-MMM-yyyy hh:mm tt")"
+                           readonly />
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">Reopening Remarks</label>
+                    <textarea class="form-control"
+                          rows="3"
+                          readonly>@Model.ReopenRemarks</textarea>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+<!-- ================= REOPEN GRIEVANCE ================= -->
+@if (isRejected)
+{
+    <div class="card card-bordered mt-4">
+        <div class="card-inner">
+
+            <h5 class="title mb-3">
+                <em class="icon ni ni-alert-circle text-danger"></em>
+                Rejected Grievance
+            </h5>
+
+            <div class="alert alert-warning">
+                This grievance has been rejected.
+                Click below to reopen it and send it back to the same employee.
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Rejection Remarks</label>
+                <textarea class="form-control"
+                      rows="3"
+                      readonly>@Model.RejectionRemarks</textarea>
+            </div>
+
+            <form action="/HRMS/Grievance/ReopenGrievance"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="id" value="@Model.Id" />
+
+                <input type="hidden"
+                       name="returnUrl"
+                       value="@ViewBag.ReturnUrl" />
+
+                <button type="submit"
+                        class="btn btn-warning"
+                        onclick="return confirm('Are you sure you want to reopen this grievance?');">
+
+                    <em class="icon ni ni-reload"></em>
+                    Reopen Grievance
+                </button>
+
+            </form>
 
         </div>
+    </div>
+}
+
+<!-- ================= MANAGER APPROVAL / REJECTION ================= -->
+@if (isPendingApproval)
+{
+    <div class="card card-bordered mt-4">
+        <div class="card-inner">
+
+            <h5 class="title mb-4">
+                <em class="icon ni ni-check-circle"></em>
+                Manager Review
+            </h5>
+
+            <form asp-area="HRMS"
+                  asp-controller="Grievance"
+                  asp-action="ReviewGrievance"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="Id" value="@Model.Id" />
+
+                <div class="row gy-3">
+
+                    <div class="col-md-12">
+                        <label class="form-label">
+                            Manager Remarks
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <textarea name="ApprovalRemarks"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Enter approval or rejection remarks..."
+                              maxlength="5000"
+                              required></textarea>
+                    </div>
+
+                    <div class="col-12 mt-3 text-end">
+
+                        <button type="submit"
+                                name="decision"
+                                value="Reject"
+                                class="btn btn-danger"
+                                onclick="return confirm('Are you sure you want to reject this resolution?');">
+
+                            <em class="icon ni ni-cross-circle"></em>
+                            Reject Resolution
+                        </button>
+
+                        <button type="submit"
+                                name="decision"
+                                value="Approve"
+                                class="btn btn-success"
+                                onclick="return confirm('Are you sure you want to approve this resolution?');">
+
+                            <em class="icon ni ni-check-circle"></em>
+                            Approve Resolution
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+}
+
+<!-- ================= EXISTING MANAGER UPDATE FORM ================= -->
+@if (!isPendingApproval &&
+     !isRejected &&
+     Model.Status != "Closed")
+{
+    <div class="card card-bordered mt-4">
+        <div class="card-inner">
+
+            <h5 class="title mb-4">Update Grievance</h5>
+
+            <form asp-area="HRMS"
+                  asp-controller="Grievance"
+                  asp-action="GrievanceDetails"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="Id" />
+
+                <div class="row gy-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label">Priority</label>
+
+                        <select asp-for="Priority" class="form-select">
+                            <option value="Normal">Normal</option>
+                            <option value="High">High</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Status</label>
+
+                        <select asp-for="Status" class="form-select">
+                            <option value="Submitted">Submitted</option>
+                            <option value="Assigned">Assigned</option>
+                            <option value="In Progress">In Progress</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label">Grievance Team Remarks</label>
+
+                        <textarea name="TeamRemarks"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Enter remarks or action taken...">@Model.TeamRemarks</textarea>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Upload Report</label>
+
+                        <input type="file"
+                               name="ReportFile"
+                               class="form-control"
+                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+
+                        <small class="text-muted">
+                            Allowed: PDF, DOC, DOCX, JPG, JPEG, PNG. Maximum size: 5 MB.
+                        </small>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Previously Uploaded Report</label>
+
+                        @if (!string.IsNullOrWhiteSpace(Model.ReportPath))
+                        {
+                            <div>
+                                <a href="@Url.Content(Model.ReportPath)"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="btn btn-outline-success">
+                                    <em class="icon ni ni-file-text"></em>
+                                    View Report
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No Report Uploaded</span>
+                        }
+                    </div>
+
+                    <div class="col-12 mt-4">
+
+                        <button type="submit"
+                                class="btn btn-primary"
+                                onclick="return confirm('Are you sure you want to update this grievance?');">
+                            <em class="icon ni ni-save"></em>
+                            Save Update
+                        </button>
+
+                        <a href="@returnUrl"
+                           class="btn btn-outline-secondary ms-2">
+                            Cancel
+                        </a>
+
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+}
+
+<!-- ================= ASSIGN EMPLOYEE ================= -->
+@if (Model.Status == "Submitted" && !isAssigned)
+{
+    <div class="col-12 mt-4">
+
+        <button type="button"
+                class="btn btn-success"
+                data-bs-toggle="collapse"
+                data-bs-target="#assignEmployeeCard">
+
+            <em class="icon ni ni-user-add"></em>
+            Assign To Employee
+        </button>
 
     </div>
 
+    <div class="col-12 mt-3 collapse" id="assignEmployeeCard">
+
+        <div class="card card-bordered">
+            <div class="card-inner">
+
+                <h5 class="title mb-3">
+                    Assign Grievance To Employee
+                </h5>
+
+                <form asp-area="HRMS"
+                      asp-controller="Grievance"
+                      asp-action="AssignEmployee"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="GrievanceId"
+                           value="@Model.Id" />
+
+                    <div class="row gy-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Select Employee
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <select name="EmployeeId"
+                                    id="EmployeeId"
+                                    class="form-select"
+                                    asp-items="ViewBag.EmployeeList"
+                                    required>
+
+                                <option value="">-- Search or Select Employee --</option>
+
+                            </select>
+                        </div>
+
+                        <div class="col-md-12">
+
+                            <label class="form-label">
+                                Assignment Remarks
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <textarea name="AssignedEmployeeRemarks"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="Enter instructions for the assigned employee..."
+                                  maxlength="5000"
+                                  required></textarea>
+
+                        </div>
+
+                        <div class="col-12">
+
+                            <button type="submit"
+                                    class="btn btn-primary"
+                                    onclick="return confirm('Are you sure you want to assign this grievance?');">
+
+                                <em class="icon ni ni-user-add"></em>
+                                Assign Employee
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+}
+@* </div>
 </div>
+</div>
+</div>
+</div>
+</div>
+</div> *@
+@section Scripts {
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('#EmployeeId').select2({
+                placeholder: "-- Search or Select Employee --",
+                allowClear: true,
+                width: '100%',
+                minimumResultsForSearch: 0
+            });
+
+        });
+    </script>
+}
