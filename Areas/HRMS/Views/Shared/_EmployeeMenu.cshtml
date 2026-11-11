@@ -200,6 +200,21 @@
 		isRegionalHeadReportingManager =
 			regionalHeadReportingManagerIds.Contains(employee.EmployeeId);
 	}
+	//for grievance module
+	var currentUserId = User.FindFirst(
+		System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+	var employeeIdgri = !string.IsNullOrEmpty(currentUserId)
+				? Context.Employee
+					.Where(x => x.ApplicationUserId == currentUserId)
+					.Select(x => (int?)x.EmployeeId)
+					.FirstOrDefault()
+				: null;
+
+	var hasAssignedGrievance = employeeIdgri.HasValue &&
+		Context.Grievance.Any(x =>
+			x.AssignedTo == employeeIdgri.Value
+				   /*  && x.Status != "Closed" */);
 }
 
 <style>
@@ -1873,7 +1888,7 @@
 	
 	<!-- MANAGER - REPORTING MANAGER ONLY -->
 	<!-- ===================================================== -->
-	@if (isReportingManager || showReimbursementApproverMenu || isFinanceEmployee || isHR || isFinanceHead || isCEO || User.IsInRole("GrievanceTeam"))
+	@if (isReportingManager || showReimbursementApproverMenu || isFinanceEmployee || isHR || isFinanceHead || isCEO || hasAssignedGrievance || User.IsInRole("GrievanceTeam"))
 
 	{
 		<li class="nk-menu-heading">
@@ -2249,92 +2264,157 @@
 
 		}
 
-	@if (User.IsInRole("GrievanceTeam"))
-	{
-		<li class="nk-menu-item has-sub">
+		@if (User.IsInRole("GrievanceTeam"))
+		{
+			<li class="nk-menu-item has-sub">
 
-			<a href="#"
-			   class="nk-menu-link nk-menu-toggle">
+				<a href="#"
+				   class="nk-menu-link nk-menu-toggle">
 
-				<span class="nk-menu-icon">
-					<em class="icon ni ni-alert-circle"></em>
-				</span>
+					<span class="nk-menu-icon">
+						<em class="icon ni ni-alert-circle"></em>
+					</span>
 
-				<span class="nk-menu-text">
-					Grievance Management
-				</span>
+					<span class="nk-menu-text">
+						Grievance Management
+					</span>
 
-			</a>
+				</a>
 
-			<ul class="nk-menu-sub">
+				<ul class="nk-menu-sub">
 
-				<!-- All Grievances -->
+					<!-- All Grievances -->
 
-				<li class="nk-menu-item">
+					<li class="nk-menu-item">
 
-					<a href="/HRMS/Grievance/GrievanceList"
-					   class="nk-menu-link">
+						<a href="/HRMS/Grievance/GrievanceList"
+						   class="nk-menu-link">
 
-						<span class="nk-menu-text">
-							All Grievances
-						</span>
+							<span class="nk-menu-text">
+								All Grievances
+							</span>
 
-					</a>
+						</a>
 
-				</li>
-
-
-				<!-- Pending Grievances -->
-
-				<li class="nk-menu-item">
-
-					<a href="/HRMS/Grievance/PendingGrievance"
-					   class="nk-menu-link">
-
-						<span class="nk-menu-text">
-							Pending Grievances
-						</span>
-
-					</a>
-
-				</li>
+					</li>
 
 
-				<!-- In Progress -->
+					<!-- Pending Grievances -->
 
-				<li class="nk-menu-item">
+					<li class="nk-menu-item">
 
-					<a href="/HRMS/Grievance/InProgressGrievance"
-					   class="nk-menu-link">
+						<a href="/HRMS/Grievance/PendingGrievance"
+						   class="nk-menu-link">
 
-						<span class="nk-menu-text">
-							In Progress
-						</span>
+							<span class="nk-menu-text">
+								Pending Grievances
+							</span>
 
-					</a>
+						</a>
 
-				</li>
+					</li>
+
+					<li class="nk-menu-item">
+						<a href="/HRMS/Grievance/AssignedGrievances" class="nk-menu-link">
+							<span class="nk-menu-text">Assigned to Employees</span>
+						</a>
+					</li>
+					<!-- In Progress -->
+
+					<li class="nk-menu-item">
+
+						<a href="/HRMS/Grievance/InProgressGrievance"
+						   class="nk-menu-link">
+
+							<span class="nk-menu-text">
+								In Progress
+							</span>
+
+						</a>
+
+					</li>
 
 
-				<!-- Resolved -->
+					<!-- Resolved -->
 
-				<li class="nk-menu-item">
+					<li class="nk-menu-item">
 
-					<a href="/HRMS/Grievance/ResolvedGrievance"
+						@* <a href="/HRMS/Grievance/ResolvedGrievance"
 					   class="nk-menu-link">
 
 						<span class="nk-menu-text">
 							Resolved Grievances
 						</span>
 
-					</a>
+					</a> *@
+					<li class="nk-menu-item">
+						<a href="/HRMS/Grievance/PendingApprovalGrievance"
+						   class="nk-menu-link">
+							<span class="nk-menu-text">
+								Resolved – Pending Approval
+							</span>
+						</a>
+					</li>
+					<li class="nk-menu-item">
+						<a href="/HRMS/Grievance/RejectedGrievances"
+						   class="nk-menu-link">
+							<span class="nk-menu-text">Rejected Grievances</span>
+						</a>
+					</li>
+					<li class="nk-menu-item">
+						<a href="/HRMS/Grievance/ReopenedGrievances" class="nk-menu-link">
+							<span class="nk-menu-text">Reopened Grievances</span>
+						</a>
+					</li>
 
+					<li class="nk-menu-item">
+						<a href="/HRMS/Grievance/ClosedGrievances" class="nk-menu-link">
+							<span class="nk-menu-text">Closed Grievances</span>
+						</a>
+					</li>
+			</li>
+
+		</ul>
+
+				</li>
+		}
+		@if (hasAssignedGrievance)
+		{
+		<li class="nk-menu-item has-sub">
+
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-alert-circle"></em>
+				</span>
+				<span class="nk-menu-text">My Grievances</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/Grievance/MyAssignedGrievances"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Assigned Grievances</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/Grievance/MyInProgressGrievances"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">In Progress</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/Grievance/MyResolvedGrievances"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Resolved Grievances</span>
+					</a>
 				</li>
 
 			</ul>
-
 		</li>
-	}
+		}
 
 	}
 
