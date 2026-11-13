@@ -83,8 +83,10 @@ builder.Services.AddScoped<ILeaveService, LeaveService>();
 builder.Services.AddScoped<
     IAttendanceSummaryService,
     AttendanceSummaryService>();
-builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IMenuCountService, MenuCountService>();
+builder.Services.AddScoped<ApprovalService>();
+builder.Services.AddMemoryCache();
+
 var app = builder.Build();
 
 

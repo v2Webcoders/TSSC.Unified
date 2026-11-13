@@ -20,6 +20,36 @@
 @section Styles {
     <link rel="stylesheet" href="~/assets/css/base.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/assets/css/dashboard.css" asp-append-version="true" />
+    <style>
+        section.kpi-off .kcards,
+        section.kpi-off .kcards * {
+            filter: grayscale(1) !important;
+        }
+
+        section.kpi-off .kcards {
+            opacity: .55 !important;
+            pointer-events: none !important;
+            user-select: none !important;
+        }
+
+        section.kpi-off .kc {
+            border-top-color: #d1d5db !important;
+        }
+
+        section.kpi-off select[data-fysel] {
+            opacity: .6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+
+        section.kpi-off .preview-tag {
+            background: #e5e7eb !important;
+            color: #6b7280 !important;
+        }
+    </style>
+
+    <section class="kpi-off">
+        ...
 }
 
 
@@ -31,7 +61,24 @@
                     
                     <div id="scrim"></div>
                     <div id="main">
-                        
+                        @if (TempData["success"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <em class="icon ni ni-check-circle"></em>
+                                @TempData["success"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                            </div>
+                        }
+
+                        @if (TempData["error"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                @TempData["error"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                            </div>
+                        }
                         <main class="content" id="top">
                             <div class="page view " id="v-dash" data-crumb="CEO Dashboard">
                                 <div data-fy="2026-27">
@@ -89,7 +136,7 @@
                                                             </span>
 
                                                             <span class="sc sc-late">
-                                                                <b>@workforce.Delayed</b> Delay
+                                                                <b>@workforce.Delayed</b> Late
                                                             </span>
                                                         </span>
                                                     </div>
@@ -99,12 +146,12 @@
                                                         <span class="l">
                                                             <i class="dot"
                                                                style="background:var(--royal)"></i>
-                                                            On duty (OD)
+                                                            On official duty
                                                         </span>
 
                                                         <span class="n">@workforce.OnDuty</span>
 
-                                                        <span class="s">Working remotely</span>
+                                                        <span class="s">Working outside office</span>
                                                     </div>
 
                                                     <!-- ON LEAVE -->
@@ -166,9 +213,7 @@
                                                 </div>
 
                                                 <div class="segnote">
-                                                    Present includes on-time and delayed employees.
-                                                    OD (working remotely) and On leave are counted
-                                                    separately from Absent.
+                                                    Present = on time + late. Working today (present + official duty).
                                                 </div>
 
                                             </div>
@@ -271,43 +316,22 @@
                                             <div class="ph">
                                                 <div>
                                                     <h3>Latest pending requests</h3>
-                                                    <p class="cnt">Showing 4 of 7 pending requests</p>
+                                                    <p class="cnt">Showing @Model.PendingApprovals.Count of @Model.ApprovalSummary.AwaitingApprovals pending requests</p>
                                                 </div>
                                                 <div class="fx">
-                                                    @* <select class="ctl" aria-label="Department" data-filter>
-                                                        <option value="">All departments</option>
-                                                        <option value="Administration">Administration</option>
-                                                        <option value="Affiliation">Affiliation</option>
-                                                        <option value="Assessment &amp; Certification">
-                                                            Assessment &amp;
-                                                            Certification
-                                                        </option>
-                                                        <option value="Finance &amp; Accounts">
-                                                            Finance &amp; Accounts
-                                                        </option>
-                                                        <option value="HR Management">HR Management</option>
-                                                        <option value="IT &amp; Asset Management">
-                                                            IT &amp; Asset Management
-                                                        </option>
-                                                        <option value="NAPS">NAPS</option>
-                                                        <option value="Project Management">Project Management</option>
-                                                        <option value="Training &amp; Operations">
-                                                            Training &amp; Operations
-                                                        </option>
-                                                        <option value="Vendor Management">Vendor Management</option>
-                                                    </select><select class="ctl" aria-label="Priority" data-filter>
-                                                        <option value="">All priorities</option>
-                                                        <option value="High">High</option>
-                                                        <option value="Medium">Medium</option>
-                                                        <option value="Low">Low</option>
-                                                    </select> *@
-                                                    <select class="ctl" aria-label="Department" data-filter>
+                                                    <select class="ctl" aria-label="Department" id="departmentFilter">
                                                         <option value="">All departments</option>
 
                                                         @foreach (var department in Model.ApprovalDepartments)
                                                         {
                                                             <option value="@department">@department</option>
                                                         }
+                                                    </select>
+                                                    <select class="ctl" aria-label="Priority" id="priorityFilter">
+                                                        <option value="">All priorities</option>
+                                                        <option value="High">High</option>
+                                                        <option value="Medium">Medium</option>
+                                                        <option value="Low">Low</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -327,11 +351,12 @@
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody>
+                                                        <tbody id="pendingApprovalsBody">
                                                             @foreach (var item in Model.PendingApprovals)
                                                             {
-                                                                <tr data-department="@item.Department"
-                                                                    data-priority="@item.Priority">
+                                                                var overdue = item.DueDate.HasValue && item.DueDate.Value.Date < DateTime.Today;
+                                                                <tr class="@(overdue ? "hot" : "")" data-department="@item.Department"
+                                                                    data-priority="@item.Priority" data-overdue="@(overdue ? "1" : "0")">
 
                                                                     <td class="rid">@item.RequestId</td>
 
@@ -372,7 +397,7 @@
                                                                                asp-controller="Home"
                                                                                asp-area="HRMS"
                                                                                asp-route-id="@item.Id"
-                                                                               asp-route-requestType="@item.RequestType">
+                                                                               asp-route-source="@item.SourceTable">
                                                                                 View
                                                                             </a>
                                                                         </div>
@@ -605,27 +630,16 @@
                                                 </div>
                                                 <p class="empty" hidden>Nothing waiting for the CEO in this view.</p>
                                                 <div class="legend">
-                                                    <span>
-                                                        <b style="color:var(--green)">✓</b>
-                                                        Approve
-                                                    </span><span>
-                                                        <b style="color:var(--red)">✕</b>
-                                                        Reject
-                                                    </span><span>
-                                                        <b style="color:var(--purple)">↩</b> Return for
-                                                        clarification
-                                                    </span><span>
-                                                        Actions follow the CEO's approval role.
-                                                        Decisions here are a demonstration and are not saved.
-                                                    </span>
+                                                    <p class="hint">Open a request with <b>View</b> to approve, reject or return it.</p>
+                                                    
                                                 </div>
                                             </div>
                                         </div>
                                     </section>
-                                    <section>
+                                        <section class="kpi-off">
                                         <div class="sh">
                                             <div>
-                                                <h2>③ TSSC KPIs</h2>
+                                                <h2>③ TSSC KPIs <span class="preview-tag">Preview · sample figures</span></h2>
                                                 <p>Key performance indicators for FY 2026-27 (Current)</p>
                                             </div>
                                             <div class="shr">
@@ -781,158 +795,105 @@
                                             <div class="shr"></div>
                                         </div>
                                         <div class="dgrid">
-                                            <a class="dept" href="https://erp.tsscindia.com/HRMS/Home"
-                                               target="_blank" rel="noopener noreferrer">
+
+                                            <!-- HR Dashboard: unchanged -->
+                                            <a class="dept" href="/HRMS/Home/HRDashboard" target="_blank" rel="noopener noreferrer">
                                                 <span class="ic ico">
-                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none"
-                                                         stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                                                         stroke-linejoin="round" aria-hidden="true">
+                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                         <circle cx="9" cy="8" r="3.5"></circle>
-                                                        <path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6M16 4.5a3.5 3.5 0 010 7M18 14c2.5.6 4 2.6 4 6">
-                                                        </path>
+                                                        <path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6M16 4.5a3.5 3.5 0 010 7M18 14c2.5.6 4 2.6 4 6"></path>
                                                     </svg>
-                                                </span><span class="dn">HR Management</span><span class="dd">
-                                                    Employee records, attendance, leave and payroll
-                                                    inputs
-                                                </span><span class="kv">
-                                                    <span>Open portal</span><span class="go">↗</span>
-                                                </span>
-                                            </a><a class="dept"
-                                                   href="https://erp.tsscindia.com/" target="_blank"
-                                                   rel="noopener noreferrer">
+                                                </span><span class="dn">HR Dashboard</span><span class="dd">
+                                                    Employee records, attendance, leave and payroll inputs
+                                                </span><span class="kv"><span>Open Dashboard</span><span class="go">↗</span></span>
+                                            </a>
+
+                                            <div class="dept is-soon" aria-disabled="true">
                                                 <span class="ic ico">
-                                                    <svg viewBox="0 0 24 24"
-                                                         width="20" height="20" fill="none" stroke="currentColor"
-                                                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-                                                         aria-hidden="true">
+                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                         <ellipse cx="12" cy="6" rx="8" ry="3"></ellipse>
-                                                        <path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6">
-                                                        </path>
+                                                        <path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"></path>
                                                     </svg>
-                                                </span><span class="dn">Finance &amp; Accounts</span><span class="dd">Budgets, payments, invoices and audit support</span><span class="kv">
-                                                    <span>Open portal</span><span class="go">↗</span>
-                                                </span>
-                                            </a><a class="dept"
-                                                   href="https://erp.tsscindia.com/" target="_blank"
-                                                   rel="noopener noreferrer">
+                                                </span><span class="dn">Finance &amp; Accounts</span><span class="dd">Budgets, payments, invoices and audit support</span>
+                                                <span class="kv"><span>Coming soon</span><span class="go">↗</span></span>
+                                            </div>
+
+                                            <div class="dept is-soon" aria-disabled="true">
                                                 <span class="ic ico">
-                                                    <svg viewBox="0 0 24 24"
-                                                         width="20" height="20" fill="none" stroke="currentColor"
-                                                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-                                                         aria-hidden="true">
-                                                        <path d="M2 9l10-5 10 5-10 5-10-5zM6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5">
-                                                        </path>
+                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                        <path d="M2 9l10-5 10 5-10 5-10-5zM6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"></path>
                                                     </svg>
-                                                </span><span class="dn">Training &amp; Operations</span><span class="dd">
-                                                    Training partner operations, batches and
-                                                    monitoring
-                                                </span><span class="kv">
-                                                    <span>Open portal</span><span class="go">↗</span>
-                                                </span>
-                                            </a><a class="dept"
-                                                   href="https://erp.tsscindia.com/" target="_blank"
-                                                   rel="noopener noreferrer">
+                                                </span><span class="dn">Training &amp; Operations</span><span class="dd">Training partner operations, batches and monitoring</span>
+                                                <span class="kv"><span>Coming soon</span><span class="go">↗</span></span>
+                                            </div>
+
+                                            <div class="dept is-soon" aria-disabled="true">
                                                 <span class="ic ico">
-                                                    <svg viewBox="0 0 24 24"
-                                                         width="20" height="20" fill="none" stroke="currentColor"
-                                                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-                                                         aria-hidden="true">
+                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                         <circle cx="12" cy="9" r="6"></circle>
                                                         <path d="M8.5 14L7 21l5-3 5 3-1.5-7"></path>
                                                     </svg>
-                                                </span><span class="dn">Affiliation</span><span class="dd">Training partner and centre affiliation workflow</span><span class="kv">
-                                                    <span>Open portal</span><span class="go">↗</span>
-                                                </span>
-                                            </a><a class="dept"
-                                                   href="https://erp.tsscindia.com/" target="_blank"
-                                                   rel="noopener noreferrer">
+                                                </span><span class="dn">Affiliation</span><span class="dd">Training partner and centre affiliation workflow</span>
+                                                <span class="kv"><span>Coming soon</span><span class="go">↗</span></span>
+                                            </div>
+
+                                            <div class="dept is-soon" aria-disabled="true">
                                                 <span class="ic ico">
-                                                    <svg viewBox="0 0 24 24"
-                                                         width="20" height="20" fill="none" stroke="currentColor"
-                                                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-                                                         aria-hidden="true">
+                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                         <rect x="5" y="4" width="14" height="17" rx="2"></rect>
                                                         <path d="M9 4V3h6v1M9 13l2 2 4-4"></path>
                                                     </svg>
-                                                </span><span class="dn">Assessment &amp; Certification</span><span class="dd">Assessments, assessors and certificate issuance</span><span class="kv">
-                                                    <span>Open portal</span><span class="go">↗</span>
-                                                </span>
-                                            </a><a class="dept"
-                                                   href="https://erp.tsscindia.com/" target="_blank"
-                                                   rel="noopener noreferrer">
+                                                </span><span class="dn">Assessment &amp; Certification</span><span class="dd">Assessments, assessors and certificate issuance</span>
+                                                <span class="kv"><span>Coming soon</span><span class="go">↗</span></span>
+                                            </div>
+
+                                            <div class="dept is-soon" aria-disabled="true">
                                                 <span class="ic ico">
-                                                    <svg viewBox="0 0 24 24"
-                                                         width="20" height="20" fill="none" stroke="currentColor"
-                                                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-                                                         aria-hidden="true">
-                                                        <path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1">
-                                                        </path>
+                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                        <path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"></path>
                                                     </svg>
-                                                </span><span class="dn">NAPS</span><span class="dd">
-                                                    Apprenticeship
-                                                    promotion and establishment linkages
-                                                </span><span class="kv">
-                                                    <span>
-                                                        Open
-                                                        portal
-                                                    </span><span class="go">↗</span>
-                                                </span>
-                                            </a><a class="dept"
-                                                   href="https://erp.tsscindia.com/" target="_blank"
-                                                   rel="noopener noreferrer">
+                                                </span><span class="dn">NAPS</span><span class="dd">Apprenticeship promotion and establishment linkages</span>
+                                                <span class="kv"><span>Coming soon</span><span class="go">↗</span></span>
+                                            </div>
+
+                                            <div class="dept is-soon" aria-disabled="true">
                                                 <span class="ic ico">
-                                                    <svg viewBox="0 0 24 24"
-                                                         width="20" height="20" fill="none" stroke="currentColor"
-                                                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-                                                         aria-hidden="true">
+                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                         <rect x="3" y="4" width="18" height="6" rx="1.5"></rect>
                                                         <rect x="3" y="14" width="18" height="6" rx="1.5"></rect>
                                                         <path d="M7 7h1M7 17h1"></path>
                                                     </svg>
-                                                </span><span class="dn">IT &amp; Asset Management</span><span class="dd">Systems, access, assets and service requests</span><span class="kv">
-                                                    <span>Open portal</span><span class="go">↗</span>
-                                                </span>
-                                            </a><a class="dept"
-                                                   href="https://erp.tsscindia.com/" target="_blank"
-                                                   rel="noopener noreferrer">
+                                                </span><span class="dn">IT &amp; Asset Management</span><span class="dd">Systems, access, assets and service requests</span>
+                                                <span class="kv"><span>Coming soon</span><span class="go">↗</span></span>
+                                            </div>
+
+                                            <div class="dept is-soon" aria-disabled="true">
                                                 <span class="ic ico">
-                                                    <svg viewBox="0 0 24 24"
-                                                         width="20" height="20" fill="none" stroke="currentColor"
-                                                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-                                                         aria-hidden="true">
-                                                        <path d="M2 6h11v10H2zM13 10h5l3 3v3h-8M6 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3z">
-                                                        </path>
+                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                        <path d="M2 6h11v10H2zM13 10h5l3 3v3h-8M6 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path>
                                                     </svg>
-                                                </span><span class="dn">Vendor Management</span><span class="dd">Vendor onboarding, contracts and performance</span><span class="kv">
-                                                    <span>Open portal</span><span class="go">↗</span>
-                                                </span>
-                                            </a><a class="dept"
-                                                   href="https://erp.tsscindia.com/" target="_blank"
-                                                   rel="noopener noreferrer">
+                                                </span><span class="dn">Vendor Management</span><span class="dd">Vendor onboarding, contracts and performance</span>
+                                                <span class="kv"><span>Coming soon</span><span class="go">↗</span></span>
+                                            </div>
+
+                                            <div class="dept is-soon" aria-disabled="true">
                                                 <span class="ic ico">
-                                                    <svg viewBox="0 0 24 24"
-                                                         width="20" height="20" fill="none" stroke="currentColor"
-                                                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-                                                         aria-hidden="true">
+                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                         <path d="M12 3l9 5-9 5-9-5 9-5zM3 12.5l9 5 9-5"></path>
                                                     </svg>
-                                                </span><span class="dn">Project Management</span><span class="dd">Projects, milestones and task tracking</span><span class="kv">
-                                                    <span>Open portal</span><span class="go">↗</span>
-                                                </span>
-                                            </a><a class="dept"
-                                                   href="https://erp.tsscindia.com/" target="_blank"
-                                                   rel="noopener noreferrer">
+                                                </span><span class="dn">Project Management</span><span class="dd">Projects, milestones and task tracking</span>
+                                                <span class="kv"><span>Coming soon</span><span class="go">↗</span></span>
+                                            </div>
+
+                                            <div class="dept is-soon" aria-disabled="true">
                                                 <span class="ic ico">
-                                                    <svg viewBox="0 0 24 24"
-                                                         width="20" height="20" fill="none" stroke="currentColor"
-                                                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-                                                         aria-hidden="true">
+                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                         <rect x="4" y="3" width="16" height="18" rx="1.5"></rect>
                                                         <path d="M9 7h2M13 7h2M9 11h2M13 11h2M10 21v-4h4v4"></path>
                                                     </svg>
-                                                </span><span class="dn">Administration</span><span class="dd">Office administration, facilities and circulars</span><span class="kv"><span>Open portal</span><span class="go">↗</span></span>
-                                            </a>
-                                        </div>
+                                                </span><span class="dn">Administration</span><span class="dd">Office administration, facilities and circulars</span>
+                                                <span class="kv"><span>Coming soon</span><span class="go">↗</span></span>
+                                            </div>
                                     </section>
                                 </div>
                                 <div data-fy="2025-26" hidden>
@@ -1161,7 +1122,7 @@
                                             </div>
                                         </div>
                                     </section>
-                                    <section>
+                                    <section class="kpi-off">
                                         <div class="sh">
                                             <div>
                                                 <h2>③ TSSC KPIs</h2>
@@ -1182,7 +1143,7 @@
                                             </button><button class="tab" data-tab="qual">Qualitative KPI</button>
                                         </div>
                                         <div data-pane="fin">
-                                            <div class="kcards">
+                                            <div class="kcards" style="filter:grayscale(1);opacity:.55;pointer-events:none;user-select:none">
                                                 <div class="kc c-orange">
                                                     <span class="kc-t">
                                                         <span class="kc-n">
@@ -1683,19 +1644,7 @@
                                                 </div>
                                                 <p class="empty" hidden>Nothing waiting for the CEO in this view.</p>
                                                 <div class="legend">
-                                                    <span>
-                                                        <b style="color:var(--green)">✓</b>
-                                                        Approve
-                                                    </span><span>
-                                                        <b style="color:var(--red)">✕</b>
-                                                        Reject
-                                                    </span><span>
-                                                        <b style="color:var(--purple)">↩</b> Return for
-                                                        clarification
-                                                    </span><span>
-                                                        Actions follow the CEO's approval role.
-                                                        Decisions here are a demonstration and are not saved.
-                                                    </span>
+                                                    <span>View request details to review and submit your approval decision.</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -1856,7 +1805,7 @@
                                             <div class="shr"></div>
                                         </div>
                                         <div class="dgrid">
-                                            <a class="dept" href="https://erp.tsscindia.com/HRMS/Home"
+                                            <a class="dept" href="/HRMS/Home/HRDashboard"
                                                target="_blank" rel="noopener noreferrer">
                                                 <span class="ic ico">
                                                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none"
@@ -3696,6 +3645,57 @@
         </div>
     </div>
 </div>
+
+@section Scripts{
+    <script src="~/assets/js/js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const departmentFilter = document.getElementById("departmentFilter");
+            const priorityFilter = document.getElementById("priorityFilter");
+            const tbody = document.getElementById("pendingApprovalsBody");
+
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+            const panel = document.querySelector(".panel.apanel[data-limit='4']");
+            const countText = panel.querySelector(".ph .cnt");
+            const emptyMessage = panel.querySelector(".empty");
+            const tableScroll = panel.querySelector(".scroll");
+
+            const limit = parseInt(panel.dataset.limit || "4");
+
+            function filterApprovals() {
+
+                const department = departmentFilter.value.toLowerCase();
+                const priority = priorityFilter.value.toLowerCase();
+
+                const filteredRows = rows.filter(row => {
+                    const rowDepartment = row.dataset.department.toLowerCase();
+                    const rowPriority = row.dataset.priority.toLowerCase();
+
+                    return (!department || rowDepartment === department) &&
+                           (!priority || rowPriority === priority);
+                });
+
+                rows.forEach(row => row.hidden = true);
+
+                filteredRows.slice(0, limit).forEach(row => {
+                    row.hidden = false;
+                });
+
+                countText.textContent =
+                    `Showing ${Math.min(filteredRows.length, limit)} of ${filteredRows.length} pending requests`;
+
+                emptyMessage.hidden = filteredRows.length !== 0;
+                tableScroll.hidden = filteredRows.length === 0;
+            }
+
+            departmentFilter.addEventListener("change", filterApprovals);
+            priorityFilter.addEventListener("change", filterApprovals);
+
+            filterApprovals();
+        });
+    </script>
+}
 
 
 

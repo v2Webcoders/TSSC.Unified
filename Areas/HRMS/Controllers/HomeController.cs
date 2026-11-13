@@ -32,14 +32,16 @@ namespace QUIZAPP.Areas.HRMS.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly ITodayAttendanceLiveService _todayAttendanceLiveService;
         private readonly IAttendanceSummaryService _attendanceSummaryService;
-        public HomeController(ITodayAttendanceLiveService todayAttendanceLiveService, ILogger<HomeController> logger, AppdbContext db, IConfiguration configuration, IWebHostEnvironment environment, IAttendanceSummaryService attendanceSummaryService)
+        private readonly ApprovalService _approvalService;
+        public HomeController(ITodayAttendanceLiveService todayAttendanceLiveService, ILogger<HomeController> logger, AppdbContext db, IConfiguration configuration, IWebHostEnvironment environment, IAttendanceSummaryService attendanceSummaryService, ApprovalService approvalService)
         {
             _logger = logger;
             _db = db;
             _configuration = configuration;
             _environment = environment;
             _todayAttendanceLiveService = todayAttendanceLiveService;
-            _attendanceSummaryService=attendanceSummaryService;
+            _attendanceSummaryService = attendanceSummaryService;
+            _approvalService = approvalService;
         }
 
 
@@ -452,8 +454,8 @@ namespace QUIZAPP.Areas.HRMS.Controllers
         [Authorize]
         public IActionResult Index()
         {
-            if (User.IsInRole("CEO"))
-                return RedirectToAction(nameof(CEODashboard));
+            //if (User.IsInRole("CEO"))
+            //    return RedirectToAction(nameof(CEODashboard));
 
             if (User.IsInRole("HR"))
                 return RedirectToAction(nameof(HRDashboard));
@@ -462,6 +464,283 @@ namespace QUIZAPP.Areas.HRMS.Controllers
         }
 
 
+
+        //        [Authorize(Roles = "CEO")]
+        //        public async Task<IActionResult> CEODashboard(string? financialYear)
+        //        {
+        //            var applicationUserId =
+        //                User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        //            if (string.IsNullOrEmpty(applicationUserId))
+        //                return RedirectToAction("Login", "Account");
+
+        //            var employee = await _db.Employee
+        //                .FirstOrDefaultAsync(x =>
+        //                    x.ApplicationUserId == applicationUserId);
+
+        //            var today = DateTime.Today;
+        //            var tomorrow = today.AddDays(1);
+
+        //            var model = new CEODashboardVM
+        //            {
+        //                EmployeeName = employee?.FirstName ?? "CEO",
+        //                EmployeeCode = employee?.EmployeeCode
+        //            };
+
+        //            // =====================================================
+        //            // 1. HR - WORKFORCE
+        //            // =====================================================
+
+        //            // TOTAL ACTIVE EMPLOYEES
+
+        //            var activeEmployeeIds = await _db.Employee
+        //                .Where(x => x.IsActive)
+        //                .Select(x => x.EmployeeId)
+        //                .ToListAsync();
+
+        //            var activeEmployeeSet = activeEmployeeIds.ToHashSet();
+
+        //            model.Workforce.TotalEmployees = activeEmployeeSet.Count;
+
+        //            // =====================================================
+        //            // TODAY'S ATTENDANCE RECORDS
+        //            // =====================================================
+
+        //            var attendanceRecords = await _db.EmployeeAttendance
+        //                .Where(x =>
+        //                    x.AttendanceDate >= today &&
+        //                    x.AttendanceDate < tomorrow &&
+        //                    activeEmployeeSet.Contains(x.EmployeeId))
+        //                .Select(x => new
+        //                {
+        //                    x.EmployeeId,
+        //                    x.InTime,
+        //                    x.AttendanceSource
+        //                })
+        //                .ToListAsync();
+
+        //            // =====================================================
+        //            // EMPLOYEES ON APPROVED LEAVE
+        //            // =====================================================
+
+        //            var employeesOnLeave = await _db.LeaveRequest
+        //                .Where(x =>
+        //                    x.Status == "Approved" &&
+        //                    x.FromDate <= today &&
+        //                    x.ToDate >= today &&
+        //                    activeEmployeeSet.Contains(x.EmployeeId))
+        //                .Select(x => x.EmployeeId)
+        //                .Distinct()
+        //                .ToListAsync();
+
+        //            var onLeaveSet = employeesOnLeave.ToHashSet();
+
+        //            model.Workforce.OnLeave = onLeaveSet.Count;
+
+        //            // =====================================================
+        //            // EMPLOYEES ON DUTY (OD)
+        //            // =====================================================
+
+        //            var onDutyIds = attendanceRecords
+        //                .Where(x => x.AttendanceSource == "OD")
+        //                .Select(x => x.EmployeeId)
+        //                .Distinct()
+        //                .ToHashSet();
+
+        //            // Leave has priority over attendance classification
+        //            onDutyIds.ExceptWith(onLeaveSet);
+
+        //            model.Workforce.OnDuty = onDutyIds.Count;
+
+        //            // =====================================================
+        //            // PRESENT EMPLOYEES
+        //            // =====================================================
+
+        //            // Exclude OD and approved leave employees.
+        //            // Consider the earliest check-in for each employee.
+
+        //            var firstCheckIns = attendanceRecords
+        //                .Where(x =>
+        //                    x.InTime.HasValue &&
+        //                    x.AttendanceSource != "OD" &&
+        //                    !onLeaveSet.Contains(x.EmployeeId))
+        //                .GroupBy(x => x.EmployeeId)
+        //                .Select(g => new
+        //                {
+        //                    EmployeeId = g.Key,
+        //                    InTime = g.Min(x => x.InTime!.Value)
+        //                })
+        //                .Where(x => !onDutyIds.Contains(x.EmployeeId))
+        //                .ToList();
+
+        //            // =====================================================
+        //            // ON TIME - BEFORE 10:00 AM
+        //            // =====================================================
+
+        //            var onTimeCount = firstCheckIns
+        //                .Count(x =>
+        //                    x.InTime.TimeOfDay < new TimeSpan(10, 0, 0));
+
+        //            // =====================================================
+        //            // DELAYED - 10:00 AM ONWARDS
+        //            // =====================================================
+
+        //            var delayedCount = firstCheckIns
+        //                .Count(x =>
+        //                    x.InTime.TimeOfDay >= new TimeSpan(10, 0, 0));
+
+        //            model.Workforce.OnTime = onTimeCount;
+
+        //            model.Workforce.Delayed = delayedCount;
+
+        //            model.Workforce.Present =
+        //                onTimeCount + delayedCount;
+
+        //            // =====================================================
+        //            // ABSENT EMPLOYEES
+        //            // =====================================================
+
+        //            // Sunday and published holidays are not counted as absent.
+
+        //            var isSunday = today.DayOfWeek == DayOfWeek.Sunday;
+
+        //            var isHoliday = await _db.Holiday
+        //                .AnyAsync(x =>
+        //                    x.HolidayDate >= today &&
+        //                    x.HolidayDate < tomorrow &&
+        //                    x.Status == "Published");
+
+        //            if (!isSunday && !isHoliday)
+        //            {
+        //                model.Workforce.Absent =
+        //                    Math.Max(
+        //                        0,
+        //                        model.Workforce.TotalEmployees -
+        //                        model.Workforce.Present -
+        //                        model.Workforce.OnDuty -
+        //                        model.Workforce.OnLeave);
+        //            }
+        //            else
+        //            {
+        //                model.Workforce.Absent = 0;
+        //            }
+
+        //            // =====================================================
+        //            // PRESENT PERCENTAGE
+        //            // =====================================================
+
+        //            model.Workforce.PresentPercentage =
+        //                model.Workforce.TotalEmployees > 0
+        //                    ? Math.Round(
+        //                        (decimal)model.Workforce.Present /
+        //                        model.Workforce.TotalEmployees * 100, 0)
+        //                    : 0;
+
+        //            // =====================================================
+        //            // 2. CEO - APPROVALS PENDING
+        //            // =====================================================
+
+        //            // Financial year (April to March)
+        //            var currentFYStart = today.Month >= 4
+        //                ? today.Year
+        //                : today.Year - 1;
+
+        //            var currentFY = $"{currentFYStart}-{(currentFYStart + 1) % 100:00}";
+
+        //            var selectedFY = string.IsNullOrWhiteSpace(financialYear)
+        //                ? currentFY
+        //                : financialYear;
+
+        //            model.FinancialYear = selectedFY;
+
+        //            model.FinancialYears = new List<string>
+        //{
+        //    currentFY,
+        //    $"{currentFYStart - 1}-{currentFYStart % 100:00}",
+        //    $"{currentFYStart - 2}-{(currentFYStart - 1) % 100:00}"
+        //};
+
+        //            // =====================================================
+        //            // GET APPROVAL RECORDS FROM SQL VIEW
+        //            // =====================================================
+
+        //            var approvalQuery = _db.CEOApprovals
+        //                .AsNoTracking()
+        //                .Where(x => x.FinancialYear == selectedFY);
+
+        //            var allApprovals = await approvalQuery.ToListAsync();
+
+        //            // =====================================================
+        //            // SUMMARY CARDS
+        //            // =====================================================
+
+        //            model.ApprovalSummary.PendingLeave =
+        //                allApprovals.Count(x =>
+        //                    x.RequestType == "Leave" &&
+        //                    x.Status == "Pending");
+
+        //            model.ApprovalSummary.AwaitingApprovals =
+        //                allApprovals.Count(x => x.Status == "Pending");
+
+        //            // Priority is currently a placeholder in the SQL View.
+        //            // Do not treat this count as a genuine business metric
+        //            // until actual priority data is available.
+        //            model.ApprovalSummary.HighPriority =
+        //                allApprovals.Count(x =>
+        //                    x.Status == "Pending" &&
+        //                    x.Priority == "High");
+
+        //            model.ApprovalSummary.Overdue =
+        //                allApprovals.Count(x =>
+        //                    x.Status == "Pending" &&
+        //                    x.DueDate.HasValue &&
+        //                    x.DueDate.Value.Date < today);
+
+        //            model.ApprovalSummary.Decided =
+        //                allApprovals.Count(x =>
+        //                    x.Status == "Approved" ||
+        //                    x.Status == "Rejected");
+
+        //            // =====================================================
+        //            // PENDING REQUESTS TABLE
+        //            // =====================================================
+
+        //            //model.PendingApprovals = allApprovals
+        //            //    .Where(x => x.Status == "Pending")
+        //            //    .OrderByDescending(x => x.SubmittedDate)
+        //            //    .ToList();
+        //            model.PendingApprovals = allApprovals
+        //    .Where(x => x.Status == "Pending")
+        //    .OrderByDescending(x => x.SubmittedDate)
+        //    .Select(x => new CEOApprovalRequestVM
+        //    {
+        //        Id = x.ApprovalId,
+        //        RequestId = x.RequestId,
+        //        RequestTitle = x.RequestTitle,
+        //        Department = x.Department,
+        //        SubmittedBy = x.SubmittedBy,
+        //        SubmittedDate = x.SubmittedDate,
+        //        DueDate = x.DueDate,
+        //        Priority = x.Priority,
+        //        Status = x.Status,
+        //        RequestType = x.RequestType,
+        //        SourceTable = x.SourceTable
+        //    })
+        //    .ToList();
+        //            // =====================================================
+        //            // DEPARTMENT FILTER
+        //            // =====================================================
+
+        //            model.ApprovalDepartments = model.PendingApprovals
+        //                .Select(x => x.Department)
+        //                .Where(x => !string.IsNullOrWhiteSpace(x))
+        //                .Distinct()
+        //                .OrderBy(x => x)
+        //                .ToList();
+
+
+        //            return View(model);
+        //        }
 
         [Authorize(Roles = "CEO")]
         public async Task<IActionResult> CEODashboard(string? financialYear)
@@ -645,102 +924,76 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
             var currentFY = $"{currentFYStart}-{(currentFYStart + 1) % 100:00}";
 
-            var selectedFY = string.IsNullOrWhiteSpace(financialYear)
-                ? currentFY
-                : financialYear;
+            //var selectedFY = string.IsNullOrWhiteSpace(financialYear)
+            //    ? currentFY
+            //    : financialYear;
+
+            //model.FinancialYear = selectedFY;
+
+            model.FinancialYears = new List<string>
+            {
+                currentFY,
+                $"{currentFYStart - 1}-{currentFYStart % 100:00}",
+                $"{currentFYStart - 2}-{(currentFYStart - 1) % 100:00}"
+            };
+
+            // Accept only a known financial year
+            var selectedFY = (!string.IsNullOrWhiteSpace(financialYear) &&
+                              model.FinancialYears.Contains(financialYear))
+                ? financialYear
+                : currentFY;
 
             model.FinancialYear = selectedFY;
 
-            model.FinancialYears = new List<string>
-{
-    currentFY,
-    $"{currentFYStart - 1}-{currentFYStart % 100:00}",
-    $"{currentFYStart - 2}-{(currentFYStart - 1) % 100:00}"
-};
-
-            // =====================================================
-            // GET APPROVAL RECORDS FROM SQL VIEW
-            // =====================================================
-
-            var approvalQuery = _db.CEOApprovals
+            // PENDING (FY applied)
+            var pending = await _db.CEOApprovals
                 .AsNoTracking()
-                .Where(x => x.FinancialYear == selectedFY);
+                .Where(x => x.FinancialYear == selectedFY)
+                .ToListAsync();
 
-            var allApprovals = await approvalQuery.ToListAsync();
-
-            // =====================================================
             // SUMMARY CARDS
-            // =====================================================
+            model.ApprovalSummary.PendingLeave = pending.Count(x => x.RequestType == "Leave");
+            model.ApprovalSummary.AwaitingApprovals = pending.Count;
+            model.ApprovalSummary.HighPriority = pending.Count(x => x.Priority == "High");
+            model.ApprovalSummary.Overdue = pending.Count(x => x.DueDate.HasValue && x.DueDate.Value.Date < today);
 
-            model.ApprovalSummary.PendingLeave =
-                allApprovals.Count(x =>
-                    x.RequestType == "Leave" &&
-                    x.Status == "Pending");
+            // DECIDED (same FY, by decision date)
+            //model.ApprovalSummary.Decided = await _db.CEODecisions
+            model.ApprovalSummary.Decided = await _db.CEODecisions
+                .AsNoTracking()
+                .CountAsync(x => x.FinancialYear == selectedFY);
 
-            model.ApprovalSummary.AwaitingApprovals =
-                allApprovals.Count(x => x.Status == "Pending");
+            // TABLE: overdue first, then priority, then due date
+            model.PendingApprovals = pending
+                .OrderByDescending(x => x.DueDate.HasValue && x.DueDate.Value.Date < today)
+                .ThenBy(x => x.Priority == "High" ? 0 : x.Priority == "Medium" ? 1 : 2)
+                .ThenBy(x => x.DueDate ?? DateTime.MaxValue)
+                .Select(x => new CEOApprovalRequestVM
+                {
+                    Id = x.ApprovalId,
+                    RequestId = x.RequestId,
+                    RequestTitle = x.RequestTitle,
+                    Department = x.Department,
+                    SubmittedBy = x.SubmittedBy,
+                    SubmittedDate = x.SubmittedDate,
+                    DueDate = x.DueDate,
+                    Priority = x.Priority,
+                    Status = x.Status,
+                    RequestType = x.RequestType,
+                    SourceTable = x.SourceTable
+                })
+                .ToList();
 
-            // Priority is currently a placeholder in the SQL View.
-            // Do not treat this count as a genuine business metric
-            // until actual priority data is available.
-            model.ApprovalSummary.HighPriority =
-                allApprovals.Count(x =>
-                    x.Status == "Pending" &&
-                    x.Priority == "High");
-
-            model.ApprovalSummary.Overdue =
-                allApprovals.Count(x =>
-                    x.Status == "Pending" &&
-                    x.DueDate.HasValue &&
-                    x.DueDate.Value.Date < today);
-
-            model.ApprovalSummary.Decided =
-                allApprovals.Count(x =>
-                    x.Status == "Approved" ||
-                    x.Status == "Rejected");
-
-            // =====================================================
-            // PENDING REQUESTS TABLE
-            // =====================================================
-
-            //model.PendingApprovals = allApprovals
-            //    .Where(x => x.Status == "Pending")
-            //    .OrderByDescending(x => x.SubmittedDate)
-            //    .ToList();
-            model.PendingApprovals = allApprovals
-    .Where(x => x.Status == "Pending")
-    .OrderByDescending(x => x.SubmittedDate)
-    .Select(x => new CEOApprovalRequestVM
-    {
-        Id = x.ApprovalId,
-        RequestId = x.RequestId,
-        RequestTitle = x.RequestTitle,
-        Department = x.Department,
-        SubmittedBy = x.SubmittedBy,
-        SubmittedDate = x.SubmittedDate,
-        DueDate = x.DueDate,
-        Priority = x.Priority,
-        Status = x.Status,
-        RequestType = x.RequestType
-    })
-    .ToList();
-            // =====================================================
             // DEPARTMENT FILTER
-            // =====================================================
-
             model.ApprovalDepartments = model.PendingApprovals
                 .Select(x => x.Department)
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Distinct()
                 .OrderBy(x => x)
                 .ToList();
-
-
             return View(model);
         }
-
-
-        [Authorize(Roles = "HR")]
+        [Authorize(Roles = "HR,CEO")]
         public async Task<IActionResult> HRDashboard()
         {
             var applicationUserId =
@@ -915,8 +1168,8 @@ namespace QUIZAPP.Areas.HRMS.Controllers
         public async Task<IActionResult> EmployeeDashboard()
         {
             // Prevent HR and CEO from accessing the employee dashboard.
-            if (User.IsInRole("CEO"))
-                return RedirectToAction(nameof(CEODashboard));
+            //if (User.IsInRole("CEO"))
+            //    return RedirectToAction(nameof(CEODashboard));
 
             if (User.IsInRole("HR"))
                 return RedirectToAction(nameof(HRDashboard));
@@ -1452,9 +1705,61 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             }
         }
 
+        //[Authorize(Roles = "CEO")]
+        [HttpGet]
+        public async Task<IActionResult> ApprovalDetails(string source, long id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            if (string.IsNullOrEmpty(userId))
+                return RedirectToAction("Login", "Account");
 
+            var ceoId = await _approvalService.GetCeoEmployeeIdAsync(userId);
 
+            if (!ceoId.HasValue)
+                return Forbid();
+
+            var header = await _approvalService.GetHeaderAsync(
+                source, id, ceoId.Value);
+
+            if (header == null)
+                return NotFound();
+
+            var model = await _approvalService.GetDetailsAsync(
+                header, ceoId.Value);
+
+            return View(model);
+        }
+
+        [Authorize(Roles = "CEO")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DecideApproval(DecideApprovalInput input)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return RedirectToAction("Login", "Account");
+
+            var ceoId = await _approvalService.GetCeoEmployeeIdAsync(userId);
+
+            if (!ceoId.HasValue)
+                return Forbid();
+
+            var result = await _approvalService.DecideAsync(
+                input, ceoId.Value);
+
+            TempData[result.Ok ? "success" : "error"] = result.Message;
+
+            if (result.Ok)
+            {
+                return RedirectToAction(nameof(CEODashboard));
+            }
+
+            return RedirectToAction(
+                nameof(ApprovalDetails),
+                new { source = input.Source, id = input.Id });
+        }
     }
 }
 

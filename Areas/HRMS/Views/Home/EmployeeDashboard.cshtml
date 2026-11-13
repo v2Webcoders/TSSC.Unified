@@ -64,6 +64,14 @@
 
                 <!-- Actions -->
                 <div class="dash-actions">
+                    @if (User.IsInRole("CEO"))
+                    {
+                        <a asp-area="HRMS" asp-controller="Home" asp-action="CEODashboard"
+                           class="btn btn-primary">
+                            <em class="icon ni ni-grid-alt me-1"></em>
+                            Switch to CEO dashboard
+                        </a>
+                    }
                     <button type="button"
                             class="btn btn-icon btn-outline-light dash-icon-btn"
                             data-bs-toggle="modal"

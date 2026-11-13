@@ -42,5 +42,15 @@
         public string FinancialYear { get; set; } = string.Empty;
     }
 
-
+    public class CEODecision
+    {
+        public long ApprovalId { get; set; }
+        public string RequestId { get; set; } = "";
+        public string RequestType { get; set; } = "";
+        public string SourceTable { get; set; } = "";
+        public string Decision { get; set; } = "";
+        public DateTime DecisionDate { get; set; }
+        public int? CEOEmployeeId { get; set; }
+        public string FinancialYear { get; set; } = "";
+    }
 }

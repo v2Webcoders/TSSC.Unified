@@ -70,3 +70,83 @@ th.sortable[data-dir=asc]::after{content:"\25B2";opacity:1;color:var(--orange)}
 th.sortable[data-dir=desc]::after{content:"\25BC";opacity:1;color:var(--orange)}
 th.sortable:hover,th.sortable[data-dir]{color:var(--navy)}
 th.sortable:focus-visible{outline:2px solid var(--royal);outline-offset:-2px}
+
+
+
+.dgrid .dept.is-soon {
+    background: #f3f4f6 !important;
+    border-color: #e5e7eb !important;
+    box-shadow: none !important;
+    cursor: not-allowed;
+    pointer-events: none; /* no hover, no click */
+}
+
+.dgrid .dept.is-soon .dn,
+.dgrid .dept.is-soon .dd {
+    color: #9ca3af !important;
+}
+
+.dgrid .dept.is-soon .ic {
+    background: #e5e7eb !important;
+    color: #9ca3af !important;
+}
+
+.dgrid .dept.is-soon .kv span:first-child {
+    color: #6b7280 !important;
+}
+
+.dgrid .dept.is-soon .go {
+    background: #d1d5db !important;
+    color: #fff !important;
+}
+
+.preview-tag {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 10px;
+    font-size: .7rem;
+    font-weight: 600;
+    vertical-align: middle;
+    border-radius: 999px;
+    background: var(--amberbg, #fff4e0);
+    color: var(--amber, #b45309);
+}
+
+/* TSSC KPIs: greyed out, design unchanged */
+.kpi-off .kcards {
+    filter: grayscale(1);
+    opacity: .55;
+    pointer-events: none;
+    user-select: none;
+}
+
+.kpi-off .kc {
+    border-top-color: #d1d5db !important; /* removes the coloured top bars */
+}
+
+.kpi-off select[data-fysel] {
+    opacity: .6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.kpi-off .preview-tag {
+    background: #e5e7eb;
+    color: #6b7280;
+}
+
+
+.kcards-off {
+    filter: grayscale(1) !important;
+    opacity: .55 !important;
+    pointer-events: none !important;
+    user-select: none;
+}
+
+    .kcards-off .kc {
+        border-top-color: #d1d5db !important;
+    }
+
+
+
+

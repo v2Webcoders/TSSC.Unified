@@ -109,6 +109,7 @@
         public string Status { get; set; } = "Pending";
 
         public string? RequestType { get; set; }
+        public string SourceTable { get; set; } = "";
     }
 
     public class CEOKPIVM

@@ -74,25 +74,34 @@
 
                 <!-- Actions -->
                 <div class="dash-actions">
-                    <!-- Calendar -->
-                    <button type="button"
-                            class="btn btn-outline-success btn-icon"
-                            data-bs-toggle="modal"
-                            data-bs-target="#calendarModal"
-                            title="Calendar">
-                        <em class="icon ni ni-calendar-alt"></em>
-                    </button>
+                    @if (User.IsInRole("CEO"))
+                    {
+                        <a asp-area="HRMS" asp-controller="Home" asp-action="CEODashboard"
+                           class="btn btn-outline-secondary">
+                            <em class="icon ni ni-arrow-left me-1"></em>
+                            Back to CEO dashboard
+                        </a>
+                    }
+                    
 
                     <!-- Manage Employees -->
-                    <a asp-controller="Employee"
-                       asp-action="EmployeeList"
-                       class="btn btn-primary">
-
-                        <em class="icon ni ni-users me-1"></em>
-
-                        Manage Employees
-
-                    </a>
+                    @if (User.IsInRole("HR") && !User.IsInRole("CEO"))
+                    {
+                        <!-- Calendar -->
+                        <button type="button"
+                                class="btn btn-outline-success btn-icon"
+                                data-bs-toggle="modal"
+                                data-bs-target="#calendarModal"
+                                title="Calendar">
+                            <em class="icon ni ni-calendar-alt"></em>
+                        </button>
+                        <a asp-controller="Employee"
+                           asp-action="EmployeeList"
+                           class="btn btn-primary">
+                            <em class="icon ni ni-users me-1"></em>
+                            Manage Employees
+                        </a>
+                    }
 
 
                 </div>

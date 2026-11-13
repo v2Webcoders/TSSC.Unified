@@ -2057,7 +2057,15 @@
         .wbar .s4 {
             background: var(--red)
         }
+            .wbar .s5 {
+                background: var(--purple);
+            }
+            
 
+            .wbar .s6 {
+                background: #8c98ab;
+            }
+/* Not marked yet */
         .segnote {
             font-size: 12px;
             color: var(--muted);
