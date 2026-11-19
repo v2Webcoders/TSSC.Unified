@@ -1,0 +1,182 @@
+﻿@model TSSC.Unified.Services.ApprovalDetailsVm
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+	Layout = "~/Areas/HRMS/Views/Shared/_Layout.cshtml";
+	ViewData["Title"] = "HRMS DASHBOARD";
+}
+
+
+
+<div class="container-fluid">
+    <div class="row">
+
+      
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Approval Details</h3>
+            <div class="nk-block-des text-soft">
+                <p>@Model.Header.RequestId - @Model.Header.RequestTitle</p>
+            </div>
+        </div>
+        <div class="nk-block-head-content">
+            <a asp-action="CEODashboard"
+               class="btn btn-outline-light">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="card card-bordered mb-3">
+    <div class="card-inner">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <strong>Request ID:</strong>
+                @Model.Header.RequestId
+            </div>
+
+            <div class="col-md-6">
+                <strong>Request Type:</strong>
+                @Model.Header.RequestType
+            </div>
+
+            <div class="col-md-6">
+                <strong>Department:</strong>
+                @Model.Header.Department
+            </div>
+
+            <div class="col-md-6">
+                <strong>Submitted By:</strong>
+                @Model.Header.SubmittedBy
+            </div>
+
+            <div class="col-md-6">
+                <strong>Submitted Date:</strong>
+                @Model.Header.SubmittedDate.ToString("dd MMM yyyy")
+            </div>
+
+            <div class="col-md-6">
+                <strong>Priority:</strong>
+                @Model.Header.Priority
+            </div>
+
+            <div class="col-md-6">
+                <strong>Status:</strong>
+                @Model.Header.Status
+            </div>
+
+            <div class="col-md-6">
+                <strong>Current Stage:</strong>
+                @Model.Header.CurrentStage
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card card-bordered mb-3">
+    <div class="card-inner">
+        <h5 class="title mb-3">Request Information</h5>
+
+        @foreach (var item in Model.Details)
+        {
+            <div class="row mb-2">
+                <div class="col-md-4 text-soft">
+                    @item.Label
+                </div>
+                <div class="col-md-8">
+                    @item.Value
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="card card-bordered mb-3">
+    <div class="card-inner">
+        <h5 class="title mb-3">Approval History</h5>
+
+        @foreach (var item in Model.Trail)
+        {
+            <div class="d-flex justify-content-between border-bottom py-2">
+                <span>
+                    @item.Step
+                    @if (item.IsYou)
+                    {
+                        <span class="badge bg-primary">You</span>
+                    }
+                </span>
+                <span>@item.Status</span>
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.Header.Status == "Pending")
+{
+    <div class="card card-bordered">
+        <div class="card-inner">
+            <h5 class="title mb-3">Your Decision</h5>
+
+            <form asp-action="DecideApproval"
+                  asp-controller="Home"
+                  asp-area="HRMS"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="Source"
+                       value="@Model.Header.SourceTable" />
+
+                <input type="hidden"
+                       name="Id"
+                       value="@Model.Header.ApprovalId" />
+
+                <div class="form-group mb-3">
+                    <label class="form-label">Remarks</label>
+                    <textarea name="Remarks"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Enter remarks (required for rejection or return)"></textarea>
+                </div>
+
+                <div class="d-flex gap-4">
+                    <button type="submit"
+                            name="Decision"
+                            value="1"
+                            class="btn btn-success">
+                        Approve
+                    </button>
+
+                    <button type="submit"
+                            name="Decision"
+                            value="2"
+                            class="btn btn-danger">
+                        Reject
+                    </button>
+                           @*  <a asp-area="HRMS" asp-controller="Home" asp-action="CEODashboard"
+                               class="btn btn-secondary">
+                                ← Back to dashboard
+                            </a> *@
+                    @* <button type="submit"
+                            name="Decision"
+                            value="3"
+                            class="btn btn-warning">
+                        Return
+                    </button> *@
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+    </div>
+</div>
+
+
+
+
+
+
+
