@@ -454,8 +454,8 @@ namespace QUIZAPP.Areas.HRMS.Controllers
         [Authorize]
         public IActionResult Index()
         {
-            //if (User.IsInRole("CEO"))
-            //    return RedirectToAction(nameof(CEODashboard));
+            if (User.IsInRole("CEO"))
+                return RedirectToAction(nameof(CEODashboard));
 
             if (User.IsInRole("HR"))
                 return RedirectToAction(nameof(HRDashboard));
@@ -764,6 +764,26 @@ namespace QUIZAPP.Areas.HRMS.Controllers
                 EmployeeCode = employee?.EmployeeCode
             };
 
+
+            // =====================================================
+            // TODAY'S BIRTHDAYS
+            // =====================================================
+
+            model.TodaysBirthdays = await _db.Employee
+                .AsNoTracking()
+                .Where(x =>
+                    x.IsActive &&
+                    x.DOB.HasValue &&
+                    x.DOB.Value.Month == today.Month &&
+                    x.DOB.Value.Day == today.Day)
+                .Select(x => new CEOBirthdayVM
+                {
+                    EmployeeId = x.EmployeeId,
+                    EmployeeName = (x.FirstName + " " + (x.LastName ?? "")).Trim(),
+                    Department = x.Department.DepartmentName
+                })
+                .ToListAsync();
+
             // =====================================================
             // 1. HR - WORKFORCE
             // =====================================================
@@ -953,7 +973,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
             // SUMMARY CARDS
             model.ApprovalSummary.PendingLeave = pending.Count(x => x.RequestType == "Leave");
-            model.ApprovalSummary.AwaitingApprovals = pending.Count;
+            model.ApprovalSummary.AwaitingApprovals = pending.Count(x => x.RequestType != "Leave");
             model.ApprovalSummary.HighPriority = pending.Count(x => x.Priority == "High");
             model.ApprovalSummary.Overdue = pending.Count(x => x.DueDate.HasValue && x.DueDate.Value.Date < today);
 
@@ -1097,8 +1117,7 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             // TOTAL EMPLOYEES
             // =====================================================
 
-            model.TotalEmployees =
-                await _db.Employee.CountAsync();
+            model.TotalEmployees = await _db.Employee.CountAsync(e => e.IsActive);
 
             // =====================================================
             // PRESENT TODAY

@@ -3,6 +3,8 @@
 
     public class CEODashboardVM
     {
+        public List<CEOBirthdayVM> TodaysBirthdays { get; set; } = new List<CEOBirthdayVM>();
+
         // =====================================================
         // CEO PROFILE
         // =====================================================
@@ -153,6 +155,13 @@
         public string? PortalUrl { get; set; }
 
         public bool IsExternal { get; set; }
+    }
+
+    public class CEOBirthdayVM
+    {
+        public int EmployeeId { get; set; }
+        public string EmployeeName { get; set; }
+        public string Department { get; set; }
     }
 
 }

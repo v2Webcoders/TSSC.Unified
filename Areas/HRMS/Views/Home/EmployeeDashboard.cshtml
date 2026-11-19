@@ -18,8 +18,8 @@
 
         <main class="col-md-12 col-lg-12 p-4">
             @{
-                var firstName = (Model.EmployeeName ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "";
-
+                //var firstName = (Model.EmployeeName ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "";
+                var firstName = Model.EmployeeName ?? "";
                 var hasIn = Model.TodayInTime.HasValue;
                 var hasOut = Model.TodayOutTime.HasValue;
 
