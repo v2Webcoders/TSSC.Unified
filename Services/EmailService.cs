@@ -14,7 +14,7 @@ namespace QUIZAPP.Services
             _dbContext = context;
             _configuration = configuration;
         }
-        public  async Task<string> SendEmailAsync(string toEmail, string subject, string templatePath, Dictionary<string, string> replacements)
+        public async Task<string> SendEmailAsync(string toEmail, string subject, string templatePath, Dictionary<string, string> replacements)
         {
             string filePath = templatePath;
 
@@ -41,23 +41,33 @@ namespace QUIZAPP.Services
 
 
             var smtpConfig = _configuration.GetSection("Smtp");
+            var appSettings = _configuration.GetSection("AppSettings");
+            //string mode = appSettings["Mode"];
+
             var smtpClient = new SmtpClient(smtpConfig["Host"])
             {
                 Port = int.Parse(smtpConfig["Port"]),
                 Credentials = new NetworkCredential(smtpConfig["UserName"], smtpConfig["Password"]),
-                //EnableSsl = bool.Parse(smtpConfig["EnableSsl"])
+                EnableSsl = bool.Parse(smtpConfig["EnableSsl"])
             };
 
             var mailMessage = new MailMessage
             {
-                From = new MailAddress(smtpConfig["UserName"]),
+                From = new MailAddress(smtpConfig["FromEmail"]),
                 Subject = subject,
                 Body = template,
                 IsBodyHtml = true
             };
 
             mailMessage.To.Add(toEmail);
-            mailMessage.Bcc.Add("subodh@v2web.in");
+
+            // Development / UAT: Tester copy
+            if (!string.IsNullOrWhiteSpace(appSettings["TesterEmail"]))
+            {
+                mailMessage.Bcc.Add(appSettings["TesterEmail"]);
+            }
+
+
             await smtpClient.SendMailAsync(mailMessage);
             //try
             //{

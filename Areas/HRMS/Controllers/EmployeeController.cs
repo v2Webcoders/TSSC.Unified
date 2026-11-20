@@ -2114,42 +2114,51 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             try
             {
                 string baseUrl = $"{Request.Scheme}://{Request.Host}";
-                // Prepare sample email data
-                string recipientEmail = "subodh+1002@v2web.in";
+
+                string recipientEmail = "subodh@v2web.in";
                 string subject = "Test Email from TSSC";
 
-                // Path to your email template
                 string templatePath = Path.Combine(
-                            Directory.GetCurrentDirectory(),
-                            "wwwroot",
-                            "EmailTemplates",
-                            "EmployeeCreation.html"
-                        );
+                    Directory.GetCurrentDirectory(),
+                    "wwwroot",
+                    "EmailTemplates",
+                    "EmployeeCreation.html"
+                );
 
-                // Sample replacements
-                var replacements = new Dictionary<string, string>
+                // Check template existence
+                if (!System.IO.File.Exists(templatePath))
                 {
-                    { "Name", "Subodh Kumar"},
-                    { "BaseUrl", baseUrl },
-                    { "UserName", "subodh.local" },
-                    { "Password", "xxxxxxxxxxx"}
-                };
+                    return BadRequest($"Template not found: {templatePath}");
+                }
 
-                // Send email using EmailService
-                string result = await _emailService.SendEmailAsync(recipientEmail, subject, templatePath, replacements);
+                var replacements = new Dictionary<string, string>
+        {
+            { "Name", "Subodh Kumar" },
+            { "BaseUrl", baseUrl },
+            { "UserName", "subodh.local" },
+            { "Password", "xxxxxxxxxxx" }
+        };
+
+                string result = await _emailService.SendEmailAsync(
+                    recipientEmail,
+                    subject,
+                    templatePath,
+                    replacements
+                );
 
                 if (result == "True")
                     return Ok("SUCCESS: Email sent successfully.");
-                else
-                    return BadRequest($"ERROR: {result}");
-            }
-            catch (FileNotFoundException ex)
-            {
-                return BadRequest($"Template not found: {ex.Message}");
+
+                return BadRequest($"Email sending failed: {result}");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"ERROR: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    Message = ex.Message,
+                    InnerException = ex.InnerException?.Message,
+                    StackTrace = ex.StackTrace
+                });
             }
         }
 
