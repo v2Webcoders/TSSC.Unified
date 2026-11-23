@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using TSSC.Unified.Models;
+using QUIZAPP.Services;
 
 namespace TSSC.Unified.Areas.HRMS.Controllers
 {
@@ -21,17 +22,19 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IWebHostEnvironment _environment;
+        private readonly EmailService _emailService;
         public LeaveRequestController(
             ILogger<EmployeeController> logger,
             AppdbContext context,
             UserManager<AppUser> userManager,
-            RoleManager<IdentityRole> roleManager, IWebHostEnvironment environment)
+            RoleManager<IdentityRole> roleManager, IWebHostEnvironment environment, EmailService emailService)
         {
             _logger = logger;
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
             _environment = environment;
+            _emailService = emailService;
         }
 
         public async Task<IActionResult> Create(int? id)
@@ -231,6 +234,30 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             leaveRequest.Attachment = fileName;
 
             await _context.SaveChangesAsync();
+
+
+            if (model.LeaveRequestId == 0)
+            {
+                //string templatePath = Path.Combine(_environment.ContentRootPath, "EmailTemplates", "LeaveRequestSubmitted.html");
+                string templatePath = Path.Combine(
+    _environment.WebRootPath,
+    "EmailTemplates",
+    "LeaveRequestSubmitted.html"
+);
+
+
+                if (!System.IO.File.Exists(templatePath))
+                {
+                    throw new FileNotFoundException(
+                        $"Email template not found at: {templatePath}"
+                    );
+                }
+                string reviewUrl = $"{Request.Scheme}://{Request.Host}" + Url.Action("Index", "Leave");     // ADJUST: page where the manager approves
+
+                await _emailService.NotifyLeaveAppliedAsync(leaveRequest.LeaveRequestId, reviewUrl, templatePath);
+            }
+
+
 
             TempData["LeaveSuccess"] = model.LeaveRequestId == 0
             ? "Leave request submitted successfully and sent to your reporting manager for approval."
