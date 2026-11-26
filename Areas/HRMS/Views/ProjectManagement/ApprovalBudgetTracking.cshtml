@@ -1,0 +1,82 @@
+﻿@model IEnumerable<TSSC.Unified.Models.AdminProject>
+
+@{
+    ViewData["Title"] = "Budget Tracking";
+    int count = 1;
+    Layout = "_Layout";
+}
+
+<div class="nk-content">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">
+                                Budget Tracking
+                            </h3>
+                            <div class="nk-block-des text-soft">
+                                <p>Review project budgets and expenses.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nk-block">
+                    <div class="card card-bordered card-stretch">
+                        <div class="card-inner-group">
+                            <div class="card-inner">
+                                <table class="datatable-init-export table table-tranx table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>S.No.</th>
+                                            <th>Project Name</th>
+                                            <th>Department</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            <th>Project Cost</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        @if (Model != null && Model.Any())
+                                        {
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td>@count</td>
+                                                    <td>@item.ProjectName</td>
+                                                    <td>@item.Department</td>
+                                                    <td>@item.StartDate.ToString("dd-MM-yyyy")</td>
+                                                    <td>@item.EndDate.ToString("dd-MM-yyyy")</td>
+                                                    <td>₹ @(item.ProjectCost?.ToString("N2") ?? "0.00")</td>
+                                                    <td>
+                                                        <a href="@Url.Action(
+                                                                                                                       "ApprovalBudgetDetails",
+                                                                                                                       "ProjectManagement",
+                                                                                                                       new { area = "HRMS", id = item.ProjectId })"
+                                                   class="btn btn-sm btn-outline-primary"
+                                                   title="View Project Expenses">
+                                                    <em class="icon ni ni-eye"></em>
+                                                </a>
+                                            </td>
+                                        </tr>
+
+                                                                                count++;
+                                            }
+                                        }
+                                       
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

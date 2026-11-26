@@ -1,0 +1,879 @@
+﻿@using TSSC.Unified.Models
+@model TSSC.Unified.Models.AdminProject
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Project Details";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Project Details</h3>
+            <div class="nk-block-des text-soft">
+                Complete project information and review details
+            </div>
+        </div>
+
+        <div class="nk-block-head-content">
+            <a href="/HRMS/ProjectManagement/Index"
+               class="btn btn-outline-light">
+                <em class="icon ni ni-arrow-left"></em>
+                Back
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <!-- Project Information -->
+        <h5 class="title mb-3">
+            <em class="icon ni ni-briefcase text-primary"></em>
+            Project Information
+        </h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">Project ID</label>
+                <input type="text" class="form-control"
+                       value="@Model.ProjectId" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Project Name</label>
+                <input type="text" class="form-control"
+                       value="@Model.ProjectName" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Project Type</label>
+                <input type="text" class="form-control"
+                       value="@(ViewBag.ProjectTypeName ?? "-")" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Government Type</label>
+                <input type="text" class="form-control"
+                       value="@(ViewBag.ProjectSubTypeName ?? "-")" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Department / Industry</label>
+                <input type="text" class="form-control"
+                       value="@(Model.Department ?? "-")" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Project Location</label>
+                <input type="text" class="form-control"
+                       value="@(ViewBag.ProjectLocationName ?? "-")" readonly />
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Project Description</label>
+                <textarea class="form-control"
+                          rows="4"
+                          readonly>@Model.ProjectDescription</textarea>
+            </div>
+
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- Timeline and Budget -->
+        <h5 class="title mb-3">
+            <em class="icon ni ni-calendar text-primary"></em>
+            Timeline & Budget
+        </h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">Start Date</label>
+                <input type="text" class="form-control"
+                       value="@Model.StartDate.ToString("dd-MMM-yyyy")"
+                       readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">End Date</label>
+                <input type="text" class="form-control"
+                       value="@Model.EndDate.ToString("dd-MMM-yyyy")"
+                       readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Project Cost</label>
+                <input type="text" class="form-control"
+                       value="@(Model.ProjectCost?.ToString("N2") ?? "-")"
+                       readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Project Duration</label>
+                <input type="text" class="form-control"
+                       value="@((Model.EndDate.Date - Model.StartDate.Date).Days + 1) Days"
+                       readonly />
+            </div>
+
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- Project Team -->
+        <h5 class="title mb-3">
+            <em class="icon ni ni-users text-primary"></em>
+            Project Team
+        </h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">Project Manager</label>
+                <input type="text" class="form-control"
+                       value="@(ViewBag.ProjectManagerName ?? "-")"
+                       readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Business Head</label>
+                <input type="text" class="form-control"
+                       value="@(ViewBag.BusinessHeadName ?? "-")"
+                       readonly />
+            </div>
+
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- Project Attachment -->
+        <h5 class="title mb-3">
+            <em class="icon ni ni-file-docs text-primary"></em>
+            Project Attachment
+        </h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-12">
+
+                @if (!string.IsNullOrEmpty(Model.Attachment))
+                {
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+
+                        <span class="text-soft">
+                            <em class="icon ni ni-file-text"></em>
+                            Project document uploaded
+                        </span>
+
+                        <a href="@Url.Content(Model.Attachment)"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn btn-sm btn-outline-primary">
+
+                            <em class="icon ni ni-eye"></em>
+                            View Attachment
+                        </a>
+
+                    </div>
+                }
+                else
+                {
+                    <span class="text-soft">No attachment uploaded.</span>
+                }
+
+            </div>
+
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- Record Information -->
+        <h5 class="title mb-3">
+            <em class="icon ni ni-info text-primary"></em>
+            Record Information
+        </h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">Created By</label>
+                <input type="text" class="form-control"
+                       value="@(Model.CreatedBy ?? "-")" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Created Date</label>
+                <input type="text" class="form-control"
+                       value="@Model.CreatedDate.ToString("dd-MMM-yyyy hh:mm tt")"
+                       readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Modified By</label>
+                <input type="text" class="form-control"
+                       value="@(Model.ModifiedBy ?? "-")" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Modified Date</label>
+                <input type="text" class="form-control"
+                       value="@(Model.ModifiedDate?.ToString("dd-MMM-yyyy hh:mm tt") ?? "-")"
+                       readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Project Status</label>
+                <input type="text" class="form-control"
+                       value="@(Model.IsActive ? "Active" : "Inactive")"
+                       readonly />
+            </div>
+
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- Business Head Review -->
+        <!-- Business Head Review -->
+        <hr class="my-4" />
+
+        <h5 class="title mb-3">
+            <em class="icon ni ni-check-circle text-primary"></em>
+            Project Review
+        </h5>
+
+        @if (string.IsNullOrEmpty(Model.BusinessHeadStatus))
+        {
+            <form asp-action="ReviewProject"
+                  asp-controller="ProjectManagement"
+                  asp-area="HRMS"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="projectId"
+                       value="@Model.ProjectId" />
+
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <label class="form-label">Remarks</label>
+
+                        <textarea name="remarks"
+                              class="form-control mb-3"
+                              rows="3"
+                              placeholder="Enter your remarks"></textarea>
+
+                        <div class="btn-group" role="group">
+
+                            <button type="submit"
+                                    name="decision"
+                                    value="On Hold"
+                                    class="btn btn-sm btn-outline-warning">
+                                <em class="icon ni ni-pause"></em>
+                                On Hold
+                            </button>
+
+                            <button type="submit"
+                                    name="decision"
+                                    value="Reject"
+                                    class="btn btn-sm btn-outline-danger">
+                                <em class="icon ni ni-cross"></em>
+                                Reject
+                            </button>
+
+                            <button type="submit"
+                                    name="decision"
+                                    value="Ok"
+                                    class="btn btn-sm btn-outline-success">
+                                <em class="icon ni ni-check"></em>
+                                Ok
+                            </button>
+
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-light">
+                <h6 class="mb-2">
+                    Review Already Submitted
+                </h6>
+
+                <p class="mb-1">
+                    <strong>Status:</strong>
+                    @Model.BusinessHeadStatus
+                </p>
+
+                <p class="mb-1">
+                    <strong>Remarks:</strong>
+                    @(Model.BusinessHeadRemarks ?? "-")
+                </p>
+
+                <p class="mb-0">
+                    <strong>Reviewed On:</strong>
+                    @(Model.BusinessHeadReviewedDate?.ToString("dd-MMM-yyyy hh:mm tt") ?? "-")
+                </p>
+            </div>
+        }
+
+
+@if (Model.BusinessHeadStatus == "Approved")
+{
+    @if (string.IsNullOrEmpty(Model.CEOStatus))
+    {
+        <!-- PROJECT PLANNING BUTTON -->
+        <hr class="my-4" />
+
+        <div class="mb-3">
+            <button type="button"
+                    class="btn btn-primary"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#projectPlanningCard"
+                    aria-expanded="false"
+                    aria-controls="projectPlanningCard">
+                <em class="icon ni ni-plus-circle"></em>
+                Plan Project
+            </button>
+        </div>
+
+        <!-- PROJECT PLANNING CARD -->
+        <div class="collapse" id="projectPlanningCard">
+
+            <div class="card card-bordered">
+                <div class="card-inner">
+
+                    <h5 class="title mb-3">
+                        <em class="icon ni ni-calendar-check text-primary"></em>
+                        Project Planning
+                    </h5>
+
+                    <form asp-action="SaveProjectPlanning"
+                          asp-controller="ProjectManagement"
+                          asp-area="HRMS"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="ProjectId"
+                               value="@Model.ProjectId" />
+
+                        <!-- 1. MILESTONES -->
+                        <h6 class="title mb-3">
+                            <em class="icon ni ni-calendar text-primary"></em>
+                            Timeline & Milestones
+                        </h6>
+
+                        <div id="milestoneContainer">
+
+                            <div class="milestone-row border rounded p-3 mb-3">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-12">
+                                        <label class="form-label">Milestone Name</label>
+                                        <input type="text"
+                                               name="Milestones[0].MilestoneName"
+                                               class="form-control"
+                                               placeholder="Enter milestone name"
+                                               required />
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Timeline From</label>
+                                        <input type="date"
+                                               name="Milestones[0].StartDate"
+                                               class="form-control"
+                                               required />
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Timeline To</label>
+                                        <input type="date"
+                                               name="Milestones[0].EndDate"
+                                               class="form-control"
+                                               required />
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Assigned Vendor</label>
+                                        <select name="Milestones[0].VendorId"
+                                                class="form-select">
+                                            <option value="">Select Vendor</option>
+                                            @foreach (var vendor in (IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Vendors)
+                                            {
+                                                <option value="@vendor.Value">@vendor.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                </div>
+
+                                <div class="text-end mt-2">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger remove-row"
+                                            onclick="removePlanningRow(this)">
+                                        <em class="icon ni ni-trash"></em> Remove
+                                    </button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary mb-4"
+                                onclick="addMilestone()">
+                            <em class="icon ni ni-plus"></em>
+                            Add Another Milestone
+                        </button>
+
+                        <hr class="my-4" />
+
+                        <!-- 2. ASSIGN EMPLOYEES -->
+                        <h6 class="title mb-3">
+                            <em class="icon ni ni-users text-primary"></em>
+                            Assign Employees
+                        </h6>
+
+                        <div id="employeeContainer">
+
+                            <div class="employee-row border rounded p-3 mb-3">
+
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <label class="form-label">Select Employee</label>
+
+                                        <select name="Employees[0].EmployeeId"
+                                                class="form-select"
+                                                required>
+                                            <option value="">Select Employee</option>
+                                            @foreach (var employee in (IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Employees)
+                                            {
+                                                <option value="@employee.Value">@employee.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-4 d-flex align-items-end">
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger remove-row"
+                                                onclick="removePlanningRow(this)">
+                                            <em class="icon ni ni-trash"></em> Remove
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary mb-4"
+                                onclick="addEmployee()">
+                            <em class="icon ni ni-plus"></em>
+                            Add Another Employee
+                        </button>
+
+                        <hr class="my-4" />
+
+                        <!-- 3. DEPARTMENT BUDGET -->
+                        <h6 class="title mb-3">
+                            <em class="icon ni ni-wallet text-primary"></em>
+                            Department Budget Allocation
+                        </h6>
+
+                        <div id="budgetContainer">
+
+                            <div class="budget-row border rounded p-3 mb-3">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Department</label>
+                                        <input type="text"
+                                               name="Budgets[0].Department"
+                                               class="form-control"
+                                               placeholder="Enter department"
+                                               required />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Budget Amount</label>
+                                        <input type="number"
+                                               name="Budgets[0].BudgetAmount"
+                                               class="form-control"
+                                               placeholder="Enter budget amount"
+                                               min="0.01"
+                                               step="0.01"
+                                               required />
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label">Allocation Purpose</label>
+                                        <input type="text"
+                                               name="Budgets[0].AllocationPurpose"
+                                               class="form-control"
+                                               placeholder="Enter allocation purpose" />
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label">Remarks</label>
+                                        <textarea name="Budgets[0].Remarks"
+                                                  class="form-control"
+                                                  rows="2"
+                                                  placeholder="Enter remarks"></textarea>
+                                    </div>
+
+                                </div>
+
+                                <div class="text-end mt-2">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger remove-row"
+                                            onclick="removePlanningRow(this)">
+                                        <em class="icon ni ni-trash"></em> Remove
+                                    </button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary mb-4"
+                                onclick="addBudget()">
+                            <em class="icon ni ni-plus"></em>
+                            Add Another Department
+                        </button>
+
+                        <hr class="my-4" />
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success">
+                                <em class="icon ni ni-send"></em>
+                                Send to CEO
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- DYNAMIC ROW SCRIPT -->
+        <script>
+
+            let milestoneIndex = 1;
+            let employeeIndex = 1;
+            let budgetIndex = 1;
+
+            const vendorOptions = `
+                @foreach (var vendor in (IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Vendors)
+                {
+                        <option value="@vendor.Value">@Html.Raw(System.Net.WebUtility.HtmlEncode(vendor.Text))</option>
+                }
+            `;
+
+            const employeeOptions = `
+                @foreach (var employee in (IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Employees)
+                {
+                        <option value="@employee.Value">@Html.Raw(System.Net.WebUtility.HtmlEncode(employee.Text))</option>
+                }
+            `;
+
+            function addMilestone() {
+
+                const index = milestoneIndex++;
+
+                const html = `
+                <div class="milestone-row border rounded p-3 mb-3">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-12">
+                            <label class="form-label">Milestone Name</label>
+                            <input type="text"
+                                   name="Milestones[${index}].MilestoneName"
+                                   class="form-control"
+                                   placeholder="Enter milestone name"
+                                   required />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Timeline From</label>
+                            <input type="date"
+                                   name="Milestones[${index}].StartDate"
+                                   class="form-control"
+                                   required />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Timeline To</label>
+                            <input type="date"
+                                   name="Milestones[${index}].EndDate"
+                                   class="form-control"
+                                   required />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Assigned Vendor</label>
+                            <select name="Milestones[${index}].VendorId"
+                                    class="form-select">
+                                <option value="">Select Vendor</option>
+                                ${vendorOptions}
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="text-end mt-2">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                onclick="removePlanningRow(this)">
+                            <em class="icon ni ni-trash"></em> Remove
+                        </button>
+                    </div>
+
+                </div>`;
+
+                document.getElementById("milestoneContainer")
+                    .insertAdjacentHTML("beforeend", html);
+            }
+
+            function addEmployee() {
+
+                const index = employeeIndex++;
+
+                const html = `
+                <div class="employee-row border rounded p-3 mb-3">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-8">
+                            <label class="form-label">Select Employee</label>
+
+                            <select name="Employees[${index}].EmployeeId"
+                                    class="form-select"
+                                    required>
+                                <option value="">Select Employee</option>
+                                ${employeeOptions}
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    onclick="removePlanningRow(this)">
+                                <em class="icon ni ni-trash"></em> Remove
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>`;
+
+                document.getElementById("employeeContainer")
+                    .insertAdjacentHTML("beforeend", html);
+            }
+
+            function addBudget() {
+
+                const index = budgetIndex++;
+
+                const html = `
+                <div class="budget-row border rounded p-3 mb-3">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Department</label>
+                            <input type="text"
+                                   name="Budgets[${index}].Department"
+                                   class="form-control"
+                                   placeholder="Enter department"
+                                   required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Budget Amount</label>
+                            <input type="number"
+                                   name="Budgets[${index}].BudgetAmount"
+                                   class="form-control"
+                                   placeholder="Enter budget amount"
+                                   min="0.01"
+                                   step="0.01"
+                                   required />
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Allocation Purpose</label>
+                            <input type="text"
+                                   name="Budgets[${index}].AllocationPurpose"
+                                   class="form-control"
+                                   placeholder="Enter allocation purpose" />
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Remarks</label>
+                            <textarea name="Budgets[${index}].Remarks"
+                                      class="form-control"
+                                      rows="2"
+                                      placeholder="Enter remarks"></textarea>
+                        </div>
+
+                    </div>
+
+                    <div class="text-end mt-2">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                onclick="removePlanningRow(this)">
+                            <em class="icon ni ni-trash"></em> Remove
+                        </button>
+                    </div>
+
+                </div>`;
+
+                document.getElementById("budgetContainer")
+                    .insertAdjacentHTML("beforeend", html);
+            }
+
+            function removePlanningRow(button) {
+                button.closest(".milestone-row, .employee-row, .budget-row").remove();
+            }
+
+        </script>
+
+            }
+            else
+            {
+                <div class="card card-bordered">
+                    <div class="card-inner">
+
+                        <h5 class="title mb-3">
+                            <em class="icon ni ni-calendar-check text-primary"></em>
+                            Submitted Project Planning
+                        </h5>
+
+                        <div class="alert alert-light">
+                            <strong>CEO Status:</strong> @Model.CEOStatus
+                            <br />
+
+                            <strong>Submitted Date:</strong>
+                            @(Model.SubmittedToCEODate?.ToString("dd-MMM-yyyy hh:mm tt") ?? "-")
+
+                            <br />
+
+                            <strong>CEO Remarks:</strong>
+                            @(Model.CEORemarks ?? "-")
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <h6 class="title mb-3">Timeline & Milestones</h6>
+
+                        @foreach (var item in (IEnumerable<ProjectMilestone>)ViewBag.ProjectMilestones)
+                        {
+                            <div class="border rounded p-3 mb-3">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Milestone Name</label>
+                                        <input class="form-control"
+                                               value="@item.MilestoneName" readonly />
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Start Date</label>
+                                        <input class="form-control"
+                                               value="@item.StartDate.ToString("dd-MMM-yyyy")"
+                                               readonly />
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">End Date</label>
+                                        <input class="form-control"
+                                               value="@item.EndDate.ToString("dd-MMM-yyyy")"
+                                               readonly />
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label">Assigned Vendor</label>
+                                        <input class="form-control"
+                                               value="@(item.Vendor?.VendorName ?? "-")"
+                                               readonly />
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <hr class="my-4" />
+
+                        <h6 class="title mb-3">Assigned Employees</h6>
+
+                        @foreach (var item in (IEnumerable<ProjectTeam>)ViewBag.ProjectTeams)
+                        {
+                            <div class="mb-3">
+                                <label class="form-label">Employee</label>
+                                <input class="form-control"
+                                       value="@(item.Employee?.FirstName + " " + item.Employee?.LastName + " (" + item.EmployeeId + ")")"
+                                       readonly />
+                            </div>
+                        }
+
+                        <hr class="my-4" />
+
+                        <h6 class="title mb-3">Department Budget Allocation</h6>
+
+                        @foreach (var item in (IEnumerable<ProjectDepartmentBudget>)ViewBag.ProjectBudgets)
+                        {
+                            <div class="border rounded p-3 mb-3">
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Department</label>
+                                        <input class="form-control"
+                                               value="@item.Department" readonly />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Budget Amount</label>
+                                        <input class="form-control"
+                                               value="@item.BudgetAmount.ToString("N2")"
+                                               readonly />
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label">Allocation Purpose</label>
+                                        <input class="form-control"
+                                               value="@item.AllocationPurpose" readonly />
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label">Remarks</label>
+                                        <textarea class="form-control"
+                                      rows="2"
+                                      readonly>@item.Remarks</textarea>
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            }
+        }
+
+
+    </div>
+</div>

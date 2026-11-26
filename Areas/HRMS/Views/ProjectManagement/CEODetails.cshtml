@@ -1,0 +1,542 @@
+﻿@using TSSC.Unified.Models
+@model TSSC.Unified.Models.AdminProject
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "CEO Project Details";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">CEO Project Details</h3>
+            <div class="nk-block-des text-soft">
+                Complete project information and planning details for CEO review
+            </div>
+        </div>
+
+        <a asp-area="HRMS"
+           asp-controller="ProjectManagement"
+           asp-action="CEOIndex"
+           asp-route-status="@ViewBag.ReturnStatus"
+           class="btn btn-outline-light">
+            <em class="icon ni ni-arrow-left"></em>
+            Back
+        </a>
+
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <!-- Project Information -->
+        <h5 class="title mb-3">
+            <em class="icon ni ni-briefcase text-primary"></em>
+            Project Information
+        </h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">Project ID</label>
+                <input type="text" class="form-control"
+                       value="@Model.ProjectId" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Project Name</label>
+                <input type="text" class="form-control"
+                       value="@Model.ProjectName" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Project Type</label>
+                <input type="text" class="form-control"
+                       value="@(ViewBag.ProjectTypeName ?? "-")" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Government Type</label>
+                <input type="text" class="form-control"
+                       value="@(ViewBag.ProjectSubTypeName ?? "-")" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Department / Industry</label>
+                <input type="text" class="form-control"
+                       value="@(Model.Department ?? "-")" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Project Location</label>
+                <input type="text" class="form-control"
+                       value="@(ViewBag.ProjectLocationName ?? "-")" readonly />
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Project Description</label>
+                <textarea class="form-control"
+                          rows="4"
+                          readonly>@Model.ProjectDescription</textarea>
+            </div>
+
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- Timeline and Budget -->
+        <h5 class="title mb-3">
+            <em class="icon ni ni-calendar text-primary"></em>
+            Timeline & Budget
+        </h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">Start Date</label>
+                <input type="text" class="form-control"
+                       value="@Model.StartDate.ToString("dd-MMM-yyyy")"
+                       readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">End Date</label>
+                <input type="text" class="form-control"
+                       value="@Model.EndDate.ToString("dd-MMM-yyyy")"
+                       readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Project Cost</label>
+                <input type="text" class="form-control"
+                       value="@(Model.ProjectCost?.ToString("N2") ?? "-")"
+                       readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Project Duration</label>
+                <input type="text" class="form-control"
+                       value="@((Model.EndDate.Date - Model.StartDate.Date).Days + 1) Days"
+                       readonly />
+            </div>
+
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- Project Team -->
+        <h5 class="title mb-3">
+            <em class="icon ni ni-users text-primary"></em>
+            Project Team
+        </h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">Project Manager</label>
+                <input type="text" class="form-control"
+                       value="@(ViewBag.ProjectManagerName ?? "-")"
+                       readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Business Head</label>
+                <input type="text" class="form-control"
+                       value="@(ViewBag.BusinessHeadName ?? "-")"
+                       readonly />
+            </div>
+
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- Project Attachment -->
+        <h5 class="title mb-3">
+            <em class="icon ni ni-file-docs text-primary"></em>
+            Project Attachment
+        </h5>
+
+        <div class="row g-3">
+            <div class="col-md-12">
+
+                @if (!string.IsNullOrEmpty(Model.Attachment))
+                {
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+
+                        <span class="text-soft">
+                            <em class="icon ni ni-file-text"></em>
+                            Project document uploaded
+                        </span>
+
+                        <a href="@Url.Content(Model.Attachment)"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn btn-sm btn-outline-primary">
+
+                            <em class="icon ni ni-eye"></em>
+                            View Attachment
+                        </a>
+
+                    </div>
+                }
+                else
+                {
+                    <span class="text-soft">No attachment uploaded.</span>
+                }
+
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- Record Information -->
+        <h5 class="title mb-3">
+            <em class="icon ni ni-info text-primary"></em>
+            Record Information
+        </h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">Created By</label>
+                <input type="text" class="form-control"
+                       value="@(Model.CreatedBy ?? "-")" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Created Date</label>
+                <input type="text" class="form-control"
+                       value="@Model.CreatedDate.ToString("dd-MMM-yyyy hh:mm tt")"
+                       readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Modified By</label>
+                <input type="text" class="form-control"
+                       value="@(Model.ModifiedBy ?? "-")" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Modified Date</label>
+                <input type="text" class="form-control"
+                       value="@(Model.ModifiedDate?.ToString("dd-MMM-yyyy hh:mm tt") ?? "-")"
+                       readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Project Status</label>
+                <input type="text" class="form-control"
+                       value="@(Model.IsActive ? "Active" : "Inactive")"
+                       readonly />
+            </div>
+
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- Business Head Review -->
+        <h5 class="title mb-3">
+            <em class="icon ni ni-check-circle text-primary"></em>
+            Business Head Review
+        </h5>
+
+        <div class="alert alert-light">
+            <p class="mb-2">
+                <strong>Status:</strong>
+                <span class="badge bg-success">
+                    @(Model.BusinessHeadStatus ?? "-")
+                </span>
+            </p>
+
+            <p class="mb-2">
+                <strong>Remarks:</strong>
+                @(Model.BusinessHeadRemarks ?? "-")
+            </p>
+
+            <p class="mb-0">
+                <strong>Reviewed On:</strong>
+                @(Model.BusinessHeadReviewedDate?.ToString("dd-MMM-yyyy hh:mm tt") ?? "-")
+            </p>
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- Submitted Project Planning -->
+        <h5 class="title mb-3">
+            <em class="icon ni ni-calendar-check text-primary"></em>
+            Submitted Project Planning
+        </h5>
+
+        <div class="alert alert-light">
+            <p class="mb-2">
+                <strong>CEO Status:</strong>
+                <span class="badge bg-warning text-dark">
+                    @Model.CEOStatus
+                </span>
+            </p>
+
+            <p class="mb-2">
+                <strong>Submitted Date:</strong>
+                @(Model.SubmittedToCEODate?.ToString("dd-MMM-yyyy hh:mm tt") ?? "-")
+            </p>
+
+            <p class="mb-0">
+                <strong>CEO Remarks:</strong>
+                @(Model.CEORemarks ?? "-")
+            </p>
+        </div>
+
+        <!-- Milestones -->
+        <h6 class="title mb-3">
+            <em class="icon ni ni-calendar text-primary"></em>
+            Timeline & Milestones
+        </h6>
+
+        @{
+            var milestones = ViewBag.ProjectMilestones
+            as IEnumerable<ProjectMilestone>;
+        }
+
+        @if (milestones != null && milestones.Any())
+        {
+            foreach (var item in milestones)
+            {
+                <div class="border rounded p-3 mb-3">
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Milestone Name</label>
+                            <input class="form-control"
+                                   value="@item.MilestoneName" readonly />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Start Date</label>
+                            <input class="form-control"
+                                   value="@item.StartDate.ToString("dd-MMM-yyyy")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">End Date</label>
+                            <input class="form-control"
+                                   value="@item.EndDate.ToString("dd-MMM-yyyy")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Assigned Vendor</label>
+                            <input class="form-control"
+                                   value="@(item.Vendor?.VendorName ?? "-")"
+                                   readonly />
+                        </div>
+
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-soft">No milestones available.</p>
+        }
+
+        <hr class="my-4" />
+
+        <!-- Assigned Employees -->
+        <h6 class="title mb-3">
+            <em class="icon ni ni-users text-primary"></em>
+            Assigned Employees
+        </h6>
+
+        @{
+            var projectTeams = ViewBag.ProjectTeams as IEnumerable<ProjectTeam>;
+        }
+
+        @if (projectTeams != null && projectTeams.Any())
+        {
+            foreach (var item in projectTeams)
+            {
+                <div class="mb-3">
+                    <label class="form-label">Employee</label>
+                    <input class="form-control"
+                           value="@($"{item.Employee?.FirstName} {item.Employee?.LastName} ({item.EmployeeId})")"
+                           readonly />
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-soft">No employees assigned.</p>
+        }
+
+        <hr class="my-4" />
+
+        <!-- Department Budget -->
+        <h6 class="title mb-3">
+            <em class="icon ni ni-wallet text-primary"></em>
+            Department Budget Allocation
+        </h6>
+
+        @{
+            var projectBudgets =
+            ViewBag.ProjectBudgets as IEnumerable<ProjectDepartmentBudget>;
+        }
+
+        @if (projectBudgets != null && projectBudgets.Any())
+        {
+            foreach (var item in projectBudgets)
+            {
+                <div class="border rounded p-3 mb-3">
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Department</label>
+                            <input class="form-control"
+                                   value="@item.Department" readonly />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Budget Amount</label>
+                            <input class="form-control"
+                                   value="@item.BudgetAmount.ToString("N2")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Allocation Purpose</label>
+                            <input class="form-control"
+                                   value="@(item.AllocationPurpose ?? "-")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Remarks</label>
+                            <textarea class="form-control"
+                              rows="2"
+                              readonly>@item.Remarks</textarea>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-soft">No department budgets available.</p>
+        }
+
+        <hr class="my-4" />
+
+        <!-- CEO Review -->
+        <h5 class="title mb-3">
+            <em class="icon ni ni-check-circle text-primary"></em>
+            CEO Project Review
+        </h5>
+
+        @if (Model.CEOStatus == "Pending")
+        {
+            <form asp-action="CEOReviewProject"
+                  asp-controller="ProjectManagement"
+                  asp-area="HRMS"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="projectId"
+                       value="@Model.ProjectId" />
+                <input type="hidden" name="returnStatus" value="@ViewBag.ReturnStatus" />
+
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <label class="form-label">
+                            CEO Remarks <span class="text-danger">*</span>
+                        </label>
+
+                        <textarea name="remarks"
+                              class="form-control mb-3"
+                              rows="3"
+                              maxlength="4000"
+                              placeholder="Enter your remarks"
+                              required></textarea>
+
+                        <div class="btn-group" role="group">
+
+                            <button type="submit"
+                                    name="decision"
+                                    value="On Hold"
+                                    class="btn btn-sm btn-outline-warning">
+                                <em class="icon ni ni-pause"></em>
+                                On Hold
+                            </button>
+
+                            <button type="submit"
+                                    name="decision"
+                                    value="Rejected"
+                                    class="btn btn-sm btn-outline-danger">
+                                <em class="icon ni ni-cross"></em>
+                                Reject
+                            </button>
+
+                            <button type="submit"
+                                    name="decision"
+                                    value="Approved"
+                                    class="btn btn-sm btn-outline-success">
+                                <em class="icon ni ni-check"></em>
+                                Approve
+                            </button>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </form>
+        }
+        else if (Model.CEOStatus == "Approved" ||
+        Model.CEOStatus == "Rejected" ||
+        Model.CEOStatus == "On Hold")
+        {
+            <div class="alert alert-light">
+                <h6 class="mb-2">CEO Review Already Submitted</h6>
+
+                <p class="mb-1">
+                    <strong>Status:</strong>
+                    @Model.CEOStatus
+                </p>
+
+                <p class="mb-1">
+                    <strong>Remarks:</strong>
+                    @(Model.CEORemarks ?? "-")
+                </p>
+
+                <p class="mb-0">
+                    <strong>Reviewed On:</strong>
+                    @(Model.CEOReviewedDate?.ToString("dd-MMM-yyyy hh:mm tt") ?? "-")
+                </p>
+            </div>
+        }
+
+    </div>
+</div>

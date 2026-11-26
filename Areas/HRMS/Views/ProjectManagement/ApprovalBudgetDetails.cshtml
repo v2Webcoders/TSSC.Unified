@@ -1,0 +1,314 @@
+﻿@model IEnumerable<TSSC.Unified.Models.ProjectBudgetExpense>
+
+@{
+    ViewData["Title"] = "Project Expense Details";
+    Layout = "_Layout";
+
+    bool isCEO = ViewBag.IsCEO == true;
+}
+
+<div class="nk-content">
+    <div class="container-fluid">
+
+        <div class="nk-block-head nk-block-head-sm">
+            <div class="nk-block-between">
+                <div class="nk-block-head-content">
+                    <h3 class="nk-block-title page-title">
+                        Project Expense Details
+                    </h3>
+                    <div class="nk-block-des text-soft">
+                        <p>Project Name: @ViewBag.ProjectName</p>
+                    </div>
+                </div>
+
+                <div class="nk-block-head-content">
+                    <a asp-area="HRMS"
+                       asp-controller="ProjectManagement"
+                       asp-action="ApprovalBudgetTracking"
+                       class="btn btn-outline-primary">
+                        <em class="icon ni ni-arrow-left"></em>
+                        <span>Back</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                bool canReview = isCEO
+                ? item.BusinessHeadStatus == "Approved" &&
+                (item.CEOStatus == "Pending" || item.CEOStatus == "On Hold")
+                : item.BusinessHeadStatus == "Pending" ||
+                item.BusinessHeadStatus == "On Hold";
+
+                <div class="card card-bordered mb-4">
+                    <div class="card-inner">
+
+                        <h5 class="mb-4">Expense Information</h5>
+
+                        <div class="row g-4">
+
+                            <!-- Expense Title -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Expense Title</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           value="@item.ExpenseTitle"
+                                           readonly />
+                                </div>
+                            </div>
+
+                            <!-- Vendor ID -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Vendor Name</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           value="@(
+                                           item.VendorId.HasValue &&
+                                           ((Dictionary<int, string>)ViewBag.VendorNames)
+                                               .ContainsKey(item.VendorId.Value)
+                                               ? ((Dictionary<int, string>)ViewBag.VendorNames)[item.VendorId.Value]
+                                               : "Vendor not found"
+                              )"
+                                   readonly />
+                        </div>
+                    </div>
+
+                            <!-- Expense Amount -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Expense Amount</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           value="₹ @item.ExpenseAmount.ToString("N2")"
+                                           readonly />
+                                </div>
+                            </div>
+
+                            <!-- Expense Date -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Expense Date</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           value="@item.ExpenseDate.ToString("dd-MM-yyyy")"
+                                           readonly />
+                                </div>
+                            </div>
+
+                            <!-- Payment Mode -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Payment Mode</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           value="@item.PaymentMode"
+                                           readonly />
+                                </div>
+                            </div>
+
+                            <!-- Invoice Number -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Invoice Number</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           value="@item.InvoiceNumber"
+                                           readonly />
+                                </div>
+                            </div>
+
+                            <!-- Invoice Attachment -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Invoice / Bill</label>
+
+                                    @if (!string.IsNullOrEmpty(item.InvoiceAttachment))
+                                    {
+                                        <div>
+                                            <a href="@Url.Content(item.InvoiceAttachment)"
+                                               target="_blank"
+                                               class="btn btn-outline-primary">
+                                                <em class="icon ni ni-file-pdf"></em>
+                                                View Invoice
+                                            </a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <input type="text"
+                                               class="form-control"
+                                               value="No invoice uploaded"
+                                               readonly />
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Project Manager Remarks -->
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">Project Manager Remarks</label>
+                                    <textarea class="form-control"
+                                      rows="3"
+                                      readonly>@item.Remarks</textarea>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <!-- Business Head Approval Details -->
+                        <h5 class="mb-3">Business Head Approval Details</h5>
+
+                        <div class="row g-4">
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Business Head Status</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           value="@item.BusinessHeadStatus"
+                                           readonly />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Business Head Reviewed Date</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           value="@(item.BusinessHeadReviewedDate?.ToString("dd-MM-yyyy") ?? "-")"
+                                           readonly />
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">Business Head Remarks</label>
+                                    <textarea class="form-control"
+                                      rows="3"
+                                      readonly>@item.BusinessHeadRemarks</textarea>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <!-- CEO Approval Details -->
+                        <h5 class="mb-3">CEO Approval Details</h5>
+
+                        <div class="row g-4">
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">CEO Status</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           value="@item.CEOStatus"
+                                           readonly />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">CEO Reviewed Date</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           value="@(item.CEOReviewedDate?.ToString("dd-MM-yyyy") ?? "-")"
+                                           readonly />
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">CEO Remarks</label>
+                                    <textarea class="form-control"
+                                      rows="3"
+                                      readonly>@item.CEORemarks</textarea>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Approval Form -->
+                        @if (canReview)
+                        {
+                            <hr class="my-4" />
+
+                            <h5 class="mb-3">
+                                @(isCEO ? "CEO Review" : "Business Head Review")
+                            </h5>
+
+                            <form action="@Url.Action(
+                                                                  "ApprovalExpenseReview",
+                                                                  "ProjectManagement",
+                                                                  new { area = "HRMS" })"
+                      method="post">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="expenseId"
+                                       value="@item.ExpenseId" />
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label">
+                                        @(isCEO ? "CEO Remarks" : "Business Head Remarks")
+                                    </label>
+
+                                    <textarea name="remarks"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="Enter your remarks"
+                                  required></textarea>
+                                </div>
+
+                                <button type="submit"
+                                        name="status"
+                                        value="Approved"
+                                        class="btn btn-success">
+                                    <em class="icon ni ni-check-circle"></em>
+                                    Approve
+                                </button>
+
+                                <button type="submit"
+                                        name="status"
+                                        value="Rejected"
+                                        class="btn btn-danger">
+                                    <em class="icon ni ni-cross-circle"></em>
+                                    Reject
+                                </button>
+
+                                <button type="submit"
+                                        name="status"
+                                        value="On Hold"
+                                        class="btn btn-warning">
+                                    <em class="icon ni ni-pause-circle"></em>
+                                    On Hold
+                                </button>
+
+                            </form>
+                                }
+                        else
+                        {
+                            <hr class="my-4" />
+
+                            <div class="alert alert-light">
+                                <strong>Review completed.</strong>
+                                Approval actions are no longer available for this expense.
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            }
+        }
+       
+    </div>
+</div>

@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using QUIZAPP.Models;
-using QUIZAPP.Areas.Admin.ViewModels;
-using TSSC.Unified.Models;
 using Microsoft.Identity.Client;
+using QUIZAPP.Areas.Admin.ViewModels;
+using QUIZAPP.Models;
+using TSSC.Unified.Models;
 
 namespace QUIZAPP
 {
@@ -96,5 +96,24 @@ namespace QUIZAPP
         public DbSet<Scheme> Scheme { get; set; }
         public DbSet<Project> Project { get; set; }
         public DbSet<TrainingCenter> TrainingCenter { get; set; }
+        // ------------------------- PROJECT MANAGEMENT MODULE---------------------------------------
+
+        public DbSet<AdminProject>AdminProjects { get; set; }
+        public DbSet<ProjectType> ProjectType { get; set; }
+
+        public DbSet<ProjectVendor> ProjectVendors { get; set; }
+
+        public DbSet<ProjectMilestone> ProjectMilestones { get; set; }
+
+        public DbSet<ProjectTeam> ProjectTeams { get; set; }
+
+        public DbSet<ProjectDepartmentBudget> ProjectDepartmentBudgets { get; set; }
+
+        public DbSet<ProjectTask> ProjectTasks { get; set; }
+
+        public DbSet<ProjectMilestoneUpdate> ProjectMilestoneUpdates { get; set; }
+        public DbSet<ProjectBudgetExpense> ProjectBudgetExpenses { get; set; }
+
+
     }
 }

@@ -1,0 +1,111 @@
+﻿@model IEnumerable<TSSC.Unified.Models.ProjectTask>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Completed Project Tasks";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Completed Project Tasks
+            </h3>
+        </div>
+    </div>
+</div>
+
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer dtr-inline collapsed">
+
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Task Name</th>
+                    <th>Project ID</th>
+                    <th>Employee ID</th>
+                    <th>Task Description</th>
+                    <th>Due Date</th>
+                    <th>Employee Remarks</th>
+                    <th>Completion Report</th>
+                    <th>Completed On</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@serial</td>
+
+                            <td>
+                                @item.TaskName
+                            </td>
+
+                            <td>
+                                @item.ProjectId
+                            </td>
+
+                            <td>
+                                @item.EmployeeId
+                            </td>
+
+                            <td>
+                                @(item.TaskDescription ?? "-")
+                            </td>
+
+                            <td>
+                                @item.DueDate.ToString("dd-MMM-yyyy")
+                            </td>
+
+                            <td>
+                                @(item.EmployeeRemarks ?? "-")
+                            </td>
+
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.EmployeeAttachmentPath))
+                                {
+                                    <a href="@item.EmployeeAttachmentPath"
+                                       target="_blank"
+                                       class="btn btn-sm btn-outline-primary"
+                                       title="View Completion Report">
+                                        <em class="icon ni ni-file-pdf"></em>
+                                        View
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+
+                            <td>
+                                @(item.ModifiedDate?.ToString("dd-MMM-yyyy hh:mm tt") ?? "-")
+                            </td>
+
+                            <td>
+                                <span class="badge bg-success text-white">
+                                    @item.Status
+                                </span>
+                            </td>
+                        </tr>
+
+                        serial++;
+                    }
+                }
+            </tbody>
+
+        </table>
+
+       
+
+    </div>
+</div>

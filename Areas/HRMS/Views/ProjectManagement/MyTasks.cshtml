@@ -1,0 +1,120 @@
+﻿@model IEnumerable<TSSC.Unified.Models.ProjectTask>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "My Project Tasks";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                My Project Tasks
+            </h3>
+        </div>
+    </div>
+</div>
+
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer dtr-inline collapsed">
+
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Task Name</th>
+                    <th>Project ID</th>
+                    <th>Milestone ID</th>
+                    <th>Task Description</th>
+                    <th>Start Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Created On</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null)
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@serial</td>
+
+                            <td>
+                                @item.TaskName
+                            </td>
+
+                            <td>
+                                @item.ProjectId
+                            </td>
+
+                            <td>
+                                @item.MilestoneId
+                            </td>
+
+                            <td>
+                                @(item.TaskDescription ?? "-")
+                            </td>
+
+                            <td>
+                                @item.StartDate.ToString("dd-MMM-yyyy")
+                            </td>
+
+                            <td>
+                                @item.DueDate.ToString("dd-MMM-yyyy")
+                            </td>
+
+                            <td>
+                                @if (item.Status == "Completed")
+                                {
+                                    <span class="badge bg-success">Completed</span>
+                                }
+                                else if (item.Status == "In Progress")
+                                {
+                                    <span class="badge bg-info">In Progress</span>
+                                }
+                                else if (item.Status == "On Hold")
+                                {
+                                    <span class="badge bg-warning">On Hold</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-dark">
+                                        @item.Status
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                @item.CreatedDate.ToString("dd-MMM-yyyy")
+                            </td>
+
+                            <td>
+                                <a asp-area="HRMS"
+                                   asp-controller="ProjectManagement"
+                                   asp-action="MyTaskDetails"
+                                   asp-route-id="@item.TaskId"
+                                   class="btn btn-sm btn-outline-primary"
+                                   title="View Details">
+                                    <em class="icon ni ni-eye"></em>
+                                </a>
+                            </td>
+                        </tr>
+
+                        serial++;
+                    }
+                }
+            </tbody>
+
+        </table>
+
+       
+
+    </div>
+</div>

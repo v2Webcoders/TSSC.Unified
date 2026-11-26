@@ -1,0 +1,166 @@
+﻿@using TSSC.Unified.Models
+@model AdminProject
+
+@{
+    ViewData["Title"] = "Project Timeline";
+    Layout = "_Layout";
+
+    var activities = new List<(string Name, string FieldName, string Status)>
+    {
+        ("Project Approval", "ProjectApprovalStatus", Model.ProjectApprovalStatus ?? "Pending"),
+        ("Infrastructure Setup", "InfrastructureSetupStatus", Model.InfrastructureSetupStatus ?? "Pending"),
+        ("Trainer Assignment", "TrainerAssignmentStatus", Model.TrainerAssignmentStatus ?? "Pending"),
+        ("Batch Creation", "BatchCreationStatus", Model.BatchCreationStatus ?? "Pending"),
+        ("Training Start", "TrainingStartStatus", Model.TrainingStartStatus ?? "Pending"),
+        ("Assessment", "AssessmentStatus", Model.AssessmentStatus ?? "Pending"),
+        ("Certification", "CertificationStatus", Model.CertificationStatus ?? "Pending")
+    };
+}
+
+<div class="nk-content">
+    <div class="container-fluid">
+
+        <div class="nk-block-head nk-block-head-sm">
+            <div class="nk-block-between">
+                <div class="nk-block-head-content">
+                    <h3 class="nk-block-title page-title">Project Timeline</h3>
+                    <div class="nk-block-des text-soft">
+                        <p>Manage project activity status.</p>
+                    </div>
+                </div>
+
+                <div class="nk-block-head-content">
+                    <a href="@Url.Action("Timeline", "ProjectManagement", new { area = "HRMS" })"
+                       class="btn btn-outline-light">
+                        <em class="icon ni ni-arrow-left"></em>
+                        <span>Back</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="nk-block">
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["Success"]
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div class="card card-bordered">
+                <div class="card-inner">
+
+                    <div class="card-title-group mb-4">
+                        <div class="card-title">
+                            <h5 class="title">@Model.ProjectName</h5>
+                            <p class="text-soft mb-0">
+                                Department: @(Model.Department ?? "-")
+                                | Project ID: @Model.ProjectId
+                            </p>
+                        </div>
+                    </div>
+
+                    <form action="@Url.Action("UpdateProjectTimeline", "ProjectManagement", new { area = "HRMS" })"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
+
+                        
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-middle">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th style="width:70px;">S.No.</th>
+                                        <th>Activity</th>
+                                        <th style="width:160px;">Current Status</th>
+                                        <th style="width:230px;">Update Status</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @for (int i = 0; i < activities.Count; i++)
+                                    {
+                                        var activity = activities[i];
+                                        var status = activity.Status.Trim();
+
+                                        var badgeClass = status switch
+                                        {
+                                            "Completed" => "badge-success",
+                                            "In Progress" => "badge-info",
+                                            "Delayed" => "badge-danger",
+                                            _ => "badge-secondary"
+                                        };
+
+                                        <tr>
+                                            <td>@(i + 1)</td>
+
+                                            <td>
+                                                <strong>@activity.Name</strong>
+                                            </td>
+
+                                            <td>
+                                                <span class="badge @badgeClass">
+                                                    @status
+                                                </span>
+                                            </td>
+
+                                            <td>
+                                                <select name="@activity.FieldName"
+                                                        class="form-control"
+                                                        required>
+                                                    <option value="Pending"
+                                                            selected="@(status == "Pending")">
+                                                        Pending
+                                                    </option>
+                                                    <option value="In Progress"
+                                                            selected="@(status == "In Progress")">
+                                                        In Progress
+                                                    </option>
+                                                    <option value="Completed"
+                                                            selected="@(status == "Completed")">
+                                                        Completed
+                                                    </option>
+                                                    <option value="Delayed"
+                                                            selected="@(status == "Delayed")">
+                                                        Delayed
+                                                    </option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <em class="icon ni ni-save"></em>
+                                <span>Update Timeline</span>
+                            </button>
+
+                            <a asp-area="HRMS"
+                               asp-controller="ProjectManagement"
+                               asp-action="Timeline"
+                               class="btn btn-outline-light ml-2">
+                                Cancel
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,283 @@
+﻿@model TSSC.Unified.Models.ProjectBudgetExpense
+
+@{
+    ViewData["Title"] = "Add Project Expense";
+    Layout = "_Layout";
+
+    var vendorList = ViewBag.VendorList as
+        List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>;
+}
+
+<div class="nk-content">
+    <div class="container-fluid">
+
+        <div class="nk-block-head nk-block-head-sm">
+            <div class="nk-block-between">
+                <div class="nk-block-head-content">
+                    <h3 class="nk-block-title page-title">
+                        Add Project Expense
+                    </h3>
+                    <div class="nk-block-des text-soft">
+                        <p>Enter expense details for the selected project.</p>
+                    </div>
+                </div>
+                <div class="nk-block-head-content">
+                    <a asp-area="HRMS"
+                       asp-controller="ProjectManagement"
+                       asp-action="BudgetTracking"
+                       class="btn btn-outline-primary">
+                        <em class="icon ni ni-arrow-left"></em>
+                        <span>Back</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-bordered">
+            <div class="card-inner">
+
+                <form action="@Url.Content("~/HRMS/ProjectManagement/AddBudgetExpense")"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                    <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
+
+                    <div class="row g-4">
+
+                        <!-- Project Name -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Project Name</label>
+                                <input type="text"
+                                       class="form-control"
+                                       value="@ViewBag.ProjectName"
+                                       readonly />
+                            </div>
+                        </div>
+
+                        <!-- Vendor -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+
+                                <label class="form-label">Vendor Name</label>
+
+                                @if (ViewBag.HasSingleVendor == true)
+                                {
+                                    <!-- Only one vendor: automatically selected -->
+                                    <input type="text"
+                                           class="form-control"
+                                           value="@ViewBag.SingleVendorName"
+                                           readonly />
+
+                                    <input type="hidden" asp-for="VendorId" />
+                                }
+                                else if (vendorList != null && vendorList.Count > 1)
+                                {
+                                    <!-- Multiple vendors: dropdown -->
+                                    <select name="VendorId" id="VendorId" class="form-control" required>
+                                        <option value="">--- Select Vendor ---</option>
+
+                                        @if (vendorList != null)
+                                        {
+                                            foreach (var vendor in vendorList)
+                                            {
+                                                <option value="@vendor.Value">
+                                                    @vendor.Text
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                }
+                                else
+                                {
+                                    <!-- No vendor assigned -->
+                                    <input type="text"
+                                           class="form-control"
+                                           value="No vendor assigned to this project"
+                                           readonly />
+                                }
+
+                            </div>
+                        </div>
+
+                        <!-- Expense Title -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="ExpenseTitle"
+                                       class="form-label">
+                                    Expense Title
+                                </label>
+
+                                <input type="text"
+                                       name="ExpenseTitle"
+                                       id="ExpenseTitle"
+                                       class="form-control"
+                                       placeholder="Enter expense title"
+                                       required />
+
+                                <span asp-validation-for="ExpenseTitle"
+                                      class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Expense Amount -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="ExpenseAmount"
+                                       class="form-label">
+                                    Expense Amount
+                                </label>
+
+                                <input type="number"
+                                       name="ExpenseAmount"
+                                       id="ExpenseAmount"
+                                       class="form-control"
+                                       step="0.01"
+                                       min="0.01"
+                                       placeholder="Enter expense amount"
+                                       required />
+                                <span asp-validation-for="ExpenseAmount"
+                                      class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Expense Date -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="ExpenseDate"
+                                       class="form-label">
+                                    Expense Date
+                                </label>
+
+                                <input asp-for="ExpenseDate"
+                                       type="date"
+                                       class="form-control"
+                                       required />
+                            </div>
+                        </div>
+
+                        <!-- Payment Mode -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Payment Mode</label>
+
+                                <select name="PaymentMode" id="PaymentMode"
+                                        class="form-control">
+                                    <option value="">Select Payment Mode</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="UPI">UPI</option>
+                                    <option value="Cheque">Cheque</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Invoice Number -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Invoice Number</label>
+
+                                <input type="text"
+                                       name="InvoiceNumber"
+                                       id="InvoiceNumber"
+                                       class="form-control"
+                                       placeholder="Enter invoice number" />
+                            </div>
+                        </div>
+
+                        <!-- Invoice Attachment -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Upload Invoice / Bill
+                                </label>
+
+                                <input type="file"
+                                       name="InvoiceFile"
+                                       id="InvoiceFile"
+                                       class="form-control"
+                                       accept=".pdf,.jpg,.jpeg,.png" />
+
+                                <small class="text-soft">
+                                    Allowed formats: PDF, JPG, JPEG, PNG.
+                                    Maximum size: 5 MB.
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Remarks -->
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label">Remarks</label>
+
+                                <textarea name="Remarks"
+                                          id="Remarks"
+                                          class="form-control"
+                                          rows="3"
+                                          placeholder="Enter remarks"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="col-md-12">
+                            <div class="form-group">
+
+                                <button type="submit"
+                                        class="btn btn-primary"
+                                        @(ViewBag.HasSingleVendor != true &&
+                                                                                (ViewBag.VendorList == null ||
+                                                                                !((IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.VendorList).Any())
+                                                                                ? "disabled" : "")>
+                                    Send to Business Head
+                                </button>
+
+                                <button type="reset" class="btn btn-outline-light">
+                                    Cancel
+                                </button>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.getElementById("InvoiceFile").addEventListener("change", function () {
+
+            const file = this.files[0];
+
+            if (!file) return;
+
+            const allowedExtensions = [".pdf", ".jpg", ".jpeg", ".png"];
+
+            const extension = file.name
+                .substring(file.name.lastIndexOf("."))
+                .toLowerCase();
+
+            if (!allowedExtensions.includes(extension)) {
+                alert("Only PDF, JPG, JPEG and PNG files are allowed.");
+                this.value = "";
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert("File size cannot exceed 5 MB.");
+                this.value = "";
+            }
+        });
+
+    </script>
+}

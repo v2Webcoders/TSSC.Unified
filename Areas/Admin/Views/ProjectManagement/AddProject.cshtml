@@ -1,0 +1,613 @@
+﻿@model TSSC.Unified.ViewModel.AdminProjectViewModel
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Add Project";
+}
+
+<style>
+    /* Project Type Dropdown */
+    .project-type-dropdown {
+        position: relative;
+        width: 100%;
+    }
+
+    .project-type-button {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        text-align: left;
+        background: #fff;
+        cursor: pointer;
+    }
+
+        .project-type-button em {
+            margin-left: 10px;
+        }
+
+    .project-type-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        min-width: 220px;
+        background: #fff;
+        border: 1px solid #dbdfea;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        padding: 5px 0;
+        z-index: 9999;
+    }
+
+        .project-type-menu.show {
+            display: block;
+        }
+
+    .project-menu-item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        color: #526484;
+        font-size: 14px;
+        background: #fff;
+        cursor: pointer;
+        user-select: none;
+    }
+
+        .project-menu-item:hover {
+            background: #f5f6fa;
+            color: #0971fe;
+        }
+
+    /* Government submenu */
+    .government-submenu {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 100%;
+        min-width: 190px;
+        background: #fff;
+        border: 1px solid #dbdfea;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        padding: 5px 0;
+        z-index: 10000;
+    }
+
+    .government-parent.show-submenu > .government-submenu {
+        display: block;
+    }
+
+    .project-submenu-item {
+        padding: 10px 14px;
+        color: #526484;
+        font-size: 14px;
+        white-space: nowrap;
+        cursor: pointer;
+        user-select: none;
+    }
+
+        .project-submenu-item:hover {
+            background: #0971fe;
+            color: #fff;
+        }
+
+    /* Prevent dropdown from being clipped */
+    .card,
+    .card-inner,
+    .form-group {
+        overflow: visible;
+    }
+</style>
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Add Project
+            </h3>
+        </div>
+
+        <div class="nk-block-head-content">
+            <a asp-area="Admin"
+               asp-controller="ProjectManagement"
+               asp-action="Index"
+               class="btn btn-outline-primary">
+
+                <em class="icon ni ni-arrow-left"></em>
+                <span>Back</span>
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<div class="card card-bordered">
+    <div class="card-inner">
+
+        <form asp-area="Admin"
+              asp-controller="ProjectManagement"
+              asp-action="AddProject"
+              method="post"
+              enctype="multipart/form-data">
+
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger mb-3">
+            </div>
+
+            <div class="row g-4">
+
+                <!-- Project Type -->
+                <div class="col-md-6">
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            Project Type
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="project-type-dropdown"
+                             id="projectTypeDropdown">
+
+                            <button type="button"
+                                    class="form-control project-type-button"
+                                    id="projectTypeButton">
+
+                                <span id="selectedProjectType">
+                                    Select Project Type
+                                </span>
+
+                                <em class="icon ni ni-chevron-down"></em>
+                            </button>
+
+                            <input type="hidden"
+                                   asp-for="ProjectTypeId"
+                                   id="ProjectTypeId" />
+
+                            <input type="hidden"
+                                   asp-for="ProjectSubTypeId"
+                                   id="ProjectSubTypeId" />
+
+                            <div class="project-type-menu"
+                                 id="projectTypeMenu">
+
+                                @foreach (var item in Model.ProjectTypeList)
+                                {
+                                    if (item.Text.Equals(
+                                    "Government",
+                                    StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <div class="project-menu-item government-parent"
+                                             data-government-id="@item.Value">
+
+                                            <span>Government</span>
+
+                                            <em class="icon ni ni-chevron-right"></em>
+
+                                            <div class="government-submenu">
+
+                                                @foreach (var sub in Model.ProjectSubTypeList)
+                                                {
+                                                    <div class="project-submenu-item"
+                                                         data-parent-id="@item.Value"
+                                                         data-sub-id="@sub.Value"
+                                                         data-sub-name="@sub.Text">
+
+                                                        @sub.Text
+
+                                                    </div>
+                                                }
+
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="project-menu-item main-project-type"
+                                             data-type-id="@item.Value"
+                                             data-type-name="@item.Text">
+
+                                            <span>@item.Text</span>
+
+                                        </div>
+                                    }
+                                }
+
+                            </div>
+                        </div>
+
+                        <span asp-validation-for="ProjectTypeId"
+                              class="text-danger"></span>
+
+                        <span asp-validation-for="ProjectSubTypeId"
+                              class="text-danger"></span>
+
+                    </div>
+                </div>
+
+                <!-- Project Name -->
+                <div class="col-md-6">
+                    <div class="form-group">
+
+                        <label asp-for="ProjectName" class="form-label">
+                            Project Name
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="form-control-wrap">
+                            <input asp-for="ProjectName"
+                                   class="form-control"
+                                   placeholder="Enter Project Name"
+                                   autocomplete="off" />
+                        </div>
+
+                        <span asp-validation-for="ProjectName"
+                              class="text-danger"></span>
+
+                    </div>
+                </div>
+
+                <!-- Department -->
+                <div class="col-md-6">
+                    <div class="form-group">
+
+                        <label asp-for="Department" class="form-label">
+                            Department / Industry
+                        </label>
+
+                        <div class="form-control-wrap">
+                            <input asp-for="Department"
+                                   class="form-control"
+                                   placeholder="Enter Department / Industry"
+                                   autocomplete="off" />
+                        </div>
+
+                        <span asp-validation-for="Department"
+                              class="text-danger"></span>
+
+                    </div>
+                </div>
+
+                <!-- Project Description -->
+                <div class="col-md-6">
+                    <div class="form-group">
+
+                        <label asp-for="ProjectDescription" class="form-label">
+                            Project Description
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="form-control-wrap">
+                            <textarea asp-for="ProjectDescription"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Enter Project Description"></textarea>
+                        </div>
+
+                        <span asp-validation-for="ProjectDescription"
+                              class="text-danger"></span>
+
+                    </div>
+                </div>
+
+                <!-- Start Date -->
+                <div class="col-md-6">
+                    <div class="form-group">
+
+                        <label asp-for="StartDate" class="form-label">
+                            Start Date
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="form-control-wrap">
+                            <input asp-for="StartDate"
+                                   type="date"
+                                   class="form-control" />
+                        </div>
+
+                        <span asp-validation-for="StartDate"
+                              class="text-danger"></span>
+
+                    </div>
+                </div>
+
+                <!-- End Date -->
+                <div class="col-md-6">
+                    <div class="form-group">
+
+                        <label asp-for="EndDate" class="form-label">
+                            End Date
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="form-control-wrap">
+                            <input asp-for="EndDate"
+                                   type="date"
+                                   class="form-control" />
+                        </div>
+
+                        <span asp-validation-for="EndDate"
+                              class="text-danger"></span>
+
+                    </div>
+                </div>
+
+                <!-- Project Cost -->
+                <div class="col-md-6">
+                    <div class="form-group">
+
+                        <label asp-for="ProjectCost" class="form-label">
+                            Project Cost
+                        </label>
+
+                        <div class="form-control-wrap">
+                            <input asp-for="ProjectCost"
+                                   type="number"
+                                   step="0.01"
+                                   min="0"
+                                   class="form-control"
+                                   placeholder="Enter Project Cost" />
+                        </div>
+
+                        <span asp-validation-for="ProjectCost"
+                              class="text-danger"></span>
+
+                    </div>
+                </div>
+
+                <!-- Project Location -->
+                <div class="col-md-6">
+                    <div class="form-group">
+
+                        <label asp-for="ProjectLocationId" class="form-label">
+                            Project Location
+                        </label>
+
+                        <div class="form-control-wrap">
+                            <select asp-for="ProjectLocationId"
+                                    asp-items="Model.ProjectLocationList"
+                                    class="form-select">
+
+                                <option value="">Select Location</option>
+
+                            </select>
+                        </div>
+
+                        <span asp-validation-for="ProjectLocationId"
+                              class="text-danger"></span>
+
+                    </div>
+                </div>
+
+                <!-- Project Manager -->
+                <div class="col-md-6">
+                    <div class="form-group">
+
+                        <label asp-for="ProjectManagerId" class="form-label">
+                            Project Manager
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="form-control-wrap">
+                            <select asp-for="ProjectManagerId"
+                                    asp-items="Model.ProjectManagerList"
+                                    class="form-select">
+
+                                <option value="">Select Project Manager</option>
+
+                            </select>
+                        </div>
+
+                        <span asp-validation-for="ProjectManagerId"
+                              class="text-danger"></span>
+
+                    </div>
+                </div>
+
+                <!-- Business Head -->
+                <div class="col-md-6">
+                    <div class="form-group">
+
+                        <label asp-for="BusinessHeadId" class="form-label">
+                            Business Head
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="form-control-wrap">
+                            <select asp-for="BusinessHeadId"
+                                    asp-items="Model.BusinessHeadList"
+                                    class="form-select">
+
+                                <option value="">Select Business Head</option>
+
+                            </select>
+                        </div>
+
+                        <span asp-validation-for="BusinessHeadId"
+                              class="text-danger"></span>
+
+                    </div>
+                </div>
+
+                <!-- Attachment -->
+                <div class="col-md-6">
+                    <div class="form-group">
+
+                        <label asp-for="AttachmentFile" class="form-label">
+                            Attachment
+                        </label>
+
+                        <div class="form-control-wrap">
+                            <input asp-for="AttachmentFile"
+                                   type="file"
+                                   class="form-control"
+                                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+                        </div>
+
+                        <span class="text-soft">
+                            Allowed formats: PDF, DOC, DOCX, JPG, JPEG, PNG.
+                            Maximum file size: 5 MB.
+                        </span>
+
+                        <span asp-validation-for="AttachmentFile"
+                              class="text-danger"></span>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Buttons -->
+            <div class="row mt-4">
+                <div class="col-12">
+
+                    <button type="submit" class="btn btn-primary">
+                        <em class="icon ni ni-save"></em>
+                        <span>Save Project</span>
+                    </button>
+
+                    <a asp-area="Admin"
+                       asp-controller="ProjectManagement"
+                       asp-action="Index"
+                       class="btn btn-outline-light ms-2">
+                        Cancel
+                    </a>
+
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const dropdown = document.getElementById("projectTypeDropdown");
+            const button = document.getElementById("projectTypeButton");
+            const menu = document.getElementById("projectTypeMenu");
+
+            const projectTypeId = document.getElementById("ProjectTypeId");
+            const projectSubTypeId = document.getElementById("ProjectSubTypeId");
+
+            const selectedText = document.getElementById("selectedProjectType");
+
+            const government = document.querySelector(".government-parent");
+
+            // Open / close main dropdown
+            button.addEventListener("click", function (e) {
+                e.stopPropagation();
+                menu.classList.toggle("show");
+            });
+
+            // Government submenu
+            if (government) {
+                government.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+
+                    government.classList.toggle("show-submenu");
+                });
+            }
+
+            // Select CSR / Paid Programs
+            document.querySelectorAll(".main-project-type").forEach(function (item) {
+
+                item.addEventListener("click", function (e) {
+                    e.stopPropagation();
+
+                    projectTypeId.value = this.dataset.typeId;
+                    projectSubTypeId.value = "";
+
+                    selectedText.textContent = this.dataset.typeName;
+
+                    menu.classList.remove("show");
+
+                    if (government) {
+                        government.classList.remove("show-submenu");
+                    }
+                });
+
+            });
+
+            // Select State / Central
+            document.querySelectorAll(".project-submenu-item").forEach(function (item) {
+
+                item.addEventListener("click", function (e) {
+                    e.stopPropagation();
+
+                    projectTypeId.value = this.dataset.parentId;
+                    projectSubTypeId.value = this.dataset.subId;
+
+                    selectedText.textContent =
+                        "Government - " + this.dataset.subName;
+
+                    menu.classList.remove("show");
+
+                    if (government) {
+                        government.classList.remove("show-submenu");
+                    }
+                });
+
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener("click", function (e) {
+
+                if (!dropdown.contains(e.target)) {
+                    menu.classList.remove("show");
+
+                    if (government) {
+                        government.classList.remove("show-submenu");
+                    }
+                }
+
+            });
+
+            // Restore selected values after validation error
+            const savedTypeId = projectTypeId.value;
+            const savedSubTypeId = projectSubTypeId.value;
+
+            if (savedTypeId) {
+
+                const selectedMain = document.querySelector(
+                    '.main-project-type[data-type-id="' + savedTypeId + '"]'
+                );
+
+                if (selectedMain) {
+
+                    selectedText.textContent = selectedMain.dataset.typeName;
+
+                }
+                else if (
+                    government &&
+                    government.dataset.governmentId === savedTypeId
+                ) {
+
+                    const selectedSub = document.querySelector(
+                        '.project-submenu-item[data-sub-id="' + savedSubTypeId + '"]'
+                    );
+
+                    selectedText.textContent = selectedSub
+                        ? "Government - " + selectedSub.dataset.subName
+                        : "Government";
+                }
+            }
+
+        });
+    </script>
+}

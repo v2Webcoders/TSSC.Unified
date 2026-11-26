@@ -1,0 +1,299 @@
+﻿@model TSSC.Unified.Models.ProjectTask
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Task Details";
+
+    var badgeClass = Model.Status switch
+    {
+        "Completed" => "badge-success",
+        "In Progress" => "badge-info",
+        "On Hold" => "badge-warning",
+        "Delayed" => "badge-danger",
+        _ => "badge-secondary"
+    };
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Task Details
+            </h3>
+        </div>
+
+        <div class="nk-block-head-content">
+            <a asp-area="HRMS"
+               asp-controller="ProjectManagement"
+               asp-action="MyTasks"
+               class="btn btn-outline-light">
+                <em class="icon ni ni-arrow-left"></em>
+                Back to My Tasks
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<div class="nk-block">
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div class="card card-bordered">
+
+        <div class="card-inner">
+
+            <div class="card-title-group mb-4">
+                <div class="card-title">
+                    <h5 class="title">Task Information</h5>
+                </div>
+
+                <div class="card-tools">
+                    <span class="badge @badgeClass">
+                        @Model.Status
+                    </span>
+                </div>
+            </div>
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Task ID</label>
+                        <div class="form-control-wrap">
+                            <input type="text"
+                                   class="form-control"
+                                   value="@Model.TaskId"
+                                   readonly />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Task Name</label>
+                        <div class="form-control-wrap">
+                            <input type="text"
+                                   class="form-control"
+                                   value="@Model.TaskName"
+                                   readonly />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Project ID</label>
+                        <div class="form-control-wrap">
+                            <input type="text"
+                                   class="form-control"
+                                   value="@Model.ProjectId"
+                                   readonly />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Milestone ID</label>
+                        <div class="form-control-wrap">
+                            <input type="text"
+                                   class="form-control"
+                                   value="@Model.MilestoneId"
+                                   readonly />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label">Task Description</label>
+                        <div class="form-control-wrap">
+                            <textarea class="form-control"
+                                      rows="4"
+                                      readonly>@Model.TaskDescription</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Start Date</label>
+                        <div class="form-control-wrap">
+                            <input type="text"
+                                   class="form-control"
+                                   value="@Model.StartDate.ToString("dd-MMM-yyyy")"
+                                   readonly />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Due Date</label>
+                        <div class="form-control-wrap">
+                            <input type="text"
+                                   class="form-control"
+                                   value="@Model.DueDate.ToString("dd-MMM-yyyy")"
+                                   readonly />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Assigned By (Employee ID)</label>
+                        <div class="form-control-wrap">
+                            <input type="text"
+                                   class="form-control"
+                                   value="@Model.AssignedBy"
+                                   readonly />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Created On</label>
+                        <div class="form-control-wrap">
+                            <input type="text"
+                                   class="form-control"
+                                   value="@Model.CreatedDate.ToString("dd-MMM-yyyy hh:mm tt")"
+                                   readonly />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Last Modified</label>
+                        <div class="form-control-wrap">
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(Model.ModifiedDate?.ToString("dd-MMM-yyyy hh:mm tt") ?? "-")"
+                                   readonly />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <hr class="preview-hr">
+
+            <div class="card-title mb-3">
+                <h5 class="title">Update Task</h5>
+            </div>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["Success"]
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["Error"]
+                </div>
+            }
+
+            @if (Model.Status != "Completed")
+            {
+                <form asp-area="HRMS"
+                      asp-controller="ProjectManagement"
+                      asp-action="UpdateMyTask"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="id" value="@Model.TaskId" />
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Update Status <span class="text-danger">*</span></label>
+
+                                <select name="Status" class="form-control" required>
+                                    <option value="In Progress"
+                                            selected="@(Model.Status == "In Progress" ? "selected" : null)">
+                                        In Progress
+                                    </option>
+
+                                    <option value="Completed">
+                                        Completed
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Completion Report (PDF/DOC/DOCX)</label>
+                                <input type="file"
+                                       name="ReportFile"
+                                       class="form-control"
+                                       accept=".pdf,.doc,.docx" />
+                                <small class="text-soft">Maximum file size: 5 MB. Required when completing the task.</small>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label">Employee Remarks</label>
+                                <textarea name="EmployeeRemarks"
+                                      class="form-control"
+                                      rows="3"
+                                      maxlength="2000"
+                                      placeholder="Enter your work progress or completion remarks">@Model.EmployeeRemarks</textarea>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">
+                                <em class="icon ni ni-save"></em>
+                                <span>Submit Update</span>
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="alert alert-success">
+                    <em class="icon ni ni-check-circle"></em>
+                    This task has been completed.
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Employee Remarks</label>
+                    <textarea class="form-control" rows="3" readonly>@Model.EmployeeRemarks</textarea>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.EmployeeAttachmentPath))
+                {
+                    <a href="@Model.EmployeeAttachmentPath"
+                       target="_blank"
+                       class="btn btn-outline-primary">
+                        <em class="icon ni ni-file-pdf"></em>
+                        View Completion Report
+                    </a>
+                }
+            }
+
+           
+
+        </div>
+    </div>
+
+</div>

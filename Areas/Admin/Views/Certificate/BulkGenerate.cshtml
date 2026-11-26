@@ -127,30 +127,31 @@
 
                             <!-- ================= Excel Format ================= -->
 
-                            <div class="col-md-12">
+                           <div class="col-md-12">
+    <div class="alert alert-info">
 
-                                <div class="alert alert-info">
+        <strong>Excel Format</strong>
 
-                                    <strong>
-                                        Excel Format
-                                    </strong>
+        <p class="mb-1">
+            Excel first row must contain these columns:
+        </p>
 
-                                    <p class="mb-1">
-                                        Excel first row must contain these columns:
-                                    </p>
+        @if (ViewBag.CertificateId != null && (int)ViewBag.CertificateId == 10)
+        {
+            <code>CertificateNo, FirstName, LastName, Date</code>
+        }
+        else
+        {
+            <code>CertificateNo, CompanyName, Description, StartDate, EndDate</code>
+        }
 
-                                    <code>
-                                        CertificateNo, CompanyName, Description, StartDate, EndDate
-                                    </code>
-
-                                </div>
-
-                            </div>
+    </div>
+</div>
 
 
                             <!-- ================= Sample Excel ================= -->
 
-                            <div class="col-md-12">
+                            @* <div class="col-md-12">
 
                                 <a href="/Admin/Certificate/DownloadSampleExcel"
                                    class="btn btn-outline-success">
@@ -164,7 +165,25 @@
                                 </a>
 
                             </div>
+ *@
+                          <div class="col-md-12">
 
+    <a href="@Url.Action(
+        "DownloadSampleExcel",
+        "Certificate",
+        new {
+            area = "Admin",
+            id = (int)ViewBag.CertificateId
+        })"
+       class="btn btn-outline-success">
+
+        <em class="icon ni ni-download"></em>
+
+        <span>Download Sample Excel</span>
+
+    </a>
+
+</div>
 
                             <!-- ================= Buttons ================= -->
 

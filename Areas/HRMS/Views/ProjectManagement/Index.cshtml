@@ -1,0 +1,170 @@
+﻿@model IEnumerable<TSSC.Unified.Models.AdminProject>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    int serial = 1;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                My Projects
+            </h3>
+        </div>
+
+    </div>
+</div>
+
+<div class="card card-bordered">
+
+    <div class="card-inner">
+
+        <table class="datatable-init-export table table-tranx table_custom table-bordered dataTable no-footer dtr-inline collapsed">
+
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Project Name</th>
+                    <th>Department</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Project Cost</th>
+                    <th>Project Manager</th>
+                    <th>Attachment</th>
+                    <th>Status</th>
+                    <th>Created On</th>
+                    <th>Review Status</th>
+                    <th>Business Head Remarks</th>
+                    <th>Reviewed Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if (Model != null)
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <td>@serial</td>
+
+                            <td>
+                                @item.ProjectName
+                            </td>
+
+                            <td>
+                                @item.Department
+                            </td>
+
+                            <td>
+                                @item.StartDate.ToString("dd-MMM-yyyy")
+                            </td>
+
+                            <td>
+                                @item.EndDate.ToString("dd-MMM-yyyy")
+                            </td>
+
+                            <td>
+                                @(item.ProjectCost?.ToString("N2") ?? "-")
+                            </td>
+
+                            <td>
+                                @item.ProjectManagerId
+                            </td>
+
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.Attachment))
+                                {
+                                    <a href="@item.Attachment"
+                                       target="_blank"
+                                       class="btn btn-sm btn-outline-primary"
+                                       title="View Attachment">
+
+                                        <em class="icon ni ni-file-pdf"></em>
+                                        View
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge badge-dot bg-success">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-dot bg-danger">
+                                        Inactive
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                @item.CreatedDate.ToString("dd-MMM-yyyy")
+                            </td>
+                            <td>
+                                @if (item.BusinessHeadStatus == "Approved")
+                                {
+                                    <span class="badge bg-success">Approved</span>
+                                }
+                                else if (item.BusinessHeadStatus == "Rejected")
+                                {
+                                    <span class="badge bg-danger">Rejected</span>
+                                }
+                                else if (item.BusinessHeadStatus == "On Hold")
+                                {
+                                    <span class="badge bg-warning">On Hold</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-dark">Pending Review</span>
+                                }
+                            </td>
+
+                            <td>
+                                @(item.BusinessHeadRemarks ?? "-")
+                            </td>
+
+                            <td>
+                                @(item.BusinessHeadReviewedDate?.ToString("dd-MMM-yyyy hh:mm tt") ?? "-")
+                            </td>
+                            <td>
+                                <a href="/HRMS/ProjectManagement/Details/@item.ProjectId"
+                                   class="btn btn-sm btn-outline-primary"
+                                   title="View Details">
+                                    <em class="icon ni ni-eye"></em>
+                                </a>
+                            </td>
+
+                        </tr>
+
+                        serial++;
+                    }
+                }
+
+            </tbody>
+
+        </table>
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center text-muted py-4">
+                No Projects assigned to you.
+            </div>
+        }
+
+    </div>
+
+</div>

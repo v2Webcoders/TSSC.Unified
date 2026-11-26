@@ -205,6 +205,18 @@
 			x.AssignedTo == employeeIdgri.Value 
            /*  && x.Status != "Closed" */);
 
+	//for Project Management module
+	bool isProjectManager = employee != null &&
+await Context.AdminProjects.AnyAsync(x =>
+	x.ProjectManagerId == employee.EmployeeId &&
+	x.IsActive);
+	var showMyProjectTasks = false;
+	if (employee != null)
+	{
+		showMyProjectTasks = await Context.ProjectTeams
+			.AnyAsync(x => x.EmployeeId == employee.EmployeeId);
+	}
+
 }
 
 <style>
@@ -1403,7 +1415,198 @@
 		</li>
 	}
 
+@* -------	Project management module  --------- *@
+		@if (User.IsInRole("BusinessHead"))
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					Project Management
+				</span>
+			</div>
+		</li>
+		<li class="nk-menu-item has-sub">
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-briefcase"></em>
+				</span>
+				<span class="nk-menu-text">Project Management</span>
+			</a>
 
+			<ul class="nk-menu-sub">
+				<li class="nk-menu-item">
+					<a href="/HRMS/ProjectManagement/Index"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Project List</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a href="/HRMS/ProjectManagement/ApprovalBudgetTracking"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Budget Tracking</span>
+					</a>
+				</li>
+			</ul>
+		</li>
+	}
+
+	@if (isCEO)
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					Project Management
+				</span>
+			</div>
+		</li>
+
+		<li class="nk-menu-item has-sub">
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-briefcase"></em>
+				</span>
+				<span class="nk-menu-text">Project Management</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="ProjectManagement"
+					   asp-action="CEOIndex"
+					   asp-route-status="All"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">All Projects</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="ProjectManagement"
+					   asp-action="CEOIndex"
+					   asp-route-status="Pending"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Pending Projects</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="ProjectManagement"
+					   asp-action="CEOIndex"
+					   asp-route-status="Approved"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Approved Projects</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="ProjectManagement"
+					   asp-action="CEOIndex"
+					   asp-route-status="On Hold"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">On Hold Projects</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="ProjectManagement"
+					   asp-action="CEOIndex"
+					   asp-route-status="Rejected"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Rejected Projects</span>
+					</a>
+				</li>
+
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="ProjectManagement"
+					   asp-action="ApprovalBudgetTracking"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Budget Tracking</span>
+					</a>
+				</li>
+
+			</ul>
+		</li>
+	}
+
+	@if (isProjectManager)
+	{
+
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">
+					Project Management
+				</span>
+			</div>
+		</li>
+
+		<li class="nk-menu-item has-sub">
+			<a href="#" class="nk-menu-link nk-menu-toggle">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-briefcase"></em>
+				</span>
+				<span class="nk-menu-text">Project Management</span>
+			</a>
+
+			<ul class="nk-menu-sub">
+
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="ProjectManagement"
+					   asp-action="ProjectManagerIndex"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">My Projects</span>
+					</a>
+				</li>
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="ProjectManagement"
+					   asp-action="CompletedProjectTasks"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Completed Task</span>
+					</a>
+				</li>
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="ProjectManagement"
+					   asp-action="Timeline"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Project Timeline</span>
+					</a>
+				</li>
+				<li class="nk-menu-item">
+					<a asp-area="HRMS"
+					   asp-controller="ProjectManagement"
+					   asp-action="BudgetTracking"
+					   class="nk-menu-link">
+						<span class="nk-menu-text">Budget Tracking</span>
+					</a>
+				</li>
+			</ul>
+		</li>
+
+
+	}
+	@if (showMyProjectTasks)
+	{
+		<li class="nk-menu-item">
+			<a asp-area="HRMS"
+			   asp-controller="ProjectManagement"
+			   asp-action="MyTasks"
+			   class="nk-menu-link">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-list-check"></em>
+				</span>
+				<span class="nk-menu-text">My Project Tasks</span>
+			</a>
+		</li>
+	}
+	@* -------	Project management module  --------- *@
 	<!-- HR MANAGEMENT - HR ONLY -->
 	<!-- ===================================================== -->
 	@if (isHR)

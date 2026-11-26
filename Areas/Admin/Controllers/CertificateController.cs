@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
+using iText.IO.Font;
 
 using QUIZAPP;
 using QUIZAPP.Models;
@@ -284,15 +286,48 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                             // REQUIRED COLUMNS
                             // =================================================
 
-                            string[] requiredColumns =
-                            {
-                        "certificateno",
-                        "companyname",
-                        "description",
-                        "startdate",
-                        "enddate"
-                    };
+                            //        string[] requiredColumns =
+                            //        {
+                            //    "certificateno",
+                            //    "companyname",
+                            //    "description",
+                            //    "startdate",
+                            //    "enddate"
+                            //};
+                            //        if (certificate.Id == 10)
+                            //        {
+                            //            requiredColumns = requiredColumns
+                            //                .Concat(new[]
+                            //                {
+                            //                    "firstname",
+                            //                    "lastname",
+                            //                    "date"
+                            //                })
+                            //                .ToArray();
+                            //        }
+                            string[] requiredColumns;
 
+                            if (certificate.Id == 10)
+                            {
+                                requiredColumns = new[]
+                                {
+                                     "certificateno",
+                                    "firstname",
+                                    "lastname",
+                                    "date"
+                                };
+                            }
+                            else
+                            {
+                                requiredColumns = new[]
+                                {
+        "certificateno",
+        "companyname",
+        "description",
+        "startdate",
+        "enddate"
+    };
+                            }
 
                             foreach (string column in requiredColumns)
                             {
@@ -327,64 +362,142 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                                 // READ EXCEL VALUES
                                 // =============================================
 
-                                string certificateNo =
-                                    row.Cell(
-                                        headers["certificateno"]
-                                    )
-                                    .GetString()
-                                    .Trim();
+                                //string certificateNo =
+                                //    row.Cell(
+                                //        headers["certificateno"]
+                                //    )
+                                //    .GetString()
+                                //    .Trim();
 
 
-                                string companyName =
-                                    row.Cell(
-                                        headers["companyname"]
-                                    )
-                                    .GetString()
-                                    .Trim();
+                                //string companyName =
+                                //    row.Cell(
+                                //        headers["companyname"]
+                                //    )
+                                //    .GetString()
+                                //    .Trim();
 
 
-                                string description =
-                                    row.Cell(
-                                        headers["description"]
-                                    )
-                                    .GetString()
-                                    .Trim();
+                                //string description =
+                                //    row.Cell(
+                                //        headers["description"]
+                                //    )
+                                //    .GetString()
+                                //    .Trim();
 
 
-                                string startDate =
-                                    GetExcelDate(
-                                        row.Cell(
-                                            headers["startdate"]
-                                        )
+                                //string startDate =
+                                //    GetExcelDate(
+                                //        row.Cell(
+                                //            headers["startdate"]
+                                //        )
+                                //    );
+
+
+                                //string endDate =
+                                //    GetExcelDate(
+                                //        row.Cell(
+                                //            headers["enddate"]
+                                //        )
+                                //    );
+                                //// PAID PROGRAM DETAILS
+
+                                //string firstName = "";
+                                //string lastName = "";
+                                //string certificateDate = "";
+
+                                //if (certificate.Id == 10)
+                                //{
+                                //    firstName = row.Cell(headers["firstname"])
+                                //        .GetString()
+                                //        .Trim();
+
+                                //    lastName = row.Cell(headers["lastname"])
+                                //        .GetString()
+                                //        .Trim();
+
+                                //    certificateDate = GetExcelDate(
+                                //        row.Cell(headers["date"])
+                                //    );
+                                //}
+                                string certificateNo = "";
+                                string companyName = "";
+                                string description = "";
+                                string startDate = "";
+                                string endDate = "";
+
+                                string firstName = "";
+                                string lastName = "";
+                                string certificateDate = "";
+
+                                if (certificate.Id == 10)
+                                {
+                                    certificateNo = row.Cell(headers["certificateno"])
+                                        .GetFormattedString().Trim();
+                                    firstName = row.Cell(headers["firstname"])
+                                        .GetString().Trim();
+
+                                    lastName = row.Cell(headers["lastname"])
+                                        .GetString().Trim();
+
+                                    certificateDate = GetExcelDate(
+                                        row.Cell(headers["date"])
+                                    );
+                                }
+                                else
+                                {
+                                    certificateNo = row.Cell(headers["certificateno"])
+                                        .GetString().Trim();
+
+                                    companyName = row.Cell(headers["companyname"])
+                                        .GetString().Trim();
+
+                                    description = row.Cell(headers["description"])
+                                        .GetString().Trim();
+
+                                    startDate = GetExcelDate(
+                                        row.Cell(headers["startdate"])
                                     );
 
-
-                                string endDate =
-                                    GetExcelDate(
-                                        row.Cell(
-                                            headers["enddate"]
-                                        )
+                                    endDate = GetExcelDate(
+                                        row.Cell(headers["enddate"])
                                     );
-
-
+                                }
                                 // =============================================
                                 // SKIP EMPTY ROW
                                 // =============================================
 
-                                if (
-                                    string.IsNullOrWhiteSpace(
-                                        certificateNo
-                                    )
-                                    &&
-                                    string.IsNullOrWhiteSpace(
-                                        companyName
-                                    )
-                                )
+                                //if (
+                                //    string.IsNullOrWhiteSpace(
+                                //        certificateNo
+                                //    )
+                                //    &&
+                                //    string.IsNullOrWhiteSpace(
+                                //        companyName
+                                //    )
+                                //)
+                                //{
+                                //    continue;
+                                //}
+
+                                if (certificate.Id == 10)
                                 {
-                                    continue;
+                                    if (string.IsNullOrWhiteSpace(certificateNo) && 
+                                        string.IsNullOrWhiteSpace(firstName) &&
+                                        string.IsNullOrWhiteSpace(lastName) &&
+                                        string.IsNullOrWhiteSpace(certificateDate))
+                                    {
+                                        continue;
+                                    }
                                 }
-
-
+                                else
+                                {
+                                    if (string.IsNullOrWhiteSpace(certificateNo) &&
+                                        string.IsNullOrWhiteSpace(companyName))
+                                    {
+                                        continue;
+                                    }
+                                }
                                 totalRecords++;
 
 
@@ -392,23 +505,38 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                                 // SAFE FILE NAME
                                 // =============================================
 
-                                string safeCertificateNo =
-                                    MakeSafeFileName(
-                                        certificateNo
-                                    );
+                                //string safeCertificateNo =
+                                //    MakeSafeFileName(
+                                //        certificateNo
+                                //    );
 
 
-                                if (
-                                    string.IsNullOrWhiteSpace(
-                                        safeCertificateNo
-                                    ))
+                                //if (
+                                //    string.IsNullOrWhiteSpace(
+                                //        safeCertificateNo
+                                //    ))
+                                //{
+                                //    safeCertificateNo =
+                                //        "Certificate_" +
+                                //        rowNumber;
+                                //}
+
+                                string safeCertificateNo;
+
+                                if (certificate.Id == 10)
                                 {
-                                    safeCertificateNo =
-                                        "Certificate_" +
-                                        rowNumber;
+                                    safeCertificateNo = MakeSafeFileName(
+                                        $"{firstName}_{lastName}"
+                                    );
                                 }
-
-
+                                else
+                                {
+                                    safeCertificateNo = MakeSafeFileName(certificateNo);
+                                }
+                                if (string.IsNullOrWhiteSpace(safeCertificateNo))
+                                {
+                                    safeCertificateNo = "Certificate_" + rowNumber;
+                                }
                                 // =================================================
                                 // UNIQUE FILE NAME
                                 // =================================================
@@ -428,8 +556,32 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                                     // GENERATE PDF
                                     // =============================================
 
-                                    byte[] pdfBytes =
-                                        GenerateCertificatePdf(
+                                    //byte[] pdfBytes =
+                                    //    GenerateCertificatePdf(
+                                    //        certificateNo,
+                                    //        companyName,
+                                    //        description,
+                                    //        startDate,
+                                    //        endDate,
+                                    //        templatePath
+                                    //    );
+                                    byte[] pdfBytes;
+
+                                    // PAID PROGRAM CERTIFICATE
+                                    if (certificate.Id == 10)
+                                    {
+                                        pdfBytes = GeneratePaidProgramCertificatePdf(
+                                            certificateNo,
+                                            firstName,
+                                            lastName,
+                                            certificateDate,
+                                            templatePath
+                                        );
+                                    }
+                                    else
+                                    {
+                                        // EXISTING CERTIFICATE
+                                        pdfBytes = GenerateCertificatePdf(
                                             certificateNo,
                                             companyName,
                                             description,
@@ -437,7 +589,7 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                                             endDate,
                                             templatePath
                                         );
-
+                                    }
 
                                     // =============================================
                                     // SAVE PDF PERMANENTLY
@@ -536,46 +688,84 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                                     // SAVE GENERATION DETAIL
                                     // =============================================
 
+                                    //var detail =
+                                    //    new CertificateGenerationDetail
+                                    //    {
+                                    //        CertificateGenerationId =
+                                    //            generation.Id,
+
+                                    //        CertificateNo =
+                                    //            certificateNo,
+
+                                    //        CompanyName =
+                                    //            companyName,
+
+                                    //        Description =
+                                    //            description,
+
+                                    //        StartDate =
+                                    //            parsedStartDate,
+
+                                    //        EndDate =
+                                    //            parsedEndDate,
+
+                                    //        GeneratedFileName =
+                                    //            generatedFileName,
+
+                                    //        GeneratedFilePath =
+                                    //            generatedRelativePath,
+
+                                    //        GeneratedDate =
+                                    //            DateTime.Now,
+
+                                    //        IsGenerated =
+                                    //            true,
+
+                                    //        ErrorMessage =
+                                    //            null,
+
+                                    //        IsActive =
+                                    //            true
+                                    //    };
                                     var detail =
-                                        new CertificateGenerationDetail
-                                        {
-                                            CertificateGenerationId =
-                                                generation.Id,
+    new CertificateGenerationDetail
+    {
+        CertificateGenerationId = generation.Id,
 
-                                            CertificateNo =
-                                                certificateNo,
+        CertificateNo = certificateNo,
 
-                                            CompanyName =
-                                                companyName,
+        CompanyName = certificate.Id == 10
+            ? $"{firstName} {lastName}".Trim()
+            : companyName,
 
-                                            Description =
-                                                description,
+        Description = certificate.Id == 10
+            ? "Paid Program Certificate"
+            : description,
 
-                                            StartDate =
-                                                parsedStartDate,
+        StartDate = certificate.Id == 10
+            ? (DateTime.TryParse(
+                certificateDate,
+                out DateTime paidDate)
+                    ? paidDate
+                    : null)
+            : parsedStartDate,
 
-                                            EndDate =
-                                                parsedEndDate,
+        EndDate = certificate.Id == 10
+            ? null
+            : parsedEndDate,
 
-                                            GeneratedFileName =
-                                                generatedFileName,
+        GeneratedFileName = generatedFileName,
 
-                                            GeneratedFilePath =
-                                                generatedRelativePath,
+        GeneratedFilePath = generatedRelativePath,
 
-                                            GeneratedDate =
-                                                DateTime.Now,
+        GeneratedDate = DateTime.Now,
 
-                                            IsGenerated =
-                                                true,
+        IsGenerated = true,
 
-                                            ErrorMessage =
-                                                null,
+        ErrorMessage = null,
 
-                                            IsActive =
-                                                true
-                                        };
-
+        IsActive = true
+    };
 
                                     _context
                                         .CertificateGenerationDetail
@@ -621,17 +811,36 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                                             CertificateNo =
                                                 certificateNo,
 
-                                            CompanyName =
-                                                companyName,
+                                            //CompanyName =
+                                            //    companyName,
 
-                                            Description =
-                                                description,
+                                            //Description =
+                                            //    description,
 
-                                            StartDate =
-                                                failedStartDate,
+                                            //StartDate =
+                                            //    failedStartDate,
 
-                                            EndDate =
-                                                failedEndDate,
+                                            //EndDate =
+                                            //    failedEndDate,
+                                            CompanyName = certificate.Id == 10
+    ? $"{firstName} {lastName}".Trim()
+    : companyName,
+
+                                            Description = certificate.Id == 10
+    ? "Paid Program Certificate"
+    : description,
+
+                                            StartDate = certificate.Id == 10
+    ? (DateTime.TryParse(
+        certificateDate,
+        out DateTime failedPaidDate)
+            ? failedPaidDate
+            : null)
+    : failedStartDate,
+
+                                            EndDate = certificate.Id == 10
+    ? null
+    : failedEndDate,
 
                                             GeneratedFileName =
                                                 generatedFileName,
@@ -1174,237 +1383,519 @@ namespace TSSC.Unified.Areas.Admin.Controllers
         // DOWNLOAD SAMPLE EXCEL
         // =========================================================
 
+        //[HttpGet]
+        //public IActionResult DownloadSampleExcel()
+        //{
+        //    using (XLWorkbook workbook =
+        //           new XLWorkbook())
+        //    {
+        //        var worksheet =
+        //            workbook.Worksheets.Add(
+        //                "Certificates"
+        //            );
+
+
+        //        // =================================================
+        //        // HEADERS
+        //        // =================================================
+
+        //        worksheet.Cell(
+        //            1,
+        //            1
+        //        ).Value =
+        //            "CertificateNo";
+
+
+        //        worksheet.Cell(
+        //            1,
+        //            2
+        //        ).Value =
+        //            "CompanyName";
+
+
+        //        worksheet.Cell(
+        //            1,
+        //            3
+        //        ).Value =
+        //            "Description";
+
+
+        //        worksheet.Cell(
+        //            1,
+        //            4
+        //        ).Value =
+        //            "StartDate";
+
+
+        //        worksheet.Cell(
+        //            1,
+        //            5
+        //        ).Value =
+        //            "EndDate";
+
+
+        //        // =================================================
+        //        // SAMPLE ROW 1
+        //        // =================================================
+
+        //        worksheet.Cell(
+        //            2,
+        //            1
+        //        ).Value =
+        //            "TSSC-IM-P/05";
+
+
+        //        worksheet.Cell(
+        //            2,
+        //            2
+        //        ).Value =
+        //            "One Point One Solutions Limited";
+
+
+        //        worksheet.Cell(
+        //            2,
+        //            3
+        //        ).Value =
+        //            "Is an Platinum Industry member of Telecom Sector Skill Council for a period";
+
+
+        //        worksheet.Cell(
+        //            2,
+        //            4
+        //        ).Value =
+        //            new DateTime(
+        //                2022,
+        //                12,
+        //                14
+        //            );
+
+
+        //        worksheet.Cell(
+        //            2,
+        //            5
+        //        ).Value =
+        //            new DateTime(
+        //                2027,
+        //                12,
+        //                13
+        //            );
+
+
+        //        // =================================================
+        //        // SAMPLE ROW 2
+        //        // =================================================
+
+        //        worksheet.Cell(
+        //            3,
+        //            1
+        //        ).Value =
+        //            "TSSC-IM-P/06";
+
+
+        //        worksheet.Cell(
+        //            3,
+        //            2
+        //        ).Value =
+        //            "ABC Solutions Pvt Ltd";
+
+
+        //        worksheet.Cell(
+        //            3,
+        //            3
+        //        ).Value =
+        //            "Is an Platinum Industry member of Telecom Sector Skill Council for a period";
+
+
+        //        worksheet.Cell(
+        //            3,
+        //            4
+        //        ).Value =
+        //            new DateTime(
+        //                2023,
+        //                1,
+        //                1
+        //            );
+
+
+        //        worksheet.Cell(
+        //            3,
+        //            5
+        //        ).Value =
+        //            new DateTime(
+        //                2027,
+        //                12,
+        //                31
+        //            );
+
+
+        //        // =================================================
+        //        // DATE FORMAT
+        //        // =================================================
+
+        //        worksheet.Column(4)
+        //            .Style
+        //            .DateFormat
+        //            .Format =
+        //            "dd-MMMM-yyyy";
+
+
+        //        worksheet.Column(5)
+        //            .Style
+        //            .DateFormat
+        //            .Format =
+        //            "dd-MMMM-yyyy";
+
+
+        //        // =================================================
+        //        // HEADER STYLE
+        //        // =================================================
+
+        //        var headerRange =
+        //            worksheet.Range(
+        //                "A1:E1"
+        //            );
+
+
+        //        headerRange
+        //            .Style
+        //            .Font
+        //            .Bold = true;
+
+
+        //        headerRange
+        //            .Style
+        //            .Alignment
+        //            .Horizontal =
+        //            XLAlignmentHorizontalValues.Center;
+
+
+        //        // =================================================
+        //        // COLUMN WIDTH
+        //        // =================================================
+
+        //        worksheet.Column(1).Width = 22;
+        //        worksheet.Column(2).Width = 40;
+        //        worksheet.Column(3).Width = 70;
+        //        worksheet.Column(4).Width = 20;
+        //        worksheet.Column(5).Width = 20;
+
+
+        //        // =================================================
+        //        // FREEZE HEADER
+        //        // =================================================
+
+        //        worksheet
+        //            .SheetView
+        //            .FreezeRows(1);
+
+
+        //        // =================================================
+        //        // RETURN EXCEL
+        //        // =================================================
+
+        //        using (
+        //            MemoryStream stream =
+        //            new MemoryStream())
+        //        {
+        //            workbook.SaveAs(
+        //                stream
+        //            );
+
+
+        //            byte[] fileBytes =
+        //                stream.ToArray();
+
+
+        //            return File(
+        //                fileBytes,
+        //                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        //                "Certificate_Sample.xlsx"
+        //            );
+        //        }
+        //    }
+        //}
+
+        //[HttpGet]
+        //public IActionResult DownloadSampleExcel(int id)
+        //{
+        //    using (XLWorkbook workbook = new XLWorkbook())
+        //    {
+        //        var worksheet = workbook.Worksheets.Add("Certificates");
+
+        //        // =========================================
+        //        // CHECK CERTIFICATE TYPE
+        //        // =========================================
+
+        //        bool isPaidProgram = (id == 10);
+
+        //        // =========================================
+        //        // HEADERS
+        //        // =========================================
+
+        //        string[] headers =
+        //        {
+        //    "CertificateNo",
+        //    "CompanyName",
+        //    "Description",
+        //    "StartDate",
+        //    "EndDate"
+        //};
+
+        //        if (isPaidProgram)
+        //        {
+        //            headers = headers.Concat(new[]
+        //            {
+        //        "FirstName",
+        //        "LastName",
+        //        "Date"
+        //    }).ToArray();
+        //        }
+
+        //        for (int i = 0; i < headers.Length; i++)
+        //        {
+        //            worksheet.Cell(1, i + 1).Value = headers[i];
+        //        }
+
+        //        // =========================================
+        //        // SAMPLE DATA
+        //        // =========================================
+
+        //        // ROW 2
+
+        //        worksheet.Cell(2, 1).Value = "TSSC-IM-P/05";
+        //        worksheet.Cell(2, 2).Value = "One Point One Solutions Limited";
+        //        worksheet.Cell(2, 3).Value =
+        //            "Is an Platinum Industry member of Telecom Sector Skill Council for a period";
+
+        //        worksheet.Cell(2, 4).Value = new DateTime(2022, 12, 14);
+        //        worksheet.Cell(2, 5).Value = new DateTime(2027, 12, 13);
+
+        //        // ROW 3
+
+        //        worksheet.Cell(3, 1).Value = "TSSC-IM-P/06";
+        //        worksheet.Cell(3, 2).Value = "ABC Solutions Pvt Ltd";
+        //        worksheet.Cell(3, 3).Value =
+        //            "Is an Platinum Industry member of Telecom Sector Skill Council for a period";
+
+        //        worksheet.Cell(3, 4).Value = new DateTime(2023, 1, 1);
+        //        worksheet.Cell(3, 5).Value = new DateTime(2027, 12, 31);
+
+        //        // =========================================
+        //        // PAID PROGRAM SAMPLE DATA
+        //        // =========================================
+
+        //        if (isPaidProgram)
+        //        {
+        //            worksheet.Cell(2, 6).Value = "Rahul";
+        //            worksheet.Cell(2, 7).Value = "Sharma";
+        //            worksheet.Cell(2, 8).Value = new DateTime(2026, 11, 24);
+
+        //            worksheet.Cell(3, 6).Value = "Amit";
+        //            worksheet.Cell(3, 7).Value = "Verma";
+        //            worksheet.Cell(3, 8).Value = new DateTime(2026, 11, 24);
+
+        //            worksheet.Column(6).Width = 20;
+        //            worksheet.Column(7).Width = 20;
+        //            worksheet.Column(8).Width = 20;
+
+        //            worksheet.Column(8)
+        //                .Style.DateFormat.Format = "dd-MMMM-yyyy";
+        //        }
+
+        //        // =========================================
+        //        // DATE FORMAT
+        //        // =========================================
+
+        //        worksheet.Column(4)
+        //            .Style.DateFormat.Format = "dd-MMMM-yyyy";
+
+        //        worksheet.Column(5)
+        //            .Style.DateFormat.Format = "dd-MMMM-yyyy";
+
+        //        // =========================================
+        //        // HEADER STYLE
+        //        // =========================================
+
+        //        int lastColumn = isPaidProgram ? 8 : 5;
+
+        //        var headerRange = worksheet.Range(
+        //            1, 1, 1, lastColumn
+        //        );
+
+        //        headerRange.Style.Font.Bold = true;
+
+        //        headerRange.Style.Alignment.Horizontal =
+        //            XLAlignmentHorizontalValues.Center;
+
+        //        headerRange.Style.Alignment.Vertical =
+        //            XLAlignmentVerticalValues.Center;
+
+        //        // =========================================
+        //        // COLUMN WIDTH
+        //        // =========================================
+
+        //        worksheet.Column(1).Width = 22;
+        //        worksheet.Column(2).Width = 40;
+        //        worksheet.Column(3).Width = 70;
+        //        worksheet.Column(4).Width = 20;
+        //        worksheet.Column(5).Width = 20;
+
+        //        // =========================================
+        //        // FREEZE HEADER
+        //        // =========================================
+
+        //        worksheet.SheetView.FreezeRows(1);
+
+        //        // =========================================
+        //        // RETURN EXCEL
+        //        // =========================================
+
+        //        using (MemoryStream stream = new MemoryStream())
+        //        {
+        //            workbook.SaveAs(stream);
+
+        //            byte[] fileBytes = stream.ToArray();
+
+        //            return File(
+        //                fileBytes,
+        //                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        //                isPaidProgram
+        //                    ? "PaidProgram_Certificate_Sample.xlsx"
+        //                    : "Certificate_Sample.xlsx"
+        //            );
+        //        }
+        //    }
+        //}
+
         [HttpGet]
-        public IActionResult DownloadSampleExcel()
+        public IActionResult DownloadSampleExcel(int id)
         {
-            using (XLWorkbook workbook =
-                   new XLWorkbook())
+            using (XLWorkbook workbook = new XLWorkbook())
             {
-                var worksheet =
-                    workbook.Worksheets.Add(
-                        "Certificates"
-                    );
+                var worksheet = workbook.Worksheets.Add("Certificates");
 
+                bool isPaidProgram = (id == 10);
 
-                // =================================================
+                // =========================================
                 // HEADERS
-                // =================================================
+                // =========================================
 
-                worksheet.Cell(
-                    1,
-                    1
-                ).Value =
-                    "CertificateNo";
+                string[] headers;
 
+                if (isPaidProgram)
+                {
+                    headers = new[]
+                    {
+                        "CertificateNo",
+                "FirstName",
+                "LastName",
+                "Date"
+            };
+                }
+                else
+                {
+                    headers = new[]
+                    {
+                "CertificateNo",
+                "CompanyName",
+                "Description",
+                "StartDate",
+                "EndDate"
+            };
+                }
 
-                worksheet.Cell(
-                    1,
-                    2
-                ).Value =
-                    "CompanyName";
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    worksheet.Cell(1, i + 1).Value = headers[i];
+                }
 
+                // =========================================
+                // SAMPLE DATA
+                // =========================================
 
-                worksheet.Cell(
-                    1,
-                    3
-                ).Value =
-                    "Description";
+                if (isPaidProgram)
+                {
+                    // PAID PROGRAM SAMPLE DATA
 
+                    worksheet.Cell(2, 1).Value = "TSSC-IM-P/05";
+                    worksheet.Cell(2, 2).Value = "Rahul";
+                    worksheet.Cell(2, 3).Value = "Sharma";
+                    worksheet.Cell(2, 4).Value = new DateTime(2026, 11, 24);
 
-                worksheet.Cell(
-                    1,
-                    4
-                ).Value =
-                    "StartDate";
+                    worksheet.Cell(3, 1).Value = "TSSC-IM-P/06";
+                    worksheet.Cell(3, 2).Value = "Amit";
+                    worksheet.Cell(3, 3).Value = "Verma";
+                    worksheet.Cell(3, 4).Value = new DateTime(2026, 11, 24);
 
+                    worksheet.Column(1).Width = 22;
+                    worksheet.Column(2).Width = 20;
+                    worksheet.Column(3).Width = 20;
+                    worksheet.Column(4).Width = 20;
 
-                worksheet.Cell(
-                    1,
-                    5
-                ).Value =
-                    "EndDate";
+                    worksheet.Column(4).Style.DateFormat.Format = "dd-MMMM-yyyy";
+                }
+                else
+                {
+                    // OTHER CERTIFICATE SAMPLE DATA
 
+                    worksheet.Cell(2, 1).Value = "TSSC-IM-P/05";
+                    worksheet.Cell(2, 2).Value = "One Point One Solutions Limited";
+                    worksheet.Cell(2, 3).Value =
+                        "Is an Platinum Industry member of Telecom Sector Skill Council for a period";
 
-                // =================================================
-                // SAMPLE ROW 1
-                // =================================================
+                    worksheet.Cell(2, 4).Value = new DateTime(2022, 12, 14);
+                    worksheet.Cell(2, 5).Value = new DateTime(2027, 12, 13);
 
-                worksheet.Cell(
-                    2,
-                    1
-                ).Value =
-                    "TSSC-IM-P/05";
+                    worksheet.Cell(3, 1).Value = "TSSC-IM-P/06";
+                    worksheet.Cell(3, 2).Value = "ABC Solutions Pvt Ltd";
+                    worksheet.Cell(3, 3).Value =
+                        "Is an Platinum Industry member of Telecom Sector Skill Council for a period";
 
+                    worksheet.Cell(3, 4).Value = new DateTime(2023, 1, 1);
+                    worksheet.Cell(3, 5).Value = new DateTime(2027, 12, 31);
 
-                worksheet.Cell(
-                    2,
-                    2
-                ).Value =
-                    "One Point One Solutions Limited";
+                    worksheet.Column(1).Width = 22;
+                    worksheet.Column(2).Width = 40;
+                    worksheet.Column(3).Width = 70;
+                    worksheet.Column(4).Width = 20;
+                    worksheet.Column(5).Width = 20;
 
-
-                worksheet.Cell(
-                    2,
-                    3
-                ).Value =
-                    "Is an Platinum Industry member of Telecom Sector Skill Council for a period";
-
-
-                worksheet.Cell(
-                    2,
-                    4
-                ).Value =
-                    new DateTime(
-                        2022,
-                        12,
-                        14
-                    );
-
-
-                worksheet.Cell(
-                    2,
-                    5
-                ).Value =
-                    new DateTime(
-                        2027,
-                        12,
-                        13
-                    );
-
-
-                // =================================================
-                // SAMPLE ROW 2
-                // =================================================
-
-                worksheet.Cell(
-                    3,
-                    1
-                ).Value =
-                    "TSSC-IM-P/06";
+                    worksheet.Column(4).Style.DateFormat.Format = "dd-MMMM-yyyy";
+                    worksheet.Column(5).Style.DateFormat.Format = "dd-MMMM-yyyy";
+                }
 
 
-                worksheet.Cell(
-                    3,
-                    2
-                ).Value =
-                    "ABC Solutions Pvt Ltd";
+                int lastColumn = headers.Length;
 
+                var headerRange = worksheet.Range(1, 1, 1, lastColumn);
 
-                worksheet.Cell(
-                    3,
-                    3
-                ).Value =
-                    "Is an Platinum Industry member of Telecom Sector Skill Council for a period";
+                headerRange.Style.Font.Bold = true;
 
-
-                worksheet.Cell(
-                    3,
-                    4
-                ).Value =
-                    new DateTime(
-                        2023,
-                        1,
-                        1
-                    );
-
-
-                worksheet.Cell(
-                    3,
-                    5
-                ).Value =
-                    new DateTime(
-                        2027,
-                        12,
-                        31
-                    );
-
-
-                // =================================================
-                // DATE FORMAT
-                // =================================================
-
-                worksheet.Column(4)
-                    .Style
-                    .DateFormat
-                    .Format =
-                    "dd-MMMM-yyyy";
-
-
-                worksheet.Column(5)
-                    .Style
-                    .DateFormat
-                    .Format =
-                    "dd-MMMM-yyyy";
-
-
-                // =================================================
-                // HEADER STYLE
-                // =================================================
-
-                var headerRange =
-                    worksheet.Range(
-                        "A1:E1"
-                    );
-
-
-                headerRange
-                    .Style
-                    .Font
-                    .Bold = true;
-
-
-                headerRange
-                    .Style
-                    .Alignment
-                    .Horizontal =
+                headerRange.Style.Alignment.Horizontal =
                     XLAlignmentHorizontalValues.Center;
 
+                headerRange.Style.Alignment.Vertical =
+                    XLAlignmentVerticalValues.Center;
 
-                // =================================================
-                // COLUMN WIDTH
-                // =================================================
+                worksheet.SheetView.FreezeRows(1);
 
-                worksheet.Column(1).Width = 22;
-                worksheet.Column(2).Width = 40;
-                worksheet.Column(3).Width = 70;
-                worksheet.Column(4).Width = 20;
-                worksheet.Column(5).Width = 20;
-
-
-                // =================================================
-                // FREEZE HEADER
-                // =================================================
-
-                worksheet
-                    .SheetView
-                    .FreezeRows(1);
-
-
-                // =================================================
-                // RETURN EXCEL
-                // =================================================
-
-                using (
-                    MemoryStream stream =
-                    new MemoryStream())
+                using (MemoryStream stream = new MemoryStream())
                 {
-                    workbook.SaveAs(
-                        stream
-                    );
+                    workbook.SaveAs(stream);
 
-
-                    byte[] fileBytes =
-                        stream.ToArray();
-
+                    byte[] fileBytes = stream.ToArray();
 
                     return File(
                         fileBytes,
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        "Certificate_Sample.xlsx"
+                        isPaidProgram
+                            ? "PaidProgram_Certificate_Sample.xlsx"
+                            : "Certificate_Sample.xlsx"
                     );
                 }
             }
         }
+
 
         [HttpGet]
         public IActionResult DownloadSampleAssExcel()
@@ -1547,7 +2038,23 @@ namespace TSSC.Unified.Areas.Admin.Controllers
         }
 
 
-        [HttpGet]
+        //[HttpGet]
+        //public async Task<IActionResult> CertificateHistory()
+        //{
+        //    var history = await _context.CertificateGenerationDetail
+        //        .Include(x => x.CertificateGeneration)
+        //        .Where(x =>
+        //            x.IsActive &&
+        //            x.CertificateGeneration != null &&
+        //            x.CertificateGeneration.IsActive)
+        //        .OrderByDescending(x => x.CertificateGeneration.GeneratedDate)
+        //        .ToListAsync();
+
+        //    ViewBag.States = await _context.State
+        //        .ToDictionaryAsync(x => x.Id, x => x.StateName);
+
+        //    return View(history);
+        //}
         public async Task<IActionResult> CertificateHistory()
         {
             var history = await _context.CertificateGenerationDetail
@@ -1555,8 +2062,30 @@ namespace TSSC.Unified.Areas.Admin.Controllers
                 .Where(x =>
                     x.IsActive &&
                     x.CertificateGeneration != null &&
-                    x.CertificateGeneration.IsActive)
+                    x.CertificateGeneration.IsActive &&
+                    x.CertificateGeneration.CertificateId != 10
+                )
                 .OrderByDescending(x => x.CertificateGeneration.GeneratedDate)
+                .ToListAsync();
+
+            ViewBag.States = await _context.State
+                .ToDictionaryAsync(x => x.Id, x => x.StateName);
+
+            return View(history);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> PaidProgramCertificateHistory()
+        {
+            var history = await _context.CertificateGenerationDetail
+                .Include(x => x.CertificateGeneration)
+                .Where(x =>
+                    x.IsActive &&
+                    x.CertificateGeneration != null &&
+                    x.CertificateGeneration.IsActive &&
+                    x.CertificateGeneration.CertificateId == 10)
+                .OrderByDescending(x => x.GeneratedDate)
                 .ToListAsync();
 
             ViewBag.States = await _context.State
@@ -2746,6 +3275,166 @@ namespace TSSC.Unified.Areas.Admin.Controllers
         {
             return View();   // Views/Certificate/CertificateTypes.cshtml
         }
+
+        private byte[] GeneratePaidProgramCertificatePdf(string certificateNo,
+            string firstName,
+            string lastName,
+            string certificateDate,
+            string templatePath)
+        {
+            using (MemoryStream outputStream = new MemoryStream())
+            {
+                // A4 Landscape
+                var pageSize = iText.Kernel.Geom.PageSize.A4.Rotate();
+
+                PdfWriter writer = new PdfWriter(outputStream);
+                PdfDocument pdf = new PdfDocument(writer);
+
+                pdf.SetDefaultPageSize(pageSize);
+
+                iText.Layout.Document document =
+                    new iText.Layout.Document(pdf);
+
+                document.SetMargins(0, 0, 0, 0);
+
+                float pageWidth = pageSize.GetWidth();
+                float pageHeight = pageSize.GetHeight();
+
+                // Fonts
+                PdfFont regularFont =
+                    PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
+
+                PdfFont boldFont =
+                    PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
+                PdfFont cursiveFont =
+    PdfFontFactory.CreateFont(StandardFonts.TIMES_ITALIC);
+
+                // Background Template
+                ImageData imageData = ImageDataFactory.Create(templatePath);
+
+                Image background = new Image(imageData);
+
+                background
+                    .ScaleAbsolute(pageWidth, pageHeight)
+                    .SetFixedPosition(0, 0);
+
+                document.Add(background);
+
+                // =========================================
+                // PARTICIPANT NAME
+                // =========================================
+
+                string fullName =
+                    $"{firstName.Trim()} {lastName.Trim()}".Trim();
+
+                //Paragraph participantName =
+                //    new Paragraph(fullName)
+                //        .SetFont(boldFont)
+                //        .SetFontSize(24)
+                //        .SetFontColor(ColorConstants.BLACK)
+                //        .SetTextAlignment(
+                //            iText.Layout.Properties.TextAlignment.CENTER)
+                //        .SetFixedPosition(
+                //            0,
+                //            285,
+                //            pageWidth);
+
+                //document.Add(participantName);
+                // Load Monotype Corsiva Font
+                string fontPath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "wwwroot",
+                    "fonts",
+                    "MTCORSVA.TTF"
+                );
+
+                if (!System.IO.File.Exists(fontPath))
+                {
+                    throw new FileNotFoundException(
+                        "Monotype Corsiva font file not found.",
+                        fontPath
+                    );
+                }
+
+                PdfFont cursiveFontnew = PdfFontFactory.CreateFont(
+                    fontPath,
+                    PdfEncodings.IDENTITY_H
+                );
+
+                Paragraph participantName =
+                 new Paragraph(fullName)
+                     .SetFont(cursiveFontnew)
+                     .SetFontSize(30)
+                     .SetFontColor(ColorConstants.BLACK)
+                     .SetTextAlignment(
+                         iText.Layout.Properties.TextAlignment.CENTER)
+                     .SetFixedPosition(0, 275, pageWidth);
+
+                document.Add(participantName);
+
+
+                // =========================================
+                // CERTIFICATE NUMBER
+                // =========================================
+
+                Paragraph certificateNoText =
+     new Paragraph($"Certificate No : TSSC/NC/TELQ24{certificateNo}")
+         .SetFont(boldFont)
+         .SetFontSize(9)
+         .SetFontColor(ColorConstants.BLACK)
+         .SetTextAlignment(iText.Layout.Properties.TextAlignment.RIGHT)
+         .SetFixedPosition(470, 440, 280);
+
+                document.Add(certificateNoText);
+                // =========================================
+                // CERTIFICATE DATE
+                // =========================================
+
+                string formattedDate = certificateDate;
+
+                if (DateTime.TryParse(
+                    certificateDate,
+                    out DateTime parsedDate))
+                {
+                    formattedDate = parsedDate.ToString("dd MMMM yyyy");
+                }
+
+
+                Paragraph dateText =
+                    new Paragraph(formattedDate)
+                        .SetFont(boldFont)
+                        .SetFontSize(15)
+                        .SetFontColor(ColorConstants.BLACK)
+                        .SetTextAlignment(
+                            iText.Layout.Properties.TextAlignment.CENTER)
+                        .SetFixedPosition(
+                            345,
+                            186,
+                            195);
+
+                document.Add(dateText);
+
+                // =========================================
+                // QR Code 
+                // =========================================
+                string qrUrl = "https://tsscindia.com/verify-certificate";
+
+                BarcodeQRCode qrCode = new BarcodeQRCode(qrUrl);
+
+                Image qrImage = new Image(
+                    qrCode.CreateFormXObject(document.GetPdfDocument())
+                );
+
+                qrImage.SetFixedPosition(1, 690, 55, 75);
+
+                document.Add(qrImage);
+                // Close PDF
+                document.Close();
+
+                return outputStream.ToArray();
+            }
+        }
+
     }
 
 

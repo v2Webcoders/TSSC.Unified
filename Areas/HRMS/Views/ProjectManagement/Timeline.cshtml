@@ -1,0 +1,128 @@
+﻿@using TSSC.Unified.Models
+@model List<AdminProject>
+
+@{
+    ViewData["Title"] = "Project Timeline";
+    Layout = "_Layout";
+}
+
+<div class="nk-content">
+    <div class="container-fluid">
+
+        <div class="nk-block-head nk-block-head-sm">
+            <div class="nk-block-between">
+                <div class="nk-block-head-content">
+                    <h3 class="nk-block-title page-title">Project Timeline</h3>
+                    <div class="nk-block-des text-soft">
+                        <p>View and manage your assigned project timelines.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nk-block">
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["Success"]
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div class="card card-bordered">
+
+                <div class="card-inner">
+                    <div class="card-title-group">
+                        <div class="card-title">
+                            <h5 class="title">My Projects</h5>
+                        </div>
+
+                        <div class="card-tools">
+                            <span class="badge badge-outline-primary">
+                                @(Model?.Count ?? 0) Projects
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-inner pt-0">
+
+                    <div class="table-responsive">
+
+                        <table class="datatable-init-export table table-tranx table_custom table-bordered">
+
+                            <thead>
+                                <tr>
+                                    <th>S.No.</th>
+                                    <th>Project Name</th>
+                                    <th>Department</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @if (Model != null && Model.Any())
+                                {
+                                    int i = 1;
+
+                                    foreach (var project in Model)
+                                    {
+                                        <tr>
+                                            <td>@i</td>
+
+                                            <td>
+                                                <strong>@project.ProjectName</strong>
+                                            </td>
+
+                                            <td>@project.Department</td>
+
+                                            <td>
+                                                @project.StartDate.ToString("dd MMM yyyy")
+                                            </td>
+
+                                            <td>
+                                                @project.EndDate.ToString("dd MMM yyyy")
+                                            </td>
+
+                                            <td class="text-center">
+    <a href="@Url.Action(
+        "ProjectTimeline",
+        "ProjectManagement",
+        new {
+            area = "HRMS",
+            id = project.ProjectId
+        })"
+       class="btn btn-sm btn-outline-primary"
+       title="View Project Timeline">
+
+        <em class="icon ni ni-eye"></em>
+    </a>
+</td>
+                                        </tr>
+
+                                        i++;
+                                    }
+                                }
+                               
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

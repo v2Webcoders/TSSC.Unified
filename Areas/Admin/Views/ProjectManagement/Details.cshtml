@@ -1,0 +1,340 @@
+﻿@model TSSC.Unified.Models.AdminProject
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Project Details";
+}
+
+<!-- Page Heading -->
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">
+                Project Details
+            </h3>
+            <div class="nk-block-des text-soft">
+                Complete information about the selected project.
+            </div>
+        </div>
+
+        <div class="nk-block-head-content">
+            <a asp-area="Admin"
+               asp-controller="ProjectManagement"
+               asp-action="Index"
+               class="btn btn-outline-primary">
+
+                <em class="icon ni ni-arrow-left"></em>
+                <span>Back to Projects</span>
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- Project Summary -->
+<div class="card card-bordered mb-4">
+    <div class="card-inner">
+
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+                <h4 class="title mb-1">
+                    @(Model.ProjectName ?? "Untitled Project")
+                </h4>
+
+                <div class="text-soft">
+                    @(Model.Department ?? "Department not specified")
+                </div>
+
+                <div class="mt-2">
+                    <span class="badge badge-dim bg-light text-dark">
+                        Project ID: #@Model.ProjectId
+                    </span>
+                </div>
+            </div>
+
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+
+                @if (Model.IsActive)
+                {
+                    <span class="badge badge-dim bg-success">
+                        <em class="icon ni ni-check-circle"></em>
+                        Active Project
+                    </span>
+                }
+                else
+                {
+                    <span class="badge badge-dim bg-danger">
+                        <em class="icon ni ni-cross-circle"></em>
+                        Inactive Project
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="row g-4">
+
+    <!-- Basic Project Information -->
+    <div class="col-lg-6">
+        <div class="card card-bordered h-100">
+
+            <div class="card-inner border-bottom">
+                <h5 class="title">
+                    <em class="icon ni ni-briefcase text-primary me-1"></em>
+                    Basic Project Information
+                </h5>
+            </div>
+
+            <div class="card-inner">
+
+                <div class="row g-3">
+
+                    <div class="col-sm-6">
+                        <label class="form-label text-soft">Project Type</label>
+                        <div class="fw-bold">
+                            @(ViewBag.ProjectTypeName ?? "-")
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label text-soft">Government Type</label>
+                        <div class="fw-bold">
+                            @(ViewBag.ProjectSubTypeName ?? "-")
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label text-soft">Project Name</label>
+                        <div class="fw-bold">
+                            @(Model.ProjectName ?? "-")
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label text-soft">Department / Industry</label>
+                        <div class="fw-bold">
+                            @(Model.Department ?? "-")
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label text-soft">Project Description</label>
+                        <div class="bg-lighter p-3 rounded">
+                            @(string.IsNullOrWhiteSpace(Model.ProjectDescription)
+                                                        ? "No description provided."
+                                                        : Model.ProjectDescription)
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline and Budget -->
+    <div class="col-lg-6">
+        <div class="card card-bordered h-100">
+
+            <div class="card-inner border-bottom">
+                <h5 class="title">
+                    <em class="icon ni ni-calendar text-primary me-1"></em>
+                    Timeline & Budget
+                </h5>
+            </div>
+
+            <div class="card-inner">
+
+                <div class="row g-4">
+
+                    <div class="col-sm-6">
+                        <label class="form-label text-soft">Start Date</label>
+                        <div class="fw-bold">
+                            @Model.StartDate.ToString("dd MMM yyyy")
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label text-soft">End Date</label>
+                        <div class="fw-bold">
+                            @Model.EndDate.ToString("dd MMM yyyy")
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label text-soft">Project Cost</label>
+                        <div class="fw-bold">
+                            @(Model.ProjectCost.HasValue
+                                                        ? Model.ProjectCost.Value.ToString("N2")
+                                                        : "Not specified")
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label text-soft">Project Duration</label>
+                        <div class="fw-bold">
+                            @((Model.EndDate.Date - Model.StartDate.Date).Days + 1) Days
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label text-soft">Project Location</label>
+                        <div class="fw-bold">
+                            @(ViewBag.ProjectLocationName ?? "-")
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Team -->
+    <div class="col-lg-6">
+        <div class="card card-bordered h-100">
+
+            <div class="card-inner border-bottom">
+                <h5 class="title">
+                    <em class="icon ni ni-users text-primary me-1"></em>
+                    Project Team
+                </h5>
+            </div>
+
+            <div class="card-inner">
+
+                <div class="row g-4">
+
+                    <div class="col-12">
+                        <label class="form-label text-soft">Project Manager</label>
+                        <div class="fw-bold">
+                            @(ViewBag.ProjectManagerName ?? "Not assigned")
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label text-soft">Business Head</label>
+                        <div class="fw-bold">
+                            @(ViewBag.BusinessHeadName ?? "Not assigned")
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Attachment -->
+    <div class="col-lg-6">
+        <div class="card card-bordered h-100">
+
+            <div class="card-inner border-bottom">
+                <h5 class="title">
+                    <em class="icon ni ni-file-docs text-primary me-1"></em>
+                    Project Documents
+                </h5>
+            </div>
+
+            <div class="card-inner">
+
+                @if (!string.IsNullOrWhiteSpace(Model.Attachment))
+                {
+                    <div class="row align-items-center">
+
+                        <div class="col">
+                            <div class="fw-bold">
+                                <em class="icon ni ni-file-text text-primary me-1"></em>
+                                Project Attachment
+                            </div>
+                            <div class="text-soft small">
+                                Uploaded project document
+                            </div>
+                        </div>
+
+                        <div class="col-auto">
+                            <a href="@Url.Content(Model.Attachment)"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="btn btn-sm btn-outline-primary">
+
+                                <em class="icon ni ni-eye"></em>
+                                View File
+                            </a>
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="text-soft">
+                        <em class="icon ni ni-file-remove"></em>
+                        No attachment uploaded.
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Record Information -->
+    <div class="col-12">
+        <div class="card card-bordered">
+
+            <div class="card-inner border-bottom">
+                <h5 class="title">
+                    <em class="icon ni ni-info text-primary me-1"></em>
+                    Record Information
+                </h5>
+            </div>
+
+            <div class="card-inner">
+
+                <div class="row g-4">
+
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label text-soft">Created By</label>
+                        <div class="fw-bold">
+                            @(Model.CreatedBy ?? "-")
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label text-soft">Created Date</label>
+                        <div class="fw-bold">
+                            @Model.CreatedDate.ToString("dd MMM yyyy, hh:mm tt")
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label text-soft">Modified By</label>
+                        <div class="fw-bold">
+                            @(Model.ModifiedBy ?? "-")
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label text-soft">Modified Date</label>
+                        <div class="fw-bold">
+                            @(Model.ModifiedDate.HasValue
+                                                        ? Model.ModifiedDate.Value.ToString("dd MMM yyyy, hh:mm tt")
+                                                        : "-")
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
