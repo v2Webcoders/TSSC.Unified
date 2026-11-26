@@ -2181,7 +2181,7 @@ progress {
   display: block;
   width: 100%;
   padding: 0.4375rem 1rem;
-  font-size: 0.8125rem;
+  font-size: 0.9125rem;
   font-weight: 400;
   line-height: 1.25rem;
   color: #3c4d62;
@@ -16111,7 +16111,7 @@ a:hover .btn-trigger:before {
   padding-right: calc(1rem + 24px);
 }
 .form-label {
-  font-size: 0.875rem;
+  font-size: 0.975rem;
   font-weight: 500;
   color: #344357;
   margin-bottom: 0.5rem;

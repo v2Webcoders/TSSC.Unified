@@ -108,6 +108,8 @@ namespace QUIZAPP
         public DbSet<CEOApproval> CEOApprovals { get; set; }
         public DbSet<CEODecision> CEODecisions { get; set; }
 
+        public DbSet<KpiMaster> KpiMasters { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

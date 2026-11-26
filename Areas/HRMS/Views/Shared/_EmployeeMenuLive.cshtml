@@ -722,6 +722,25 @@
 		</a>
 	</li>
 
+	@if (User.IsInRole("Finance") && employee?.EmployeeCode == "C015/82")
+	{
+		<li class="nk-menu-heading">
+			<div class="nk-menu-heading-content">
+				<span class="nk-menu-heading-text">FINANCE MANAGEMENT</span>
+			</div>
+		</li>
+		<li class="nk-menu-item">
+			<a asp-area="HRMS"
+			   asp-controller="KPIMaster"
+			   asp-action="Create"
+			   class="nk-menu-link">
+				<span class="nk-menu-icon">
+					<em class="icon ni ni-growth"></em>
+				</span>
+				<span class="nk-menu-text">Add KPI</span>
+			</a>
+		</li>
+	}
 
 	@if (isCEO)
 	{
@@ -855,11 +874,9 @@
 	{
 		<li class="nk-menu-heading">
 			<div class="nk-menu-heading-content">
-				<span class="nk-menu-heading-text">
-					<em class="icon ni ni-user-check"></em>
-					TOT/TOA
-				</span>
+				<span class="nk-menu-heading-text">TOT/TOA</span>
 			</div>
+			
 		</li>
 
 		<!-- TOT/TOA -->
@@ -1068,7 +1085,7 @@
 		<li class="nk-menu-heading">
 			<div class="nk-menu-heading-content">
 				<span class="nk-menu-heading-text">
-					<em class="icon ni ni-user-check"></em>
+					
 					TOT/TOA
 				</span>
 			</div>

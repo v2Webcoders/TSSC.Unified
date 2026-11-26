@@ -1,0 +1,124 @@
+﻿@using TSSC.Unified.ViewModel
+@model KpiCreateViewModel
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Add KPI";
+    Layout = "_Layout";
+}
+
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Add Financial KPIs</h3>
+            <div class="nk-block-des text-soft">
+                <p>Values shown are the last saved ones. Change what has moved, set the dates for each total, and save. All amounts are in ₹.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-icon">
+        <em class="icon ni ni-check-circle"></em> @TempData["Success"]
+    </div>
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div asp-validation-summary="All" class="alert alert-danger"></div>
+}
+
+<form asp-area="HRMS" asp-controller="KPIMaster" asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="nk-block">
+        @for (int i = 0; i < Model.Items.Count; i++)
+        {
+            <div class="card card-bordered mb-3 kpi-row">
+                <div class="card-inner">
+                    <h6 class="mb-3">@Model.Items[i].KpiName <span class="text-soft fw-normal">(₹ )</span></h6>
+                    <input type="hidden" asp-for="Items[i].KpiName" />
+
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label asp-for="Items[i].TotalValue" class="form-label">Total</label>
+                                <input asp-for="Items[i].TotalValue" type="number" step="0.01" min="0"
+                                       class="form-control kpi-total" placeholder="e.g. 125.50" required />
+                                <span asp-validation-for="Items[i].TotalValue" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label asp-for="Items[i].FromDate" class="form-label">From Date</label>
+                                <input asp-for="Items[i].FromDate" type="date"
+                                       class="form-control kpi-from" required />
+                                <span asp-validation-for="Items[i].FromDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label asp-for="Items[i].ToDate" class="form-label">To Date</label>
+                                <input asp-for="Items[i].ToDate" type="date"
+                                       class="form-control kpi-to" required />
+                                <span asp-validation-for="Items[i].ToDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label asp-for="Items[i].ReceivedValue" class="form-label">Received</label>
+                                <input asp-for="Items[i].ReceivedValue" type="number" step="0.01" min="0"
+                                       class="form-control kpi-received" placeholder="Amount received so far" required />
+                                <span asp-validation-for="Items[i].ReceivedValue" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Pending</label>
+                                <input type="text" class="form-control kpi-pending" readonly tabindex="-1"
+                                       placeholder="Calculated: Total − Received" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-note mt-1">From and To dates apply to the Total.</div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="nk-block">
+        <button type="submit" class="btn btn-primary">Save KPIs</button>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        // Pending = Total - Received (display only; computed again on the server side when read)
+        document.querySelectorAll('.kpi-row').forEach(row => {
+            const total = row.querySelector('.kpi-total');
+            const received = row.querySelector('.kpi-received');
+            const pending = row.querySelector('.kpi-pending');
+            const from = row.querySelector('.kpi-from');
+            const to = row.querySelector('.kpi-to');
+
+            // To date cannot be before From date
+            function syncMin() { to.min = from.value || ''; }
+            from.addEventListener('change', syncMin);
+            syncMin();
+
+            function calc() {
+                if (total.value === '' || received.value === '') { pending.value = ''; return; }
+                const p = parseFloat(total.value) - parseFloat(received.value);
+                pending.value = p.toFixed(2);
+                received.setCustomValidity(p < 0 ? 'Received cannot be more than total' : '');
+            }
+            total.addEventListener('input', calc);
+            received.addEventListener('input', calc);
+            calc();
+        });
+    </script>
+}

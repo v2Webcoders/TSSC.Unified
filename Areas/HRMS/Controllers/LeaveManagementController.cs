@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using TSSC.Unified.Models;
+using DocumentFormat.OpenXml.Spreadsheet;
+using QUIZAPP.Services;
 
 namespace TSSC.Unified.Areas.HRMS.Controllers
 {
@@ -21,17 +23,19 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IWebHostEnvironment _environment;
+        private readonly EmailService _emailService;
         public LeaveManagementController(
             ILogger<EmployeeController> logger,
             AppdbContext context,
             UserManager<AppUser> userManager,
-            RoleManager<IdentityRole> roleManager, IWebHostEnvironment environment)
+            RoleManager<IdentityRole> roleManager, IWebHostEnvironment environment, EmailService emailService)
         {
             _logger = logger;
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
             _environment = environment;
+            _emailService = emailService;
         }
         // HR ROLE LEAVE MANAGEMENT
         [Authorize]
@@ -146,12 +150,22 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             if (leave == null)
                 return NotFound();
-
+            DateTime now = DateTime.Now;
             leave.Status = "Approved";
             leave.ApprovedBy = employee.EmployeeId;
-            leave.ApprovedDate = DateTime.Now;
+            leave.ApprovedDate = now;
 
             await _context.SaveChangesAsync();
+
+            // mails AFTER the save; a mail problem never undoes the approval
+            await _emailService.NotifyLeaveDecisionAsync(
+                leave.LeaveRequestId,
+                "Approved",
+                employee.EmployeeId,
+                now,
+                Url.Action("MyLeaves", "Leave"),
+                Url.Action(nameof(MyLeaves), "LeaveManagement"),
+                Path.Combine(_environment.WebRootPath, "EmailTemplates", "LeaveRequestDecision.html"));
 
             TempData["Success"] = "Leave request approved successfully.";
 
@@ -173,12 +187,21 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             if (leave == null)
                 return NotFound();
-
+            DateTime now = DateTime.Now;
             leave.Status = "Rejected";
             leave.ApprovedBy = employee.EmployeeId;
-            leave.ApprovedDate = DateTime.Now;
+            leave.ApprovedDate = now;
 
             await _context.SaveChangesAsync();
+
+            await _emailService.NotifyLeaveDecisionAsync(
+                leave.LeaveRequestId,
+                "Rejected",
+                employee.EmployeeId,
+                now,
+                Url.Action("MyLeaves", "Leave"),
+                Url.Action(nameof(MyLeaves), "LeaveManagement"),
+                Path.Combine(_environment.WebRootPath, "EmailTemplates", "LeaveRequestDecision.html"));
 
             TempData["Success"] = "Leave request rejected successfully.";
 
@@ -465,7 +488,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             int approvedCount = 0;
             int skippedCount = 0;
-
+            var approvedIds = new List<int>();
+            DateTime now = DateTime.Now;
             foreach (var id in selectedIds)
             {
                 var leave =
@@ -492,12 +516,33 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     employee.EmployeeId;
 
                 leave.ApprovedDate =
-                    DateTime.Now;
-
+                    now;
+                approvedIds.Add(leave.LeaveRequestId);                  // NEW
                 approvedCount++;
             }
 
             await _context.SaveChangesAsync();
+
+
+            if (approvedIds.Count > 0)
+            {
+                string templatePath = Path.Combine(
+                    _environment.WebRootPath,
+                    "EmailTemplates",
+                    "LeaveRequestDecision.html");
+
+                foreach (var leaveId in approvedIds)
+                {
+                    await _emailService.NotifyLeaveDecisionAsync(
+                        leaveId,
+                        "Approved",
+                        employee.EmployeeId,
+                        now,
+                        Url.Action("MyLeaves", "LeaveRequest"),
+                        Url.Action(nameof(MyLeaves), "LeaveManagement"),
+                        templatePath);
+                }
+            }
 
             // Result message
             if (approvedCount > 0 && skippedCount == 0)
@@ -516,7 +561,6 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 TempData["Error"] =
                     "No selected leave requests could be approved.";
             }
-
             return RedirectToAction(nameof(MyLeaves));
         }
     }

@@ -53,6 +53,9 @@
             = new();
 
         public List<string> ApprovalDepartments { get; set; } = new();
+
+        public List<CEOKpiCardVM> FinancialKpis { get; set; } = new();
+        public string KpiFinancialYear { get; set; } = "";   // FY chosen in the KPI section only
     }
 
 
@@ -162,6 +165,33 @@
         public int EmployeeId { get; set; }
         public string EmployeeName { get; set; }
         public string Department { get; set; }
+    }
+
+    public class CEOKpiCardVM
+    {
+        public string Name { get; set; } = "";
+        public decimal? Total { get; set; }
+        public decimal? Received { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
+
+        // Pending is always Total - Received (null when there is no data)
+        public decimal? Pending => (Total.HasValue && Received.HasValue) ? Total - Received : null;
+
+        public string KpiFinancialYear { get; set; } = "";   // FY chosen in the KPI section only
+    }
+
+    public enum AttStatus { OnTime, Late, OnDuty, OnLeave, Absent, OffDay }
+
+    public class WorkforceEmployeeVm
+    {
+        public int EmployeeId { get; set; }      // change type if your key isn't int
+        public string? Code { get; set; }
+        public string Name { get; set; } = "";
+        public string? Department { get; set; }
+        public AttStatus Status { get; set; }
+        public string InTime { get; set; } = "—";
+        public string Remark { get; set; } = "";
     }
 
 }

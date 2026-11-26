@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using TSSC.Unified.Models;
+using QUIZAPP.Services;
 
 namespace TSSC.Unified.Areas.HRMS.Controllers
 {
@@ -21,17 +22,19 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IWebHostEnvironment _environment;
+        private readonly EmailService _emailService;
         public LeaveRequestController(
             ILogger<EmployeeController> logger,
             AppdbContext context,
             UserManager<AppUser> userManager,
-            RoleManager<IdentityRole> roleManager, IWebHostEnvironment environment)
+            RoleManager<IdentityRole> roleManager, IWebHostEnvironment environment, EmailService emailService)
         {
             _logger = logger;
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
             _environment = environment;
+            _emailService = emailService;
         }
 
         public async Task<IActionResult> Create(int? id)
@@ -232,6 +235,19 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             await _context.SaveChangesAsync();
 
+            if (model.LeaveRequestId == 0)
+            {
+                string templatePath = Path.Combine(
+                _environment.WebRootPath,
+                "EmailTemplates",
+                "LeaveRequestSubmitted.html"
+            );
+                string reviewUrl = $"{Request.Scheme}://{Request.Host}" + Url.Action("ManageLeaves", "LeaveRequest");     // ADJUST: page where the manager approves
+
+                await _emailService.NotifyLeaveAppliedAsync(leaveRequest.LeaveRequestId, reviewUrl, templatePath);
+            }
+
+
             TempData["LeaveSuccess"] = model.LeaveRequestId == 0
             ? "Leave request submitted successfully and sent to your reporting manager for approval."
             : "Leave request updated successfully.";
@@ -398,6 +414,19 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             await _context.SaveChangesAsync();
 
+
+            string templatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates", "LeaveRequestDecision.html");
+
+            await _emailService.NotifyLeaveDecisionAsync(
+                leave.LeaveRequestId,
+                "Approved",
+                employee.EmployeeId,
+                leave.ApprovedDate.Value,                         // ADJUST if ApprovedDate is not nullable: leave.ApprovedDate
+                Url.Action("MyLeaves", "LeaveRequest"),
+                Url.Action(nameof(ManageLeaves), "LeaveRequest"),
+                templatePath);
+
+
             TempData["Success"] =
                 "Leave request approved successfully.";
 
@@ -463,6 +492,17 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             await _context.SaveChangesAsync();
 
+            string templatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates", "LeaveRequestDecision.html");
+
+            await _emailService.NotifyLeaveDecisionAsync(
+                leave.LeaveRequestId,
+                "Rejected",
+                employee.EmployeeId,
+                leave.ApprovedDate.Value,                         // ADJUST if ApprovedDate is not nullable: leave.ApprovedDate
+                 Url.Action("MyLeaves", "LeaveRequest"),
+                Url.Action(nameof(ManageLeaves), "LeaveRequest"),
+                templatePath);
+
             TempData["Success"] =
                 "Leave request rejected successfully.";
 
@@ -521,6 +561,148 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             return RedirectToAction(nameof(MyLeaves));
         }
 
+        //[Authorize]
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> BulkApproveLeave(List<int> selectedIds)
+        //{
+        //    if (selectedIds == null || !selectedIds.Any())
+        //    {
+        //        TempData["Error"] =
+        //            "Please select at least one leave request.";
+
+        //        return RedirectToAction(nameof(MyLeaves));
+        //    }
+
+
+        //    // =====================================================
+        //    // CURRENT USER
+        //    // =====================================================
+
+        //    var currentUser =
+        //        await _userManager.GetUserAsync(User);
+
+        //    if (currentUser == null)
+        //        return Unauthorized();
+
+
+        //    // =====================================================
+        //    // CURRENT EMPLOYEE
+        //    // =====================================================
+
+        //    var employee =
+        //        await _context.Employee
+        //            .FirstOrDefaultAsync(x =>
+        //                x.ApplicationUserId == currentUser.Id);
+
+        //    if (employee == null)
+        //        return NotFound();
+
+
+        //    int approvedCount = 0;
+        //    int skippedCount = 0;
+
+
+        //    // =====================================================
+        //    // APPROVE SELECTED REQUESTS
+        //    // =====================================================
+
+        //    foreach (var id in selectedIds)
+        //    {
+        //        var leave =
+        //            await _context.LeaveRequest
+        //                .Include(x => x.Employee)
+        //                .FirstOrDefaultAsync(x =>
+        //                    x.LeaveRequestId == id);
+
+
+        //        // -------------------------------------------------
+        //        // REQUEST NOT FOUND
+        //        // -------------------------------------------------
+
+        //        if (leave == null)
+        //        {
+        //            skippedCount++;
+        //            continue;
+        //        }
+
+
+        //        // -------------------------------------------------
+        //        // CHECK REPORTING MANAGER
+        //        // -------------------------------------------------
+
+        //        bool isApprover =
+        //            leave.Employee != null &&
+        //            leave.Employee.ReportingManagerId ==
+        //                employee.EmployeeId;
+
+        //        if (!isApprover)
+        //        {
+        //            skippedCount++;
+        //            continue;
+        //        }
+
+
+        //        // -------------------------------------------------
+        //        // ONLY PENDING REQUESTS
+        //        // -------------------------------------------------
+
+        //        if (leave.Status != "Pending")
+        //        {
+        //            skippedCount++;
+        //            continue;
+        //        }
+
+
+        //        // -------------------------------------------------
+        //        // APPROVE
+        //        // -------------------------------------------------
+
+        //        leave.Status =
+        //            "Approved";
+
+        //        leave.ApprovedBy =
+        //            employee.EmployeeId;
+
+        //        leave.ApprovedDate =
+        //            DateTime.Now;
+
+        //        approvedCount++;
+        //    }
+
+
+        //    // =====================================================
+        //    // SAVE
+        //    // =====================================================
+
+        //    await _context.SaveChangesAsync();
+
+
+        //    // =====================================================
+        //    // RESULT MESSAGE
+        //    // =====================================================
+
+        //    if (approvedCount > 0 && skippedCount == 0)
+        //    {
+        //        TempData["Success"] =
+        //            $"{approvedCount} leave request(s) approved successfully.";
+        //    }
+        //    else if (approvedCount > 0 && skippedCount > 0)
+        //    {
+        //        TempData["Success"] =
+        //            $"{approvedCount} leave request(s) approved successfully. " +
+        //            $"{skippedCount} request(s) skipped.";
+        //    }
+        //    else
+        //    {
+        //        TempData["Error"] =
+        //            "No selected leave requests could be approved.";
+        //    }
+
+
+        //    return RedirectToAction(nameof(ManageLeaves));
+        //}
+
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -531,7 +713,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 TempData["Error"] =
                     "Please select at least one leave request.";
 
-                return RedirectToAction(nameof(MyLeaves));
+                return RedirectToAction(nameof(ManageLeaves));          // was MyLeaves: the selection comes from ManageLeaves
             }
 
 
@@ -561,13 +743,15 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             int approvedCount = 0;
             int skippedCount = 0;
+            var approvedIds = new List<int>();                          // NEW (ADJUST id type)
+            DateTime now = DateTime.Now;                                // NEW: same time for all approvals and mails
 
 
             // =====================================================
             // APPROVE SELECTED REQUESTS
             // =====================================================
 
-            foreach (var id in selectedIds)
+            foreach (var id in selectedIds.Distinct())                  // Distinct: a repeated id is not processed twice
             {
                 var leave =
                     await _context.LeaveRequest
@@ -589,6 +773,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                 // -------------------------------------------------
                 // CHECK REPORTING MANAGER
+                // (the single Approve checks leave.ApproverId == employee.EmployeeId.
+                //  Both are the same unless the manager changed after the employee applied.)
                 // -------------------------------------------------
 
                 bool isApprover =
@@ -625,8 +811,9 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     employee.EmployeeId;
 
                 leave.ApprovedDate =
-                    DateTime.Now;
+                    now;
 
+                approvedIds.Add(leave.LeaveRequestId);                  // NEW
                 approvedCount++;
             }
 
@@ -636,6 +823,33 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             // =====================================================
 
             await _context.SaveChangesAsync();
+
+
+            // =====================================================
+            // EMAILS (after the save: a mail problem never undoes the approvals)
+            // one set per approved leave, same as the single Approve:
+            // employee + approver + HR
+            // =====================================================
+
+            if (approvedIds.Count > 0)
+            {
+                string templatePath = Path.Combine(
+                    _environment.WebRootPath,
+                    "EmailTemplates",
+                    "LeaveRequestDecision.html");
+
+                foreach (var leaveId in approvedIds)
+                {
+                    await _emailService.NotifyLeaveDecisionAsync(
+                        leaveId,
+                        "Approved",
+                        employee.EmployeeId,
+                        now,
+                        Url.Action("MyLeaves", "LeaveRequest"),
+                        Url.Action(nameof(ManageLeaves), "Leave"),
+                        templatePath);
+                }
+            }
 
 
             // =====================================================

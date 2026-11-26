@@ -46,6 +46,7 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 	@RenderSection("Styles", required: false)
 	<style>
+
 		.employee-search-widget {
 		position: relative;
 		width: 100%;
@@ -306,7 +307,7 @@
 							<div class="nk-header-brand d-xl-none">
 								<a href="html/index.html" class="logo-link">
 									<img class="logo-light logo-img" src="./images/logomine.png" srcset="./images/logo2x.png 2x" alt="logo">
-									<img class="logo-dark logo-img" src="./images/logomine.png" srcset="./images/logo-dark2x.png 2x" alt="logo-dark">
+									<img class="logo-dark logo-img" src="./images/logomine.png" srcset="~/images/logo-dark2x.png 2x" alt="logo-dark">
 								</a>
 							</div><!-- .nk-header-brand -->
 							@if (roles.Contains("CEO"))
@@ -370,9 +371,18 @@
 							</div> *@
 							<div class="nk-header-tools">
 								<ul class="nk-quick-nav">
-									
-							
-									
+									<li class="d-flex align-items-center">
+										<a href="/manual/user-manual.html" target="_blank"
+										   class="nk-team-btn"
+										   title="User Manual"
+										   aria-label="View User Manual"
+										   data-bs-toggle="tooltip"
+										   data-bs-placement="bottom">
+											<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+												<path d="M18 2H7C5.3 2 4 3.3 4 5v14c0 1.7 1.3 3 3 3h12v-2H7c-.6 0-1-.4-1-1s.4-1 1-1h12c.6 0 1-.4 1-1V3c0-.6-.4-1-1-1zM8 6h8v2H8V6z" />
+											</svg>
+										</a>
+									</li>
 									<li class="d-flex align-items-center">
 										<a href="/HRMS/Team/TeamMembers"
 										   class="nk-team-btn"
@@ -596,6 +606,127 @@
 	<!-- JavaScript -->
 	<script src="~/assets/js/bundle.js?ver=3.4.0"></script>
 	<script src="~/assets/js/scripts.js?ver=3.4.0"></script>
+@* 	<script>
+		(function () {
+			function init() {
+				const menu = document.querySelector('.nk-sidebar .nk-menu');
+				if (!menu || menu.dataset.wf) return;
+				menu.dataset.wf = '1';
+
+				const norm = el => el.textContent.replace(/\s+/g, ' ').trim().toUpperCase();
+				const text = el => (el.textContent || '').toLowerCase();
+
+				/* ---------- build groups from headings ---------- */
+				const groups = [], byName = {};
+				let cur = null;
+				[...menu.children].forEach(li => {
+					if (li.classList.contains('nk-menu-heading')) {
+						const key = norm(li);
+						if (byName[key]) {                    // same heading rendered twice (e.g. TOT/TOA for two roles): merge
+							cur = byName[key];
+							li.classList.add('wf-dup');
+						} else {
+							cur = { head: li, items: [], key: key };
+							li.classList.add('wf-head');
+							byName[key] = cur;
+							groups.push(cur);
+						}
+					} else if (cur) {
+						cur.items.push(li);                   // items before the first heading (Dashboard) stay visible
+					}
+				});
+				if (!groups.length) return;
+
+				/* ---------- chevron + pending-count on each heading ---------- */
+				groups.forEach(g => {
+					let total = 0;
+					g.items.forEach(li => {                   // only top-level badges, so sub-item badges are not counted twice
+						const b = li.querySelector(':scope > .nk-menu-link .badge');
+						if (b) total += parseInt(b.textContent, 10) || 0;
+					});
+					if (total > 0) {
+						const c = document.createElement('span');
+						c.className = 'wf-count';
+						c.textContent = total;
+						g.head.appendChild(c);
+					}
+					const chev = document.createElement('span');
+					chev.className = 'wf-chev';
+					g.head.appendChild(chev);
+				});
+
+				/* ---------- open / close ---------- */
+				function setOpen(g, open) {
+					g.head.classList.toggle('wf-open', open);
+					g.items.forEach(li => li.classList.toggle('wf-hide', !open));
+				}
+				function openOnly(target) { groups.forEach(g => setOpen(g, g === target)); }
+
+				groups.forEach(g => g.head.addEventListener('click', () => {
+					if (g.head.classList.contains('wf-open')) setOpen(g, false); else openOnly(g);
+				}));
+
+				/* ---------- which group holds the current page? ---------- */
+				const here = location.pathname.toLowerCase();
+				let activeGroup = groups.find(g => g.items.some(li =>
+					li.classList.contains('active') || li.querySelector('.active, .current-page')));
+				if (!activeGroup) {
+					activeGroup = groups.find(g => g.items.some(li =>
+						[...li.querySelectorAll('a[href]')].some(a => {
+							const h = a.getAttribute('href');
+							return h && h !== '#' && h.split('?')[0].toLowerCase() === here;
+						})));
+				}
+				let lastOpen = activeGroup || groups[0];
+				openOnly(lastOpen);
+
+				/* ---------- search ---------- */
+				const wrap = document.createElement('div');
+				wrap.className = 'wf-menu-search';
+				wrap.innerHTML = '<em class="icon ni ni-search"></em><input type="text" placeholder="Search menu…" autocomplete="off">';
+				menu.parentElement.insertBefore(wrap, menu);
+				const input = wrap.querySelector('input');
+
+				input.addEventListener('input', () => {
+					const q = input.value.trim().toLowerCase();
+
+					if (!q) {
+						menu.classList.remove('wf-searching');
+						menu.querySelectorAll('.wf-hide-s').forEach(e => e.classList.remove('wf-hide-s'));
+						menu.querySelectorAll('.wf-force-open').forEach(e => e.classList.remove('wf-force-open'));
+						openOnly(lastOpen);
+						return;
+					}
+
+					const openNow = groups.find(g => g.head.classList.contains('wf-open'));
+					if (openNow) lastOpen = openNow;
+
+					menu.classList.add('wf-searching');
+					menu.querySelectorAll('.wf-force-open').forEach(e => e.classList.remove('wf-force-open'));
+
+					groups.forEach(g => {
+						let any = false;
+						g.items.forEach(li => {
+							li.classList.remove('wf-hide');
+							const m = text(li).includes(q);
+							li.classList.toggle('wf-hide-s', !m);
+							if (m) { any = true; li.classList.add('wf-force-open'); }
+						});
+						g.head.classList.toggle('wf-hide-s', !any);
+					});
+
+					[...menu.children].forEach(li => {          // Dashboard etc.
+						if (li.classList.contains('nk-menu-heading')) return;
+						if (!groups.some(g => g.items.includes(li)))
+							li.classList.toggle('wf-hide-s', !text(li).includes(q));
+					});
+				});
+			}
+
+			if (document.readyState === 'complete') init();
+			else window.addEventListener('load', init);      // runs after DashLite has marked the active item
+		})();
+	</script> *@
 	<script src="~/assets/js/charts/gd-default.js?ver=3.4.0"></script>
 	<script src="~/assets/js/charts/tssc-dashboard.js?ver=1.0.0"></script>
 
@@ -603,7 +734,7 @@
 	<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
 	<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 	@await RenderSectionAsync("Scripts", required: false)
-	
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('employeeSearch');

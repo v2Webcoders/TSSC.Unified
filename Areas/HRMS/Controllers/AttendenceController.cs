@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QUIZAPP;
 using QUIZAPP.Models;
+using QUIZAPP.Services;
 using TSSC.Unified.Models;
 using TSSC.Unified.Services;
 using TSSC.Unified.ViewModel;
@@ -18,15 +21,19 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
         private readonly IAttendanceSyncService _syncService;
         private readonly UserManager<AppUser> _userManager;
         private readonly IAttendanceSummaryService _attendanceSummaryService;
+        private readonly IWebHostEnvironment _environment;
+        private readonly EmailService _emailService;
 
         public AttendanceController(
             AppdbContext context,
-            IAttendanceSyncService syncService, UserManager<AppUser> userManager, IAttendanceSummaryService attendanceSummaryService)
+            IAttendanceSyncService syncService, UserManager<AppUser> userManager, IAttendanceSummaryService attendanceSummaryService, IWebHostEnvironment environment, EmailService emailService)
         {
             _context = context;
             _syncService = syncService;
             _userManager = userManager;
             _attendanceSummaryService = attendanceSummaryService;
+            _environment = environment;
+            _emailService = emailService;
         }
 
 
@@ -1117,6 +1124,38 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             await _context.SaveChangesAsync();
 
+            // =========================================
+            // SEND SUBMISSION NOTIFICATION EMAILS
+            // =========================================
+
+            try
+            {
+                await _emailService.NotifyRegularizationSubmittedAsync(
+                    request.RegularizationId,
+
+                    Url.Action(
+                        nameof(MyRegularizations),
+                        "Attendance"),
+
+                    Url.Action(
+                        nameof(RegularizationRequests),
+                        "Attendance"),
+
+                    Url.Action(
+                        nameof(AllRegularizations),
+                        "Attendance"),
+
+                    Path.Combine(
+                        _environment.WebRootPath,
+                        "EmailTemplates",
+                        "RegularizationSubmitted.html"));
+            }
+            catch (Exception ex)
+            {
+               //// _logger.LogError(
+               //     ex,
+               //     "Failed to send regularization submission notification.");
+            }
 
             // =====================================================
             // SUCCESS
@@ -1299,6 +1338,12 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             if (currentUser == null)
                 return Unauthorized();
 
+            // NEW: the HR employee who approves (needed for the email and for the record)
+            var approver = await _context.Employee
+                .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
+            if (approver == null)
+                return Unauthorized();
+
 
             // =========================================
             // FIND REPORTING MANAGER
@@ -1382,6 +1427,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 baseAttendanceStatus = "Half Day";
             }
 
+            DateTime now = DateTime.Now;
 
             if (attendance == null)
             {
@@ -1463,6 +1509,18 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             await _context.SaveChangesAsync();
 
 
+            // NEW: mails AFTER the save; a mail problem never undoes the approval
+            await _emailService.NotifyRegularizationDecisionAsync(
+                request.RegularizationId,
+                "Approved",
+                approver.EmployeeId,
+                now,
+                baseAttendanceStatus,
+                Url.Action("MyAttendance", "Attendance"),                  // ADJUST: where the employee sees attendance
+                Url.Action(nameof(AllRegularizations), "Attendance"),      // ADJUST: page for manager / HR
+                Path.Combine(_environment.WebRootPath, "EmailTemplates", "RegularizationDecision.html"));
+
+
             TempData["Success"] =
                 "Attendance regularization approved successfully.";
 
@@ -1486,14 +1544,14 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             if (currentUser == null)
                 return Unauthorized();
 
+            // NEW: the HR employee who rejects (needed for the email and for the record)
+            var approver = await _context.Employee
+                .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
+            
+            if (approver == null)
+                return Unauthorized();
 
-            //var manager =
-            //    await _context.Employee
-            //        .FirstOrDefaultAsync(x =>
-            //            x.ApplicationUserId == currentUser.Id);
 
-            //if (manager == null)
-            //    return Unauthorized();
 
 
             var request =
@@ -1521,7 +1579,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     nameof(AllRegularizations));
             }
 
-
+            DateTime now = DateTime.Now;
             request.Status =
                 "Rejected";
 
@@ -1533,6 +1591,18 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
 
             await _context.SaveChangesAsync();
+
+
+            // NEW: mails AFTER the save; a mail problem never undoes the rejection
+            await _emailService.NotifyRegularizationDecisionAsync(
+                request.RegularizationId,
+                "Rejected",
+                approver.EmployeeId,
+                now,
+                "",                                                        // resulting status is not used for a rejection
+                Url.Action("MyAttendance", "Attendance"),                  // ADJUST: where the employee sees attendance
+                Url.Action(nameof(AllRegularizations), "Attendance"),      // ADJUST: page for manager / HR
+                Path.Combine(_environment.WebRootPath, "EmailTemplates", "RegularizationDecision.html"));
 
 
             TempData["Success"] =
@@ -1971,7 +2041,12 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             await _context.SaveChangesAsync();
 
-
+            await _emailService.NotifyODSubmittedAsync(
+            request.ODRequestId,
+            Path.Combine(
+            _environment.WebRootPath,
+            "EmailTemplates",
+            "ODSubmitted.html"));
             // =====================================================
             // SUCCESS
             // =====================================================
@@ -1983,39 +2058,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             return RedirectToAction(
                 nameof(MyOD));
         }
-        //[Authorize]
-        //[HttpGet]
-        //public async Task<IActionResult> MyOD()
-        //{
-        //    var currentUser =
-        //        await _userManager.GetUserAsync(User);
-
-        //    if (currentUser == null)
-        //        return Unauthorized();
-
-
-        //    var employee =
-        //        await _context.Employee
-        //            .FirstOrDefaultAsync(x =>
-        //                x.ApplicationUserId == currentUser.Id);
-
-        //    if (employee == null)
-        //        return Unauthorized();
-
-
-        //    var requests =
-        //        await _context.ODRequest
-        //            .Include(x => x.Approver)
-        //            .Where(x =>
-        //                x.EmployeeId ==
-        //                    employee.EmployeeId)
-        //            .OrderByDescending(
-        //                x => x.CreatedDate)
-        //            .ToListAsync();
-
-
-        //    return View(requests);
-        //}
+        
 
         [Authorize]
         [HttpGet]
@@ -2235,9 +2278,14 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             await _context.SaveChangesAsync();
 
-
-            TempData["Success"] =
-                "OD request approved and attendance updated successfully.";
+            await _emailService.NotifyODDecisionAsync(
+        request.ODRequestId,
+        employee.EmployeeId,
+        "Approved",
+        Path.Combine(
+        _environment.WebRootPath,
+        "EmailTemplates",
+        "ODDecision.html"));
 
 
             // =====================================================
@@ -2387,7 +2435,14 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             await _context.SaveChangesAsync();
 
-
+            await _emailService.NotifyODDecisionAsync(
+        request.ODRequestId,
+        employee.EmployeeId,
+        "Rejected",
+        Path.Combine(
+        _environment.WebRootPath,
+        "EmailTemplates",
+        "ODDecision.html"));
             // =====================================================
             // SUCCESS MESSAGE
             // =====================================================
@@ -3158,12 +3213,12 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             // =========================================
             // APPROVE REQUEST
             // =========================================
-
+            DateTime now = DateTime.Now;                   // NEW: one time for the record and the mails
             request.Status =
                 "Approved";
 
             request.ApprovedDate =
-                DateTime.Now;
+               now;
 
             request.ApprovalRemarks =
                 "Attendance regularization approved.";
@@ -3174,6 +3229,18 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             // =========================================
 
             await _context.SaveChangesAsync();
+
+            // NEW: mails AFTER the save; a mail problem never undoes the approval
+            await _emailService.NotifyRegularizationDecisionAsync(
+                request.RegularizationId,
+                "Approved",
+                manager.EmployeeId,
+                now,
+                baseAttendanceStatus,
+                Url.Action("MyAttendance", "Attendance"),                          // ADJUST: where the employee sees attendance
+                Url.Action(nameof(RegularizationRequests), "Attendance"),          // manager's page
+                Path.Combine(_environment.WebRootPath, "EmailTemplates", "RegularizationDecision.html"),
+                hrPath: Url.Action(nameof(AllRegularizations), "Attendance"));     // NEW: HR cannot open the manager's page
 
 
             TempData["Success"] =
@@ -3248,7 +3315,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                     nameof(RegularizationRequests));
             }
 
-
+            DateTime now = DateTime.Now;
             // =========================================
             // REJECT REQUEST
             // =========================================
@@ -3257,7 +3324,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 "Rejected";
 
             request.ApprovedDate =
-                DateTime.Now;
+                now;
 
             request.ApprovalRemarks =
                 "Attendance regularization rejected.";
@@ -3268,6 +3335,18 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             // =========================================
 
             await _context.SaveChangesAsync();
+
+            // NEW: mails AFTER the save; a mail problem never undoes the approval
+            await _emailService.NotifyRegularizationDecisionAsync(
+                request.RegularizationId,
+                "Rejected",
+                manager.EmployeeId,
+                now,
+                "",
+                Url.Action("MyAttendance", "Attendance"),                          // ADJUST: where the employee sees attendance
+                Url.Action(nameof(RegularizationRequests), "Attendance"),          // manager's page
+                Path.Combine(_environment.WebRootPath, "EmailTemplates", "RegularizationDecision.html"),
+                hrPath: Url.Action(nameof(AllRegularizations), "Attendance"));     // NEW: HR cannot open the manager's page
 
 
             TempData["Success"] =
@@ -3296,14 +3375,20 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             if (currentUser == null)
                 return Unauthorized();
 
+            // NEW: the HR employee who approves (needed for the mails)
+            var approver = await _context.Employee
+                .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
+            if (approver == null)
+                return Unauthorized();
+
             int approvedCount = 0;
             int skippedCount = 0;
-
+            DateTime now = DateTime.Now;
 
             // =========================================
             // PROCESS SELECTED REQUESTS
             // =========================================
-
+            var approved = new List<(int Id, string Status)>();          // NEW 
             foreach (var id in selectedIds)
             {
                 // =========================================
@@ -3476,7 +3561,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                 request.ApprovalRemarks =
                     "Attendance regularization approved.";
-
+                approved.Add((request.RegularizationId, baseAttendanceStatus));
                 approvedCount++;
             }
 
@@ -3487,6 +3572,24 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             await _context.SaveChangesAsync();
 
+            // NEW: mails AFTER the save, one set per approved request; a mail problem never undoes the approvals
+            if (approved.Count > 0)
+            {
+                string templatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates", "RegularizationDecision.html");
+
+                foreach (var a in approved)
+                {
+                    await _emailService.NotifyRegularizationDecisionAsync(
+                        a.Id,
+                        "Approved",
+                        approver.EmployeeId,
+                        now,
+                        a.Status,
+                        Url.Action("MyAttendance", "Attendance"),                  // ADJUST
+                        Url.Action(nameof(AllRegularizations), "Attendance"),      // ADJUST
+                        templatePath);
+                }
+            }
 
             // =========================================
             // RESULT MESSAGE
@@ -3532,15 +3635,21 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             if (currentUser == null)
                 return Unauthorized();
 
+            var approver = await _context.Employee
+            .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
+            
+            if (approver == null)
+                return Unauthorized();
 
             int rejectedCount = 0;
             int skippedCount = 0;
-
 
             // =========================================
             // PROCESS SELECTED REQUESTS
             // =========================================
 
+            var rejectedIds = new List<int>();
+            DateTime now = DateTime.Now;
             foreach (var id in selectedIds)
             {
                 // =========================================
@@ -3582,7 +3691,7 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                 request.ApprovalRemarks =
                     "Attendance regularization rejected.";
-
+                rejectedIds.Add(request.RegularizationId);
                 rejectedCount++;
             }
 
@@ -3592,6 +3701,25 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             // =========================================
 
             await _context.SaveChangesAsync();
+
+            if (rejectedIds.Count > 0)
+            {
+                string templatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates", "RegularizationDecision.html");
+
+                foreach (var rid in rejectedIds)
+                {
+                    await _emailService.NotifyRegularizationDecisionAsync(
+                        rid,
+                        "Rejected",
+                        approver.EmployeeId,
+                        now,
+                        "",                                                         // not used for a rejection
+                        Url.Action("MyAttendance", "Attendance"),                  // ADJUST
+                        Url.Action(nameof(AllRegularizations), "Attendance"),      // ADJUST
+                        templatePath);
+                }
+            }
+
 
 
             // =========================================
@@ -4093,12 +4221,16 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             int approvedCount = 0;
             int skippedCount = 0;
+            var approver = await _context.Employee
+    .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
 
+            if (approver == null)
+                return Unauthorized();
 
             // =========================================
             // PROCESS SELECTED REQUESTS
             // =========================================
-
+            var approvedODIds = new List<int>();
             foreach (var id in selectedIds)
             {
                 // =========================================
@@ -4167,6 +4299,8 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                 await CreateODAttendance(request);
 
+                // Collect only successfully approved requests
+                approvedODIds.Add(request.ODRequestId);
 
                 approvedCount++;
             }
@@ -4178,6 +4312,26 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             await _context.SaveChangesAsync();
 
+            // =========================================
+            // SEND EMAILS FOR BULK APPROVED OD REQUESTS
+            // =========================================
+
+            if (approvedODIds.Count > 0)
+            {
+                string templatePath = Path.Combine(
+                    _environment.WebRootPath,
+                    "EmailTemplates",
+                    "ODDecision.html");
+
+                foreach (var odId in approvedODIds)
+                {
+                    await _emailService.NotifyODDecisionAsync(
+                        odId,
+                        approver.EmployeeId,
+                        "Approved",
+                        templatePath);
+                }
+            }
 
             // =========================================
             // RESULT MESSAGE
@@ -4246,7 +4400,9 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             // =========================================
             // PROCESS SELECTED REQUESTS
             // =========================================
+            DateTime now = DateTime.Now;
 
+            var approved = new List<(int Id, string Status)>();
             foreach (var id in selectedIds)
             {
                 // =========================================
@@ -4429,7 +4585,10 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
                 request.ApprovalRemarks =
                     "Attendance regularization approved by Reporting Manager.";
-
+                approved.Add((
+                request.RegularizationId,
+                baseAttendanceStatus
+                    ));
                 approvedCount++;
             }
 
@@ -4438,6 +4597,59 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
             // =========================================
 
             await _context.SaveChangesAsync();
+
+
+            // =========================================
+            // SEND APPROVAL EMAILS AFTER SAVE
+            // =========================================
+
+            if (approved.Count > 0)
+            {
+                string templatePath = Path.Combine(
+                    _environment.WebRootPath,
+                    "EmailTemplates",
+                    "RegularizationDecision.html");
+
+                // Employee attendance page
+                string employeePath = Url.Action(
+                    "MyAttendance",
+                    "Attendance");
+
+                // Manager regularization page
+                string managerPath = Url.Action(
+                    nameof(RegularizationRequests),
+                    "Attendance");
+
+                // HR regularization page
+                string hrPath = Url.Action(
+                    nameof(AllRegularizations),
+                    "Attendance");
+
+                foreach (var a in approved)
+                {
+                    try
+                    {
+                        await _emailService.NotifyRegularizationDecisionAsync(
+                            a.Id,
+                            "Approved",
+                            employee.EmployeeId,
+                            now,
+                            a.Status,
+                            employeePath,
+                            managerPath,
+                            templatePath,
+                            hrPath: hrPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        //_logger.LogError(
+                        //    ex,
+                        //    "Failed to send manager bulk approval email for Regularization ID {Id}",
+                        //    a.Id);
+                    }
+                }
+            }
+
 
             // =========================================
             // RESULT MESSAGE
@@ -4490,10 +4702,15 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
 
             if (employee == null)
                 return Unauthorized();
+            var approver = await _context.Employee
+            .FirstOrDefaultAsync(x => x.ApplicationUserId == currentUser.Id);
+
+            if (approver == null)
+                return Unauthorized();
 
             int approvedCount = 0;
             int skippedCount = 0;
-
+            var approvedODIds = new List<int>();
             foreach (var id in selectedIds)
             {
                 var request =
@@ -4539,11 +4756,28 @@ namespace TSSC.Unified.Areas.HRMS.Controllers
                 // =====================================================
 
                 await CreateODAttendance(request);
-
+                approvedODIds.Add(request.ODRequestId);
                 approvedCount++;
             }
 
             await _context.SaveChangesAsync();
+
+            if (approvedODIds.Count > 0)
+            {
+                string templatePath = Path.Combine(
+                    _environment.WebRootPath,
+                    "EmailTemplates",
+                    "ODDecision.html");
+
+                foreach (var odId in approvedODIds)
+                {
+                    await _emailService.NotifyODDecisionAsync(
+                        odId,
+                        approver.EmployeeId,
+                        "Approved",
+                        templatePath);
+                }
+            }
 
             // =====================================================
             // RESULT MESSAGE

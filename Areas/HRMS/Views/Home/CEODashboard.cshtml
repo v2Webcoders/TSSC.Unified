@@ -1,52 +1,26 @@
 ﻿@using QUIZAPP.ViewModel
+@using System.Globalization
 @model TSSC.Unified.ViewModel.CEODashboardVM
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
 	Layout = "~/Areas/HRMS/Views/Shared/_Layout.cshtml";
 	ViewData["Title"] = "CEO DASHBOARD";
-    var workforce = Model.Workforce;
-    var total = workforce.TotalEmployees;
+    // var workforce = Model.Workforce;
+    // var total = workforce.TotalEmployees;
 
-    decimal GetPercentage(int value) =>
-        total > 0 ? (decimal)value / total * 100 : 0;
+    // decimal GetPercentage(int value) =>
+    //     total > 0 ? (decimal)value / total * 100 : 0;
 
-    var onTimeWidth = GetPercentage(workforce.OnTime);
-    var delayedWidth = GetPercentage(workforce.Delayed);
-    var onDutyWidth = GetPercentage(workforce.OnDuty);
-    var onLeaveWidth = GetPercentage(workforce.OnLeave);
-    var absentWidth = GetPercentage(workforce.Absent);
+    // var onTimeWidth = GetPercentage(workforce.OnTime);
+    // var delayedWidth = GetPercentage(workforce.Delayed);
+    // var onDutyWidth = GetPercentage(workforce.OnDuty);
+    // var onLeaveWidth = GetPercentage(workforce.OnLeave);
+    // var absentWidth = GetPercentage(workforce.Absent);
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/assets/css/base.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/assets/css/dashboard.css" asp-append-version="true" />
-    <style>
-        section.kpi-off .kcards,
-        section.kpi-off .kcards * {
-            filter: grayscale(1) !important;
-        }
-
-        section.kpi-off .kcards {
-            opacity: .55 !important;
-            pointer-events: none !important;
-            user-select: none !important;
-        }
-
-        section.kpi-off .kc {
-            border-top-color: #d1d5db !important;
-        }
-
-        section.kpi-off select[data-fysel] {
-            opacity: .6 !important;
-            cursor: not-allowed !important;
-            pointer-events: none !important;
-        }
-
-        section.kpi-off .preview-tag {
-            background: #e5e7eb !important;
-            color: #6b7280 !important;
-        }
-    </style>
 }
 
 
@@ -168,7 +142,7 @@
                                                 </div>
                                             </section>
 
-                                        <section>
+                                        @* <section>
                                             <div class="sh">
                                                 <div>
                                                     <h2>① HR · Workforce</h2>
@@ -293,8 +267,112 @@
                                                 </div>
 
                                             </div>
+                                        </section> *@
+                                        @{
+                                            var workforce = Model.Workforce;
+                                            double wfTotal = workforce.TotalEmployees > 0 ? workforce.TotalEmployees : 1;
+
+                                            double onTimeWidth = workforce.OnTime / wfTotal * 100;
+                                            double delayedWidth = workforce.Delayed / wfTotal * 100;
+                                            double onDutyWidth = workforce.OnDuty / wfTotal * 100;
+                                            double onLeaveWidth = workforce.OnLeave / wfTotal * 100;
+                                            double absentWidth = workforce.Absent / wfTotal * 100;
+                                            var inv = System.Globalization.CultureInfo.InvariantCulture;
+                                        }
+
+                                        <section>
+                                            <div class="sh">
+                                                <div>
+                                                    <h2>① HR · Workforce</h2>
+                                                    <p>Headcount, leave and notices for <b>@DateTime.Today.ToString("ddd, d MMM yyyy")</b></p>
+                                                </div>
+                                                <div class="shr"></div>
+                                            </div>
+
+                                            <div class="wsum">
+                                                <div class="wgrid">
+
+                                                    <!-- TOTAL -->
+                                                    <div class="wc w-total wc-click" data-cat="total" role="button" tabindex="0">
+                                                        <span class="l">Total employees</span>
+                                                        <span class="n">@workforce.TotalEmployees</span>
+                                                    </div>
+
+                                                    <!-- PRESENT -->
+                                                    <div class="wc w-pres wc-click" data-cat="present" role="button" tabindex="0">
+                                                        <span class="l"><i class="dot" style="background:var(--green)"></i> Present</span>
+                                                        <span class="n">@workforce.Present</span>
+                                                        <span class="s"><b>@workforce.PresentPercentage.ToString("0")</b>% of employees</span>
+                                                        <span class="subs">
+                                                            <span class="sc sc-ok wc-click" data-cat="ontime" role="button" tabindex="0">
+                                                                <b>@workforce.OnTime</b> On time
+                                                            </span>
+                                                            <span class="sc sc-late wc-click" data-cat="late" role="button" tabindex="0">
+                                                                <b>@workforce.Delayed</b> Late
+                                                            </span>
+                                                        </span>
+                                                    </div>
+
+                                                    <!-- ON DUTY -->
+                                                    <div class="wc wc-click" data-cat="od" role="button" tabindex="0">
+                                                        <span class="l"><i class="dot" style="background:var(--royal)"></i> On duty (OD)</span>
+                                                        <span class="n">@workforce.OnDuty</span>
+                                                        <span class="s">Working outside office</span>
+                                                    </div>
+
+                                                    <!-- ON LEAVE -->
+                                                    <div class="wc w-leave wc-click" data-cat="leave" role="button" tabindex="0">
+                                                        <span class="l"><i class="dot" style="background:var(--purple)"></i> On leave</span>
+                                                        <span class="n">@workforce.OnLeave</span>
+                                                        <span class="s">Approved leave today</span>
+                                                    </div>
+
+                                                    <!-- ABSENT -->
+                                                    <div class="wc wc-click" data-cat="absent" role="button" tabindex="0">
+                                                        <span class="l"><i class="dot" style="background:var(--red)"></i> Absent</span>
+                                                        <span class="n">@workforce.Absent</span>
+                                                        <span class="s">Not marked</span>
+                                                    </div>
+
+                                                </div>
+
+                                                <!-- ATTENDANCE SPLIT BAR -->
+                                                <div class="wbar" aria-label="Attendance split">
+                                                    <i class="s1" title="On time: @workforce.OnTime" style="width:@onTimeWidth.ToString("0.##", inv)%"></i>
+                                                    <i class="s2" title="Late: @workforce.Delayed" style="width:@delayedWidth.ToString("0.##", inv)%"></i>
+                                                    <i class="s3" title="On duty: @workforce.OnDuty" style="width:@onDutyWidth.ToString("0.##", inv)%"></i>
+                                                    <i class="s5" title="On leave: @workforce.OnLeave" style="width:@onLeaveWidth.ToString("0.##", inv)%"></i>
+                                                    <i class="s4" title="Absent: @workforce.Absent" style="width:@absentWidth.ToString("0.##", inv)%"></i>
+                                                </div>
+
+                                                <div class="segnote">Present = on time + late. Working today (present + official duty).</div>
+                                            </div>
                                         </section>
 
+                                        <!-- ============ WORKFORCE MODAL (shared by all cards) ============ -->
+                                        <div id="wfModal" class="wf-overlay" hidden>
+                                            <div class="wf-dialog" role="dialog" aria-modal="true" aria-labelledby="wfTitle">
+                                                <div class="wf-head">
+                                                    <h3 id="wfTitle">Employees</h3>
+                                                    <button type="button" class="wf-close" aria-label="Close">&times;</button>
+                                                </div>
+
+                                                <div class="wf-chips">
+                                                    <button type="button" data-cat="total" class="chip">All</button>
+                                                    <button type="button" data-cat="present" class="chip c-pres">Present</button>
+                                                    <button type="button" data-cat="ontime" class="chip c-ok">On time</button>
+                                                    <button type="button" data-cat="late" class="chip c-late">Late</button>
+                                                    <button type="button" data-cat="od" class="chip c-od">On duty</button>
+                                                    <button type="button" data-cat="leave" class="chip c-leave">On leave</button>
+                                                    <button type="button" data-cat="absent" class="chip c-abs">Absent</button>
+                                                </div>
+
+                                                <input id="wfSearch" class="wf-search" placeholder="Search name / department…" />
+                                                <div id="wfBody" class="wf-body"></div>
+                                            </div>
+                                        </div>
+
+                 
                                             
                                     </div>
                                     <section>
@@ -715,16 +793,21 @@
                                         </div>
                                     </section>
                                         <section class="kpi-off">
+                                        @{
+                                            var currentFY = Model.FinancialYears.First();   // first item is the current FY
+                                        }
+
                                         <div class="sh">
                                             <div>
-                                                <h2>③ TSSC KPIs <span class="preview-tag">Preview · sample figures</span></h2>
-                                                <p>Key performance indicators for FY 2026-27 (Current)</p>
+                                                <h2>③ TSSC KPIs</h2>
+                                                <p>Key performance indicators for FY @Model.KpiFinancialYear@(Model.KpiFinancialYear == currentFY ? " (Current)" : "")</p>
                                             </div>
-                                            <div class="shr">
-                                                <select class="ctl" aria-label="Financial year" data-fysel>
-                                                    <option value="2026-27" selected>FY 2026-27 (Current)</option>
-                                                    <option value="2025-26">FY 2025-26</option>
-                                                    <option value="2024-25">FY 2024-25</option>
+                                            <div class="shr" style="pointer-events:auto">
+                                                <select class="ctl" id="kpiFySelect" aria-label="Financial year" style="pointer-events:auto">
+                                                    @foreach (var fy in Model.FinancialYears)
+                                                    {
+                                                        <option value="@fy" selected="@(fy == Model.KpiFinancialYear)">FY @fy@(fy == currentFY ? " (Current)" : "")</option>
+                                                    }
                                                 </select>
                                             </div>
                                         </div>
@@ -734,132 +817,81 @@
                                                 KPI
                                             </button><button class="tab" data-tab="qual">Qualitative KPI</button>
                                         </div>
-                                            <div data-pane="fin">
-                                                <div class="kcards">
-                                                    <div class="kc c-orange">
+                                        @using System.Globalization
+                                        @{
+                                            var inr = CultureInfo.GetCultureInfo("en-IN");
+                                            var kpiColors = new[] { "c-orange", "c-green", "c-blue", "c-purple" };
+                                            string Fmt(decimal? v) => v.HasValue ? v.Value.ToString("#,##0.##", inr) : "NA";
+                                        }
+
+                                        <div data-pane="fin">
+                                            <div class="kcards">
+
+                                                @* ---------- Dynamic cards (from KPI Master) ---------- *@
+                                                @for (int i = 0; i < Model.FinancialKpis.Count; i++)
+                                                {
+                                                    var k = Model.FinancialKpis[i];
+                                                    <div class="kc @kpiColors[i % kpiColors.Length]">
                                                         <span class="kc-t">
-                                                            <span class="kc-n">
-                                                                Gross Revenue
-                                                                (₹ Cr)
-                                                            </span>
-                                                        </span><span class="kc-v">NA</span><span class="kc-f">
-                                                            <span>Received <b>NA</b></span><span>
-                                                                Pending
-                                                                <b>NA</b>
-                                                            </span>
+                                                            <span class="kc-n">@k.Name (₹ INR)</span>
+                                                            @if (k.FromDate.HasValue && k.ToDate.HasValue)
+                                                            {
+                                                                <span class="kc-d">@k.FromDate.Value.ToString("dd-MM-yyyy") to @k.ToDate.Value.ToString("dd-MM-yyyy")</span>
+                                                            }
+                                                        </span>
+                                                        <span class="kc-v">@Fmt(k.Total)</span>
+                                                        <span class="kc-f">
+                                                            <span>Received <b>@Fmt(k.Received)</b></span>
+                                                            <span>Pending <b>@Fmt(k.Pending)</b></span>
                                                         </span>
                                                     </div>
-                                                    <div class="kc c-green">
-                                                        <span class="kc-t">
-                                                            <span class="kc-n">
-                                                                Surplus (₹
-                                                                Cr)
-                                                            </span>
-                                                        </span><span class="kc-v">NA</span><span class="kc-f">
-                                                            <span>Received <b>NA</b></span><span>
-                                                                Pending
-                                                                <b>NA</b>
-                                                            </span>
-                                                        </span>
-                                                    </div>
-                                                    <div class="kc c-blue">
-                                                        <span class="kc-t">
-                                                            <span class="kc-n">
-                                                                Govt Business
-                                                                (₹ Cr)
-                                                            </span>
-                                                        </span><span class="kc-v">NA</span><span class="kc-f">
-                                                            <span>Received <b>NA</b></span><span>
-                                                                Pending
-                                                                <b>NA</b>
-                                                            </span>
-                                                        </span>
-                                                    </div>
-                                                    <div class="kc c-purple">
-                                                        <span class="kc-t">
-                                                            <span class="kc-n">
-                                                                Non Govt
-                                                                Business (₹ Cr)
-                                                            </span>
-                                                        </span><span class="kc-v">NA</span><span class="kc-f">
-                                                            <span>Received <b>NA</b></span><span>
-                                                                Pending
-                                                                <b>NA</b>
-                                                            </span>
-                                                        </span>
-                                                    </div>
-                                                    <div class="kc c-teal">
-                                                        <span class="kc-t">
-                                                            <span class="kc-n">Students</span>
-                                                        </span><span class="kc-v">NA</span><span class="kc-f">
-                                                            <span>
-                                                                Certified
-                                                                <b>NA</b>
-                                                            </span><span>
-                                                                Under training
-                                                                <b>NA</b>
-                                                            </span>
-                                                        </span>
-                                                    </div>
-                                                    <div class="kc c-amber">
-                                                        <span class="kc-t">
-                                                            <span class="kc-n">Placement</span>
-                                                        </span><span class="kc-v">NA</span>
-                                                    </div>
+                                                }
+
+                                                @* ---------- Not dynamic yet: greyed out ---------- *@
+                                                <div class="kc c-teal kc-off" title="Not connected yet" aria-disabled="true">
+                                                    <span class="kc-t"><span class="kc-n">Students</span></span>
+                                                    <span class="kc-v">NA</span>
+                                                    <span class="kc-f">
+                                                        <span>Certified <b>NA</b></span>
+                                                        <span>Under training <b>NA</b></span>
+                                                    </span>
+                                                </div>
+                                                <div class="kc c-amber kc-off" title="Not connected yet" aria-disabled="true">
+                                                    <span class="kc-t"><span class="kc-n">Placement</span></span>
+                                                    <span class="kc-v">NA</span>
                                                 </div>
                                             </div>
-                                            <div data-pane="qual" hidden>
-                                                <div class="kcards">
-                                                    <div class="kc c-orange">
-                                                        <span class="kc-t">
-                                                            <span class="kc-n">
-                                                                Creation of
-                                                                New Courses and Micro Credentials
-                                                            </span>
-                                                        </span><span class="kc-v">NA</span>
-                                                    </div>
-                                                    <div class="kc c-green">
-                                                        <span class="kc-t">
-                                                            <span class="kc-n">
-                                                                Certified
-                                                                Trainers
-                                                            </span>
-                                                        </span><span class="kc-v">NA</span>
-                                                    </div>
-                                                    <div class="kc c-blue">
-                                                        <span class="kc-t">
-                                                            <span class="kc-n">
-                                                                Certified
-                                                                Assessors
-                                                            </span>
-                                                        </span><span class="kc-v">NA</span>
-                                                    </div>
-                                                    <div class="kc c-purple">
-                                                        <span class="kc-t">
-                                                            <span class="kc-n">
-                                                                Digital
-                                                                Content
-                                                            </span>
-                                                        </span><span class="kc-v">NA</span>
-                                                    </div>
-                                                    <div class="kc c-teal">
-                                                        <span class="kc-t">
-                                                            <span class="kc-n">
-                                                                E-Book and
-                                                                Regional Book
-                                                            </span>
-                                                        </span><span class="kc-v">NA</span>
-                                                    </div>
-                                                    <div class="kc c-amber">
-                                                        <span class="kc-t">
-                                                            <span class="kc-n">
-                                                                International
-                                                                Engagement with Placement
-                                                            </span>
-                                                        </span><span class="kc-v">NA</span>
-                                                    </div>
+                                        </div>
+
+                                        <div data-pane="qual" hidden>
+                                            <div class="kcards">
+                                                <div class="kc c-orange kc-off" title="Not connected yet" aria-disabled="true">
+                                                    <span class="kc-t"><span class="kc-n">Creation of New Courses and Micro Credentials</span></span>
+                                                    <span class="kc-v">NA</span>
+                                                </div>
+                                                <div class="kc c-green kc-off" title="Not connected yet" aria-disabled="true">
+                                                    <span class="kc-t"><span class="kc-n">Certified Trainers</span></span>
+                                                    <span class="kc-v">NA</span>
+                                                </div>
+                                                <div class="kc c-blue kc-off" title="Not connected yet" aria-disabled="true">
+                                                    <span class="kc-t"><span class="kc-n">Certified Assessors</span></span>
+                                                    <span class="kc-v">NA</span>
+                                                </div>
+                                                <div class="kc c-purple kc-off" title="Not connected yet" aria-disabled="true">
+                                                    <span class="kc-t"><span class="kc-n">Digital Content</span></span>
+                                                    <span class="kc-v">NA</span>
+                                                </div>
+                                                <div class="kc c-teal kc-off" title="Not connected yet" aria-disabled="true">
+                                                    <span class="kc-t"><span class="kc-n">E-Book and Regional Book</span></span>
+                                                    <span class="kc-v">NA</span>
+                                                </div>
+                                                <div class="kc c-amber kc-off" title="Not connected yet" aria-disabled="true">
+                                                    <span class="kc-t"><span class="kc-n">International Engagement with Placement</span></span>
+                                                    <span class="kc-v">NA</span>
                                                 </div>
                                             </div>
+                                        </div>
+                                            
                                     </section>
                                         <section>
                                             <div class="sh">
@@ -3806,6 +3838,65 @@
 
 @section Scripts{
     <script src="~/assets/js/js/app.js"></script>
+    <script>
+        (function () {
+            const modal  = document.getElementById('wfModal');
+            const body   = document.getElementById('wfBody');
+            const title  = document.getElementById('wfTitle');
+            const search = document.getElementById('wfSearch');
+            const titles = {
+                total: 'All employees', present: 'Present', ontime: 'Present – On time',
+                late: 'Present – Late', od: 'On duty (OD)', leave: 'On leave', absent: 'Absent'
+            };
+
+            async function load(cat) {
+                title.textContent = titles[cat] || 'Employees';
+                search.value = '';
+                body.innerHTML = '<p style="padding:20px;color:#667085">Loading…</p>';
+                modal.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
+
+                try {
+                    // CHANGE "Dashboard" to the name of your controller (without "Controller")
+                    const r = await fetch('@Url.Action("WorkforceList", "Home")?category=' + encodeURIComponent(cat));
+                    if (!r.ok) throw new Error(r.status);
+                    body.innerHTML = await r.text();
+                } catch (e) {
+                    body.innerHTML = '<p style="padding:20px;color:#b42318">Could not load employees.</p>';
+                }
+            }
+
+            function open(cat) { modal.hidden = false; document.body.style.overflow = 'hidden'; load(cat); }
+            function close()   { modal.hidden = true;  document.body.style.overflow = ''; }
+
+            document.querySelectorAll('.wc-click').forEach(el => {
+                const handler = e => { e.stopPropagation(); open(el.dataset.cat); };
+                el.addEventListener('click', handler);
+                el.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(e); }
+                });
+            });
+
+            modal.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => load(c.dataset.cat)));
+            modal.querySelector('.wf-close').addEventListener('click', close);
+            modal.addEventListener('click', e => { if (e.target === modal) close(); });
+            document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) close(); });
+
+            search.addEventListener('input', () => {
+                const q = search.value.toLowerCase();
+                body.querySelectorAll('tbody tr').forEach(tr => tr.hidden = !tr.textContent.toLowerCase().includes(q));
+            });
+        })();
+    </script>
+    <script>
+        // Reload with the chosen KPI year; other query values (approvals year) are kept.
+        document.addEventListener('change', function (e) {
+            if (e.target && e.target.id === 'kpiFySelect') {
+                var u = new URL(window.location.href);
+                u.searchParams.set('kpiFinancialYear', e.target.value);
+                window.location.assign(u.toString());
+            }
+        }, true);
+    </script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 

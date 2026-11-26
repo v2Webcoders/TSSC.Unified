@@ -1,0 +1,50 @@
+﻿@using TSSC.Unified.ViewModel
+@model List<WorkforceEmployeeVm>
+
+@functions {
+    string Css(AttStatus s) => s switch
+    {
+        AttStatus.OnTime => "st-ontime",
+        AttStatus.Late => "st-late",
+        AttStatus.OnDuty => "st-od",
+        AttStatus.OnLeave => "st-leave",
+        AttStatus.OffDay => "st-off",
+        _ => "st-absent"
+    };
+
+    string Label(AttStatus s) => s switch
+    {
+        AttStatus.OnTime => "On time",
+        AttStatus.Late => "Late",
+        AttStatus.OnDuty => "On duty",
+        AttStatus.OnLeave => "On leave",
+        AttStatus.OffDay => "Off day",
+        _ => "Absent"
+    };
+}
+
+@if (!Model.Any())
+{
+    <p style="padding:20px;color:#667085">No employees in this category today.</p>
+}
+else
+{
+    <table class="wf-table">
+        <thead>
+            <tr><th>Code</th><th>Name</th><th>Department</th><th>Status</th><th>In</th><th>Remark</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var e in Model)
+            {
+                <tr class="wf-row @Css(e.Status)">
+                    <td>@e.Code</td>
+                    <td><b>@e.Name</b></td>
+                    <td>@e.Department</td>
+                    <td><span class="badge @Css(e.Status)">@Label(e.Status)</span></td>
+                    <td>@e.InTime</td>
+                    <td>@e.Remark</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
