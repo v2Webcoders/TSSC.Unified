@@ -73,11 +73,152 @@ namespace QUIZAPP.Areas.HRMS.Controllers
         }
 
         [Authorize(Roles = "StandardsTeam")]
-        public IActionResult StandardsHeadDashboard()
+        public async Task<IActionResult> StandardsHeadDashboard(string? financialYear)
         {
-            return View();
-        }
+            var applicationUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+            if (string.IsNullOrEmpty(applicationUserId))
+                return RedirectToAction("Login", "Account");
+
+            var employee = await _db.Employee
+                .AsNoTracking()
+                .Where(x => x.ApplicationUserId == applicationUserId)
+                .Select(x => new
+                {
+                    x.EmployeeId,
+                    x.FirstName,
+                    x.EmployeeCode,
+                    DesignationName = x.Designation.DesignationName
+                })
+                .FirstOrDefaultAsync();
+
+            if (employee == null)
+                return RedirectToAction("Login", "Account");
+
+            // Only the head may open this page
+            if (!string.Equals(employee.DesignationName?.Trim(),
+                    "GM - Head Standards & Technology",
+                    StringComparison.OrdinalIgnoreCase))
+                return RedirectToAction(nameof(EmployeeDashboard));
+
+            var today = DateTime.Today;
+            var tomorrow = today.AddDays(1);
+
+            var model = new StandardsHeadDashboardVM
+            {
+                EmployeeName = employee.FirstName,
+                EmployeeCode = employee.EmployeeCode,
+                Designation = employee.DesignationName ?? ""
+            };
+
+            // =====================================================
+            // TODAY'S ATTENDANCE (for the logged-in employee)
+            // =====================================================
+            var attendance = await _db.EmployeeAttendance
+                .AsNoTracking()
+                .Where(x => x.EmployeeId == employee.EmployeeId
+                         && x.AttendanceDate >= today
+                         && x.AttendanceDate < tomorrow)
+                .OrderBy(x => x.InTime)
+                .ToListAsync();
+
+            var firstIn = attendance.Where(x => x.InTime.HasValue).Min(x => x.InTime);
+            var lastOut = attendance.Where(x => x.OutTime.HasValue).Max(x => x.OutTime);
+
+            model.IsMarked = firstIn.HasValue;
+            model.InTime = firstIn;
+            model.OutTime = lastOut;
+
+            if (firstIn.HasValue)
+                model.Worked = (lastOut ?? DateTime.Now) - firstIn.Value;
+
+            // =====================================================
+            // TODAY'S BIRTHDAYS
+            // =====================================================
+            model.TodaysBirthdays = await _db.Employee
+                .AsNoTracking()
+                .Where(x => x.IsActive
+                         && x.DOB.HasValue
+                         && x.DOB.Value.Month == today.Month
+                         && x.DOB.Value.Day == today.Day)
+                .Select(x => new CEOBirthdayVM
+                {
+                    EmployeeId = x.EmployeeId,
+                    EmployeeName = (x.FirstName + " " + (x.LastName ?? "")).Trim(),
+                    Department = x.Department.DepartmentName
+                })
+                .ToListAsync();
+
+            // =====================================================
+            // MY TEAM - WORKFORCE (direct reports only)
+            // =====================================================
+            var workforce = await GetTeamWorkforceAsync(employee.EmployeeId, today);
+
+            model.Team.Total = workforce.Count;
+            model.Team.OnTime = workforce.Count(x => x.Status == AttStatus.OnTime);
+            model.Team.Delayed = workforce.Count(x => x.Status == AttStatus.Late);
+            model.Team.OnDuty = workforce.Count(x => x.Status == AttStatus.OnDuty);
+            model.Team.OnLeave = workforce.Count(x => x.Status == AttStatus.OnLeave);
+            model.Team.Absent = workforce.Count(x => x.Status == AttStatus.Absent);
+
+            // =====================================================
+            // APPROVALS PENDING (Standards Head stage)
+            // =====================================================
+            var fyStart = today.Month >= 4 ? today.Year : today.Year - 1;
+            var currentFY = $"{fyStart}-{(fyStart + 1) % 100:00}";
+
+            model.FinancialYears = new List<string>
+{
+    currentFY,
+    $"{fyStart - 1}-{fyStart % 100:00}",
+    $"{fyStart - 2}-{(fyStart - 1) % 100:00}"
+};
+
+            model.FinancialYear = (!string.IsNullOrWhiteSpace(financialYear) &&
+                                   model.FinancialYears.Contains(financialYear))
+                ? financialYear
+                : currentFY;
+
+            var pending = await _db.StandardsHeadApprovals                      // <-- YOUR SOURCE: replace with the table/view of requests
+                .AsNoTracking()                                         //     waiting at the Standards Head stage
+                .Where(x => x.FinancialYear == model.FinancialYear)
+                // .Where(x => x.CurrentApproverEmployeeId == employee.EmployeeId)   // add your stage / approver filter
+                .ToListAsync();
+
+            model.ApprovalSummary.PendingLeave = pending.Count(x => x.RequestType == "Leave");
+            model.ApprovalSummary.AwaitingApprovals = pending.Count(x => x.RequestType != "Leave");
+            model.ApprovalSummary.HighPriority = pending.Count(x => x.Priority == "High");
+            model.ApprovalSummary.Overdue = pending.Count(x => x.DueDate.HasValue && x.DueDate.Value.Date < today);
+
+            model.PendingApprovals = pending
+                .OrderByDescending(x => x.DueDate.HasValue && x.DueDate.Value.Date < today)
+                .ThenBy(x => x.Priority == "High" ? 0 : x.Priority == "Medium" ? 1 : 2)
+                .ThenBy(x => x.DueDate ?? DateTime.MaxValue)
+                .Select(x => new CEOApprovalRequestVM
+                {
+                    Id = x.ApprovalId,
+                    RequestId = x.RequestId,
+                    RequestTitle = x.RequestTitle,
+                    Department = x.Department,
+                    SubmittedBy = x.SubmittedBy,
+                    SubmittedDate = x.SubmittedDate,
+                    DueDate = x.DueDate,
+                    Priority = x.Priority,
+                    Status = x.Status,
+                    RequestType = x.RequestType,
+                    SourceTable = x.SourceTable
+                })
+                .ToList();
+
+            model.ApprovalDepartments = model.PendingApprovals
+                .Select(x => x.Department)
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList();
+
+            return View(model);
+        }
         //        [Authorize(Roles = "CEO")]
         //        public async Task<IActionResult> CEODashboard(string? financialYear)
         //        {
@@ -1549,6 +1690,111 @@ namespace QUIZAPP.Areas.HRMS.Controllers
 
             return list;
         }
+        private async Task<List<WorkforceEmployeeVm>> GetTeamWorkforceAsync(
+    int managerEmployeeId,
+    DateTime today)
+        {
+            var tomorrow = today.AddDays(1);
+
+            // Team = active direct reports of this manager (not including him)
+            var employees = await _db.Employee
+                .AsNoTracking()
+                .Where(x => x.IsActive
+                         && x.ReportingManagerId == managerEmployeeId
+                         && (x.RelievingDate == null || x.RelievingDate >= today))
+                .Select(x => new
+                {
+                    x.EmployeeId,
+                    x.EmployeeCode,
+                    Name = (x.FirstName + " " + (x.LastName ?? "")).Trim(),
+                    Dept = x.Department.DepartmentName
+                })
+                .ToListAsync();
+
+            if (employees.Count == 0)
+                return new List<WorkforceEmployeeVm>();
+
+            var teamIds = employees.Select(e => e.EmployeeId).ToList();
+
+            var attendance = await _db.EmployeeAttendance
+                .AsNoTracking()
+                .Where(x => x.AttendanceDate >= today
+                         && x.AttendanceDate < tomorrow
+                         && teamIds.Contains(x.EmployeeId))
+                .Select(x => new { x.EmployeeId, x.InTime, x.AttendanceSource })
+                .ToListAsync();
+
+            var leaveIds = (await _db.LeaveRequest
+                .AsNoTracking()
+                .Where(x => x.Status == "Approved"
+                         && x.FromDate <= today
+                         && x.ToDate >= today
+                         && teamIds.Contains(x.EmployeeId))
+                .Select(x => x.EmployeeId)
+                .Distinct()
+                .ToListAsync()).ToHashSet();
+
+            var odIds = attendance
+                .Where(x => x.AttendanceSource == "OD")
+                .Select(x => x.EmployeeId)
+                .ToHashSet();
+
+            var firstIn = attendance
+                .Where(x => x.InTime.HasValue && x.AttendanceSource != "OD")
+                .GroupBy(x => x.EmployeeId)
+                .ToDictionary(g => g.Key, g => g.Min(x => x.InTime!.Value));
+
+            var isOffDay = today.DayOfWeek == DayOfWeek.Sunday ||
+                await _db.Holiday.AnyAsync(x =>
+                    x.HolidayDate >= today && x.HolidayDate < tomorrow && x.Status == "Published");
+
+            var list = new List<WorkforceEmployeeVm>(employees.Count);
+
+            foreach (var e in employees)
+            {
+                var vm = new WorkforceEmployeeVm
+                {
+                    EmployeeId = e.EmployeeId,
+                    Code = e.EmployeeCode,
+                    Name = e.Name,
+                    Department = e.Dept
+                };
+
+                if (leaveIds.Contains(e.EmployeeId))                        // leave wins
+                {
+                    vm.Status = AttStatus.OnLeave;
+                    vm.Remark = "Approved leave";
+                }
+                else if (odIds.Contains(e.EmployeeId))                      // then OD
+                {
+                    vm.Status = AttStatus.OnDuty;
+                    vm.Remark = "Working outside office";
+                }
+                else if (firstIn.TryGetValue(e.EmployeeId, out var inTime)) // then present
+                {
+                    vm.InTime = inTime.ToString("hh:mm tt");
+                    if (inTime.TimeOfDay < LateCutOff)
+                    {
+                        vm.Status = AttStatus.OnTime;
+                    }
+                    else
+                    {
+                        vm.Status = AttStatus.Late;
+                        vm.Remark = $"{(int)(inTime.TimeOfDay - LateCutOff).TotalMinutes} min late";
+                    }
+                }
+                else                                                        // nothing marked
+                {
+                    vm.Status = isOffDay ? AttStatus.OffDay : AttStatus.Absent;
+                    vm.Remark = isOffDay ? "Sunday / holiday" : "Not marked";
+                }
+
+                list.Add(vm);
+            }
+
+            return list;
+        }
+
 
         [Authorize(Roles = "CEO")]
         [HttpGet]
@@ -1570,7 +1816,35 @@ namespace QUIZAPP.Areas.HRMS.Controllers
             return PartialView("_WorkforceList",
                 list.OrderBy(e => e.Status).ThenBy(e => e.Name).ToList());
         }
-    }
+        [Authorize(Roles = "StandardsTeam")]
+        public async Task<IActionResult> TeamWorkforceList(string category = "total")
+        {
+            var applicationUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+            var managerId = await _db.Employee
+                .AsNoTracking()
+                .Where(x => x.ApplicationUserId == applicationUserId)
+                .Select(x => (int?)x.EmployeeId)
+                .FirstOrDefaultAsync();
+
+            if (managerId == null)
+                return Forbid();
+
+            var list = await GetTeamWorkforceAsync(managerId.Value, DateTime.Today);
+
+            list = category switch
+            {
+                "present" => list.Where(x => x.Status == AttStatus.OnTime || x.Status == AttStatus.Late).ToList(),
+                "ontime" => list.Where(x => x.Status == AttStatus.OnTime).ToList(),
+                "late" => list.Where(x => x.Status == AttStatus.Late).ToList(),
+                "od" => list.Where(x => x.Status == AttStatus.OnDuty).ToList(),
+                "leave" => list.Where(x => x.Status == AttStatus.OnLeave).ToList(),
+                "absent" => list.Where(x => x.Status == AttStatus.Absent).ToList(),
+                _ => list
+            };
+
+            return PartialView("_WorkforceList", list.OrderBy(x => x.Name).ToList());
+        }
+    }
 }
 

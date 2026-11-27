@@ -101,7 +101,7 @@
 .tc-strip-val{font-size:28px;white-space:nowrap;font-weight:800;letter-spacing:-.03em;line-height:1.1}
 .tc-strip-val.tc-empty{color:rgba(255,255,255,.35)}
 .tc-hero-foot .tc-btn{flex:0 0 auto;min-width:220px;height:auto;min-height:56px;padding:0 26px;font-size:15px}
-.tc-hero h1{font-size:34px;font-weight:800;letter-spacing:-.035em;line-height:1.1}
+.tc-hero h1{font-size:34px;font-weight:800;letter-spacing:-.035em;line-height:1.1;color:#fff !important;}
 .tc-hero-date{font-size:14px;color:#B8C5DE;font-weight:500;margin-top:8px}
 .tc-bday{padding:24px;display:flex;flex-direction:column;gap:18px}
 .tc-bday-head{display:flex;align-items:center;gap:12px}
@@ -537,4 +537,233 @@
 .tc-lps{flex:0 0 100%;display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .tc-lp{display:inline-flex;align-items:center;gap:8px;padding:5px 6px 5px 12px;border:1px solid var(--tc-line);border-radius:999px;background:#FAFBFE;color:#33415C;font-size:12.5px;font-weight:600;line-height:1;text-decoration:none;transition:border-color .15s,background .15s,color .15s}
 .tc-lp b{display:inline-grid;place-items:center;min-width:24px;height:22px;padding:0 6px;border-radius:999px;background:#E8EEFC;color:var(--tc-navy);font-size:11.5px;font-weight:800}
+
+
 .tc-lp:hover,.tc-lp:focus-visible{border-color:var(--tc-navy);background:#fff;color:var(--tc-navy);outline:none}
+
+
+/* ===== Workforce modal (25-11-26) ===== */
+:root {
+    --wf-green: #16a34a;
+    --wf-amber: #f59e0b;
+    --wf-blue: #2563eb;
+    --wf-purple: #7c3aed;
+    --wf-red: #dc2626;
+    --wf-grey: #98a2b3;
+}
+
+/* clickable cards */
+.wc-click {
+    cursor: pointer;
+    transition: transform .12s, box-shadow .12s
+}
+
+    .wc-click:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 14px rgba(0,0,0,.12)
+    }
+
+    .wc-click:focus-visible {
+        outline: 2px solid var(--wf-blue);
+        outline-offset: 2px
+    }
+
+.sc.wc-click:hover {
+    transform: none;
+    box-shadow: none;
+    filter: brightness(.95)
+}
+
+/* modal */
+.wf-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050
+}
+
+    .wf-overlay[hidden] {
+        display: none
+    }
+
+.wf-dialog {
+    background: #fff;
+    color: #344054;
+    width: min(820px,94vw);
+    max-height: 86vh;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden
+}
+
+    .wf-dialog .wf-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 18px;
+        border-bottom: 1px solid #eee
+    }
+
+        .wf-dialog .wf-head h3 {
+            margin: 0;
+            font-size: 17px
+        }
+
+.wf-close {
+    border: 0;
+    background: none;
+    font-size: 26px;
+    cursor: pointer;
+    line-height: 1
+}
+
+.wf-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding: 10px 18px 0
+}
+
+.chip {
+    border: 1px solid #d0d5dd;
+    background: #fff;
+    color: #344054;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 12px;
+    cursor: pointer
+}
+
+    .chip.active {
+        color: #fff;
+        border-color: transparent;
+        background: #344054
+    }
+
+    .chip.c-pres.active,
+    .chip.c-ok.active {
+        background: var(--wf-green)
+    }
+
+    .chip.c-late.active {
+        background: var(--wf-amber)
+    }
+
+    .chip.c-od.active {
+        background: var(--wf-blue)
+    }
+
+    .chip.c-leave.active {
+        background: var(--wf-purple)
+    }
+
+    .chip.c-abs.active {
+        background: var(--wf-red)
+    }
+
+.wf-search {
+    margin: 10px 18px;
+    padding: 8px 10px;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px
+}
+
+.wf-body {
+    overflow: auto;
+    padding: 0 18px 16px
+}
+
+/* table + distinct row marking */
+.wf-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px
+}
+
+    .wf-table th {
+        position: sticky;
+        top: 0;
+        background: #f9fafb;
+        text-align: left;
+        padding: 8px;
+        font-size: 11px;
+        text-transform: uppercase;
+        color: #667085
+    }
+
+    .wf-table td {
+        padding: 8px;
+        border-bottom: 1px solid #f0f0f0
+    }
+
+.wf-row {
+    border-left: 4px solid transparent
+}
+
+    .wf-row.st-ontime {
+        border-left-color: var(--wf-green);
+        background: #f0fdf4
+    }
+
+    .wf-row.st-late {
+        border-left-color: var(--wf-amber);
+        background: #fffbeb
+    }
+
+    .wf-row.st-od {
+        border-left-color: var(--wf-blue);
+        background: #eff6ff
+    }
+
+    .wf-row.st-leave {
+        border-left-color: var(--wf-purple);
+        background: #faf5ff
+    }
+
+    .wf-row.st-absent {
+        border-left-color: var(--wf-red);
+        background: #fef2f2
+    }
+
+    .wf-row.st-off {
+        border-left-color: var(--wf-grey);
+        background: #f9fafb
+    }
+
+/* status badges (scoped to the modal table) */
+.wf-table .badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff !important
+}
+
+    .wf-table .badge.st-ontime {
+        background: var(--wf-green) !important
+    }
+
+    .wf-table .badge.st-late {
+        background: var(--wf-amber) !important
+    }
+
+    .wf-table .badge.st-od {
+        background: var(--wf-blue) !important
+    }
+
+    .wf-table .badge.st-leave {
+        background: var(--wf-purple) !important
+    }
+
+    .wf-table .badge.st-absent {
+        background: var(--wf-red) !important
+    }
+
+    .wf-table .badge.st-off {
+        background: var(--wf-grey) !important
+    }

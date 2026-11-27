@@ -109,18 +109,25 @@ namespace QUIZAPP
         public DbSet<CEODecision> CEODecisions { get; set; }
 
         public DbSet<KpiMaster> KpiMasters { get; set; }
-
+        public DbSet<StandardsHeadApproval> StandardsHeadApprovals { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
+    {
+        base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<CEOApproval>(entity =>
-            {
-                entity.HasNoKey();
-                entity.ToView("vw_CEOApprovals", "dbo");
-            });
-            modelBuilder.Entity<CEODecision>().HasNoKey().ToView("vw_CEODecisions");
-        }
+        modelBuilder.Entity<CEOApproval>(entity =>
+        {
+            entity.HasNoKey();
+            entity.ToView("vw_CEOApprovals", "dbo");
+        });
+
+        modelBuilder.Entity<CEODecision>().HasNoKey().ToView("vw_CEODecisions");
+
+        modelBuilder.Entity<StandardsHeadApproval>(entity =>
+        {
+            entity.HasNoKey();
+            entity.ToView("vw_StandardsHeadApprovals", "dbo");
+        });
     }
+}
     
     }

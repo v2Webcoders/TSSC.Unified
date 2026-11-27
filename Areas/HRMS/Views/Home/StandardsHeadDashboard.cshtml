@@ -1,1171 +1,1428 @@
 ﻿@using QUIZAPP.ViewModel
 @using System.Globalization
+@using TSSC.Unified.ViewModel
+@model StandardsHeadDashboardVM
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
 	Layout = "~/Areas/HRMS/Views/Shared/_Layout.cshtml";
 	ViewData["Title"] = "CEO DASHBOARD";
-    // var workforce = Model.Workforce;
-    // var total = workforce.TotalEmployees;
+	string Initials(string name)
+	{
+		var parts = (name ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries);
+		if (parts.Length == 0) return "";
+		return parts.Length == 1
+			? parts[0][..1].ToUpper()
+			: (parts[0][..1] + parts[^1][..1]).ToUpper();
+	}
 
-    // decimal GetPercentage(int value) =>
-    //     total > 0 ? (decimal)value / total * 100 : 0;
+	string Time(DateTime? t) => t.HasValue ? t.Value.ToString("HH:mm") : "--:--";
 
-    // var onTimeWidth = GetPercentage(workforce.OnTime);
-    // var delayedWidth = GetPercentage(workforce.Delayed);
-    // var onDutyWidth = GetPercentage(workforce.OnDuty);
-    // var onLeaveWidth = GetPercentage(workforce.OnLeave);
-    // var absentWidth = GetPercentage(workforce.Absent);
+	string Worked(TimeSpan? w) =>
+		w.HasValue ? $"{(int)w.Value.TotalHours}h {w.Value.Minutes:00}m" : "--";
+
+	var t = Model.Team;
+
+	string Pct(int n) =>
+		(t.Total > 0 ? (decimal)n / t.Total * 100 : 0)
+			.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "%";
 }
+
+
 
 @section Styles {
-    <link rel="stylesheet" href="~/assets/css/standarddash.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/assets/css/standarddash.css" asp-append-version="true" />
+
 }
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <symbol id="tc-i-grid" viewBox="0 0 24 24">
-        <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-        <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-        <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
-        <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-    </symbol>
-    <symbol id="tc-i-calendar" viewBox="0 0 24 24">
-        <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-        <path d="M16 2v4M8 2v4M3 10h18"></path>
-    </symbol>
-    <symbol id="tc-i-calendar-dots" viewBox="0 0 24 24">
-        <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-        <path d="M16 2v4M8 2v4M3 10h18M8 15h3"></path>
-    </symbol>
-    <symbol id="tc-i-leave" viewBox="0 0 24 24">
-        <path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"></path>
-        <path d="M21 3v5h-5"></path>
-        <path d="M12 8v4l3 2"></path>
-    </symbol>
-    <symbol id="tc-i-tasks" viewBox="0 0 24 24">
-        <rect x="8" y="2" width="8" height="4" rx="1"></rect>
-        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-        <path d="m9 14 2 2 4-4"></path>
-    </symbol>
-    <symbol id="tc-i-tasks-list" viewBox="0 0 24 24">
-        <rect x="8" y="2" width="8" height="4" rx="1"></rect>
-        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-        <path d="M9 12h6M9 16h4"></path>
-    </symbol>
-    <symbol id="tc-i-check" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="9"></circle>
-        <path d="m8.5 12 2.5 2.5 4.5-5"></path>
-    </symbol>
-    <symbol id="tc-i-tick" viewBox="0 0 24 24">
-        <path d="m5 12.5 4.5 4.5L19 7.5"></path>
-    </symbol>
-    <symbol id="tc-i-wallet" viewBox="0 0 24 24">
-        <path d="M3 7a2 2 0 0 1 2-2h13v4"></path>
-        <path d="M3 7v11a2 2 0 0 0 2 2h15V9H5a2 2 0 0 1-2-2z"></path>
-        <circle cx="16.5" cy="14.5" r="1"></circle>
-    </symbol>
-    <symbol id="tc-i-user" viewBox="0 0 24 24">
-        <circle cx="12" cy="8" r="4"></circle>
-        <path d="M4 21a8 8 0 0 1 16 0"></path>
-    </symbol>
-    <symbol id="tc-i-users" viewBox="0 0 24 24">
-        <circle cx="9" cy="8" r="3.5"></circle>
-        <path d="M2.5 20a6.5 6.5 0 0 1 13 0"></path>
-        <circle cx="17" cy="9" r="2.5"></circle>
-        <path d="M17 14.5a5 5 0 0 1 4.5 5"></path>
-    </symbol>
-    <symbol id="tc-i-shield" viewBox="0 0 24 24">
-        <path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"></path>
-        <path d="m9 12 2 2 4-4"></path>
-    </symbol>
-    <symbol id="tc-i-org" viewBox="0 0 24 24">
-        <rect x="9" y="3" width="6" height="5" rx="1"></rect>
-        <rect x="3" y="16" width="6" height="5" rx="1"></rect>
-        <rect x="15" y="16" width="6" height="5" rx="1"></rect>
-        <path d="M12 8v4M6 16v-4h12v4"></path>
-    </symbol>
-    <symbol id="tc-i-clock" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="9"></circle>
-        <path d="M12 7v5l3 2"></path>
-    </symbol>
-    <symbol id="tc-i-alert" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="9"></circle>
-        <path d="M12 8v5M12 16.5v.01"></path>
-    </symbol>
-    <symbol id="tc-i-search" viewBox="0 0 24 24">
-        <circle cx="11" cy="11" r="7"></circle>
-        <path d="m20 20-3.5-3.5"></path>
-    </symbol>
-    <symbol id="tc-i-bell" viewBox="0 0 24 24">
-        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"></path>
-        <path d="M10.3 20a2 2 0 0 0 3.4 0"></path>
-    </symbol>
-    <symbol id="tc-i-menu" viewBox="0 0 24 24">
-        <path d="M4 6h16M4 12h16M4 18h16"></path>
-    </symbol>
-    <symbol id="tc-i-gift" viewBox="0 0 24 24">
-        <rect x="3" y="8" width="18" height="4" rx="1"></rect>
-        <path d="M12 8v13M5 12v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"></path>
-    </symbol>
-    <symbol id="tc-i-monitor" viewBox="0 0 24 24">
-        <rect x="3" y="4" width="18" height="12" rx="2"></rect>
-        <path d="M8 20h8M12 16v4"></path>
-    </symbol>
-    <symbol id="tc-i-laptop" viewBox="0 0 24 24">
-        <rect x="4" y="5" width="16" height="11" rx="2"></rect>
-        <path d="M2 20h20"></path>
-    </symbol>
-    <symbol id="tc-i-briefcase" viewBox="0 0 24 24">
-        <rect x="3" y="7" width="18" height="13" rx="2"></rect>
-        <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
-    </symbol>
-    <symbol id="tc-i-history" viewBox="0 0 24 24">
-        <path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path>
-        <path d="M3 3v5h5"></path>
-        <path d="M12 7v5l3 2"></path>
-    </symbol>
-    <symbol id="tc-i-arrow" viewBox="0 0 24 24">
-        <path d="M5 12h14M13 6l6 6-6 6"></path>
-    </symbol>
-    <symbol id="tc-i-out" viewBox="0 0 24 24">
-        <path d="M7 17 17 7M8 7h9v9"></path>
-    </symbol>
-    <symbol id="tc-i-database" viewBox="0 0 24 24">
-        <ellipse cx="12" cy="5" rx="8" ry="3"></ellipse>
-        <path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"></path>
-    </symbol>
-    <symbol id="tc-i-cap" viewBox="0 0 24 24">
-        <path d="m2 9 10-5 10 5-10 5z"></path>
-        <path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5M22 9v6"></path>
-    </symbol>
-    <symbol id="tc-i-award" viewBox="0 0 24 24">
-        <circle cx="12" cy="9" r="5.5"></circle>
-        <path d="m8.5 13.5-1.5 7.5 5-3 5 3-1.5-7.5"></path>
-    </symbol>
-    <symbol id="tc-i-link" viewBox="0 0 24 24">
-        <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path>
-        <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path>
-    </symbol>
-    <symbol id="tc-i-server" viewBox="0 0 24 24">
-        <rect x="3" y="4" width="18" height="7" rx="2"></rect>
-        <rect x="3" y="13" width="18" height="7" rx="2"></rect>
-        <path d="M7 7.5h.01M7 16.5h.01"></path>
-    </symbol>
-    <symbol id="tc-i-truck" viewBox="0 0 24 24">
-        <path d="M2 6h11v10H2z"></path>
-        <path d="M13 9h4l4 4v3h-8"></path>
-        <circle cx="7" cy="18" r="2"></circle>
-        <circle cx="17" cy="18" r="2"></circle>
-    </symbol>
-    <symbol id="tc-i-layers" viewBox="0 0 24 24">
-        <path d="m12 3 9 5-9 5-9-5z"></path>
-        <path d="m3 13 9 5 9-5"></path>
-    </symbol>
-    <symbol id="tc-i-building" viewBox="0 0 24 24">
-        <rect x="5" y="3" width="14" height="18" rx="1.5"></rect>
-        <path d="M9 8h2M13 8h2M9 12h2M13 12h2M10 21v-4h4v4"></path>
-    </symbol>
-    <symbol id="tc-i-hourglass" viewBox="0 0 24 24">
-        <path d="M6 2h12M6 22h12M7 2c0 5 5 6 5 10s-5 5-5 10M17 2c0 5-5 6-5 10s5 5 5 10"></path>
-    </symbol>
-    <symbol id="tc-i-x" viewBox="0 0 24 24">
-        <path d="M6 6l12 12M18 6 6 18"></path>
-    </symbol>
-    <symbol id="tc-i-return" viewBox="0 0 24 24">
-        <path d="M9 14 4 9l5-5"></path>
-        <path d="M4 9h10a6 6 0 0 1 0 12h-3"></path>
-    </symbol>
-    <symbol id="tc-i-sort" viewBox="0 0 24 24">
-        <path d="M8 9l4-4 4 4M8 15l4 4 4-4"></path>
-    </symbol>
-</svg>
+
 @* <div class="container-fluid m-0 p-0">
     <div class="row">
         <div id="dash-root">
             <div id="wrap"> *@
-                <div class="tc-app">
-                    <div class="tc-main">
-                        <main class="tc-content">
-                            <!-- Welcome + birthdays -->
-                            <section class="tc-top-grid">
-                                <div class="tc-card tc-hero">
-                                    <div class="tc-hero-head">
-                                        <div>
-                                            <h1>Welcome, Sanjay</h1>
-                                            <p class="tc-hero-date">
-                                                <span id="tc-today">Friday, 23 October 2026</span> &middot;
-                                                Vertical Head
-                                            </p>
-                                        </div>
-                                        <div class="tc-hero-status">
-                                            <span class="tc-pill tc-pill-warn" id="tc-statusPill">
-                                                <i></i><span id="tc-statusText">Not marked</span>
-                                            </span>
-                                            <button class="tc-linkbtn" type="button" id="tc-resetBtn" hidden>Reset today</button>
-                                        </div>
-                                    </div>
-                                    <div class="tc-hero-foot">
-                                        <div class="tc-strip">
-                                            <div class="tc-strip-cell">
-                                                <span class="tc-strip-label">
-                                                    <svg class="tc-ic">
-                                                        <use href="#tc-i-clock" />
-                                                    </svg>In
-                                                </span><strong class="tc-strip-val tc-num tc-empty"
-                                                               id="tc-inTime">--:--</strong>
-                                            </div>
-                                            <div class="tc-strip-cell">
-                                                <span class="tc-strip-label">
-                                                    <svg class="tc-ic">
-                                                        <use href="#tc-i-clock" />
-                                                    </svg>Out
-                                                </span><strong class="tc-strip-val tc-num tc-empty"
-                                                               id="tc-outTime">--:--</strong>
-                                            </div>
-                                            <div class="tc-strip-cell">
-                                                <span class="tc-strip-label">
-                                                    <svg class="tc-ic">
-                                                        <use href="#tc-i-history" />
-                                                    </svg>Worked
-                                                </span><strong class="tc-strip-val tc-num tc-empty"
-                                                               id="tc-workedTime">--</strong>
-                                            </div>
-                                        </div>
-                                        <button class="tc-btn" type="button" data-mark>
-                                            <svg class="tc-ic">
-                                                <use href="#tc-i-check" />
-                                            </svg><span data-mark-label>Mark Attendance</span>
-                                        </button>
-                                    </div>
-                                </div>
+<div class="tc-app">
+	<div class="tc-main">
+		<main class="tc-content">
+			<!-- Welcome + birthdays -->
+			<section class="tc-top-grid">
+				<div class="tc-card tc-hero">
+					<div class="tc-hero-head">
+						<div>
+							<h1>Welcome, @Model.EmployeeName</h1>
+							<p class="tc-hero-date">
+								<span id="tc-today">@DateTime.Today.ToString("dddd, dd MMMM yyyy")</span> &middot;
+								@Model.Designation
+							</p>
+						</div>
+						<div class="tc-hero-status">
+							<span class="tc-pill @(Model.IsMarked ? "tc-pill-ok" : "tc-pill-warn")" id="tc-statusPill">
+								<i></i><span id="tc-statusText">@(Model.IsMarked ? "Marked" : "Not marked")</span>
+							</span>
+						</div>
+					</div>
 
-                                <div class="tc-card tc-bday">
-                                    <div class="tc-bday-head">
-                                        <div class="tc-chip tc-chip-orange">
-                                            <svg class="tc-ic">
-                                                <use href="#tc-i-gift" />
-                                            </svg>
-                                        </div>
-                                        <h2>Today's birthdays</h2>
-                                    </div>
-                                    <div class="tc-bday-item">
-                                        <div class="tc-avatar tc-neutral" aria-hidden="true">SC</div>
-                                        <div>
-                                            <div class="tc-bday-name">Suraj Chauhan</div>
-                                            <div class="tc-bday-note">Birthday today</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
+					<div class="tc-hero-foot">
+						<div class="tc-strip">
+							<div class="tc-strip-cell">
+								<span class="tc-strip-label">
+									<svg class="tc-ic"><use href="#tc-i-clock" /></svg>In
+								</span>
+								<strong class="tc-strip-val tc-num @(Model.InTime.HasValue ? "" : "tc-empty")"
+										id="tc-inTime">@(Model.InTime.HasValue ? Model.InTime.Value.ToString("hh:mm tt") : "--")</strong>
+							</div>
+							<div class="tc-strip-cell">
+								<span class="tc-strip-label">
+									<svg class="tc-ic"><use href="#tc-i-clock" /></svg>Out
+								</span>
+								<strong class="tc-strip-val tc-num @(Model.OutTime.HasValue ? "" : "tc-empty")"
+										id="tc-outTime">@(Model.OutTime.HasValue ? Model.OutTime.Value.ToString("hh:mm tt") : "--")</strong>
+							</div>
+							<div class="tc-strip-cell">
+								<span class="tc-strip-label">
+									<svg class="tc-ic"><use href="#tc-i-history" /></svg>Worked
+								</span>
+								<strong class="tc-strip-val tc-num @(Model.Worked.HasValue ? "" : "tc-empty")"
+										id="tc-workedTime">@Worked(Model.Worked)</strong>
+							</div>
+						</div>
 
-                            <!-- 1. HR Workforce -->
-                            <section aria-labelledby="tc-s1">
-                                <header class="tc-sec-head">
-                                    <div>
-                                        <div class="tc-sec-title">
-                                            <span class="tc-sec-bar"></span><span class="tc-secno"
-                                                                                  aria-hidden="true">1</span>
-                                            <h2 id="tc-s1">My Team</h2>
-                                        </div>
-                                        <p class="tc-sec-sub">
-                                            Headcount, leave and notices for <strong id="tc-hrDate">
-                                                Thu, 12 Nov
-                                                2026
-                                            </strong>
-                                        </p>
-                                    </div>
+						@if (!Model.IsMarked)
+						{
+							<button class="tc-btn" type="button" data-mark>
+								<svg class="tc-ic"><use href="#tc-i-check" /></svg>
+								<span data-mark-label>Mark Attendance</span>
+							</button>
+						}
+					</div>
+				</div>
 
-                                </header>
-                                <div class="tc-card tc-hr-card">
-                                    <div class="tc-hr-grid">
-                                        <div class="tc-hr-cell">
-                                            <div class="tc-hr-label">Total employees</div>
-                                            <div class="tc-hr-num tc-num" style="color:#C75A0A">24</div>
-                                        </div>
-                                        <div class="tc-hr-cell">
-                                            <div class="tc-hr-label"><i class="tc-dot" style="background:#2E9E6B"></i>Present</div>
-                                            <div class="tc-hr-num tc-num" style="color:#146C43">19</div>
-                                            <div class="tc-hr-note"><span class="tc-num">79%</span> of employees</div>
-                                            <div class="tc-hr-pills">
-                                                <span class="tc-pill tc-pill-good tc-pill-sm tc-num">
-                                                    15 On
-                                                    time
-                                                </span><span class="tc-pill tc-pill-warn tc-pill-sm tc-num">4 Delay</span>
-                                            </div>
-                                        </div>
-                                        <div class="tc-hr-cell">
-                                            <div class="tc-hr-label">
-                                                <i class="tc-dot" style="background:#2347B8"></i>On duty (OD)
-                                            </div>
-                                            <div class="tc-hr-num tc-num">3</div>
-                                            <div class="tc-hr-note">Working remotely</div>
-                                        </div>
-                                        <div class="tc-hr-cell">
-                                            <div class="tc-hr-label"><i class="tc-dot" style="background:#7A4CC2"></i>On leave</div>
-                                            <div class="tc-hr-num tc-num">1</div>
-                                            <div class="tc-hr-note">Approved leave today</div>
-                                        </div>
-                                        <div class="tc-hr-cell">
-                                            <div class="tc-hr-label"><i class="tc-dot" style="background:#D23B3B"></i>Absent</div>
-                                            <div class="tc-hr-num tc-num">1</div>
-                                            <div class="tc-hr-note">Not marked</div>
-                                        </div>
-                                    </div>
-                                    <div class="tc-stack" role="img"
-                                         aria-label="Of 24 employees: 15 on time, 4 delayed, 3 on duty, 1 on leave, 1 absent">
-                                        <span style="width:62.5%;background:#2E9E6B"></span><span style="width:16.67%;background:#D98B1A"></span><span style="width:12.5%;background:#2347B8"></span><span style="width:4.17%;background:#7A4CC2"></span><span style="width:4.17%;background:#D23B3B"></span>
-                                    </div>
-                                    <p class="tc-stack-note">
-                                        Present includes on-time and delayed employees. OD (working remotely)
-                                        and On leave are counted separately from Absent.
-                                    </p>
-                                </div>
-                            </section>
+				<div class="tc-card tc-bday">
+					<div class="tc-bday-head">
+						<div class="tc-chip tc-chip-orange">
+							<svg class="tc-ic"><use href="#tc-i-gift" /></svg>
+						</div>
+						<h2>Today's birthdays</h2>
+					</div>
 
-                            <!-- 2. Approvals pending -->
-                            <section aria-labelledby="tc-s2">
-                                <header class="tc-sec-head">
-                                    <div>
-                                        <div class="tc-sec-title">
-                                            <span class="tc-sec-bar"></span><span class="tc-secno"
-                                                                                  aria-hidden="true">2</span>
-                                            <h2 id="tc-s2">Approvals pending</h2>
-                                        </div>
-                                        <p class="tc-sec-sub">Requests that have reached the Vertical Head stage. Filter by department.</p>
-                                    </div>
-                                    <label class="tc-fy" for="tc-fy">
-                                        <span class="tc-sr-only">Financial year</span>
-                                        <select class="tc-select" id="tc-fy">
-                                            <option>FY 2026-27 (Current)</option>
-                                            <option>FY 2025-26</option>
-                                        </select>
-                                    </label>
-                                </header>
-                                <div class="tc-ap-tiles">
-                                    <div class="tc-card tc-ap-tile">
-                                        <div class="tc-chip tc-chip-purple">
-                                            <svg class="tc-ic">
-                                                <use href="#tc-i-hourglass" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <div class="tc-ap-num tc-num">4</div>
-                                            <div class="tc-ap-label">Pending leave</div>
-                                        </div>
-                                    </div>
-                                    <div class="tc-card tc-ap-tile">
-                                        <div class="tc-chip">
-                                            <svg class="tc-ic">
-                                                <use href="#tc-i-clock" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <div class="tc-ap-num tc-num">7</div>
-                                            <div class="tc-ap-label">Awaiting approvals</div>
-                                        </div>
-                                    </div>
-                                    <div class="tc-card tc-ap-tile">
-                                        <div class="tc-chip tc-chip-amber">
-                                            <svg class="tc-ic">
-                                                <use href="#tc-i-hourglass" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <div class="tc-ap-num tc-num">3</div>
-                                            <div class="tc-ap-label">High priority</div>
-                                        </div>
-                                    </div>
-                                    <div class="tc-card tc-ap-tile">
-                                        <div class="tc-chip tc-chip-red">
-                                            <svg class="tc-ic">
-                                                <use href="#tc-i-clock" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <div class="tc-ap-num tc-num">3</div>
-                                            <div class="tc-ap-label">Overdue</div>
-                                        </div>
-                                    </div>
-                                </div>
+					@if (Model.TodaysBirthdays.Any())
+					{
+						foreach (var b in Model.TodaysBirthdays)
+						{
+							<div class="tc-bday-item">
+								<div class="tc-avatar tc-neutral" aria-hidden="true">@Initials(b.EmployeeName)</div>
+								<div>
+									<div class="tc-bday-name">@b.EmployeeName</div>
+									<div class="tc-bday-note">
+										@(string.IsNullOrWhiteSpace(b.Department) ? "Birthday today" : b.Department)
+									</div>
+								</div>
+							</div>
+						}
+					}
+					else
+					{
+						<div class="tc-bday-note">No birthdays today</div>
+					}
+				</div>
+			</section>
+			<!-- 1. HR Workforce -->
+			<!-- 1. HR Workforce -->
+			<section aria-labelledby="tc-s1">
+				<header class="tc-sec-head">
+					<div>
+						<div class="tc-sec-title">
+							<span class="tc-sec-bar"></span><span class="tc-secno" aria-hidden="true">1</span>
+							<h2 id="tc-s1">My Team</h2>
+						</div>
+						<p class="tc-sec-sub">
+							Headcount, leave and notices for
+							<strong id="tc-hrDate">@DateTime.Today.ToString("ddd, dd MMM yyyy")</strong>
+						</p>
+					</div>
+				</header>
 
-                                <div class="tc-card tc-req-card">
-                                    <div class="tc-req-head">
-                                        <div>
-                                            <h3 class="tc-req-title">Latest pending requests</h3>
-                                            <p class="tc-req-sub" id="tc-reqCount">Showing 4 of 7 pending requests</p>
-                                        </div>
-                                        <div class="tc-filters">
-                                            <label class="tc-sr-only" for="tc-fDept">Department</label>
-                                            <select class="tc-select" id="tc-fDept">
-                                                <option value="">All departments</option>
-                                                <option>HR Management</option>
-                                                <option>Project Management</option>
-                                                <option>Finance &amp; Accounts</option>
-                                                <option>Assessment &amp; Certification</option>
-                                            </select>
-                                            <label class="tc-sr-only" for="tc-fPri">Priority</label>
-                                            <select class="tc-select" id="tc-fPri">
-                                                <option value="">All priorities</option>
-                                                <option>High</option>
-                                                <option>Medium</option>
-                                                <option>Low</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="tc-table-wrap">
-                                        <table class="tc-req-table" id="tc-reqTable">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col" aria-sort="none">
-                                                        <button class="tc-th-sort" type="button"
-                                                                data-col="0">
-                                                            Request ID<svg class="tc-ic tc-ic-sm">
-                                                                <use href="#tc-i-sort" />
-                                                            </svg>
-                                                        </button>
-                                                    </th>
-                                                    <th scope="col" aria-sort="none">
-                                                        <button class="tc-th-sort" type="button"
-                                                                data-col="1">
-                                                            Task / Request title<svg class="tc-ic tc-ic-sm">
-                                                                <use href="#tc-i-sort" />
-                                                            </svg>
-                                                        </button>
-                                                    </th>
-                                                    <th scope="col" aria-sort="none">
-                                                        <button class="tc-th-sort" type="button"
-                                                                data-col="2">
-                                                            Department<svg class="tc-ic tc-ic-sm">
-                                                                <use href="#tc-i-sort" />
-                                                            </svg>
-                                                        </button>
-                                                    </th>
-                                                    <th scope="col" aria-sort="none">
-                                                        <button class="tc-th-sort" type="button"
-                                                                data-col="3">
-                                                            Submitted by<svg class="tc-ic tc-ic-sm">
-                                                                <use href="#tc-i-sort" />
-                                                            </svg>
-                                                        </button>
-                                                    </th>
-                                                    <th scope="col" aria-sort="none">
-                                                        <button class="tc-th-sort" type="button"
-                                                                data-col="4">
-                                                            Submitted<svg class="tc-ic tc-ic-sm">
-                                                                <use href="#tc-i-sort" />
-                                                            </svg>
-                                                        </button>
-                                                    </th>
-                                                    <th scope="col" aria-sort="none">
-                                                        <button class="tc-th-sort" type="button"
-                                                                data-col="5">
-                                                            Due<svg class="tc-ic tc-ic-sm">
-                                                                <use href="#tc-i-sort" />
-                                                            </svg>
-                                                        </button>
-                                                    </th>
-                                                    <th scope="col" aria-sort="none">
-                                                        <button class="tc-th-sort" type="button"
-                                                                data-col="6">
-                                                            Priority<svg class="tc-ic tc-ic-sm">
-                                                                <use href="#tc-i-sort" />
-                                                            </svg>
-                                                        </button>
-                                                    </th>
-                                                    <th scope="col" aria-sort="none">
-                                                        <button class="tc-th-sort" type="button"
-                                                                data-col="7">
-                                                            Status<svg class="tc-ic tc-ic-sm">
-                                                                <use href="#tc-i-sort" />
-                                                            </svg>
-                                                        </button>
-                                                    </th>
-                                                    <th scope="col">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr class="tc-req" data-id="REQ-0427" data-dept="HR Management" data-priority="Low">
-                                                    <td data-v="REQ-0427"><a class="tc-rid" href="#">REQ-0427</a></td>
-                                                    <td data-v="Revised leave policy circular" class="tc-rtitle">
-                                                        Revised leave
-                                                        policy circular
-                                                    </td>
-                                                    <td data-v="HR Management">HR Management</td>
-                                                    <td data-v="P. Singh">P. Singh</td>
-                                                    <td data-v="2026-11-04" class="tc-num">4 Nov</td>
-                                                    <td data-v="2026-11-12" class="tc-num">12 Nov</td>
-                                                    <td data-v="1"><span class="tc-tag tc-tag-low">Low</span></td>
-                                                    <td data-v="pending">
-                                                        <span class="tc-tag tc-tag-pending tc-js-status">Pending</span>
-                                                    </td>
-                                                    <td>
-                                                        <div class="tc-act">
-                                                            <button class="tc-act-btn tc-act-view" type="button"
-                                                                    data-act="view">
-                                                                View
-                                                            </button>
-                                                            <button class="tc-act-btn tc-act-ok" type="button" data-act="Approved"
-                                                                    aria-label="Approve REQ-0427" title="Approve">
-                                                                <svg class="tc-ic tc-ic-sm">
-                                                                    <use href="#tc-i-tick" />
-                                                                </svg>
-                                                            </button>
-                                                            <button class="tc-act-btn tc-act-no" type="button" data-act="Rejected"
-                                                                    aria-label="Reject REQ-0427" title="Reject">
-                                                                <svg class="tc-ic tc-ic-sm">
-                                                                    <use href="#tc-i-x" />
-                                                                </svg>
-                                                            </button>
-                                                            <button class="tc-act-btn tc-act-ret" type="button" data-act="Returned"
-                                                                    aria-label="Return REQ-0427 for clarification"
-                                                                    title="Return for clarification">
-                                                                <svg class="tc-ic tc-ic-sm">
-                                                                    <use href="#tc-i-return" />
-                                                                </svg>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr class="tc-req" data-id="REQ-0425" data-dept="Project Management"
-                                                    data-priority="Medium">
-                                                    <td data-v="REQ-0425"><a class="tc-rid" href="#">REQ-0425</a></td>
-                                                    <td data-v="MoU renewal with state skill mission" class="tc-rtitle">
-                                                        MoU renewal
-                                                        with state skill mission
-                                                    </td>
-                                                    <td data-v="Project Management">Project Management</td>
-                                                    <td data-v="K. Verma">K. Verma</td>
-                                                    <td data-v="2026-11-02" class="tc-num">2 Nov</td>
-                                                    <td data-v="2026-11-14" class="tc-num">14 Nov</td>
-                                                    <td data-v="2"><span class="tc-tag tc-tag-med">Medium</span></td>
-                                                    <td data-v="pending">
-                                                        <span class="tc-tag tc-tag-pending tc-js-status">Pending</span>
-                                                    </td>
-                                                    <td>
-                                                        <div class="tc-act">
-                                                            <button class="tc-act-btn tc-act-view" type="button"
-                                                                    data-act="view">
-                                                                View
-                                                            </button>
-                                                            <button class="tc-act-btn tc-act-ok" type="button" data-act="Approved"
-                                                                    aria-label="Approve REQ-0425" title="Approve">
-                                                                <svg class="tc-ic tc-ic-sm">
-                                                                    <use href="#tc-i-tick" />
-                                                                </svg>
-                                                            </button>
-                                                            <button class="tc-act-btn tc-act-no" type="button" data-act="Rejected"
-                                                                    aria-label="Reject REQ-0425" title="Reject">
-                                                                <svg class="tc-ic tc-ic-sm">
-                                                                    <use href="#tc-i-x" />
-                                                                </svg>
-                                                            </button>
-                                                            <button class="tc-act-btn tc-act-ret" type="button" data-act="Returned"
-                                                                    aria-label="Return REQ-0425 for clarification"
-                                                                    title="Return for clarification">
-                                                                <svg class="tc-ic tc-ic-sm">
-                                                                    <use href="#tc-i-return" />
-                                                                </svg>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr class="tc-req tc-is-high" data-id="REQ-0421" data-dept="Finance &amp; Accounts"
-                                                    data-priority="High">
-                                                    <td data-v="REQ-0421"><a class="tc-rid" href="#">REQ-0421</a></td>
-                                                    <td data-v="Budget reallocation for skilling events" class="tc-rtitle">
-                                                        Budget
-                                                        reallocation for skilling events
-                                                    </td>
-                                                    <td data-v="Finance &amp; Accounts">Finance &amp; Accounts</td>
-                                                    <td data-v="A. Nair">A. Nair</td>
-                                                    <td data-v="2026-11-01" class="tc-num">1 Nov</td>
-                                                    <td data-v="2026-11-08" class="tc-num">8 Nov</td>
-                                                    <td data-v="3"><span class="tc-tag tc-tag-high">High</span></td>
-                                                    <td data-v="pending">
-                                                        <span class="tc-tag tc-tag-pending tc-js-status">Pending</span>
-                                                    </td>
-                                                    <td>
-                                                        <div class="tc-act">
-                                                            <button class="tc-act-btn tc-act-view" type="button"
-                                                                    data-act="view">
-                                                                View
-                                                            </button>
-                                                            <button class="tc-act-btn tc-act-ok" type="button" data-act="Approved"
-                                                                    aria-label="Approve REQ-0421" title="Approve">
-                                                                <svg class="tc-ic tc-ic-sm">
-                                                                    <use href="#tc-i-tick" />
-                                                                </svg>
-                                                            </button>
-                                                            <button class="tc-act-btn tc-act-no" type="button" data-act="Rejected"
-                                                                    aria-label="Reject REQ-0421" title="Reject">
-                                                                <svg class="tc-ic tc-ic-sm">
-                                                                    <use href="#tc-i-x" />
-                                                                </svg>
-                                                            </button>
-                                                            <button class="tc-act-btn tc-act-ret" type="button" data-act="Returned"
-                                                                    aria-label="Return REQ-0421 for clarification"
-                                                                    title="Return for clarification">
-                                                                <svg class="tc-ic tc-ic-sm">
-                                                                    <use href="#tc-i-return" />
-                                                                </svg>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr class="tc-req" data-id="REQ-0418" data-dept="Assessment &amp; Certification"
-                                                    data-priority="Medium">
-                                                    <td data-v="REQ-0418"><a class="tc-rid" href="#">REQ-0418</a></td>
-                                                    <td data-v="Assessor panel revision for Q4" class="tc-rtitle">
-                                                        Assessor panel
-                                                        revision for Q4
-                                                    </td>
-                                                    <td data-v="Assessment &amp; Certification">Assessment &amp; Certification</td>
-                                                    <td data-v="S. Iyer">S. Iyer</td>
-                                                    <td data-v="2026-10-31" class="tc-num">31 Oct</td>
-                                                    <td data-v="2026-11-10" class="tc-num">10 Nov</td>
-                                                    <td data-v="2"><span class="tc-tag tc-tag-med">Medium</span></td>
-                                                    <td data-v="pending">
-                                                        <span class="tc-tag tc-tag-pending tc-js-status">Pending</span>
-                                                    </td>
-                                                    <td>
-                                                        <div class="tc-act">
-                                                            <button class="tc-act-btn tc-act-view" type="button"
-                                                                    data-act="view">
-                                                                View
-                                                            </button>
-                                                            <button class="tc-act-btn tc-act-ok" type="button" data-act="Approved"
-                                                                    aria-label="Approve REQ-0418" title="Approve">
-                                                                <svg class="tc-ic tc-ic-sm">
-                                                                    <use href="#tc-i-tick" />
-                                                                </svg>
-                                                            </button>
-                                                            <button class="tc-act-btn tc-act-no" type="button" data-act="Rejected"
-                                                                    aria-label="Reject REQ-0418" title="Reject">
-                                                                <svg class="tc-ic tc-ic-sm">
-                                                                    <use href="#tc-i-x" />
-                                                                </svg>
-                                                            </button>
-                                                            <button class="tc-act-btn tc-act-ret" type="button" data-act="Returned"
-                                                                    aria-label="Return REQ-0418 for clarification"
-                                                                    title="Return for clarification">
-                                                                <svg class="tc-ic tc-ic-sm">
-                                                                    <use href="#tc-i-return" />
-                                                                </svg>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <p class="tc-req-empty" id="tc-reqEmpty" hidden>No pending requests match these filters.</p>
-                                    <div class="tc-legend">
-                                        <span>
-                                            <svg class="tc-ic tc-ic-sm" style="color:#146C43">
-                                                <use href="#tc-i-tick" />
-                                            </svg> Approve
-                                        </span>
-                                        <span>
-                                            <svg class="tc-ic tc-ic-sm" style="color:#C23030">
-                                                <use href="#tc-i-x" />
-                                            </svg> Reject
-                                        </span>
-                                        <span>
-                                            <svg class="tc-ic tc-ic-sm" style="color:#5B32A3">
-                                                <use href="#tc-i-return" />
-                                            </svg> Return for clarification
-                                        </span>
-                                        <span>
-                                            Actions follow the Vertical Head's approval role. Decisions here are a demonstration and are not
-                                            saved.
-                                        </span>
-                                    </div>
-                                </div>
-                            </section>
+				<div class="tc-card tc-hr-card">
+					<div class="tc-hr-grid">
+						<div class="tc-hr-cell tc-clickable" data-cat="total" role="button" tabindex="0">
+							<div class="tc-hr-label">Total employees</div>
+							<div class="tc-hr-num tc-num" style="color:#C75A0A">@t.Total</div>
+						</div>
 
-                            <!-- 3. TSSC KPIs -->
-                            <section aria-labelledby="tc-kpi-title">
-                                <header class="tc-sec-head">
-                                    <div>
-                                        <div class="tc-sec-title">
-                                            <span class="tc-sec-bar"></span><span class="tc-secno"
-                                                                                  aria-hidden="true">3</span>
-                                            <h2 id="tc-kpi-title">TSSC KPIs</h2>
-                                        </div>
-                                        <p class="tc-sec-sub">The seven performance indicators tracked for this vertical.</p>
-                                    </div>
-                                    <span class="tc-eyebrow tc-num">7 KPIs &middot; Sample data</span>
-                                </header>
+						<div class="tc-hr-cell tc-clickable" data-cat="present" role="button" tabindex="0">
+							<div class="tc-hr-label"><i class="tc-dot" style="background:#2E9E6B"></i>Present</div>
+							<div class="tc-hr-num tc-num" style="color:#146C43">@t.Present</div>
+							<div class="tc-hr-note"><span class="tc-num">@t.PresentPercentage%</span> of employees</div>
+							<div class="tc-hr-pills">
+								<span class="tc-pill tc-pill-good tc-pill-sm tc-num tc-clickable" data-cat="ontime" role="button" tabindex="0">@t.OnTime On time</span>
+								<span class="tc-pill tc-pill-warn tc-pill-sm tc-num tc-clickable" data-cat="late" role="button" tabindex="0">@t.Delayed Late</span>
+							</div>
+						</div>
 
-                                <div class="tc-kpi-top">
-                                    <div class="tc-card tc-kpi-tile tc-kpi-tile-main">
-                                        <div class="tc-kpi-ring" role="img" aria-label="Overall achievement 71 percent">
-                                            <svg viewBox="0 0 90 90"><circle class="tc-ring-bg" cx="45" cy="45" r="36" /><circle class="tc-ring-fg" id="tc-kpiRing" cx="45" cy="45" r="36" stroke-dasharray="160.6 226.2" /></svg>
-                                            <b class="tc-num" id="tc-kpiAvg">71%</b>
-                                        </div>
-                                        <div><div class="tc-kpi-tile-label">Overall achievement</div><div class="tc-kpi-tile-sub">Average of all 7 KPIs against target</div></div>
-                                    </div>
-                                    <div class="tc-card tc-kpi-tile tc-kpi-tile-ok"><span class="tc-kpi-tile-label">On track</span><strong class="tc-num" id="tc-cntOk">4</strong><span class="tc-kpi-tile-sub">75% or more of target</span></div>
-                                    <div class="tc-card tc-kpi-tile tc-kpi-tile-warn"><span class="tc-kpi-tile-label">At risk</span><strong class="tc-num" id="tc-cntWarn">2</strong><span class="tc-kpi-tile-sub">60&ndash;74% of target</span></div>
-                                    <div class="tc-card tc-kpi-tile tc-kpi-tile-bad"><span class="tc-kpi-tile-label">Behind</span><strong class="tc-num" id="tc-cntBad">1</strong><span class="tc-kpi-tile-sub">Below 60% of target</span></div>
-                                </div>
+						<div class="tc-hr-cell tc-clickable" data-cat="od" role="button" tabindex="0">
+							<div class="tc-hr-label"><i class="tc-dot" style="background:#2347B8"></i>On duty (OD)</div>
+							<div class="tc-hr-num tc-num">@t.OnDuty</div>
+							<div class="tc-hr-note">Working remotely</div>
+						</div>
 
-                                <div class="tc-card tc-kpi-board">
-                                    <div class="tc-kpi-cols" aria-hidden="true"><span></span><span>KPI</span><span>Achieved</span><span>Progress</span><span>Status</span></div>
-                                    <div class="tc-kpi-group tc-kpi-group-a">
-                                        <div class="tc-kpi-ghead"><span class="tc-kpi-gdot tc-kpi-a"></span>Delivery &amp; revenue</div>
-                                        <article class="tc-kpi tc-kpi-s-ok" data-kpi="1" data-current="18" data-target="24" data-prefix="" data-suffix="" data-unit="ToTs">
-                                            <span class="tc-kpi-no tc-kpi-a">1</span>
-                                            <div class="tc-kpi-main">
-                                                <h4 class="tc-kpi-name">Conduct of ToTs</h4>
-                                                <p class="tc-kpi-meta">Trainer-of-Trainers programmes conducted this year</p>
-                                            </div>
-                                            <div class="tc-kpi-figure">
-                                                <span class="tc-kpi-current tc-num">18</span>
-                                                <span class="tc-kpi-target">Target 24 ToTs</span>
-                                            </div>
-                                            <div class="tc-kpi-prog">
-                                                <div class="tc-track tc-kpi-track" role="img" aria-label="75 percent of target"><div class="tc-fill tc-kpi-fill" style="width:75%"></div></div>
-                                                <strong class="tc-kpi-pct tc-num">75%</strong>
-                                            </div>
-                                            <span class="tc-tag tc-tag-ok tc-kpi-status">On track</span>
-                                        </article>
-                                        <article class="tc-kpi tc-kpi-s-ok" data-kpi="2" data-current="12" data-target="16" data-prefix="" data-suffix="" data-unit="ToAs">
-                                            <span class="tc-kpi-no tc-kpi-a">2</span>
-                                            <div class="tc-kpi-main">
-                                                <h4 class="tc-kpi-name">Conduct of ToAs</h4>
-                                                <p class="tc-kpi-meta">Training-of-Assessors programmes conducted this year</p>
-                                            </div>
-                                            <div class="tc-kpi-figure">
-                                                <span class="tc-kpi-current tc-num">12</span>
-                                                <span class="tc-kpi-target">Target 16 ToAs</span>
-                                            </div>
-                                            <div class="tc-kpi-prog">
-                                                <div class="tc-track tc-kpi-track" role="img" aria-label="75 percent of target"><div class="tc-fill tc-kpi-fill" style="width:75%"></div></div>
-                                                <strong class="tc-kpi-pct tc-num">75%</strong>
-                                            </div>
-                                            <span class="tc-tag tc-tag-ok tc-kpi-status">On track</span>
-                                        </article>
-                                        <article class="tc-kpi tc-kpi-s-warn" data-kpi="3" data-current="42.5" data-target="60" data-prefix="₹" data-suffix=" L" data-unit="">
-                                            <span class="tc-kpi-no tc-kpi-a">3</span>
-                                            <div class="tc-kpi-main">
-                                                <h4 class="tc-kpi-name">Annual TOT/TOA revenue</h4>
-                                                <p class="tc-kpi-meta">Annual revenue from ToT and ToA programmes</p>
-                                            </div>
-                                            <div class="tc-kpi-figure">
-                                                <span class="tc-kpi-current tc-num">₹42.5 L</span>
-                                                <span class="tc-kpi-target">Target ₹60 L</span>
-                                            </div>
-                                            <div class="tc-kpi-prog">
-                                                <div class="tc-track tc-kpi-track" role="img" aria-label="71 percent of target"><div class="tc-fill tc-kpi-fill" style="width:71%"></div></div>
-                                                <strong class="tc-kpi-pct tc-num">71%</strong>
-                                            </div>
-                                            <span class="tc-tag tc-tag-med tc-kpi-status">At risk</span>
-                                        </article>
-                                    </div>
-                                    <div class="tc-kpi-group tc-kpi-group-b">
-                                        <div class="tc-kpi-ghead"><span class="tc-kpi-gdot tc-kpi-b"></span>Certified workforce &middot; NSDC quarterly evaluation</div>
-                                        <article class="tc-kpi tc-kpi-s-ok" data-kpi="4" data-current="14" data-target="18" data-prefix="" data-suffix="" data-unit="QPs">
-                                            <span class="tc-kpi-no tc-kpi-b">4</span>
-                                            <div class="tc-kpi-main">
-                                                <h4 class="tc-kpi-name">Telecom Qualification Packs to have at least 5 certified trainers as per NSDC quarterly evaluation</h4>
-                                                <p class="tc-kpi-meta">QPs meeting the target</p>
-                                            </div>
-                                            <div class="tc-kpi-figure">
-                                                <span class="tc-kpi-current tc-num">14</span>
-                                                <span class="tc-kpi-target">Target 18 QPs</span>
-                                            </div>
-                                            <div class="tc-kpi-prog">
-                                                <div class="tc-track tc-kpi-track" role="img" aria-label="78 percent of target"><div class="tc-fill tc-kpi-fill" style="width:78%"></div></div>
-                                                <strong class="tc-kpi-pct tc-num">78%</strong>
-                                            </div>
-                                            <span class="tc-tag tc-tag-ok tc-kpi-status">On track</span>
-                                        </article>
-                                        <article class="tc-kpi tc-kpi-s-bad" data-kpi="5" data-current="9" data-target="18" data-prefix="" data-suffix="" data-unit="QPs">
-                                            <span class="tc-kpi-no tc-kpi-b">5</span>
-                                            <div class="tc-kpi-main">
-                                                <h4 class="tc-kpi-name">Telecom Qualification Packs to have at least 5 certified Assessors as per NSDC quarterly evaluation</h4>
-                                                <p class="tc-kpi-meta">QPs meeting the target</p>
-                                            </div>
-                                            <div class="tc-kpi-figure">
-                                                <span class="tc-kpi-current tc-num">9</span>
-                                                <span class="tc-kpi-target">Target 18 QPs</span>
-                                            </div>
-                                            <div class="tc-kpi-prog">
-                                                <div class="tc-track tc-kpi-track" role="img" aria-label="50 percent of target"><div class="tc-fill tc-kpi-fill" style="width:50%"></div></div>
-                                                <strong class="tc-kpi-pct tc-num">50%</strong>
-                                            </div>
-                                            <span class="tc-tag tc-tag-high tc-kpi-status">Behind</span>
-                                        </article>
-                                    </div>
-                                    <div class="tc-kpi-group tc-kpi-group-c">
-                                        <div class="tc-kpi-ghead"><span class="tc-kpi-gdot tc-kpi-c"></span>Job roles &amp; digital content</div>
-                                        <article class="tc-kpi tc-kpi-s-ok" data-kpi="6" data-current="9" data-target="12" data-prefix="" data-suffix="" data-unit="job roles">
-                                            <span class="tc-kpi-no tc-kpi-c">6</span>
-                                            <div class="tc-kpi-main">
-                                                <h4 class="tc-kpi-name">Revision and Creation of Job Roles</h4>
-                                                <p class="tc-kpi-meta">Job roles revised or created this year</p>
-                                            </div>
-                                            <div class="tc-kpi-figure">
-                                                <span class="tc-kpi-current tc-num">9</span>
-                                                <span class="tc-kpi-target">Target 12 job roles</span>
-                                            </div>
-                                            <div class="tc-kpi-prog">
-                                                <div class="tc-track tc-kpi-track" role="img" aria-label="75 percent of target"><div class="tc-fill tc-kpi-fill" style="width:75%"></div></div>
-                                                <strong class="tc-kpi-pct tc-num">75%</strong>
-                                            </div>
-                                            <span class="tc-tag tc-tag-ok tc-kpi-status">On track</span>
-                                        </article>
-                                        <article class="tc-kpi tc-kpi-s-warn" data-kpi="7" data-current="41" data-target="56" data-prefix="" data-suffix="" data-unit="job roles">
-                                            <span class="tc-kpi-no tc-kpi-c">7</span>
-                                            <div class="tc-kpi-main">
-                                                <h4 class="tc-kpi-name">Digital Content Development for 69 Job Roles</h4>
-                                                <p class="tc-kpi-meta">80% of Job Roles should have e-books/other digital content</p>
-                                            </div>
-                                            <div class="tc-kpi-figure">
-                                                <span class="tc-kpi-current tc-num">41</span>
-                                                <span class="tc-kpi-target">Target 56 of 69 (80%)</span>
-                                            </div>
-                                            <div class="tc-kpi-prog">
-                                                <div class="tc-track tc-kpi-track" role="img" aria-label="73 percent of target"><div class="tc-fill tc-kpi-fill" style="width:73%"></div></div>
-                                                <strong class="tc-kpi-pct tc-num">73%</strong>
-                                            </div>
-                                            <span class="tc-tag tc-tag-med tc-kpi-status">At risk</span>
-                                        </article>
-                                    </div>
-                                </div>
-                                <p class="tc-kpi-note">Figures shown are sample data for the design preview. To use real numbers, edit <code>data-current</code> and <code>data-target</code> on each KPI row.</p>
-                            </section>
+						<div class="tc-hr-cell tc-clickable" data-cat="leave" role="button" tabindex="0">
+							<div class="tc-hr-label"><i class="tc-dot" style="background:#7A4CC2"></i>On leave</div>
+							<div class="tc-hr-num tc-num">@t.OnLeave</div>
+							<div class="tc-hr-note">Approved leave today</div>
+						</div>
 
-                            <!-- Department workspaces -->
-                            <section aria-labelledby="tc-ws-title">
-                                <header class="tc-sec-head">
-                                    <div>
-                                        <div class="tc-sec-title">
-                                            <span class="tc-sec-bar"></span><span class="tc-secno"
-                                                                                  aria-hidden="true">4</span>
-                                            <h2 id="tc-ws-title">Department workspaces</h2>
-                                        </div>
-                                        <p class="tc-sec-sub">
-                                            Pending actions and live counts across the four working departments.
-                                        </p>
-                                    </div>
-                                    <span class="tc-eyebrow tc-num">4 workspaces</span>
-                                </header>
-                                <div class="tc-ws-grid">
+						<div class="tc-hr-cell tc-clickable" data-cat="absent" role="button" tabindex="0">
+							<div class="tc-hr-label"><i class="tc-dot" style="background:#D23B3B"></i>Absent</div>
+							<div class="tc-hr-num tc-num">@t.Absent</div>
+							<div class="tc-hr-note">Not marked</div>
+						</div>
+					</div>
 
-                                    <article class="tc-card tc-ws">
-                                        <div class="tc-ws-head">
-                                            <div class="tc-chip">
-                                                <svg class="tc-ic">
-                                                    <use href="#tc-i-shield" />
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <h3 class="tc-ws-title">Standard</h3>
-                                                <p class="tc-ws-sub">Quality &amp; compliance</p>
-                                            </div>
-                                            <a class="tc-link" href="#">
-                                                Open
-                                                <svg class="tc-ic tc-ic-sm">
-                                                    <use href="#tc-i-arrow" />
-                                                </svg>
-                                            </a>
-                                        </div>
-                                        <div class="tc-stats">
-                                            <a class="tc-stat" href="#">
-                                                <span class="tc-stat-label">Active QPs</span><span class="tc-stat-val tc-num">06
-                                                <svg class="tc-ic"><use href="#tc-i-arrow" /></svg></span>
-                                            </a>
-                                            <div class="tc-stat tc-stat-lang">
-                                                <span class="tc-stat-label">Facilitator Guide</span>
-                                                <span class="tc-stat-val tc-num">06</span>
-                                                <div class="tc-lps">
-                                                    <a class="tc-lp" href="#">English<b class="tc-num">06</b></a>
-                                                    <a class="tc-lp" href="#">Hindi<b class="tc-num">06</b></a>
-                                                </div>
-                                            </div>
-                                            <div class="tc-stat tc-stat-lang">
-                                                <span class="tc-stat-label">Participant Handbook</span>
-                                                <span class="tc-stat-val tc-num">06</span>
-                                                <div class="tc-lps">
-                                                    <a class="tc-lp" href="#">English<b class="tc-num">06</b></a>
-                                                    <a class="tc-lp" href="#">Hindi<b class="tc-num">06</b></a>
-                                                    <a class="tc-lp" href="#">Regional<b class="tc-num">03</b></a>
-                                                </div>
-                                            </div>
-                                            <a class="tc-stat" href="#">
-                                                <span class="tc-stat-label">Question Bank</span><span class="tc-stat-val tc-num">06
-                                                <svg class="tc-ic"><use href="#tc-i-arrow" /></svg></span>
-                                            </a>
-                                        </div>
-                                    </article>
+					@if (t.Total > 0)
+					{
+						<div class="tc-stack" role="img"
+							 aria-label="Of @t.Total employees: @t.OnTime on time, @t.Delayed delayed, @t.OnDuty on duty, @t.OnLeave on leave, @t.Absent absent">
+							<span style="width:@Pct(t.OnTime);background:#2E9E6B"></span>
+							<span style="width:@Pct(t.Delayed);background:#D98B1A"></span>
+							<span style="width:@Pct(t.OnDuty);background:#2347B8"></span>
+							<span style="width:@Pct(t.OnLeave);background:#7A4CC2"></span>
+							<span style="width:@Pct(t.Absent);background:#D23B3B"></span>
+						</div>
+					}
+					else
+					{
+						<p class="tc-stack-note">No team members are assigned to you yet.</p>
+					}
 
-                                    <article class="tc-card tc-ws">
-                                        <div class="tc-ws-head">
-                                            <div class="tc-chip tc-chip-orange">
-                                                <svg class="tc-ic">
-                                                    <use href="#tc-i-monitor" />
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <h3 class="tc-ws-title">TOT / TOA</h3>
-                                                <p class="tc-ws-sub">Training &amp; assessment</p>
-                                            </div>
-                                            <a class="tc-link" href="#">
-                                                Open
-                                                <svg class="tc-ic tc-ic-sm">
-                                                    <use href="#tc-i-arrow" />
-                                                </svg>
-                                            </a>
-                                        </div>
-                                        <div class="tc-stats">
-                                            <a class="tc-stat" href="#">
-                                                <span class="tc-stat-label">Today's Screening</span><span class="tc-stat-val tc-num">
-                                                    04
-                                                    <svg class="tc-ic">
-                                                        <use href="#tc-i-arrow" />
-                                                    </svg>
-                                                </span>
-                                            </a>
+					<p class="tc-stack-note">
+						Present includes on-time and delayed employees. OD (working remotely)
+						and On leave are counted separately from Absent.
+					</p>
+				</div>
+			</section>
+			<div id="wfModal" class="wf-overlay" hidden>
+				<div class="wf-dialog" role="dialog" aria-modal="true" aria-labelledby="wfTitle">
+					<div class="wf-head">
+						<h3 id="wfTitle">Employees</h3>
+						<button type="button" class="wf-close" aria-label="Close">&times;</button>
+					</div>
 
-                                            <a class="tc-stat" href="#">
-                                                <span class="tc-stat-label">Total Certified Trainer</span><span class="tc-stat-val tc-num">
-                                                    04
-                                                    <svg class="tc-ic">
-                                                        <use href="#tc-i-arrow" />
-                                                    </svg>
-                                                </span>
-                                            </a>
+					<div class="wf-chips">
+						<button type="button" data-cat="total" class="chip">All</button>
+						<button type="button" data-cat="present" class="chip c-pres">Present</button>
+						<button type="button" data-cat="ontime" class="chip c-ok">On time</button>
+						<button type="button" data-cat="late" class="chip c-late">Late</button>
+						<button type="button" data-cat="od" class="chip c-od">On duty</button>
+						<button type="button" data-cat="leave" class="chip c-leave">On leave</button>
+						<button type="button" data-cat="absent" class="chip c-abs">Absent</button>
+					</div>
 
-                                            <a class="tc-stat" href="#">
-                                                <span class="tc-stat-label">Total Certified Assessor </span><span class="tc-stat-val tc-num">
-                                                    04
-                                                    <svg class="tc-ic">
-                                                        <use href="#tc-i-arrow" />
-                                                    </svg>
-                                                </span>
-                                            </a>
+					<input id="wfSearch" class="wf-search" placeholder="Search name / department…" />
+					<div id="wfBody" class="wf-body"></div>
+				</div>
+			</div>
+			@{
+				string PriCss(string? p) => p == "High" ? "tc-tag-high" : p == "Medium" ? "tc-tag-med" : "tc-tag-low";
+				int PriVal(string? p) => p == "High" ? 3 : p == "Medium" ? 2 : 1;
+			}
 
-                                            <a class="tc-stat" href="#">
-                                                <span class="tc-stat-label">Total Certified Master Trainer </span><span class="tc-stat-val tc-num">
-                                                    12
-                                                    <svg class="tc-ic">
-                                                        <use href="#tc-i-arrow" />
-                                                    </svg>
-                                                </span>
-                                            </a>
+			<section aria-labelledby="tc-s2">
+				<header class="tc-sec-head">
+					<div>
+						<div class="tc-sec-title">
+							<span class="tc-sec-bar"></span><span class="tc-secno" aria-hidden="true">2</span>
+							<h2 id="tc-s2">Approvals pending</h2>
+						</div>
+						<p class="tc-sec-sub">Requests that have reached the Standards Head stage. Filter by department.</p>
+					</div>
 
-                                            <a class="tc-stat" href="#">
-                                                <span class="tc-stat-label">Total Certified Master Assessors</span><span class="tc-stat-val tc-num">
-                                                    04
-                                                    <svg class="tc-ic">
-                                                        <use href="#tc-i-arrow" />
-                                                    </svg>
-                                                </span>
-                                            </a>
+					<form asp-action="StandardsHeadDashboard" asp-controller="Home" asp-area="HRMS" method="get" class="tc-fy">
+						<span class="tc-sr-only">Financial year</span>
+						<select class="tc-select" id="tc-fy" name="financialYear" onchange="this.form.submit()">
+							@foreach (var fy in Model.FinancialYears)
+							{
+								<option value="@fy" selected="@(Model.FinancialYear == fy)">
+									FY @fy @(fy == Model.FinancialYears.First() ? "(Current)" : "")
+								</option>
+							}
+						</select>
+					</form>
+				</header>
+
+				<div class="tc-ap-tiles">
+					<div class="tc-card tc-ap-tile">
+						<div class="tc-chip tc-chip-purple"><svg class="tc-ic"><use href="#tc-i-hourglass" /></svg></div>
+						<div><div class="tc-ap-num tc-num">@Model.ApprovalSummary.PendingLeave</div><div class="tc-ap-label">Pending leave</div></div>
+					</div>
+					<div class="tc-card tc-ap-tile">
+						<div class="tc-chip"><svg class="tc-ic"><use href="#tc-i-clock" /></svg></div>
+						<div><div class="tc-ap-num tc-num">@Model.ApprovalSummary.AwaitingApprovals</div><div class="tc-ap-label">Awaiting approvals</div></div>
+					</div>
+					<div class="tc-card tc-ap-tile">
+						<div class="tc-chip tc-chip-amber"><svg class="tc-ic"><use href="#tc-i-hourglass" /></svg></div>
+						<div><div class="tc-ap-num tc-num">@Model.ApprovalSummary.HighPriority</div><div class="tc-ap-label">High priority</div></div>
+					</div>
+					<div class="tc-card tc-ap-tile">
+						<div class="tc-chip tc-chip-red"><svg class="tc-ic"><use href="#tc-i-clock" /></svg></div>
+						<div><div class="tc-ap-num tc-num">@Model.ApprovalSummary.Overdue</div><div class="tc-ap-label">Overdue</div></div>
+					</div>
+				</div>
+
+				<div class="tc-card tc-req-card">
+					<div class="tc-req-head">
+						<div>
+							<h3 class="tc-req-title">Latest pending requests</h3>
+							<p class="tc-req-sub" id="tc-reqCount">Showing @Model.PendingApprovals.Count of @Model.PendingApprovals.Count pending requests</p>
+						</div>
+						<div class="tc-filters">
+							<label class="tc-sr-only" for="tc-fDept">Department</label>
+							<select class="tc-select" id="tc-fDept">
+								<option value="">All departments</option>
+								@foreach (var d in Model.ApprovalDepartments)
+								{
+									<option value="@d">@d</option>
+								}
+							</select>
+							<label class="tc-sr-only" for="tc-fPri">Priority</label>
+							<select class="tc-select" id="tc-fPri">
+								<option value="">All priorities</option>
+								<option value="High">High</option>
+								<option value="Medium">Medium</option>
+								<option value="Low">Low</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="tc-table-wrap">
+						<table class="tc-req-table" id="tc-reqTable">
+							<thead>
+								<tr>
+									@{
+										var heads = new[] { "Request ID", "Task / Request title", "Department", "Submitted by", "Submitted", "Due", "Priority", "Status" };
+									}
+									@for (var i = 0; i < heads.Length; i++)
+									{
+										<th scope="col" aria-sort="none">
+											<button class="tc-th-sort" type="button" data-col="@i">
+												@heads[i]<svg class="tc-ic tc-ic-sm"><use href="#tc-i-sort" /></svg>
+											</button>
+										</th>
+									}
+									<th scope="col">Action</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var item in Model.PendingApprovals)
+								{
+									<tr class="tc-req @(item.Priority == "High" ? "tc-is-high" : "")"
+										data-dept="@item.Department" data-priority="@item.Priority">
+										<td data-v="@item.RequestId"><span class="tc-rid">@item.RequestId</span></td>
+										<td data-v="@item.RequestTitle" class="tc-rtitle">@item.RequestTitle</td>
+										<td data-v="@item.Department">@item.Department</td>
+										<td data-v="@item.SubmittedBy">@item.SubmittedBy</td>
+										<td data-v="@item.SubmittedDate.ToString("yyyy-MM-dd")" class="tc-num">@item.SubmittedDate.ToString("d MMM")</td>
+										<td data-v="@(item.DueDate?.ToString("yyyy-MM-dd") ?? "9999-12-31")" class="tc-num">
+											@(item.DueDate.HasValue ? item.DueDate.Value.ToString("d MMM") : "-")
+										</td>
+										<td data-v="@PriVal(item.Priority)"><span class="tc-tag @PriCss(item.Priority)">@item.Priority</span></td>
+										<td data-v="@item.Status?.ToLower()"><span class="tc-tag tc-tag-pending">@item.Status</span></td>
+										<td>
+											<div class="tc-act">
+												<a class="tc-act-btn tc-act-view"
+												   asp-action="ApprovalDetails" asp-controller="Home" asp-area="HRMS"
+												   asp-route-id="@item.Id" asp-route-source="@item.SourceTable">View</a>
+											</div>
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+
+					<p class="tc-req-empty" id="tc-reqEmpty" @(Model.PendingApprovals.Any() ? "hidden" : "")>
+						No pending requests match these filters.
+					</p>
+					<div class="tc-legend">
+						<span>Open a request with <b>View</b> to approve, reject or return it.</span>
+					</div>
+				</div>
+			</section>
+			<!-- 2. Approvals pending -->
+			@* <section aria-labelledby="tc-s2">
+				<header class="tc-sec-head">
+					<div>
+						<div class="tc-sec-title">
+							<span class="tc-sec-bar"></span><span class="tc-secno"
+														   aria-hidden="true">2</span>
+							<h2 id="tc-s2">Approvals pending</h2>
+						</div>
+						<p class="tc-sec-sub">Requests that have reached the Vertical Head stage. Filter by department.</p>
+					</div>
+					<label class="tc-fy" for="tc-fy">
+						<span class="tc-sr-only">Financial year</span>
+						<select class="tc-select" id="tc-fy">
+							<option>FY 2026-27 (Current)</option>
+							<option>FY 2025-26</option>
+						</select>
+					</label>
+				</header>
+				<div class="tc-ap-tiles">
+					<div class="tc-card tc-ap-tile">
+						<div class="tc-chip tc-chip-purple">
+							<svg class="tc-ic">
+								<use href="#tc-i-hourglass" />
+							</svg>
+						</div>
+						<div>
+							<div class="tc-ap-num tc-num">4</div>
+							<div class="tc-ap-label">Pending leave</div>
+						</div>
+					</div>
+					<div class="tc-card tc-ap-tile">
+						<div class="tc-chip">
+							<svg class="tc-ic">
+								<use href="#tc-i-clock" />
+							</svg>
+						</div>
+						<div>
+							<div class="tc-ap-num tc-num">7</div>
+							<div class="tc-ap-label">Awaiting approvals</div>
+						</div>
+					</div>
+					<div class="tc-card tc-ap-tile">
+						<div class="tc-chip tc-chip-amber">
+							<svg class="tc-ic">
+								<use href="#tc-i-hourglass" />
+							</svg>
+						</div>
+						<div>
+							<div class="tc-ap-num tc-num">3</div>
+							<div class="tc-ap-label">High priority</div>
+						</div>
+					</div>
+					<div class="tc-card tc-ap-tile">
+						<div class="tc-chip tc-chip-red">
+							<svg class="tc-ic">
+								<use href="#tc-i-clock" />
+							</svg>
+						</div>
+						<div>
+							<div class="tc-ap-num tc-num">3</div>
+							<div class="tc-ap-label">Overdue</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="tc-card tc-req-card">
+					<div class="tc-req-head">
+						<div>
+							<h3 class="tc-req-title">Latest pending requests</h3>
+							<p class="tc-req-sub" id="tc-reqCount">Showing 4 of 7 pending requests</p>
+						</div>
+						<div class="tc-filters">
+							<label class="tc-sr-only" for="tc-fDept">Department</label>
+							<select class="tc-select" id="tc-fDept">
+								<option value="">All departments</option>
+								<option>HR Management</option>
+								<option>Project Management</option>
+								<option>Finance &amp; Accounts</option>
+								<option>Assessment &amp; Certification</option>
+							</select>
+							<label class="tc-sr-only" for="tc-fPri">Priority</label>
+							<select class="tc-select" id="tc-fPri">
+								<option value="">All priorities</option>
+								<option>High</option>
+								<option>Medium</option>
+								<option>Low</option>
+							</select>
+						</div>
+					</div>
+					<div class="tc-table-wrap">
+						<table class="tc-req-table" id="tc-reqTable">
+							<thead>
+								<tr>
+									<th scope="col" aria-sort="none">
+										<button class="tc-th-sort" type="button"
+												data-col="0">
+											Request ID<svg class="tc-ic tc-ic-sm">
+												<use href="#tc-i-sort" />
+											</svg>
+										</button>
+									</th>
+									<th scope="col" aria-sort="none">
+										<button class="tc-th-sort" type="button"
+												data-col="1">
+											Task / Request title<svg class="tc-ic tc-ic-sm">
+												<use href="#tc-i-sort" />
+											</svg>
+										</button>
+									</th>
+									<th scope="col" aria-sort="none">
+										<button class="tc-th-sort" type="button"
+												data-col="2">
+											Department<svg class="tc-ic tc-ic-sm">
+												<use href="#tc-i-sort" />
+											</svg>
+										</button>
+									</th>
+									<th scope="col" aria-sort="none">
+										<button class="tc-th-sort" type="button"
+												data-col="3">
+											Submitted by<svg class="tc-ic tc-ic-sm">
+												<use href="#tc-i-sort" />
+											</svg>
+										</button>
+									</th>
+									<th scope="col" aria-sort="none">
+										<button class="tc-th-sort" type="button"
+												data-col="4">
+											Submitted<svg class="tc-ic tc-ic-sm">
+												<use href="#tc-i-sort" />
+											</svg>
+										</button>
+									</th>
+									<th scope="col" aria-sort="none">
+										<button class="tc-th-sort" type="button"
+												data-col="5">
+											Due<svg class="tc-ic tc-ic-sm">
+												<use href="#tc-i-sort" />
+											</svg>
+										</button>
+									</th>
+									<th scope="col" aria-sort="none">
+										<button class="tc-th-sort" type="button"
+												data-col="6">
+											Priority<svg class="tc-ic tc-ic-sm">
+												<use href="#tc-i-sort" />
+											</svg>
+										</button>
+									</th>
+									<th scope="col" aria-sort="none">
+										<button class="tc-th-sort" type="button"
+												data-col="7">
+											Status<svg class="tc-ic tc-ic-sm">
+												<use href="#tc-i-sort" />
+											</svg>
+										</button>
+									</th>
+									<th scope="col">Action</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="tc-req" data-id="REQ-0427" data-dept="HR Management" data-priority="Low">
+									<td data-v="REQ-0427"><a class="tc-rid" href="#">REQ-0427</a></td>
+									<td data-v="Revised leave policy circular" class="tc-rtitle">
+										Revised leave
+										policy circular
+									</td>
+									<td data-v="HR Management">HR Management</td>
+									<td data-v="P. Singh">P. Singh</td>
+									<td data-v="2026-11-04" class="tc-num">4 Nov</td>
+									<td data-v="2026-11-12" class="tc-num">12 Nov</td>
+									<td data-v="1"><span class="tc-tag tc-tag-low">Low</span></td>
+									<td data-v="pending">
+										<span class="tc-tag tc-tag-pending tc-js-status">Pending</span>
+									</td>
+									<td>
+										<div class="tc-act">
+											<button class="tc-act-btn tc-act-view" type="button"
+													data-act="view">
+												View
+											</button>
+											<button class="tc-act-btn tc-act-ok" type="button" data-act="Approved"
+													aria-label="Approve REQ-0427" title="Approve">
+												<svg class="tc-ic tc-ic-sm">
+													<use href="#tc-i-tick" />
+												</svg>
+											</button>
+											<button class="tc-act-btn tc-act-no" type="button" data-act="Rejected"
+													aria-label="Reject REQ-0427" title="Reject">
+												<svg class="tc-ic tc-ic-sm">
+													<use href="#tc-i-x" />
+												</svg>
+											</button>
+											<button class="tc-act-btn tc-act-ret" type="button" data-act="Returned"
+													aria-label="Return REQ-0427 for clarification"
+													title="Return for clarification">
+												<svg class="tc-ic tc-ic-sm">
+													<use href="#tc-i-return" />
+												</svg>
+											</button>
+										</div>
+									</td>
+								</tr>
+								<tr class="tc-req" data-id="REQ-0425" data-dept="Project Management"
+									data-priority="Medium">
+									<td data-v="REQ-0425"><a class="tc-rid" href="#">REQ-0425</a></td>
+									<td data-v="MoU renewal with state skill mission" class="tc-rtitle">
+										MoU renewal
+										with state skill mission
+									</td>
+									<td data-v="Project Management">Project Management</td>
+									<td data-v="K. Verma">K. Verma</td>
+									<td data-v="2026-11-02" class="tc-num">2 Nov</td>
+									<td data-v="2026-11-14" class="tc-num">14 Nov</td>
+									<td data-v="2"><span class="tc-tag tc-tag-med">Medium</span></td>
+									<td data-v="pending">
+										<span class="tc-tag tc-tag-pending tc-js-status">Pending</span>
+									</td>
+									<td>
+										<div class="tc-act">
+											<button class="tc-act-btn tc-act-view" type="button"
+													data-act="view">
+												View
+											</button>
+											<button class="tc-act-btn tc-act-ok" type="button" data-act="Approved"
+													aria-label="Approve REQ-0425" title="Approve">
+												<svg class="tc-ic tc-ic-sm">
+													<use href="#tc-i-tick" />
+												</svg>
+											</button>
+											<button class="tc-act-btn tc-act-no" type="button" data-act="Rejected"
+													aria-label="Reject REQ-0425" title="Reject">
+												<svg class="tc-ic tc-ic-sm">
+													<use href="#tc-i-x" />
+												</svg>
+											</button>
+											<button class="tc-act-btn tc-act-ret" type="button" data-act="Returned"
+													aria-label="Return REQ-0425 for clarification"
+													title="Return for clarification">
+												<svg class="tc-ic tc-ic-sm">
+													<use href="#tc-i-return" />
+												</svg>
+											</button>
+										</div>
+									</td>
+								</tr>
+								<tr class="tc-req tc-is-high" data-id="REQ-0421" data-dept="Finance &amp; Accounts"
+									data-priority="High">
+									<td data-v="REQ-0421"><a class="tc-rid" href="#">REQ-0421</a></td>
+									<td data-v="Budget reallocation for skilling events" class="tc-rtitle">
+										Budget
+										reallocation for skilling events
+									</td>
+									<td data-v="Finance &amp; Accounts">Finance &amp; Accounts</td>
+									<td data-v="A. Nair">A. Nair</td>
+									<td data-v="2026-11-01" class="tc-num">1 Nov</td>
+									<td data-v="2026-11-08" class="tc-num">8 Nov</td>
+									<td data-v="3"><span class="tc-tag tc-tag-high">High</span></td>
+									<td data-v="pending">
+										<span class="tc-tag tc-tag-pending tc-js-status">Pending</span>
+									</td>
+									<td>
+										<div class="tc-act">
+											<button class="tc-act-btn tc-act-view" type="button"
+													data-act="view">
+												View
+											</button>
+											<button class="tc-act-btn tc-act-ok" type="button" data-act="Approved"
+													aria-label="Approve REQ-0421" title="Approve">
+												<svg class="tc-ic tc-ic-sm">
+													<use href="#tc-i-tick" />
+												</svg>
+											</button>
+											<button class="tc-act-btn tc-act-no" type="button" data-act="Rejected"
+													aria-label="Reject REQ-0421" title="Reject">
+												<svg class="tc-ic tc-ic-sm">
+													<use href="#tc-i-x" />
+												</svg>
+											</button>
+											<button class="tc-act-btn tc-act-ret" type="button" data-act="Returned"
+													aria-label="Return REQ-0421 for clarification"
+													title="Return for clarification">
+												<svg class="tc-ic tc-ic-sm">
+													<use href="#tc-i-return" />
+												</svg>
+											</button>
+										</div>
+									</td>
+								</tr>
+								<tr class="tc-req" data-id="REQ-0418" data-dept="Assessment &amp; Certification"
+									data-priority="Medium">
+									<td data-v="REQ-0418"><a class="tc-rid" href="#">REQ-0418</a></td>
+									<td data-v="Assessor panel revision for Q4" class="tc-rtitle">
+										Assessor panel
+										revision for Q4
+									</td>
+									<td data-v="Assessment &amp; Certification">Assessment &amp; Certification</td>
+									<td data-v="S. Iyer">S. Iyer</td>
+									<td data-v="2026-10-31" class="tc-num">31 Oct</td>
+									<td data-v="2026-11-10" class="tc-num">10 Nov</td>
+									<td data-v="2"><span class="tc-tag tc-tag-med">Medium</span></td>
+									<td data-v="pending">
+										<span class="tc-tag tc-tag-pending tc-js-status">Pending</span>
+									</td>
+									<td>
+										<div class="tc-act">
+											<button class="tc-act-btn tc-act-view" type="button"
+													data-act="view">
+												View
+											</button>
+											<button class="tc-act-btn tc-act-ok" type="button" data-act="Approved"
+													aria-label="Approve REQ-0418" title="Approve">
+												<svg class="tc-ic tc-ic-sm">
+													<use href="#tc-i-tick" />
+												</svg>
+											</button>
+											<button class="tc-act-btn tc-act-no" type="button" data-act="Rejected"
+													aria-label="Reject REQ-0418" title="Reject">
+												<svg class="tc-ic tc-ic-sm">
+													<use href="#tc-i-x" />
+												</svg>
+											</button>
+											<button class="tc-act-btn tc-act-ret" type="button" data-act="Returned"
+													aria-label="Return REQ-0418 for clarification"
+													title="Return for clarification">
+												<svg class="tc-ic tc-ic-sm">
+													<use href="#tc-i-return" />
+												</svg>
+											</button>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<p class="tc-req-empty" id="tc-reqEmpty" hidden>No pending requests match these filters.</p>
+					<div class="tc-legend">
+						<span>
+							<svg class="tc-ic tc-ic-sm" style="color:#146C43">
+								<use href="#tc-i-tick" />
+							</svg> Approve
+						</span>
+						<span>
+							<svg class="tc-ic tc-ic-sm" style="color:#C23030">
+								<use href="#tc-i-x" />
+							</svg> Reject
+						</span>
+						<span>
+							<svg class="tc-ic tc-ic-sm" style="color:#5B32A3">
+								<use href="#tc-i-return" />
+							</svg> Return for clarification
+						</span>
+						<span>
+							Actions follow the Vertical Head's approval role. Decisions here are a demonstration and are not
+							saved.
+						</span>
+					</div>
+				</div>
+			</section> *@
+
+			<!-- 3. TSSC KPIs -->
+			<section aria-labelledby="tc-kpi-title">
+				<header class="tc-sec-head">
+					<div>
+						<div class="tc-sec-title">
+							<span class="tc-sec-bar"></span><span class="tc-secno"
+														   aria-hidden="true">3</span>
+							<h2 id="tc-kpi-title">TSSC KPIs</h2>
+						</div>
+						<p class="tc-sec-sub">The seven performance indicators tracked for this vertical.</p>
+					</div>
+					<span class="tc-eyebrow tc-num">7 KPIs &middot; Sample data</span>
+				</header>
+
+				<div class="tc-kpi-top">
+					<div class="tc-card tc-kpi-tile tc-kpi-tile-main">
+						<div class="tc-kpi-ring" role="img" aria-label="Overall achievement 71 percent">
+							<svg viewBox="0 0 90 90"><circle class="tc-ring-bg" cx="45" cy="45" r="36" /><circle class="tc-ring-fg" id="tc-kpiRing" cx="45" cy="45" r="36" stroke-dasharray="160.6 226.2" /></svg>
+							<b class="tc-num" id="tc-kpiAvg">71%</b>
+						</div>
+						<div><div class="tc-kpi-tile-label">Overall achievement</div><div class="tc-kpi-tile-sub">Average of all 7 KPIs against target</div></div>
+					</div>
+					<div class="tc-card tc-kpi-tile tc-kpi-tile-ok"><span class="tc-kpi-tile-label">On track</span><strong class="tc-num" id="tc-cntOk">4</strong><span class="tc-kpi-tile-sub">75% or more of target</span></div>
+					<div class="tc-card tc-kpi-tile tc-kpi-tile-warn"><span class="tc-kpi-tile-label">At risk</span><strong class="tc-num" id="tc-cntWarn">2</strong><span class="tc-kpi-tile-sub">60&ndash;74% of target</span></div>
+					<div class="tc-card tc-kpi-tile tc-kpi-tile-bad"><span class="tc-kpi-tile-label">Behind</span><strong class="tc-num" id="tc-cntBad">1</strong><span class="tc-kpi-tile-sub">Below 60% of target</span></div>
+				</div>
+
+				<div class="tc-card tc-kpi-board">
+					<div class="tc-kpi-cols" aria-hidden="true"><span></span><span>KPI</span><span>Achieved</span><span>Progress</span><span>Status</span></div>
+					<div class="tc-kpi-group tc-kpi-group-a">
+						<div class="tc-kpi-ghead"><span class="tc-kpi-gdot tc-kpi-a"></span>Delivery &amp; revenue</div>
+						<article class="tc-kpi tc-kpi-s-ok" data-kpi="1" data-current="18" data-target="24" data-prefix="" data-suffix="" data-unit="ToTs">
+							<span class="tc-kpi-no tc-kpi-a">1</span>
+							<div class="tc-kpi-main">
+								<h4 class="tc-kpi-name">Conduct of ToTs</h4>
+								<p class="tc-kpi-meta">Trainer-of-Trainers programmes conducted this year</p>
+							</div>
+							<div class="tc-kpi-figure">
+								<span class="tc-kpi-current tc-num">18</span>
+								<span class="tc-kpi-target">Target 24 ToTs</span>
+							</div>
+							<div class="tc-kpi-prog">
+								<div class="tc-track tc-kpi-track" role="img" aria-label="75 percent of target"><div class="tc-fill tc-kpi-fill" style="width:75%"></div></div>
+								<strong class="tc-kpi-pct tc-num">75%</strong>
+							</div>
+							<span class="tc-tag tc-tag-ok tc-kpi-status">On track</span>
+						</article>
+						<article class="tc-kpi tc-kpi-s-ok" data-kpi="2" data-current="12" data-target="16" data-prefix="" data-suffix="" data-unit="ToAs">
+							<span class="tc-kpi-no tc-kpi-a">2</span>
+							<div class="tc-kpi-main">
+								<h4 class="tc-kpi-name">Conduct of ToAs</h4>
+								<p class="tc-kpi-meta">Training-of-Assessors programmes conducted this year</p>
+							</div>
+							<div class="tc-kpi-figure">
+								<span class="tc-kpi-current tc-num">12</span>
+								<span class="tc-kpi-target">Target 16 ToAs</span>
+							</div>
+							<div class="tc-kpi-prog">
+								<div class="tc-track tc-kpi-track" role="img" aria-label="75 percent of target"><div class="tc-fill tc-kpi-fill" style="width:75%"></div></div>
+								<strong class="tc-kpi-pct tc-num">75%</strong>
+							</div>
+							<span class="tc-tag tc-tag-ok tc-kpi-status">On track</span>
+						</article>
+						<article class="tc-kpi tc-kpi-s-warn" data-kpi="3" data-current="42.5" data-target="60" data-prefix="₹" data-suffix=" L" data-unit="">
+							<span class="tc-kpi-no tc-kpi-a">3</span>
+							<div class="tc-kpi-main">
+								<h4 class="tc-kpi-name">Annual TOT/TOA revenue</h4>
+								<p class="tc-kpi-meta">Annual revenue from ToT and ToA programmes</p>
+							</div>
+							<div class="tc-kpi-figure">
+								<span class="tc-kpi-current tc-num">₹42.5 L</span>
+								<span class="tc-kpi-target">Target ₹60 L</span>
+							</div>
+							<div class="tc-kpi-prog">
+								<div class="tc-track tc-kpi-track" role="img" aria-label="71 percent of target"><div class="tc-fill tc-kpi-fill" style="width:71%"></div></div>
+								<strong class="tc-kpi-pct tc-num">71%</strong>
+							</div>
+							<span class="tc-tag tc-tag-med tc-kpi-status">At risk</span>
+						</article>
+					</div>
+					<div class="tc-kpi-group tc-kpi-group-b">
+						<div class="tc-kpi-ghead"><span class="tc-kpi-gdot tc-kpi-b"></span>Certified workforce &middot; NSDC quarterly evaluation</div>
+						<article class="tc-kpi tc-kpi-s-ok" data-kpi="4" data-current="14" data-target="18" data-prefix="" data-suffix="" data-unit="QPs">
+							<span class="tc-kpi-no tc-kpi-b">4</span>
+							<div class="tc-kpi-main">
+								<h4 class="tc-kpi-name">Telecom Qualification Packs to have at least 5 certified trainers as per NSDC quarterly evaluation</h4>
+								<p class="tc-kpi-meta">QPs meeting the target</p>
+							</div>
+							<div class="tc-kpi-figure">
+								<span class="tc-kpi-current tc-num">14</span>
+								<span class="tc-kpi-target">Target 18 QPs</span>
+							</div>
+							<div class="tc-kpi-prog">
+								<div class="tc-track tc-kpi-track" role="img" aria-label="78 percent of target"><div class="tc-fill tc-kpi-fill" style="width:78%"></div></div>
+								<strong class="tc-kpi-pct tc-num">78%</strong>
+							</div>
+							<span class="tc-tag tc-tag-ok tc-kpi-status">On track</span>
+						</article>
+						<article class="tc-kpi tc-kpi-s-bad" data-kpi="5" data-current="9" data-target="18" data-prefix="" data-suffix="" data-unit="QPs">
+							<span class="tc-kpi-no tc-kpi-b">5</span>
+							<div class="tc-kpi-main">
+								<h4 class="tc-kpi-name">Telecom Qualification Packs to have at least 5 certified Assessors as per NSDC quarterly evaluation</h4>
+								<p class="tc-kpi-meta">QPs meeting the target</p>
+							</div>
+							<div class="tc-kpi-figure">
+								<span class="tc-kpi-current tc-num">9</span>
+								<span class="tc-kpi-target">Target 18 QPs</span>
+							</div>
+							<div class="tc-kpi-prog">
+								<div class="tc-track tc-kpi-track" role="img" aria-label="50 percent of target"><div class="tc-fill tc-kpi-fill" style="width:50%"></div></div>
+								<strong class="tc-kpi-pct tc-num">50%</strong>
+							</div>
+							<span class="tc-tag tc-tag-high tc-kpi-status">Behind</span>
+						</article>
+					</div>
+					<div class="tc-kpi-group tc-kpi-group-c">
+						<div class="tc-kpi-ghead"><span class="tc-kpi-gdot tc-kpi-c"></span>Job roles &amp; digital content</div>
+						<article class="tc-kpi tc-kpi-s-ok" data-kpi="6" data-current="9" data-target="12" data-prefix="" data-suffix="" data-unit="job roles">
+							<span class="tc-kpi-no tc-kpi-c">6</span>
+							<div class="tc-kpi-main">
+								<h4 class="tc-kpi-name">Revision and Creation of Job Roles</h4>
+								<p class="tc-kpi-meta">Job roles revised or created this year</p>
+							</div>
+							<div class="tc-kpi-figure">
+								<span class="tc-kpi-current tc-num">9</span>
+								<span class="tc-kpi-target">Target 12 job roles</span>
+							</div>
+							<div class="tc-kpi-prog">
+								<div class="tc-track tc-kpi-track" role="img" aria-label="75 percent of target"><div class="tc-fill tc-kpi-fill" style="width:75%"></div></div>
+								<strong class="tc-kpi-pct tc-num">75%</strong>
+							</div>
+							<span class="tc-tag tc-tag-ok tc-kpi-status">On track</span>
+						</article>
+						<article class="tc-kpi tc-kpi-s-warn" data-kpi="7" data-current="41" data-target="56" data-prefix="" data-suffix="" data-unit="job roles">
+							<span class="tc-kpi-no tc-kpi-c">7</span>
+							<div class="tc-kpi-main">
+								<h4 class="tc-kpi-name">Digital Content Development for 69 Job Roles</h4>
+								<p class="tc-kpi-meta">80% of Job Roles should have e-books/other digital content</p>
+							</div>
+							<div class="tc-kpi-figure">
+								<span class="tc-kpi-current tc-num">41</span>
+								<span class="tc-kpi-target">Target 56 of 69 (80%)</span>
+							</div>
+							<div class="tc-kpi-prog">
+								<div class="tc-track tc-kpi-track" role="img" aria-label="73 percent of target"><div class="tc-fill tc-kpi-fill" style="width:73%"></div></div>
+								<strong class="tc-kpi-pct tc-num">73%</strong>
+							</div>
+							<span class="tc-tag tc-tag-med tc-kpi-status">At risk</span>
+						</article>
+					</div>
+				</div>
+				<p class="tc-kpi-note">Figures shown are sample data for the design preview. To use real numbers, edit <code>data-current</code> and <code>data-target</code> on each KPI row.</p>
+			</section>
+
+			<!-- Department workspaces -->
+			<section aria-labelledby="tc-ws-title">
+				<header class="tc-sec-head">
+					<div>
+						<div class="tc-sec-title">
+							<span class="tc-sec-bar"></span><span class="tc-secno"
+														   aria-hidden="true">4</span>
+							<h2 id="tc-ws-title">Department workspaces</h2>
+						</div>
+						<p class="tc-sec-sub">
+							Pending actions and live counts across the four working departments.
+						</p>
+					</div>
+					<span class="tc-eyebrow tc-num">4 workspaces</span>
+				</header>
+				<div class="tc-ws-grid">
+
+					<article class="tc-card tc-ws">
+						<div class="tc-ws-head">
+							<div class="tc-chip">
+								<svg class="tc-ic">
+									<use href="#tc-i-shield" />
+								</svg>
+							</div>
+							<div>
+								<h3 class="tc-ws-title">Standard</h3>
+								<p class="tc-ws-sub">Quality &amp; compliance</p>
+							</div>
+							<a class="tc-link" href="#">
+								Open
+								<svg class="tc-ic tc-ic-sm">
+									<use href="#tc-i-arrow" />
+								</svg>
+							</a>
+						</div>
+						<div class="tc-stats">
+							<a class="tc-stat" href="#">
+								<span class="tc-stat-label">Active QPs</span><span class="tc-stat-val tc-num">
+									06
+									<svg class="tc-ic"><use href="#tc-i-arrow" /></svg>
+								</span>
+							</a>
+							<div class="tc-stat tc-stat-lang">
+								<span class="tc-stat-label">Facilitator Guide</span>
+								<span class="tc-stat-val tc-num">06</span>
+								<div class="tc-lps">
+									<a class="tc-lp" href="#">English<b class="tc-num">06</b></a>
+									<a class="tc-lp" href="#">Hindi<b class="tc-num">06</b></a>
+								</div>
+							</div>
+							<div class="tc-stat tc-stat-lang">
+								<span class="tc-stat-label">Participant Handbook</span>
+								<span class="tc-stat-val tc-num">06</span>
+								<div class="tc-lps">
+									<a class="tc-lp" href="#">English<b class="tc-num">06</b></a>
+									<a class="tc-lp" href="#">Hindi<b class="tc-num">06</b></a>
+									<a class="tc-lp" href="#">Regional<b class="tc-num">03</b></a>
+								</div>
+							</div>
+							<a class="tc-stat" href="#">
+								<span class="tc-stat-label">Question Bank</span><span class="tc-stat-val tc-num">
+									06
+									<svg class="tc-ic"><use href="#tc-i-arrow" /></svg>
+								</span>
+							</a>
+						</div>
+					</article>
+
+					<article class="tc-card tc-ws">
+						<div class="tc-ws-head">
+							<div class="tc-chip tc-chip-orange">
+								<svg class="tc-ic">
+									<use href="#tc-i-monitor" />
+								</svg>
+							</div>
+							<div>
+								<h3 class="tc-ws-title">TOT / TOA</h3>
+								<p class="tc-ws-sub">Training &amp; assessment</p>
+							</div>
+							<a class="tc-link" href="#">
+								Open
+								<svg class="tc-ic tc-ic-sm">
+									<use href="#tc-i-arrow" />
+								</svg>
+							</a>
+						</div>
+						<div class="tc-stats">
+							<a class="tc-stat" href="#">
+								<span class="tc-stat-label">Today's Screening</span><span class="tc-stat-val tc-num">
+									04
+									<svg class="tc-ic">
+										<use href="#tc-i-arrow" />
+									</svg>
+								</span>
+							</a>
+
+							<a class="tc-stat" href="#">
+								<span class="tc-stat-label">Total Certified Trainer</span><span class="tc-stat-val tc-num">
+									04
+									<svg class="tc-ic">
+										<use href="#tc-i-arrow" />
+									</svg>
+								</span>
+							</a>
+
+							<a class="tc-stat" href="#">
+								<span class="tc-stat-label">Total Certified Assessor </span><span class="tc-stat-val tc-num">
+									04
+									<svg class="tc-ic">
+										<use href="#tc-i-arrow" />
+									</svg>
+								</span>
+							</a>
+
+							<a class="tc-stat" href="#">
+								<span class="tc-stat-label">Total Certified Master Trainer </span><span class="tc-stat-val tc-num">
+									12
+									<svg class="tc-ic">
+										<use href="#tc-i-arrow" />
+									</svg>
+								</span>
+							</a>
+
+							<a class="tc-stat" href="#">
+								<span class="tc-stat-label">Total Certified Master Assessors</span><span class="tc-stat-val tc-num">
+									04
+									<svg class="tc-ic">
+										<use href="#tc-i-arrow" />
+									</svg>
+								</span>
+							</a>
 
 
-                                        </div>
-                                    </article>
+						</div>
+					</article>
 
-                                    <article class="tc-card tc-ws">
-                                        <div class="tc-ws-head">
-                                            <div class="tc-chip tc-chip-green">
-                                                <svg class="tc-ic">
-                                                    <use href="#tc-i-laptop" />
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <h3 class="tc-ws-title">IT</h3>
-                                                <p class="tc-ws-sub">Assets &amp; resources</p>
-                                            </div>
-                                            <a class="tc-link" href="#">
-                                                Open
-                                                <svg class="tc-ic tc-ic-sm">
-                                                    <use href="#tc-i-arrow" />
-                                                </svg>
-                                            </a>
-                                        </div>
-                                        <div class="tc-stats">
-                                            <a class="tc-stat" href="#">
-                                                <span class="tc-stat-label">Assets assigned</span>
-                                                <span class="tc-stat-val tc-num">
-                                                    128
-                                                    <svg class="tc-ic">
-                                                        <use href="#tc-i-arrow" />
-                                                    </svg>
-                                                </span>
-                                                <div class="tc-track" role="img" aria-label="128 of 152 assets assigned">
-                                                    <div class="tc-fill" style="width:84.2%"></div>
-                                                </div>
-                                            </a>
-                                            <a class="tc-stat" href="#">
-                                                <span class="tc-stat-label">Assets available</span>
-                                                <span class="tc-stat-val tc-num">
-                                                    24
-                                                    <svg class="tc-ic">
-                                                        <use href="#tc-i-arrow" />
-                                                    </svg>
-                                                </span>
-                                                <div class="tc-track" role="img" aria-label="24 of 152 assets available">
-                                                    <div class="tc-fill tc-fill-orange" style="width:15.8%"></div>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </article>
+					<article class="tc-card tc-ws">
+						<div class="tc-ws-head">
+							<div class="tc-chip tc-chip-green">
+								<svg class="tc-ic">
+									<use href="#tc-i-laptop" />
+								</svg>
+							</div>
+							<div>
+								<h3 class="tc-ws-title">IT</h3>
+								<p class="tc-ws-sub">Assets &amp; resources</p>
+							</div>
+							<a class="tc-link" href="#">
+								Open
+								<svg class="tc-ic tc-ic-sm">
+									<use href="#tc-i-arrow" />
+								</svg>
+							</a>
+						</div>
+						<div class="tc-stats">
+							<a class="tc-stat" href="#">
+								<span class="tc-stat-label">Assets assigned</span>
+								<span class="tc-stat-val tc-num">
+									128
+									<svg class="tc-ic">
+										<use href="#tc-i-arrow" />
+									</svg>
+								</span>
+								<div class="tc-track" role="img" aria-label="128 of 152 assets assigned">
+									<div class="tc-fill" style="width:84.2%"></div>
+								</div>
+							</a>
+							<a class="tc-stat" href="#">
+								<span class="tc-stat-label">Assets available</span>
+								<span class="tc-stat-val tc-num">
+									24
+									<svg class="tc-ic">
+										<use href="#tc-i-arrow" />
+									</svg>
+								</span>
+								<div class="tc-track" role="img" aria-label="24 of 152 assets available">
+									<div class="tc-fill tc-fill-orange" style="width:15.8%"></div>
+								</div>
+							</a>
+						</div>
+					</article>
 
-                                    <article class="tc-card tc-ws">
-                                        <div class="tc-ws-head">
-                                            <div class="tc-chip tc-chip-amber">
-                                                <svg class="tc-ic">
-                                                    <use href="#tc-i-tasks-list" />
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <h3 class="tc-ws-title">Task</h3>
-                                                <p class="tc-ws-sub">Plan, track &amp; deliver</p>
-                                            </div>
-                                            <a class="tc-link" href="#">
-                                                Open
-                                                <svg class="tc-ic tc-ic-sm">
-                                                    <use href="#tc-i-arrow" />
-                                                </svg>
-                                            </a>
-                                        </div>
-                                        <div class="tc-stats">
-                                            <a class="tc-stat" href="#">
-                                                <span class="tc-stat-label">Assigned</span><span class="tc-stat-val tc-num">
-                                                    18
-                                                    <svg class="tc-ic">
-                                                        <use href="#tc-i-arrow" />
-                                                    </svg>
-                                                </span>
-                                            </a>
-                                            <a class="tc-stat" href="#">
-                                                <span class="tc-stat-label">Pending</span><span class="tc-stat-val tc-num">
-                                                    07
-                                                    <svg class="tc-ic">
-                                                        <use href="#tc-i-arrow" />
-                                                    </svg>
-                                                </span>
-                                            </a>
-                                            <a class="tc-stat" href="#">
-                                                <span class="tc-stat-label">Completed</span>
-                                                <span class="tc-stat-val tc-num">
-                                                    11
-                                                    <svg class="tc-ic">
-                                                        <use href="#tc-i-arrow" />
-                                                    </svg>
-                                                </span>
-                                                <div class="tc-track" role="img" aria-label="11 of 18 tasks completed">
-                                                    <div class="tc-fill" style="width:61.1%"></div>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </article>
+					<article class="tc-card tc-ws">
+						<div class="tc-ws-head">
+							<div class="tc-chip tc-chip-amber">
+								<svg class="tc-ic">
+									<use href="#tc-i-tasks-list" />
+								</svg>
+							</div>
+							<div>
+								<h3 class="tc-ws-title">Task</h3>
+								<p class="tc-ws-sub">Plan, track &amp; deliver</p>
+							</div>
+							<a class="tc-link" href="#">
+								Open
+								<svg class="tc-ic tc-ic-sm">
+									<use href="#tc-i-arrow" />
+								</svg>
+							</a>
+						</div>
+						<div class="tc-stats">
+							<a class="tc-stat" href="#">
+								<span class="tc-stat-label">Assigned</span><span class="tc-stat-val tc-num">
+									18
+									<svg class="tc-ic">
+										<use href="#tc-i-arrow" />
+									</svg>
+								</span>
+							</a>
+							<a class="tc-stat" href="#">
+								<span class="tc-stat-label">Pending</span><span class="tc-stat-val tc-num">
+									07
+									<svg class="tc-ic">
+										<use href="#tc-i-arrow" />
+									</svg>
+								</span>
+							</a>
+							<a class="tc-stat" href="#">
+								<span class="tc-stat-label">Completed</span>
+								<span class="tc-stat-val tc-num">
+									11
+									<svg class="tc-ic">
+										<use href="#tc-i-arrow" />
+									</svg>
+								</span>
+								<div class="tc-track" role="img" aria-label="11 of 18 tasks completed">
+									<div class="tc-fill" style="width:61.1%"></div>
+								</div>
+							</a>
+						</div>
+					</article>
 
-                                </div>
-                            </section>
+				</div>
+			</section>
 
-                            <!-- 5. Department-wise portal access -->
-                            <section aria-labelledby="tc-s4">
-                                <header class="tc-sec-head">
-                                    <div>
-                                        <div class="tc-sec-title">
-                                            <span class="tc-sec-bar"></span><span class="tc-secno"
-                                                                                  aria-hidden="true">5</span>
-                                            <h2 id="tc-s4">Department-wise portal access</h2>
-                                        </div>
-                                        <p class="tc-sec-sub">
-                                            Every card is a link. HR opens the HRMS; the others open the TSSC ERP
-                                            home until their own module address is added.
-                                        </p>
-                                    </div>
+			<!-- 5. Department-wise portal access -->
+			<section aria-labelledby="tc-s4">
+				<header class="tc-sec-head">
+					<div>
+						<div class="tc-sec-title">
+							<span class="tc-sec-bar"></span><span class="tc-secno"
+														   aria-hidden="true">5</span>
+							<h2 id="tc-s4">Department-wise portal access</h2>
+						</div>
+						<p class="tc-sec-sub">
+							Every card is a link. HR opens the HRMS; the others open the TSSC ERP
+							home until their own module address is added.
+						</p>
+					</div>
 
-                                </header>
-                                <div class="tc-portal-grid">
-
-
-
-                                    <a class="tc-card tc-portal" href="#" data-portal="Affiliation">
-                                        <span class="tc-portal-ic">
-                                            <svg class="tc-ic">
-                                                <use href="#tc-i-award" />
-                                            </svg>
-                                        </span>
-                                        <h3 class="tc-portal-title">Standards & Qualification Pack </h3>
-                                        <p class="tc-portal-desc">Training partner and centre affiliation workflow</p>
-                                        <span class="tc-portal-foot">
-                                            <span>Open portal</span><span class="tc-portal-go">
-                                                <svg class="tc-ic tc-ic-sm">
-                                                    <use href="#tc-i-out" />
-                                                </svg>
-                                            </span>
-                                        </span>
-                                    </a>
+				</header>
+				<div class="tc-portal-grid">
 
 
 
-                                    <a class="tc-card tc-portal" href="#" data-portal="Vendor Management">
-                                        <span class="tc-portal-ic">
-                                            <svg class="tc-ic">
-                                                <use href="#tc-i-truck" />
-                                            </svg>
-                                        </span>
-                                        <h3 class="tc-portal-title">ToT / ToA Management </h3>
-                                        <p class="tc-portal-desc">Vendor onboarding, contracts and performance</p>
-                                        <span class="tc-portal-foot">
-                                            <span>Open portal</span><span class="tc-portal-go">
-                                                <svg class="tc-ic tc-ic-sm">
-                                                    <use href="#tc-i-out" />
-                                                </svg>
-                                            </span>
-                                        </span>
-                                    </a>
-                                    <a class="tc-card tc-portal" href="#" data-portal="Project Management">
-                                        <span class="tc-portal-ic">
-                                            <svg class="tc-ic">
-                                                <use href="#tc-i-layers" />
-                                            </svg>
-                                        </span>
-                                        <h3 class="tc-portal-title">Asset Management </h3>
-                                        <p class="tc-portal-desc">Projects, milestones and task tracking</p>
-                                        <span class="tc-portal-foot">
-                                            <span>Open portal</span><span class="tc-portal-go">
-                                                <svg class="tc-ic tc-ic-sm">
-                                                    <use href="#tc-i-out" />
-                                                </svg>
-                                            </span>
-                                        </span>
-                                    </a>
+					<a class="tc-card tc-portal" href="#" data-portal="Affiliation">
+						<span class="tc-portal-ic">
+							<svg class="tc-ic">
+								<use href="#tc-i-award" />
+							</svg>
+						</span>
+						<h3 class="tc-portal-title">Standards & Qualification Pack </h3>
+						<p class="tc-portal-desc">Training partner and centre affiliation workflow</p>
+						<span class="tc-portal-foot">
+							<span>Open portal</span><span class="tc-portal-go">
+								<svg class="tc-ic tc-ic-sm">
+									<use href="#tc-i-out" />
+								</svg>
+							</span>
+						</span>
+					</a>
 
-                                </div>
-                            </section>
 
-                            <p class="tc-footnote">Counts and requests are illustrative. Links open preview pages.</p>
-                        </main>
-                    </div>
-                    <dialog class="tc-dlg" id="tc-reqDialog" aria-labelledby="tc-dlgTitle">
-                        <div class="tc-dlg-head">
-                            <h3 id="tc-dlgTitle">Request details</h3><button class="tc-icon-btn" type="button" id="tc-dlgClose"
-                                                                             aria-label="Close">
-                                <svg class="tc-ic">
-                                    <use href="#tc-i-x" />
-                                </svg>
-                            </button>
-                        </div>
-                        <dl class="tc-dlg-list" id="tc-dlgList"></dl>
-                    </dialog>
-                </div>
-                @* <div id="toast" role="status" hidden></div>
+
+					<a class="tc-card tc-portal" href="#" data-portal="Vendor Management">
+						<span class="tc-portal-ic">
+							<svg class="tc-ic">
+								<use href="#tc-i-truck" />
+							</svg>
+						</span>
+						<h3 class="tc-portal-title">ToT / ToA Management </h3>
+						<p class="tc-portal-desc">Vendor onboarding, contracts and performance</p>
+						<span class="tc-portal-foot">
+							<span>Open portal</span><span class="tc-portal-go">
+								<svg class="tc-ic tc-ic-sm">
+									<use href="#tc-i-out" />
+								</svg>
+							</span>
+						</span>
+					</a>
+					<a class="tc-card tc-portal" href="#" data-portal="Project Management">
+						<span class="tc-portal-ic">
+							<svg class="tc-ic">
+								<use href="#tc-i-layers" />
+							</svg>
+						</span>
+						<h3 class="tc-portal-title">Asset Management </h3>
+						<p class="tc-portal-desc">Projects, milestones and task tracking</p>
+						<span class="tc-portal-foot">
+							<span>Open portal</span><span class="tc-portal-go">
+								<svg class="tc-ic tc-ic-sm">
+									<use href="#tc-i-out" />
+								</svg>
+							</span>
+						</span>
+					</a>
+
+				</div>
+			</section>
+
+			<p class="tc-footnote">Counts and requests are illustrative. Links open preview pages.</p>
+		</main>
+	</div>
+	<dialog class="tc-dlg" id="tc-reqDialog" aria-labelledby="tc-dlgTitle">
+		<div class="tc-dlg-head">
+			<h3 id="tc-dlgTitle">Request details</h3><button class="tc-icon-btn" type="button" id="tc-dlgClose"
+													   aria-label="Close">
+				<svg class="tc-ic">
+					<use href="#tc-i-x" />
+				</svg>
+			</button>
+		</div>
+		<dl class="tc-dlg-list" id="tc-dlgList"></dl>
+	</dialog>
+</div>
+@* <div id="toast" role="status" hidden></div>
             </div>
         </div>
     </div>
 </div> *@
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+	<symbol id="tc-i-grid" viewBox="0 0 24 24">
+		<rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+		<rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+		<rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+		<rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+	</symbol>
+	<symbol id="tc-i-calendar" viewBox="0 0 24 24">
+		<rect x="3" y="4" width="18" height="18" rx="2"></rect>
+		<path d="M16 2v4M8 2v4M3 10h18"></path>
+	</symbol>
+	<symbol id="tc-i-calendar-dots" viewBox="0 0 24 24">
+		<rect x="3" y="4" width="18" height="18" rx="2"></rect>
+		<path d="M16 2v4M8 2v4M3 10h18M8 15h3"></path>
+	</symbol>
+	<symbol id="tc-i-leave" viewBox="0 0 24 24">
+		<path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"></path>
+		<path d="M21 3v5h-5"></path>
+		<path d="M12 8v4l3 2"></path>
+	</symbol>
+	<symbol id="tc-i-tasks" viewBox="0 0 24 24">
+		<rect x="8" y="2" width="8" height="4" rx="1"></rect>
+		<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+		<path d="m9 14 2 2 4-4"></path>
+	</symbol>
+	<symbol id="tc-i-tasks-list" viewBox="0 0 24 24">
+		<rect x="8" y="2" width="8" height="4" rx="1"></rect>
+		<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+		<path d="M9 12h6M9 16h4"></path>
+	</symbol>
+	<symbol id="tc-i-check" viewBox="0 0 24 24">
+		<circle cx="12" cy="12" r="9"></circle>
+		<path d="m8.5 12 2.5 2.5 4.5-5"></path>
+	</symbol>
+	<symbol id="tc-i-tick" viewBox="0 0 24 24">
+		<path d="m5 12.5 4.5 4.5L19 7.5"></path>
+	</symbol>
+	<symbol id="tc-i-wallet" viewBox="0 0 24 24">
+		<path d="M3 7a2 2 0 0 1 2-2h13v4"></path>
+		<path d="M3 7v11a2 2 0 0 0 2 2h15V9H5a2 2 0 0 1-2-2z"></path>
+		<circle cx="16.5" cy="14.5" r="1"></circle>
+	</symbol>
+	<symbol id="tc-i-user" viewBox="0 0 24 24">
+		<circle cx="12" cy="8" r="4"></circle>
+		<path d="M4 21a8 8 0 0 1 16 0"></path>
+	</symbol>
+	<symbol id="tc-i-users" viewBox="0 0 24 24">
+		<circle cx="9" cy="8" r="3.5"></circle>
+		<path d="M2.5 20a6.5 6.5 0 0 1 13 0"></path>
+		<circle cx="17" cy="9" r="2.5"></circle>
+		<path d="M17 14.5a5 5 0 0 1 4.5 5"></path>
+	</symbol>
+	<symbol id="tc-i-shield" viewBox="0 0 24 24">
+		<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"></path>
+		<path d="m9 12 2 2 4-4"></path>
+	</symbol>
+	<symbol id="tc-i-org" viewBox="0 0 24 24">
+		<rect x="9" y="3" width="6" height="5" rx="1"></rect>
+		<rect x="3" y="16" width="6" height="5" rx="1"></rect>
+		<rect x="15" y="16" width="6" height="5" rx="1"></rect>
+		<path d="M12 8v4M6 16v-4h12v4"></path>
+	</symbol>
+	<symbol id="tc-i-clock" viewBox="0 0 24 24">
+		<circle cx="12" cy="12" r="9"></circle>
+		<path d="M12 7v5l3 2"></path>
+	</symbol>
+	<symbol id="tc-i-alert" viewBox="0 0 24 24">
+		<circle cx="12" cy="12" r="9"></circle>
+		<path d="M12 8v5M12 16.5v.01"></path>
+	</symbol>
+	<symbol id="tc-i-search" viewBox="0 0 24 24">
+		<circle cx="11" cy="11" r="7"></circle>
+		<path d="m20 20-3.5-3.5"></path>
+	</symbol>
+	<symbol id="tc-i-bell" viewBox="0 0 24 24">
+		<path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"></path>
+		<path d="M10.3 20a2 2 0 0 0 3.4 0"></path>
+	</symbol>
+	<symbol id="tc-i-menu" viewBox="0 0 24 24">
+		<path d="M4 6h16M4 12h16M4 18h16"></path>
+	</symbol>
+	<symbol id="tc-i-gift" viewBox="0 0 24 24">
+		<rect x="3" y="8" width="18" height="4" rx="1"></rect>
+		<path d="M12 8v13M5 12v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"></path>
+	</symbol>
+	<symbol id="tc-i-monitor" viewBox="0 0 24 24">
+		<rect x="3" y="4" width="18" height="12" rx="2"></rect>
+		<path d="M8 20h8M12 16v4"></path>
+	</symbol>
+	<symbol id="tc-i-laptop" viewBox="0 0 24 24">
+		<rect x="4" y="5" width="16" height="11" rx="2"></rect>
+		<path d="M2 20h20"></path>
+	</symbol>
+	<symbol id="tc-i-briefcase" viewBox="0 0 24 24">
+		<rect x="3" y="7" width="18" height="13" rx="2"></rect>
+		<path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
+	</symbol>
+	<symbol id="tc-i-history" viewBox="0 0 24 24">
+		<path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path>
+		<path d="M3 3v5h5"></path>
+		<path d="M12 7v5l3 2"></path>
+	</symbol>
+	<symbol id="tc-i-arrow" viewBox="0 0 24 24">
+		<path d="M5 12h14M13 6l6 6-6 6"></path>
+	</symbol>
+	<symbol id="tc-i-out" viewBox="0 0 24 24">
+		<path d="M7 17 17 7M8 7h9v9"></path>
+	</symbol>
+	<symbol id="tc-i-database" viewBox="0 0 24 24">
+		<ellipse cx="12" cy="5" rx="8" ry="3"></ellipse>
+		<path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"></path>
+	</symbol>
+	<symbol id="tc-i-cap" viewBox="0 0 24 24">
+		<path d="m2 9 10-5 10 5-10 5z"></path>
+		<path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5M22 9v6"></path>
+	</symbol>
+	<symbol id="tc-i-award" viewBox="0 0 24 24">
+		<circle cx="12" cy="9" r="5.5"></circle>
+		<path d="m8.5 13.5-1.5 7.5 5-3 5 3-1.5-7.5"></path>
+	</symbol>
+	<symbol id="tc-i-link" viewBox="0 0 24 24">
+		<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path>
+		<path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path>
+	</symbol>
+	<symbol id="tc-i-server" viewBox="0 0 24 24">
+		<rect x="3" y="4" width="18" height="7" rx="2"></rect>
+		<rect x="3" y="13" width="18" height="7" rx="2"></rect>
+		<path d="M7 7.5h.01M7 16.5h.01"></path>
+	</symbol>
+	<symbol id="tc-i-truck" viewBox="0 0 24 24">
+		<path d="M2 6h11v10H2z"></path>
+		<path d="M13 9h4l4 4v3h-8"></path>
+		<circle cx="7" cy="18" r="2"></circle>
+		<circle cx="17" cy="18" r="2"></circle>
+	</symbol>
+	<symbol id="tc-i-layers" viewBox="0 0 24 24">
+		<path d="m12 3 9 5-9 5-9-5z"></path>
+		<path d="m3 13 9 5 9-5"></path>
+	</symbol>
+	<symbol id="tc-i-building" viewBox="0 0 24 24">
+		<rect x="5" y="3" width="14" height="18" rx="1.5"></rect>
+		<path d="M9 8h2M13 8h2M9 12h2M13 12h2M10 21v-4h4v4"></path>
+	</symbol>
+	<symbol id="tc-i-hourglass" viewBox="0 0 24 24">
+		<path d="M6 2h12M6 22h12M7 2c0 5 5 6 5 10s-5 5-5 10M17 2c0 5-5 6-5 10s5 5 5 10"></path>
+	</symbol>
+	<symbol id="tc-i-x" viewBox="0 0 24 24">
+		<path d="M6 6l12 12M18 6 6 18"></path>
+	</symbol>
+	<symbol id="tc-i-return" viewBox="0 0 24 24">
+		<path d="M9 14 4 9l5-5"></path>
+		<path d="M4 9h10a6 6 0 0 1 0 12h-3"></path>
+	</symbol>
+	<symbol id="tc-i-sort" viewBox="0 0 24 24">
+		<path d="M8 9l4-4 4 4M8 15l4 4 4-4"></path>
+	</symbol>
+</svg>
 
-@section Scripts{
-    
-    </script>
+
+@section Scripts {
+
+	<script>
+		(function () {
+			const modal  = document.getElementById('wfModal');
+			const body   = document.getElementById('wfBody');
+			const title  = document.getElementById('wfTitle');
+			const search = document.getElementById('wfSearch');
+			const titles = {
+				total: 'My team', present: 'Present', ontime: 'Present – On time',
+				late: 'Present – Late', od: 'On duty (OD)', leave: 'On leave', absent: 'Absent'
+			};
+
+			async function load(cat) {
+				title.textContent = titles[cat] || 'Employees';
+				search.value = '';
+				body.innerHTML = '<p style="padding:20px;color:#667085">Loading…</p>';
+				modal.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
+
+				try {
+					const r = await fetch('@Url.Action("TeamWorkforceList", "Home")?category=' + encodeURIComponent(cat));
+					if (!r.ok) throw new Error(r.status);
+					body.innerHTML = await r.text();
+				} catch (e) {
+					body.innerHTML = '<p style="padding:20px;color:#b42318">Could not load employees.</p>';
+				}
+			}
+
+			function open(cat) { modal.hidden = false; document.body.style.overflow = 'hidden'; load(cat); }
+			function close()   { modal.hidden = true;  document.body.style.overflow = ''; }
+
+			document.querySelectorAll('.tc-clickable').forEach(el => {
+				const handler = e => { e.stopPropagation(); open(el.dataset.cat); };
+				el.addEventListener('click', handler);
+				el.addEventListener('keydown', e => {
+					if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(e); }
+				});
+			});
+
+			modal.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => load(c.dataset.cat)));
+			modal.querySelector('.wf-close').addEventListener('click', close);
+			modal.addEventListener('click', e => { if (e.target === modal) close(); });
+			document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) close(); });
+
+			search.addEventListener('input', () => {
+				const q = search.value.toLowerCase();
+				body.querySelectorAll('tbody tr').forEach(tr => tr.hidden = !tr.textContent.toLowerCase().includes(q));
+			});
+		})();
+	</script>
+	<script>
+		(function () {
+			const dept = document.getElementById('tc-fDept');
+			const pri  = document.getElementById('tc-fPri');
+			const rows = [...document.querySelectorAll('#tc-reqTable tbody tr')];
+			const cnt  = document.getElementById('tc-reqCount');
+			const none = document.getElementById('tc-reqEmpty');
+			if (!dept || !pri) return;
+
+			function apply() {
+				let shown = 0;
+				rows.forEach(r => {
+					const ok = (!dept.value || r.dataset.dept === dept.value) &&
+							   (!pri.value  || r.dataset.priority === pri.value);
+					r.hidden = !ok;
+					if (ok) shown++;
+				});
+				cnt.textContent = 'Showing ' + shown + ' of ' + rows.length + ' pending requests';
+				none.hidden = shown > 0;
+			}
+			dept.addEventListener('change', apply);
+			pri.addEventListener('change', apply);
+		})();
+	</script>
 }
 
 
